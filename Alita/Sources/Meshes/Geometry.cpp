@@ -10,17 +10,11 @@ NS_RX_BEGIN
 
 Geometry::Geometry()
 {
-    std::memset(vertexBuffers_, 0, sizeof(vertexBuffers_[0]) * VertexBufferKindCount);
 }
 
-void Geometry::SetVertexBuffer(VertexBufferKind vertexBufferKind, VertexBuffer* buffer)
+void Geometry::AppendVertexBuffer(VertexBuffer* buffer)
 {
-    vertexBuffers_[(int)vertexBufferKind] = buffer;
-}
-
-VertexBuffer* Geometry::GetVertexBuffer(VertexBufferKind vertexBufferKind)
-{
-    return vertexBuffers_[(int)vertexBufferKind];
+    vbStreams_.push_back(buffer);
 }
 
 NS_RX_END

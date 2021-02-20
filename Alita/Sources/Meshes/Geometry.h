@@ -10,17 +10,25 @@
 
 NS_RX_BEGIN
 
+class MeshComponentBuilder;
+
 class Geometry
 {
 public:
     Geometry();
     
-    void SetVertexBuffer(VertexBufferKind vertexBufferKind, VertexBuffer* buffer);
+    void AppendVertexBuffer(VertexBuffer* buffer);
     
-    VertexBuffer* GetVertexBuffer(VertexBufferKind vertexBufferKind);
+    const std::vector<VertexBuffer*>& GetVBStreams()
+    {
+        return vbStreams_;
+    }
     
 protected:
-    VertexBuffer* vertexBuffers_[VertexBufferKindCount];
+    std::vector<VertexBuffer*> vbStreams_;
+    std::vector<std::uint32_t> indexBuffer_;
+
+    friend class MeshComponentBuilder;
 };
 
 NS_RX_END

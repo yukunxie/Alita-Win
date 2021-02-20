@@ -11,11 +11,11 @@
 
 NS_RX_BEGIN
 
-enum VertexBufferKind
+enum VertexBufferAttriKind
 {
     POSITION = 0x1, // xyz
-    TEXCOORD = 0x2, // uv 2floats
-    DIFFUSE  = 0x4, // rgba 4byte
+    DIFFUSE  = 0x2, // rgba 4byte
+    TEXCOORD = 0x4, // uv 2floats
     NORMAL = 0x8,  // xyz
     TANGENT = 0x10, // xyz
     BINORMAL = 0x20, // xyz
@@ -24,8 +24,10 @@ enum VertexBufferKind
 
 constexpr std::uint32_t VertexBufferKindCount = 7;// (std::uint32_t)VertexBufferKind::MAX_COUNT;
 
-class VertexBuffer
+struct VertexBuffer
 {
+    std::uint32_t mask = 0;
+    std::vector<std::uint8_t> buffer;
 };
 
 

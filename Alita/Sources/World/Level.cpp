@@ -5,20 +5,6 @@
 #include "Level.h"
 
 NS_RX_BEGIN
-//
-//void Level::AddObject(SceneComponent* sceneComponent)
-//{
-//    sceneObjects_.insert(sceneObjects_.end(), sceneComponent);
-//}
-//
-//void Level::AddModel(Model* model)
-//{
-//    auto sceneComponent = model->GetComponent<SceneComponent>();
-//    if (sceneComponent)
-//    {
-//        sceneObjects_.insert(sceneObjects_.end(), sceneComponent);
-//    }
-//}
 
 void Level::AddEntity(Entity* entity)
 {

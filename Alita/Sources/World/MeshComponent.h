@@ -11,18 +11,22 @@
 
 NS_RX_BEGIN
 
+class MeshComponentBuilder;
+
 class MeshComponent : public Component
 {
 
 protected:
 	Material* material_ = nullptr;
 	Geometry* geometry_ = nullptr;
+
+	friend class MeshComponentBuilder;
 };
 
 class MeshComponentBuilder
 {
 public:
-	MeshComponent* CreateBox();
+	static MeshComponent* CreateBox();
 };
 
 NS_RX_END

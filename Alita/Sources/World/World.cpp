@@ -10,6 +10,12 @@ NS_RX_BEGIN
 World::World()
 {
 	SetupDefaultCamera();
+
+	auto level = new Level();
+
+	AddLevel(level);
+
+	level->AddEntity(new Model());
 }
 
 void World::SetupDefaultCamera()

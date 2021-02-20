@@ -17,10 +17,7 @@ class Level : public ObjectBase
 {
 public:
     void AddEntity(Entity* entity);
-    /*void AddObject(SceneComponent* sceneComponent);
-    void AddModel(Model* model);*/
 protected:
-    //std::list<SceneComponent*> sceneObjects_;
     std::vector<Entity*> entities_;
 };
 
