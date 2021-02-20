@@ -13,12 +13,28 @@
 
 NS_RX_BEGIN
 
-class Level : public ObjectBase
+class World;
+
+class Level : public Entity
 {
 public:
+    Level(World* world)
+        : owner_(world)
+    {
+    }
+
+    World* GetOwner()
+    {
+        return owner_;
+    }
+
     void AddEntity(Entity* entity);
+
+    void Tick(float dt);
+
 protected:
     std::vector<Entity*> entities_;
+    World* owner_ = nullptr;
 };
 
 NS_RX_END

@@ -360,12 +360,6 @@
     <ClCompile Include="Sources\Types\TData.cpp">
       <Filter>源文件\Sources\Types</Filter>
     </ClCompile>
-    <ClCompile Include="GraphicPipeline.cpp">
-      <Filter>源文件\Sources\Graphics\Private</Filter>
-    </ClCompile>
-    <ClCompile Include="RenderScene.cpp">
-      <Filter>源文件\Sources\Graphics\Private</Filter>
-    </ClCompile>
     <ClCompile Include="Sources\Graphics\Effect.cpp">
       <Filter>源文件\Sources\Graphics\Private</Filter>
     </ClCompile>
@@ -404,6 +398,12 @@
     </ClCompile>
     <ClCompile Include="Sources\Meshes\VertexBuffer.cpp">
       <Filter>源文件\Sources\Meshes</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Graphics\GraphicPipeline.cpp">
+      <Filter>源文件\Sources\Graphics\Private</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Graphics\RenderScene.cpp">
+      <Filter>源文件\Sources\Graphics\Private</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -821,12 +821,6 @@
     <ClInclude Include="Third-Party\glm\ext.hpp">
       <Filter>源文件\Third-Party\glm</Filter>
     </ClInclude>
-    <ClInclude Include="GraphicPipeline.h">
-      <Filter>源文件\Sources\Graphics\Public</Filter>
-    </ClInclude>
-    <ClInclude Include="RenderScene.h">
-      <Filter>源文件\Sources\Graphics\Public</Filter>
-    </ClInclude>
     <ClInclude Include="Sources\Graphics\Effect.h">
       <Filter>源文件\Sources\Graphics\Public</Filter>
     </ClInclude>
@@ -865,6 +859,12 @@
     </ClInclude>
     <ClInclude Include="Sources\Meshes\VertexBuffer.h">
       <Filter>源文件\Sources\Meshes</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Graphics\GraphicPipeline.h">
+      <Filter>源文件\Sources\Graphics\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Graphics\RenderScene.h">
+      <Filter>源文件\Sources\Graphics\Public</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

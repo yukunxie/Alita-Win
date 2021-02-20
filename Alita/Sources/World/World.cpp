@@ -11,7 +11,7 @@ World::World()
 {
 	SetupDefaultCamera();
 
-	auto level = new Level();
+	auto level = new Level(this);
 
 	AddLevel(level);
 
@@ -27,11 +27,12 @@ void World::SetupDefaultCamera()
 	defaultCamera_ = Camera::CreatePerspectiveCamera(45.0f,  800.0f / 1280.0f, 1.f, 1000.0f);
 }
 
-void World::Update(float dt)
+void World::Tick(float dt)
 {
-	auto a = defaultCamera_->GetViewMatrix();
-	auto b = defaultCamera_->GetProjectMatrix();
-	auto c = defaultCamera_->GetMVP();
+	for (auto& level : levels_)
+	{
+		level->Tick(dt);
+	}
 }
 
 

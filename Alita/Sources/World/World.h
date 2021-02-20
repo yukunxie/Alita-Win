@@ -19,7 +19,7 @@ class World : public ObjectBase
 public:
     World();
     
-    void Update(float dt);
+    void Tick(float dt);
     
     void AddLevel(Level* level)
     {

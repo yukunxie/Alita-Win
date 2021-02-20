@@ -14,4 +14,9 @@ void Level::AddEntity(Entity* entity)
 	}
 }
 
+void Level::Tick(float dt)
+{
+
+}
+
 NS_RX_END

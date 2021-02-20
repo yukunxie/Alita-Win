@@ -98,7 +98,7 @@ void Engine::Update(float dt)
     }
     if (!world_)return;
     
-    world_->Update(dt);
+    world_->Tick(dt);
 }
 
 void Engine::RunWithWorld(World* world)

@@ -147,15 +147,15 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Alita.cpp" />
-    <ClCompile Include="GraphicPipeline.cpp" />
-    <ClCompile Include="RenderScene.cpp" />
     <ClCompile Include="Sources\Base\Component.cpp" />
     <ClCompile Include="Sources\Base\Entity.cpp" />
     <ClCompile Include="Sources\Base\ObjectBase.cpp" />
     <ClCompile Include="Sources\Engine\Engine.cpp" />
     <ClCompile Include="Sources\Graphics\Effect.cpp" />
+    <ClCompile Include="Sources\Graphics\GraphicPipeline.cpp" />
     <ClCompile Include="Sources\Graphics\Material.cpp" />
     <ClCompile Include="Sources\Graphics\Pass.cpp" />
+    <ClCompile Include="Sources\Graphics\RenderScene.cpp" />
     <ClCompile Include="Sources\Graphics\Technique.cpp" />
     <ClCompile Include="Sources\Meshes\AbstractMesh.cpp" />
     <ClCompile Include="Sources\Meshes\Buffer.cpp" />
@@ -240,16 +240,16 @@
     <ClCompile Include="Third-Party\StandAlone\StandAlone.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="GraphicPipeline.h" />
-    <ClInclude Include="RenderScene.h" />
     <ClInclude Include="Sources\Base\Component.h" />
     <ClInclude Include="Sources\Base\Entity.h" />
     <ClInclude Include="Sources\Base\Macros.h" />
     <ClInclude Include="Sources\Base\ObjectBase.h" />
     <ClInclude Include="Sources\Engine\Engine.h" />
     <ClInclude Include="Sources\Graphics\Effect.h" />
+    <ClInclude Include="Sources\Graphics\GraphicPipeline.h" />
     <ClInclude Include="Sources\Graphics\Material.h" />
     <ClInclude Include="Sources\Graphics\Pass.h" />
+    <ClInclude Include="Sources\Graphics\RenderScene.h" />
     <ClInclude Include="Sources\Graphics\Technique.h" />
     <ClInclude Include="Sources\Meshes\AbstractMesh.h" />
     <ClInclude Include="Sources\Meshes\Buffer.h" />
