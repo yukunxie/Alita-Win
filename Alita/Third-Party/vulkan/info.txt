@@ -1,0 +1,2 @@
+version: 1.2.162.1
+url: https://sdk.lunarg.com/sdk/download/1.2.162.1/windows/VulkanSDK-1.2.162.1-Installer.exe

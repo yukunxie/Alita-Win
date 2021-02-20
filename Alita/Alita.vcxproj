@@ -1,0 +1,403 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>16.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{da3f01cb-9758-4907-954b-441676bfdc59}</ProjectGuid>
+    <RootNamespace>Alita</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+    <IncludePath>$(ProjectDir)Third-Party\glfw\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(ProjectDir)Third-Party\glfw\lib-vc2019;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+    <IncludePath>$(ProjectDir)Sources;$(ProjectDir)Sources\RHI\;$(ProjectDir)Sources\RHI\Include;$(ProjectDir)Third-Party\OGLCompilersDLL;$(ProjectDir)Third-Party;$(ProjectDir)Third-Party\vulkan\Include;$(ProjectDir)Third-Party\glfw\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(ProjectDir)Third-Party\vulkan\Lib\Win64;$(ProjectDir)Third-Party\glfw\Lib\Win64;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>false</SDLCheck>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="Alita.cpp" />
+    <ClCompile Include="GraphicPipeline.cpp" />
+    <ClCompile Include="RenderScene.cpp" />
+    <ClCompile Include="Sources\Base\Component.cpp" />
+    <ClCompile Include="Sources\Base\Entity.cpp" />
+    <ClCompile Include="Sources\Base\ObjectBase.cpp" />
+    <ClCompile Include="Sources\Engine\Engine.cpp" />
+    <ClCompile Include="Sources\Graphics\Effect.cpp" />
+    <ClCompile Include="Sources\Graphics\Material.cpp" />
+    <ClCompile Include="Sources\Graphics\Pass.cpp" />
+    <ClCompile Include="Sources\Graphics\Technique.cpp" />
+    <ClCompile Include="Sources\Meshes\AbstractMesh.cpp" />
+    <ClCompile Include="Sources\Meshes\Buffer.cpp" />
+    <ClCompile Include="Sources\Meshes\DataBuffer.cpp" />
+    <ClCompile Include="Sources\Meshes\Geometry.cpp" />
+    <ClCompile Include="Sources\Meshes\IndexBuffer.cpp" />
+    <ClCompile Include="Sources\Meshes\Mesh.cpp" />
+    <ClCompile Include="Sources\Meshes\MeshBuilder.cpp" />
+    <ClCompile Include="Sources\Meshes\SubMesh.cpp" />
+    <ClCompile Include="Sources\Meshes\VertexBuffer.cpp" />
+    <ClCompile Include="Sources\Platform\Windows\Windows.cpp" />
+    <ClCompile Include="Sources\RHI\Backend\Vulkan\ShaderHelper.cpp" />
+    <ClCompile Include="Sources\RHI\Backend\Vulkan\VKBindGroup.cpp" />
+    <ClCompile Include="Sources\RHI\Backend\Vulkan\VKBindGroupLayout.cpp" />
+    <ClCompile Include="Sources\RHI\Backend\Vulkan\VKBuffer.cpp" />
+    <ClCompile Include="Sources\RHI\Backend\Vulkan\VKCanvasContext.cpp" />
+    <ClCompile Include="Sources\RHI\Backend\Vulkan\VKCommandBuffer.cpp" />
+    <ClCompile Include="Sources\RHI\Backend\Vulkan\VKCommandEncoder.cpp" />
+    <ClCompile Include="Sources\RHI\Backend\Vulkan\VKDevice.cpp" />
+    <ClCompile Include="Sources\RHI\Backend\Vulkan\VKPipelineLayout.cpp" />
+    <ClCompile Include="Sources\RHI\Backend\Vulkan\VKQueue.cpp" />
+    <ClCompile Include="Sources\RHI\Backend\Vulkan\VKRenderPass.cpp" />
+    <ClCompile Include="Sources\RHI\Backend\Vulkan\VKRenderPassEncoder.cpp" />
+    <ClCompile Include="Sources\RHI\Backend\Vulkan\VKRenderPipeline.cpp" />
+    <ClCompile Include="Sources\RHI\Backend\Vulkan\VKRenderQueue.cpp" />
+    <ClCompile Include="Sources\RHI\Backend\Vulkan\VKSampler.cpp" />
+    <ClCompile Include="Sources\RHI\Backend\Vulkan\VKShader.cpp" />
+    <ClCompile Include="Sources\RHI\Backend\Vulkan\VKSwapChain.cpp" />
+    <ClCompile Include="Sources\RHI\Backend\Vulkan\VKTexture.cpp" />
+    <ClCompile Include="Sources\RHI\Backend\Vulkan\VKTextureView.cpp" />
+    <ClCompile Include="Sources\RHI\Backend\Vulkan\VKTypes.cpp" />
+    <ClCompile Include="Sources\Types\TData.cpp" />
+    <ClCompile Include="Sources\World\Camera.cpp" />
+    <ClCompile Include="Sources\World\Level.cpp" />
+    <ClCompile Include="Sources\World\MeshComponent.cpp" />
+    <ClCompile Include="Sources\World\Model.cpp" />
+    <ClCompile Include="Sources\World\World.cpp" />
+    <ClCompile Include="Third-Party\glslang\GenericCodeGen\CodeGen.cpp" />
+    <ClCompile Include="Third-Party\glslang\GenericCodeGen\Link.cpp" />
+    <ClCompile Include="Third-Party\glslang\MachineIndependent\attribute.cpp" />
+    <ClCompile Include="Third-Party\glslang\MachineIndependent\Constant.cpp" />
+    <ClCompile Include="Third-Party\glslang\MachineIndependent\glslang_tab.cpp" />
+    <ClCompile Include="Third-Party\glslang\MachineIndependent\InfoSink.cpp" />
+    <ClCompile Include="Third-Party\glslang\MachineIndependent\Initialize.cpp" />
+    <ClCompile Include="Third-Party\glslang\MachineIndependent\Intermediate.cpp" />
+    <ClCompile Include="Third-Party\glslang\MachineIndependent\intermOut.cpp" />
+    <ClCompile Include="Third-Party\glslang\MachineIndependent\IntermTraverse.cpp" />
+    <ClCompile Include="Third-Party\glslang\MachineIndependent\iomapper.cpp" />
+    <ClCompile Include="Third-Party\glslang\MachineIndependent\limits.cpp" />
+    <ClCompile Include="Third-Party\glslang\MachineIndependent\linkValidate.cpp" />
+    <ClCompile Include="Third-Party\glslang\MachineIndependent\parseConst.cpp" />
+    <ClCompile Include="Third-Party\glslang\MachineIndependent\ParseContextBase.cpp" />
+    <ClCompile Include="Third-Party\glslang\MachineIndependent\ParseHelper.cpp" />
+    <ClCompile Include="Third-Party\glslang\MachineIndependent\pch.cpp" />
+    <ClCompile Include="Third-Party\glslang\MachineIndependent\PoolAlloc.cpp" />
+    <ClCompile Include="Third-Party\glslang\MachineIndependent\preprocessor\Pp.cpp" />
+    <ClCompile Include="Third-Party\glslang\MachineIndependent\preprocessor\PpAtom.cpp" />
+    <ClCompile Include="Third-Party\glslang\MachineIndependent\preprocessor\PpContext.cpp" />
+    <ClCompile Include="Third-Party\glslang\MachineIndependent\preprocessor\PpScanner.cpp" />
+    <ClCompile Include="Third-Party\glslang\MachineIndependent\preprocessor\PpTokens.cpp" />
+    <ClCompile Include="Third-Party\glslang\MachineIndependent\propagateNoContraction.cpp" />
+    <ClCompile Include="Third-Party\glslang\MachineIndependent\reflection.cpp" />
+    <ClCompile Include="Third-Party\glslang\MachineIndependent\RemoveTree.cpp" />
+    <ClCompile Include="Third-Party\glslang\MachineIndependent\Scan.cpp" />
+    <ClCompile Include="Third-Party\glslang\MachineIndependent\ShaderLang.cpp" />
+    <ClCompile Include="Third-Party\glslang\MachineIndependent\SymbolTable.cpp" />
+    <ClCompile Include="Third-Party\glslang\MachineIndependent\Versions.cpp" />
+    <ClCompile Include="Third-Party\glslang\OSDependent\Windows\main.cpp" />
+    <ClCompile Include="Third-Party\glslang\OSDependent\Windows\ossource.cpp" />
+    <ClCompile Include="Third-Party\OGLCompilersDLL\InitializeDll.cpp" />
+    <ClCompile Include="Third-Party\SPIRV\disassemble.cpp" />
+    <ClCompile Include="Third-Party\SPIRV\doc.cpp" />
+    <ClCompile Include="Third-Party\SPIRV\GlslangToSpv.cpp" />
+    <ClCompile Include="Third-Party\SPIRV\InReadableOrder.cpp" />
+    <ClCompile Include="Third-Party\SPIRV\Logger.cpp" />
+    <ClCompile Include="Third-Party\SPIRV\SpvBuilder.cpp" />
+    <ClCompile Include="Third-Party\SPIRV\SpvPostProcess.cpp" />
+    <ClCompile Include="Third-Party\SPIRV\SPVRemapper.cpp" />
+    <ClCompile Include="Third-Party\SPIRV\SpvTools.cpp" />
+    <ClCompile Include="Third-Party\StandAlone\ResourceLimits.cpp" />
+    <ClCompile Include="Third-Party\StandAlone\spirv-remap.cpp" />
+    <ClCompile Include="Third-Party\StandAlone\StandAlone.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="GraphicPipeline.h" />
+    <ClInclude Include="RenderScene.h" />
+    <ClInclude Include="Sources\Base\Component.h" />
+    <ClInclude Include="Sources\Base\Entity.h" />
+    <ClInclude Include="Sources\Base\Macros.h" />
+    <ClInclude Include="Sources\Base\ObjectBase.h" />
+    <ClInclude Include="Sources\Engine\Engine.h" />
+    <ClInclude Include="Sources\Graphics\Effect.h" />
+    <ClInclude Include="Sources\Graphics\Material.h" />
+    <ClInclude Include="Sources\Graphics\Pass.h" />
+    <ClInclude Include="Sources\Graphics\Technique.h" />
+    <ClInclude Include="Sources\Meshes\AbstractMesh.h" />
+    <ClInclude Include="Sources\Meshes\Buffer.h" />
+    <ClInclude Include="Sources\Meshes\DataBuffer.h" />
+    <ClInclude Include="Sources\Meshes\Geometry.h" />
+    <ClInclude Include="Sources\Meshes\IndexBuffer.h" />
+    <ClInclude Include="Sources\Meshes\Mesh.h" />
+    <ClInclude Include="Sources\Meshes\MeshBuilder.h" />
+    <ClInclude Include="Sources\Meshes\SubMesh.h" />
+    <ClInclude Include="Sources\Meshes\VertexBuffer.h" />
+    <ClInclude Include="Sources\Platform\Platform.h" />
+    <ClInclude Include="Sources\Platform\Windows\Windows.h" />
+    <ClInclude Include="Sources\RHI\Backend\Vulkan\ShaderHelper.h" />
+    <ClInclude Include="Sources\RHI\Backend\Vulkan\VKBindGroup.h" />
+    <ClInclude Include="Sources\RHI\Backend\Vulkan\VKBindGroupLayout.h" />
+    <ClInclude Include="Sources\RHI\Backend\Vulkan\VKBuffer.h" />
+    <ClInclude Include="Sources\RHI\Backend\Vulkan\VKCanvasContext.h" />
+    <ClInclude Include="Sources\RHI\Backend\Vulkan\VKCommandBuffer.h" />
+    <ClInclude Include="Sources\RHI\Backend\Vulkan\VKCommandEncoder.h" />
+    <ClInclude Include="Sources\RHI\Backend\Vulkan\VKDevice.h" />
+    <ClInclude Include="Sources\RHI\Backend\Vulkan\VKPipelineLayout.h" />
+    <ClInclude Include="Sources\RHI\Backend\Vulkan\VKQueue.h" />
+    <ClInclude Include="Sources\RHI\Backend\Vulkan\VKRenderPass.h" />
+    <ClInclude Include="Sources\RHI\Backend\Vulkan\VKRenderPassEncoder.h" />
+    <ClInclude Include="Sources\RHI\Backend\Vulkan\VKRenderPipeline.h" />
+    <ClInclude Include="Sources\RHI\Backend\Vulkan\VKRenderQueue.h" />
+    <ClInclude Include="Sources\RHI\Backend\Vulkan\VKSampler.h" />
+    <ClInclude Include="Sources\RHI\Backend\Vulkan\VKShader.h" />
+    <ClInclude Include="Sources\RHI\Backend\Vulkan\VKSwapChain.h" />
+    <ClInclude Include="Sources\RHI\Backend\Vulkan\VKTexture.h" />
+    <ClInclude Include="Sources\RHI\Backend\Vulkan\VKTextureView.h" />
+    <ClInclude Include="Sources\RHI\Backend\Vulkan\VKTypes.h" />
+    <ClInclude Include="Sources\RHI\Backend\Vulkan\VulkanMarcos.h" />
+    <ClInclude Include="Sources\RHI\Include\BindGroup.h" />
+    <ClInclude Include="Sources\RHI\Include\BindGroupLayout.h" />
+    <ClInclude Include="Sources\RHI\Include\BindingResource.h" />
+    <ClInclude Include="Sources\RHI\Include\Buffer.h" />
+    <ClInclude Include="Sources\RHI\Include\CanvasContext.h" />
+    <ClInclude Include="Sources\RHI\Include\CommandBuffer.h" />
+    <ClInclude Include="Sources\RHI\Include\CommandEncoder.h" />
+    <ClInclude Include="Sources\RHI\Include\Constants.h" />
+    <ClInclude Include="Sources\RHI\Include\Descriptors.h" />
+    <ClInclude Include="Sources\RHI\Include\Device.h" />
+    <ClInclude Include="Sources\RHI\Include\Flags.h" />
+    <ClInclude Include="Sources\RHI\Include\PipelineLayout.h" />
+    <ClInclude Include="Sources\RHI\Include\Queue.h" />
+    <ClInclude Include="Sources\RHI\Include\RenderPass.h" />
+    <ClInclude Include="Sources\RHI\Include\RenderPassEncoder.h" />
+    <ClInclude Include="Sources\RHI\Include\RenderPipeine.h" />
+    <ClInclude Include="Sources\RHI\Include\RenderQueue.h" />
+    <ClInclude Include="Sources\RHI\Include\RenderTarget.h" />
+    <ClInclude Include="Sources\RHI\Include\RHI.h" />
+    <ClInclude Include="Sources\RHI\Include\RHIObjectBase.h" />
+    <ClInclude Include="Sources\RHI\Include\Sampler.h" />
+    <ClInclude Include="Sources\RHI\Include\Shader.h" />
+    <ClInclude Include="Sources\RHI\Include\SwapChain.h" />
+    <ClInclude Include="Sources\RHI\Include\Texture.h" />
+    <ClInclude Include="Sources\RHI\Include\TextureView.h" />
+    <ClInclude Include="Sources\RHI\Include\xxhash64.h" />
+    <ClInclude Include="Sources\RHI\Macros.h" />
+    <ClInclude Include="Sources\Types\TData.h" />
+    <ClInclude Include="Sources\Types\Types.h" />
+    <ClInclude Include="Sources\World\Camera.h" />
+    <ClInclude Include="Sources\World\Level.h" />
+    <ClInclude Include="Sources\World\MeshComponent.h" />
+    <ClInclude Include="Sources\World\Model.h" />
+    <ClInclude Include="Sources\World\World.h" />
+    <ClInclude Include="Third-Party\glm\common.hpp" />
+    <ClInclude Include="Third-Party\glm\exponential.hpp" />
+    <ClInclude Include="Third-Party\glm\ext.hpp" />
+    <ClInclude Include="Third-Party\glm\fwd.hpp" />
+    <ClInclude Include="Third-Party\glm\geometric.hpp" />
+    <ClInclude Include="Third-Party\glm\glm.hpp" />
+    <ClInclude Include="Third-Party\glm\integer.hpp" />
+    <ClInclude Include="Third-Party\glm\mat2x2.hpp" />
+    <ClInclude Include="Third-Party\glm\mat2x3.hpp" />
+    <ClInclude Include="Third-Party\glm\mat2x4.hpp" />
+    <ClInclude Include="Third-Party\glm\mat3x2.hpp" />
+    <ClInclude Include="Third-Party\glm\mat3x3.hpp" />
+    <ClInclude Include="Third-Party\glm\mat3x4.hpp" />
+    <ClInclude Include="Third-Party\glm\mat4x2.hpp" />
+    <ClInclude Include="Third-Party\glm\mat4x3.hpp" />
+    <ClInclude Include="Third-Party\glm\mat4x4.hpp" />
+    <ClInclude Include="Third-Party\glm\matrix.hpp" />
+    <ClInclude Include="Third-Party\glm\packing.hpp" />
+    <ClInclude Include="Third-Party\glm\trigonometric.hpp" />
+    <ClInclude Include="Third-Party\glm\vec2.hpp" />
+    <ClInclude Include="Third-Party\glm\vec3.hpp" />
+    <ClInclude Include="Third-Party\glm\vec4.hpp" />
+    <ClInclude Include="Third-Party\glm\vector_relational.hpp" />
+    <ClInclude Include="Third-Party\glslang\Include\arrays.h" />
+    <ClInclude Include="Third-Party\glslang\Include\BaseTypes.h" />
+    <ClInclude Include="Third-Party\glslang\Include\Common.h" />
+    <ClInclude Include="Third-Party\glslang\Include\ConstantUnion.h" />
+    <ClInclude Include="Third-Party\glslang\Include\InfoSink.h" />
+    <ClInclude Include="Third-Party\glslang\Include\InitializeGlobals.h" />
+    <ClInclude Include="Third-Party\glslang\Include\intermediate.h" />
+    <ClInclude Include="Third-Party\glslang\Include\PoolAlloc.h" />
+    <ClInclude Include="Third-Party\glslang\Include\ResourceLimits.h" />
+    <ClInclude Include="Third-Party\glslang\Include\revision.h" />
+    <ClInclude Include="Third-Party\glslang\Include\ShHandle.h" />
+    <ClInclude Include="Third-Party\glslang\Include\Types.h" />
+    <ClInclude Include="Third-Party\glslang\MachineIndependent\attribute.h" />
+    <ClInclude Include="Third-Party\glslang\MachineIndependent\glslang_tab.cpp.h" />
+    <ClInclude Include="Third-Party\glslang\MachineIndependent\gl_types.h" />
+    <ClInclude Include="Third-Party\glslang\MachineIndependent\Initialize.h" />
+    <ClInclude Include="Third-Party\glslang\MachineIndependent\iomapper.h" />
+    <ClInclude Include="Third-Party\glslang\MachineIndependent\LiveTraverser.h" />
+    <ClInclude Include="Third-Party\glslang\MachineIndependent\localintermediate.h" />
+    <ClInclude Include="Third-Party\glslang\MachineIndependent\ParseHelper.h" />
+    <ClInclude Include="Third-Party\glslang\MachineIndependent\parseVersions.h" />
+    <ClInclude Include="Third-Party\glslang\MachineIndependent\pch.h" />
+    <ClInclude Include="Third-Party\glslang\MachineIndependent\preprocessor\PpContext.h" />
+    <ClInclude Include="Third-Party\glslang\MachineIndependent\preprocessor\PpTokens.h" />
+    <ClInclude Include="Third-Party\glslang\MachineIndependent\propagateNoContraction.h" />
+    <ClInclude Include="Third-Party\glslang\MachineIndependent\reflection.h" />
+    <ClInclude Include="Third-Party\glslang\MachineIndependent\RemoveTree.h" />
+    <ClInclude Include="Third-Party\glslang\MachineIndependent\Scan.h" />
+    <ClInclude Include="Third-Party\glslang\MachineIndependent\ScanContext.h" />
+    <ClInclude Include="Third-Party\glslang\MachineIndependent\SymbolTable.h" />
+    <ClInclude Include="Third-Party\glslang\MachineIndependent\Versions.h" />
+    <ClInclude Include="Third-Party\glslang\OSDependent\osinclude.h" />
+    <ClInclude Include="Third-Party\glslang\Public\ShaderLang.h" />
+    <ClInclude Include="Third-Party\OGLCompilersDLL\InitializeDll.h" />
+    <ClInclude Include="Third-Party\SPIRV\bitutils.h" />
+    <ClInclude Include="Third-Party\SPIRV\disassemble.h" />
+    <ClInclude Include="Third-Party\SPIRV\doc.h" />
+    <ClInclude Include="Third-Party\SPIRV\GLSL.ext.AMD.h" />
+    <ClInclude Include="Third-Party\SPIRV\GLSL.ext.EXT.h" />
+    <ClInclude Include="Third-Party\SPIRV\GLSL.ext.KHR.h" />
+    <ClInclude Include="Third-Party\SPIRV\GLSL.ext.NV.h" />
+    <ClInclude Include="Third-Party\SPIRV\GLSL.std.450.h" />
+    <ClInclude Include="Third-Party\SPIRV\GlslangToSpv.h" />
+    <ClInclude Include="Third-Party\SPIRV\hex_float.h" />
+    <ClInclude Include="Third-Party\SPIRV\Logger.h" />
+    <ClInclude Include="Third-Party\SPIRV\spirv.hpp" />
+    <ClInclude Include="Third-Party\SPIRV\SpvBuilder.h" />
+    <ClInclude Include="Third-Party\SPIRV\spvIR.h" />
+    <ClInclude Include="Third-Party\SPIRV\SPVRemapper.h" />
+    <ClInclude Include="Third-Party\SPIRV\SpvTools.h" />
+    <ClInclude Include="Third-Party\StandAlone\DirStackFileIncluder.h" />
+    <ClInclude Include="Third-Party\StandAlone\ResourceLimits.h" />
+    <ClInclude Include="Third-Party\StandAlone\Worklist.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Third-Party\glslang\Include\revision.template" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
