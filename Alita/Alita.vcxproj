@@ -128,6 +128,9 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PreBuildEvent>
+      <Command>xcopy /Y /E $(ProjectDir)Sources\Shaders  $(OutDir)Shaders\</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -149,6 +152,7 @@
     <ClCompile Include="Alita.cpp" />
     <ClCompile Include="Sources\Base\Component.cpp" />
     <ClCompile Include="Sources\Base\Entity.cpp" />
+    <ClCompile Include="Sources\Base\FileSystem.cpp" />
     <ClCompile Include="Sources\Base\ObjectBase.cpp" />
     <ClCompile Include="Sources\Engine\Engine.cpp" />
     <ClCompile Include="Sources\Graphics\Effect.cpp" />
@@ -242,6 +246,7 @@
   <ItemGroup>
     <ClInclude Include="Sources\Base\Component.h" />
     <ClInclude Include="Sources\Base\Entity.h" />
+    <ClInclude Include="Sources\Base\FileSystem.h" />
     <ClInclude Include="Sources\Base\Macros.h" />
     <ClInclude Include="Sources\Base\ObjectBase.h" />
     <ClInclude Include="Sources\Engine\Engine.h" />

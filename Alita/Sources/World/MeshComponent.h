@@ -15,6 +15,16 @@ class MeshComponentBuilder;
 
 class MeshComponent : public Component
 {
+public:
+	Material* GetMaterial()
+	{
+		return material_;
+	}
+
+	Geometry* GetGeometry()
+	{
+		return geometry_;
+	}
 
 protected:
 	Material* material_ = nullptr;

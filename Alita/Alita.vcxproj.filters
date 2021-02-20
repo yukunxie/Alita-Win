@@ -405,6 +405,9 @@
     <ClCompile Include="Sources\Graphics\RenderScene.cpp">
       <Filter>源文件\Sources\Graphics\Private</Filter>
     </ClCompile>
+    <ClCompile Include="Sources\Base\FileSystem.cpp">
+      <Filter>源文件\Sources\Base\Private</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Sources\RHI\Include\BindGroup.h">
@@ -865,6 +868,9 @@
     </ClInclude>
     <ClInclude Include="Sources\Graphics\RenderScene.h">
       <Filter>源文件\Sources\Graphics\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Base\FileSystem.h">
+      <Filter>源文件\Sources\Base\Public</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

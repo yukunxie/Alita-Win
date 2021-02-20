@@ -8,6 +8,8 @@
 #include "RHI.h"
 #include "Base/Macros.h"
 
+#include "Graphics/RenderScene.h"
+
 #include <functional>
 #include <map>
 
@@ -28,12 +30,31 @@ class Engine
 protected:
     Engine(void* data);
 
+    bool Init();
+
 public:
     virtual ~Engine();
     
     static Engine* CreateEngine(void* data);
     
     static Engine* GetEngine();
+
+public:
+
+    RHI::Device* GetGPUDevice()
+    {
+        return gpuDevice_;
+    }
+
+    RenderScene* GetRenderScene()
+    {
+        return renderScene_;
+    }
+
+    RHI::SwapChain* GetSwapchain()
+    {
+        return rhiSwapChain_;
+    }
 
 public:
     void Update(float dt);
@@ -47,6 +68,7 @@ public:
 protected:
     static Engine* engine_;
     World* world_ = nullptr;
+    RenderScene* renderScene_ = nullptr;
     
     std::uint32_t schedulerIDRecorder_ = 0;
     std::map<std::uint32_t, SchedulerEntity> schedulers_;

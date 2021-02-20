@@ -23,6 +23,11 @@ public:
     {
         return vbStreams_;
     }
+
+    std::vector<std::uint32_t>* GetIndexBuffer()
+    {
+        return &indexBuffer_;
+    }
     
 protected:
     std::vector<VertexBuffer*> vbStreams_;

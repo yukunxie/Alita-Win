@@ -3,9 +3,11 @@
 //
 
 #include "Engine.h"
-#include "../World/World.h"
+#include "World/World.h"
+#include "Base/FileSystem.h"
 
 #include "Backend/Vulkan/VKCanvasContext.h"
+#include "Backend/Vulkan/ShaderHelper.h"
 
 NS_RX_BEGIN
 
@@ -22,16 +24,26 @@ Engine::Engine(void* data)
         swapChainDescriptor.format = RHI::TextureFormat::BGRA8UNORM;
         rhiSwapChain_ = rhiCanvasContext_->ConfigureSwapChain(swapChainDescriptor);
 
-        rhiCommandEncoder_ = gpuDevice_->CreateCommandEncoder();
+        //rhiCommandEncoder_ = gpuDevice_->CreateCommandEncoder();
     }
+}
+
+bool Engine::Init()
+{
+    auto data = FileSystem::GetInstance()->GetFileData("Shaders/shader.vert.gl");
+
+    auto spirv = RHI::CompileGLSLToSPIRV((const char*)data.data(), RHI::ShaderType::VERTEX);
 
     world_ = new World();
+    renderScene_ = new RenderScene();
+    return true;
 }
 
 Engine* Engine::CreateEngine(void* data)
 {
     RX_ASSERT(nullptr == engine_);
     Engine::engine_ = new Engine(data);
+    engine_->Init();
     return GetEngine();
 }
 
@@ -50,55 +62,57 @@ Engine::~Engine()
 
 void Engine::Update(float dt)
 {
-    {
-        std::vector<RHI::RenderPassColorAttachmentDescriptor> colorAttachments = {
-        RHI::RenderPassColorAttachmentDescriptor{
-            .attachment = rhiSwapChain_->GetCurrentTexture(),
-            .resolveTarget = nullptr,
-            .loadValue = {1.0f, 0.0f, 0.0f, 1.0f},
-            .loadOp = RHI::LoadOp::CLEAR,
-            .storeOp = RHI::StoreOp::STORE,
-        }
-        };
+    //{
+    //    std::vector<RHI::RenderPassColorAttachmentDescriptor> colorAttachments = {
+    //    RHI::RenderPassColorAttachmentDescriptor{
+    //        .attachment = rhiSwapChain_->GetCurrentTexture(),
+    //        .resolveTarget = nullptr,
+    //        .loadValue = {1.0f, 0.0f, 0.0f, 1.0f},
+    //        .loadOp = RHI::LoadOp::CLEAR,
+    //        .storeOp = RHI::StoreOp::STORE,
+    //    }
+    //    };
 
-        RHI::RenderPassDescriptor renderPassDescriptor;
-        renderPassDescriptor.colorAttachments = std::move(colorAttachments);
-        renderPassDescriptor.depthStencilAttachment = {
-            .attachment = rhiDSTextureView_,
-            .depthLoadOp = RHI::LoadOp::CLEAR,
-            .depthStoreOp = RHI::StoreOp::STORE,
-            .depthLoadValue = 1.0f,
-            .stencilLoadOp = RHI::LoadOp::CLEAR,
-            .stencilStoreOp = RHI::StoreOp::STORE,
-            .stencilLoadValue = 0,
-        };
+    //    RHI::RenderPassDescriptor renderPassDescriptor;
+    //    renderPassDescriptor.colorAttachments = std::move(colorAttachments);
+    //    renderPassDescriptor.depthStencilAttachment = {
+    //        .attachment = rhiDSTextureView_,
+    //        .depthLoadOp = RHI::LoadOp::CLEAR,
+    //        .depthStoreOp = RHI::StoreOp::STORE,
+    //        .depthLoadValue = 1.0f,
+    //        .stencilLoadOp = RHI::LoadOp::CLEAR,
+    //        .stencilStoreOp = RHI::StoreOp::STORE,
+    //        .stencilLoadValue = 0,
+    //    };
 
-        auto renderPassEncoder = rhiCommandEncoder_->BeginRenderPass(renderPassDescriptor);
+    //    auto renderPassEncoder = rhiCommandEncoder_->BeginRenderPass(renderPassDescriptor);
 
-        //// Render a tile with texture.
-        //{
-        //    renderPassEncoder->SetGraphicPipeline(rhiGraphicPipeline_);
-        //    renderPassEncoder->SetVertexBuffer(rhiVertexBuffer_, 0);
-        //    renderPassEncoder->SetIndexBuffer(rhiIndexBuffer_, 0);
-        //    renderPassEncoder->SetBindGroup(0, rhiBindGroup_);
-        //    const auto& extent = rhiSwapChain_->GetExtent();
-        //    renderPassEncoder->SetViewport(0, 0, extent.width, extent.height, 0, 1);
-        //    renderPassEncoder->SetScissorRect(0, 0, extent.width, extent.height);
-        //    renderPassEncoder->DrawIndxed(36, 0);
-        //}
+    //    //// Render a tile with texture.
+    //    //{
+    //    //    renderPassEncoder->SetGraphicPipeline(rhiGraphicPipeline_);
+    //    //    renderPassEncoder->SetVertexBuffer(rhiVertexBuffer_, 0);
+    //    //    renderPassEncoder->SetIndexBuffer(rhiIndexBuffer_, 0);
+    //    //    renderPassEncoder->SetBindGroup(0, rhiBindGroup_);
+    //    //    const auto& extent = rhiSwapChain_->GetExtent();
+    //    //    renderPassEncoder->SetViewport(0, 0, extent.width, extent.height, 0, 1);
+    //    //    renderPassEncoder->SetScissorRect(0, 0, extent.width, extent.height);
+    //    //    renderPassEncoder->DrawIndxed(36, 0);
+    //    //}
 
-        renderPassEncoder->EndPass();
+    //    renderPassEncoder->EndPass();
 
-        auto commandBuffer = rhiCommandEncoder_->Finish();
+    //    auto commandBuffer = rhiCommandEncoder_->Finish();
 
-        gpuDevice_->GetQueue()->Submit(commandBuffer);
+    //    gpuDevice_->GetQueue()->Submit(commandBuffer);
 
-        // Render to screen.
-        rhiSwapChain_->Present(gpuDevice_->GetQueue());
-    }
+    //    // Render to screen.
+    //    rhiSwapChain_->Present(gpuDevice_->GetQueue());
+    //}
     if (!world_)return;
     
     world_->Tick(dt);
+
+    renderScene_->SubmitGPU();
 }
 
 void Engine::RunWithWorld(World* world)
