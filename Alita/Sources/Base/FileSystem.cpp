@@ -58,7 +58,7 @@ std::string FileSystem::GetAbsFilePath(const char* filename)
 }
 
 
-std::vector<std::uint8_t> FileSystem::GetFileData(const char* filename)
+TData FileSystem::GetBinaryData(const char* filename)
 {
 	const std::string& absFilePath = GetAbsFilePath(filename);
 	std::ifstream input(absFilePath.c_str(), std::ios::binary);
@@ -74,6 +74,14 @@ std::vector<std::uint8_t> FileSystem::GetFileData(const char* filename)
 	
 	input.read((char*)data.data(), size);
 	return std::move(data);
+}
+
+std::string FileSystem::GetStringData(const char* filename)
+{
+	const TData& data = GetBinaryData(filename);
+	std::string ret = "";
+	ret.append((const char*)data.data(), data.size());
+	return ret;
 }
 
 NS_RX_END

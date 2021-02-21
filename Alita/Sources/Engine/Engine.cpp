@@ -30,9 +30,11 @@ Engine::Engine(void* data)
 
 bool Engine::Init()
 {
-    auto data = FileSystem::GetInstance()->GetFileData("Shaders/shader.vert.gl");
+    std::string shaderText = FileSystem::GetInstance()->GetStringData("Shaders/shader.vert.gl");
 
-    auto spirv = RHI::CompileGLSLToSPIRV((const char*)data.data(), RHI::ShaderType::VERTEX);
+    auto spirv = RHI::CompileGLSLToSPIRV(shaderText, RHI::ShaderType::VERTEX);
+
+    //gpuDevice_->CreateShaderModule()
 
     world_ = new World();
     renderScene_ = new RenderScene();

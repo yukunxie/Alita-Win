@@ -119,13 +119,13 @@ const TBuiltInResource DefaultTBuiltInResource = {
                            /* .generalConstantMatrixVectorIndexing = */ 1,
                        }};
 
-std::vector<std::uint32_t>
+std::vector<std::uint8_t>
 CompileGLSLToSPIRV(const std::string &code, ShaderType type, const std::string &includeSearchPath)
 {
     return CompileGLSLToSPIRV(code.c_str(), type, includeSearchPath);
 }
 
-std::vector<std::uint32_t>
+std::vector<std::uint8_t>
 CompileGLSLToSPIRV(const char* code, ShaderType type, const std::string &includeSearchPath)
 {
     if (!glslangInitialized)
@@ -202,8 +202,12 @@ CompileGLSLToSPIRV(const char* code, ShaderType type, const std::string &include
     spv::SpvBuildLogger logger;
     glslang::SpvOptions spvOptions;
     glslang::GlslangToSpv(*Program.getIntermediate(shaderType), spirVShader, &logger, &spvOptions);
+
+    std::vector<std::uint8_t> spirvShaderCode8;
+    spirvShaderCode8.resize(spirVShader.size() * sizeof(spirVShader[0]));
+    memcpy(spirvShaderCode8.data(), spirVShader.data(), spirvShaderCode8.size());
     
-    return spirVShader;
+    return std::move(spirvShaderCode8);
 }
 
 NS_RHI_END

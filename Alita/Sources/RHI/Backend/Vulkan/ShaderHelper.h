@@ -19,9 +19,9 @@ enum class ShaderType
     COMPUTE
 };
 
-std::vector<std::uint32_t> CompileGLSLToSPIRV(const std::string& code, ShaderType type, const std::string& includeSearchPath = "");
+std::vector<std::uint8_t> CompileGLSLToSPIRV(const std::string& code, ShaderType type, const std::string& includeSearchPath = "");
 
-std::vector<std::uint32_t> CompileGLSLToSPIRV(const char* code, ShaderType type, const std::string& includeSearchPath = "");
+std::vector<std::uint8_t> CompileGLSLToSPIRV(const char* code, ShaderType type, const std::string& includeSearchPath = "");
 
 NS_RHI_END
 

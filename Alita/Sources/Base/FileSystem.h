@@ -4,6 +4,7 @@
 
 #include <vector>
 #include <string>
+#include "Types/TData.h"
 
 NS_RX_BEGIN
 
@@ -22,7 +23,9 @@ public:
 
 	std::string GetAbsFilePath(const char* filename);
 
-	std::vector<std::uint8_t> GetFileData(const char* filename);
+	TData GetBinaryData(const char* filename);
+
+	std::string GetStringData(const char* filename);
 
 private:
 	static FileSystem* instance_;
