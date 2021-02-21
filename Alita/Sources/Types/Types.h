@@ -18,7 +18,7 @@ using TColor3 = glm::vec3;
 
 struct TVertex {
     TVector3 pos;
-    TVector3 color;
+    TVector4 color;
     TVector2 texCoord;
 };
 

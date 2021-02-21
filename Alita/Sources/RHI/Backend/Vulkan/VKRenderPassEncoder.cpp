@@ -196,7 +196,7 @@ void VKRenderPassEncoder::SetGraphicPipeline(const RenderPipeline* graphicPipeli
 void VKRenderPassEncoder::SetIndexBuffer(const Buffer* buffer, std::uint32_t offset)
 {
     VkBuffer vkBuffer = ((VKBuffer*) buffer)->GetNative();
-    vkCmdBindIndexBuffer(vkCommandBuffer_, vkBuffer, offset, VK_INDEX_TYPE_UINT16);
+    vkCmdBindIndexBuffer(vkCommandBuffer_, vkBuffer, offset, VK_INDEX_TYPE_UINT32);
 }
 
 void

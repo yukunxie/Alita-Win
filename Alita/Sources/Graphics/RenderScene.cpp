@@ -4,6 +4,8 @@
 #include "Base/FileSystem.h"
 #include "Backend/Vulkan/ShaderHelper.h"
 
+#include <chrono>
+
 NS_RX_BEGIN
 
 struct UniformBufferObject
@@ -83,7 +85,7 @@ RenderScene::RenderScene()
 			renderPipelineDescriptor.depthStencilState = RHI::DepthStencilStateDescriptor{
 				.format = RHI::TextureFormat::DEPTH24PLUS_STENCIL8,
 				.depthWriteEnabled = true,
-				.depthCompare = RHI::CompareFunction::ALWAYS,
+				.depthCompare = RHI::CompareFunction::LESS,
 				.stencilFront = {},
 				.stencilBack = {},
 			};
@@ -148,7 +150,7 @@ RenderScene::RenderScene()
 		ubo.model = glm::rotate(glm::mat4(1.0f), time * glm::radians(90.0f),
 			glm::vec3(0.0f, 0.0f, 1.0f));
 		ubo.view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f),
-			glm::vec3(0.0f, 0.0f, 1.0f));
+			glm::vec3(0.0f, 1.0f, 0.0f));
 		ubo.proj = glm::perspective(glm::radians(45.0f), float(viewport.width) /
 			(float)viewport.height, 0.1f,
 			10.0f);
@@ -166,6 +168,9 @@ RenderScene::RenderScene()
 			std::uint8_t* pData = (std::uint8_t*)rhiUniformBuffer_->MapWriteAsync();
 			memcpy(pData, &ubo, bufferSize);
 			rhiUniformBuffer_->Unmap();
+
+			
+			
 		}
 
 		// setup UBO
@@ -189,6 +194,22 @@ RenderScene::RenderScene()
 			};
 			rhiBindGroup_ = rhiDevice_->CreateBindGroup(descriptor);
 		}
+	}
+
+	// Create Depth Stencil texture and textureview
+	{
+		RHI::TextureDescriptor descriptor;
+		{
+			descriptor.sampleCount = 1;
+			descriptor.format = RHI::TextureFormat::DEPTH24PLUS_STENCIL8;
+			descriptor.usage = RHI::TextureUsage::OUTPUT_ATTACHMENT;
+			descriptor.size = {1280, 800};
+			descriptor.arrayLayerCount = 1;
+			descriptor.mipLevelCount = 1;
+			descriptor.dimension = RHI::TextureDimension::TEXTURE_2D;
+		};
+		rhiDSTexture_ = rhiDevice_->CreateTexture(descriptor);
+		rhiDSTextureView_ = rhiDSTexture_->CreateView();
 	}
 
 	
@@ -240,18 +261,60 @@ void RenderScene::AddPrimitive(MeshComponent* mesh)
 	memcpy(pVertexData, buffer->buffer.data(), buffer->buffer.size());
 	rhiVertexBuffer_->Unmap();
 
+	{
+		const void* pData = rhiVertexBuffer_->MapReadAsync();
+		std::vector<float> tmp;
+		tmp.resize(9 * 6 * 4);
+		memcpy(tmp.data(), pData, tmp.size() * 4);
+		rhiVertexBuffer_->Unmap();
+	}
+
+	
+
 	std::uint8_t* pIndexData = (std::uint8_t*)rhiIndexBuffer_->MapWriteAsync();
-	memcpy(pIndexData, geometry->GetIndexBuffer()->data(), geometry->GetIndexBuffer()->size());
+	memcpy(pIndexData, geometry->GetIndexBuffer()->data(), geometry->GetIndexBuffer()->size() * 4);
 	rhiIndexBuffer_->Unmap();
+
+	{
+		const void* pData = rhiIndexBuffer_->MapReadAsync();
+		std::vector<std::uint32_t> tmp;
+		tmp.resize(36);
+		memcpy(tmp.data(), pData, 36 * 4);
+		rhiIndexBuffer_->Unmap();
+	}
+}
+
+void RenderScene::testRotate()
+{
+	static auto startTime = std::chrono::high_resolution_clock::now();
+	auto currentTime = std::chrono::high_resolution_clock::now();
+	float time = std::chrono::duration<float, std::chrono::seconds::period>(
+		currentTime - startTime).count();
+
+	RHI::Extent3D viewport = {1280, 800, 1};
+
+	UniformBufferObject ubo = {};
+	ubo.model = glm::rotate(glm::mat4(1.0f), time * glm::radians(90.0f),
+		glm::vec3(0.0f, 0.0f, 1.0f));
+	ubo.view = glm::lookAt(glm::vec3(.0f, 8.0f, .0f), glm::vec3(0.0f, 0.0f, 0.0f),
+		glm::vec3(0.0f, 0.0f, 1.0f));
+	ubo.proj = glm::perspective(glm::radians(45.0f), viewport.width /
+		(float)viewport.height, 2.0f,
+		20.0f);
+	ubo.proj[1][1] *= -1;
+
+	rhiDevice_->WriteBuffer(rhiUniformBuffer_, &ubo, 0, sizeof(UniformBufferObject));
 }
 
 void RenderScene::SubmitGPU()
 {
+	testRotate();
+
 	std::vector<RHI::RenderPassColorAttachmentDescriptor> colorAttachments = {
 	 RHI::RenderPassColorAttachmentDescriptor{
 		 .attachment = Engine::GetEngine()->GetSwapchain()->GetCurrentTexture(),
 		 .resolveTarget = nullptr,
-		 .loadValue = {1.0f, 1.0f, 0.0f, 1.0f},
+		 .loadValue = {0.0f, 0.0f, 0.0f, 1.0f},
 		 .loadOp = RHI::LoadOp::CLEAR,
 		 .storeOp = RHI::StoreOp::STORE,
 	 }
@@ -260,7 +323,7 @@ void RenderScene::SubmitGPU()
 	RHI::RenderPassDescriptor renderPassDescriptor;
 	renderPassDescriptor.colorAttachments = std::move(colorAttachments);
 	renderPassDescriptor.depthStencilAttachment = {
-		.attachment = nullptr,
+		.attachment = rhiDSTextureView_,
 		.depthLoadOp = RHI::LoadOp::CLEAR,
 		.depthStoreOp = RHI::StoreOp::STORE,
 		.depthLoadValue = 1.0f,

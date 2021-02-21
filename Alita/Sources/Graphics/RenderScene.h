@@ -18,6 +18,8 @@ public:
 
 	void SubmitGPU();
 
+    void testRotate();
+
 protected:
 	/*RHI::Buffer* rhiVertexBuffer_ = nullptr;
 	RHI::Buffer* rhiIndexBuffer_ = nullptr;

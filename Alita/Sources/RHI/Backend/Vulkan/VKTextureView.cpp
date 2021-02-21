@@ -25,6 +25,7 @@ VKTextureView::VKTextureView(VKDevice* device, VKTexture* vkTexture)
 
 	VkImageViewCreateInfo viewInfo;
 	{
+		viewInfo.pNext = nullptr;
 		viewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
 		viewInfo.image = vkTexture->GetNative();
 		viewInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
