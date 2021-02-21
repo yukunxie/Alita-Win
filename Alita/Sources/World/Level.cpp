@@ -16,7 +16,10 @@ void Level::AddEntity(Entity* entity)
 
 void Level::Tick(float dt)
 {
-
+	for (auto it : entities_)
+	{
+		it->Tick(dt);
+	}
 }
 
 NS_RX_END

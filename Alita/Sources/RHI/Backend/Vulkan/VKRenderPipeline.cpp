@@ -26,7 +26,7 @@ VKRenderPipeline::VKRenderPipeline(VKDevice* device, const RenderPipelineDescrip
         shaderStages[0].pNext = nullptr;
         shaderStages[0].flags = 0;
         shaderStages[0].stage = VK_SHADER_STAGE_VERTEX_BIT;
-        shaderStages[0].module = RHI_CAST(const VKShader*, vertexStageInfo.module)->GetNative();
+        shaderStages[0].module = RHI_CAST(const VKShader*, vertexStageInfo.shaderModule)->GetNative();
         shaderStages[0].pName = vertexStageInfo.entryPoint.c_str();
         shaderStages[0].pSpecializationInfo = nullptr;
         
@@ -34,7 +34,7 @@ VKRenderPipeline::VKRenderPipeline(VKDevice* device, const RenderPipelineDescrip
         shaderStages[1].pNext = nullptr;
         shaderStages[1].flags = 0;
         shaderStages[1].stage = VK_SHADER_STAGE_FRAGMENT_BIT;
-        shaderStages[1].module = RHI_CAST(const VKShader*, fragmentStageInfo.module)->GetNative();
+        shaderStages[1].module = RHI_CAST(const VKShader*, fragmentStageInfo.shaderModule)->GetNative();
         shaderStages[1].pName = fragmentStageInfo.entryPoint.c_str();
         shaderStages[1].pSpecializationInfo = nullptr;
     }

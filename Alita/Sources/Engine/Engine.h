@@ -41,14 +41,14 @@ public:
 
 public:
 
-    RHI::Device* GetGPUDevice()
+    static RHI::Device* GetGPUDevice()
     {
-        return gpuDevice_;
+        return Engine::GetEngine()->gpuDevice_;
     }
 
-    RenderScene* GetRenderScene()
+    static RenderScene* GetRenderScene()
     {
-        return renderScene_;
+        return Engine::GetEngine()->renderScene_;
     }
 
     RHI::SwapChain* GetSwapchain()

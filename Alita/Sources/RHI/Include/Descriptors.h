@@ -205,7 +205,7 @@ struct RenderPassDescriptor : ObjectDescriptorBase
 
 struct ProgrammableStageDescriptor
 {
-    ShaderModule* module;
+    ShaderModule* shaderModule;
     std::string entryPoint;
     // TODO: other stuff like specialization constants?
 };

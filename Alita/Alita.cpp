@@ -16,7 +16,16 @@
 #pragma comment(lib, "glfw3.lib")
 #pragma comment(lib, "vulkan-1.lib")
 
+#include <Windows.h>
+
 int main() {
+
+    // Console windows
+    {
+        HWND hwnd = GetConsoleWindow();
+        ShowWindow(hwnd, 1);
+    }
+
     glfwInit();
 
     glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);

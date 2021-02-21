@@ -37,6 +37,8 @@ public:
         }
         return nullptr;
     }
+
+    virtual void Tick(float dt) {}
     
 protected:
     std::list<Component*> components_;

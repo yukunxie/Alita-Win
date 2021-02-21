@@ -4,6 +4,7 @@
 
 #include "Model.h"
 #include "MeshComponent.h"
+#include "Engine/Engine.h"
 
 NS_RX_BEGIN
 
@@ -14,6 +15,12 @@ Model::Model()
 
 Model::~Model()
 {
+}
+
+void Model::Tick(float dt)
+{
+    auto mesh = GetComponent<MeshComponent>();
+    Engine::GetEngine()->GetRenderScene()->AddPrimitive(mesh);
 }
 
 NS_RX_END

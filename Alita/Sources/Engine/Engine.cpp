@@ -30,9 +30,9 @@ Engine::Engine(void* data)
 
 bool Engine::Init()
 {
-    std::string shaderText = FileSystem::GetInstance()->GetStringData("Shaders/shader.vert.gl");
+    /*std::string shaderText = FileSystem::GetInstance()->GetStringData("Shaders/shader.vert.gl");
 
-    auto spirv = RHI::CompileGLSLToSPIRV(shaderText, RHI::ShaderType::VERTEX);
+    auto spirv = RHI::CompileGLSLToSPIRV(shaderText, RHI::ShaderType::VERTEX);*/
 
     //gpuDevice_->CreateShaderModule()
 
@@ -64,52 +64,6 @@ Engine::~Engine()
 
 void Engine::Update(float dt)
 {
-    //{
-    //    std::vector<RHI::RenderPassColorAttachmentDescriptor> colorAttachments = {
-    //    RHI::RenderPassColorAttachmentDescriptor{
-    //        .attachment = rhiSwapChain_->GetCurrentTexture(),
-    //        .resolveTarget = nullptr,
-    //        .loadValue = {1.0f, 0.0f, 0.0f, 1.0f},
-    //        .loadOp = RHI::LoadOp::CLEAR,
-    //        .storeOp = RHI::StoreOp::STORE,
-    //    }
-    //    };
-
-    //    RHI::RenderPassDescriptor renderPassDescriptor;
-    //    renderPassDescriptor.colorAttachments = std::move(colorAttachments);
-    //    renderPassDescriptor.depthStencilAttachment = {
-    //        .attachment = rhiDSTextureView_,
-    //        .depthLoadOp = RHI::LoadOp::CLEAR,
-    //        .depthStoreOp = RHI::StoreOp::STORE,
-    //        .depthLoadValue = 1.0f,
-    //        .stencilLoadOp = RHI::LoadOp::CLEAR,
-    //        .stencilStoreOp = RHI::StoreOp::STORE,
-    //        .stencilLoadValue = 0,
-    //    };
-
-    //    auto renderPassEncoder = rhiCommandEncoder_->BeginRenderPass(renderPassDescriptor);
-
-    //    //// Render a tile with texture.
-    //    //{
-    //    //    renderPassEncoder->SetGraphicPipeline(rhiGraphicPipeline_);
-    //    //    renderPassEncoder->SetVertexBuffer(rhiVertexBuffer_, 0);
-    //    //    renderPassEncoder->SetIndexBuffer(rhiIndexBuffer_, 0);
-    //    //    renderPassEncoder->SetBindGroup(0, rhiBindGroup_);
-    //    //    const auto& extent = rhiSwapChain_->GetExtent();
-    //    //    renderPassEncoder->SetViewport(0, 0, extent.width, extent.height, 0, 1);
-    //    //    renderPassEncoder->SetScissorRect(0, 0, extent.width, extent.height);
-    //    //    renderPassEncoder->DrawIndxed(36, 0);
-    //    //}
-
-    //    renderPassEncoder->EndPass();
-
-    //    auto commandBuffer = rhiCommandEncoder_->Finish();
-
-    //    gpuDevice_->GetQueue()->Submit(commandBuffer);
-
-    //    // Render to screen.
-    //    rhiSwapChain_->Present(gpuDevice_->GetQueue());
-    //}
     if (!world_)return;
     
     world_->Tick(dt);

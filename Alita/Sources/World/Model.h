@@ -16,6 +16,10 @@ class Model : public Entity
 public:
     Model();
     virtual ~Model();
+
+public:
+    
+    virtual void Tick(float dt) override;
 };
 
 NS_RX_END
