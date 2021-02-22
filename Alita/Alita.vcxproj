@@ -82,6 +82,7 @@
     <LinkIncremental>true</LinkIncremental>
     <IncludePath>$(ProjectDir)Sources;$(ProjectDir)Sources\RHI\;$(ProjectDir)Sources\RHI\Include;$(ProjectDir)Third-Party\OGLCompilersDLL;$(ProjectDir)Third-Party;$(ProjectDir)Third-Party\vulkan\Include;$(ProjectDir)Third-Party\glfw\include;$(IncludePath)</IncludePath>
     <LibraryPath>$(ProjectDir)Third-Party\vulkan\Lib\Win64;$(ProjectDir)Third-Party\glfw\Lib\Win64;$(LibraryPath)</LibraryPath>
+    <CustomBuildBeforeTargets>Run</CustomBuildBeforeTargets>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
@@ -130,8 +131,13 @@
       <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
-      <Command>xcopy /Y /E $(ProjectDir)Sources\Shaders  $(OutDir)Shaders\</Command>
+      <Command>xcopy /Y /E $(ProjectDir)Sources\Shaders  $(OutDir)Shaders\
+xcopy /Y /E $(ProjectDir)Assets  $(OutDir)Assets\</Command>
     </PreBuildEvent>
+    <CustomBuildStep>
+      <Command>echo $(ProjectDir)
+echo "xxxxx"</Command>
+    </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -162,6 +168,7 @@
     <ClCompile Include="Sources\Graphics\Pass.cpp" />
     <ClCompile Include="Sources\Graphics\RenderScene.cpp" />
     <ClCompile Include="Sources\Graphics\Technique.cpp" />
+    <ClCompile Include="Sources\Loaders\EntityLoader.cpp" />
     <ClCompile Include="Sources\Meshes\AbstractMesh.cpp" />
     <ClCompile Include="Sources\Meshes\Buffer.cpp" />
     <ClCompile Include="Sources\Meshes\DataBuffer.cpp" />
@@ -257,6 +264,7 @@
     <ClInclude Include="Sources\Graphics\Pass.h" />
     <ClInclude Include="Sources\Graphics\RenderScene.h" />
     <ClInclude Include="Sources\Graphics\Technique.h" />
+    <ClInclude Include="Sources\Loaders\EntityLoader.h" />
     <ClInclude Include="Sources\Meshes\AbstractMesh.h" />
     <ClInclude Include="Sources\Meshes\Buffer.h" />
     <ClInclude Include="Sources\Meshes\DataBuffer.h" />

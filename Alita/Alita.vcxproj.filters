@@ -127,6 +127,9 @@
     <Filter Include="源文件\Sources\Meshes">
       <UniqueIdentifier>{2c5ef1c1-2ea3-447f-9d0f-93f2775ee973}</UniqueIdentifier>
     </Filter>
+    <Filter Include="源文件\Sources\Loader">
+      <UniqueIdentifier>{b3f8f413-e811-4933-9217-5c9d28840a79}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Alita.cpp">
@@ -407,6 +410,9 @@
     </ClCompile>
     <ClCompile Include="Sources\Base\FileSystem.cpp">
       <Filter>源文件\Sources\Base\Private</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Loaders\EntityLoader.cpp">
+      <Filter>源文件\Sources\Loader</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -871,6 +877,9 @@
     </ClInclude>
     <ClInclude Include="Sources\Base\FileSystem.h">
       <Filter>源文件\Sources\Base\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Loaders\EntityLoader.h">
+      <Filter>源文件\Sources\Loader</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

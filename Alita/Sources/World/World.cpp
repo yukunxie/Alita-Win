@@ -5,6 +5,8 @@
 #include "World.h"
 #include "glm/glm.hpp"
 
+#include "Loaders/EntityLoader.h"
+
 NS_RX_BEGIN
 
 World::World()
@@ -15,7 +17,15 @@ World::World()
 
 	AddLevel(level);
 
-	level->AddEntity(new Model());
+	auto model = EntityLoader::LoadModelFromGLTF("Models/cube.gltf");
+	if (model)
+	{
+
+	}
+	else
+	{
+		level->AddEntity(new Model());
+	}
 }
 
 void World::SetupDefaultCamera()

@@ -21,6 +21,8 @@ FileSystem::FileSystem()
 		searchPaths_.push_back(workingDir);
 	}
 
+	searchPaths_.push_back(std::string(workingDir) + "/Assets/");
+
 	// todo realxie
 #if defined(WIN32) && defined(_DEBUG)
 	//searchPaths_.push_back(workingDir + std::string("/x64/Debug"));

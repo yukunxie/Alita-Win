@@ -11,6 +11,7 @@ MeshComponent* MeshComponentBuilder::CreateBox()
 {
 	MeshComponent* meshComp = new MeshComponent();
 	meshComp->geometry_ = new Geometry;
+	meshComp->material_ = new Material("Shaders/CommonMaterial.json");
 
 	// test
 	const std::vector<float> vertices = {
