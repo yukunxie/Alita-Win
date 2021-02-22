@@ -18,6 +18,10 @@
 
 #include <Windows.h>
 
+#include "rapidjson/document.h"
+#include "rapidjson/writer.h"
+#include "rapidjson/stringbuffer.h"
+
 int main() {
 
     // Console windows
@@ -25,6 +29,13 @@ int main() {
         HWND hwnd = GetConsoleWindow();
         ShowWindow(hwnd, 1);
     }
+
+    const char* json = "{\"project\":\"rapidjson\",\"stars\":10}";
+    rapidjson::Document d;
+    d.Parse(json);
+
+    rapidjson::Value& s = d["project"];
+    auto k = s.GetString();
 
     glfwInit();
 
