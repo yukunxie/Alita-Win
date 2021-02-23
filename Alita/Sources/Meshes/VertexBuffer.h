@@ -5,14 +5,15 @@
 #ifndef ALITA_VERTEXBUFFER_H
 #define ALITA_VERTEXBUFFER_H
 
-#include "../Base/ObjectBase.h"
+#include "Base/ObjectBase.h"
 
-#include <cstdint>
+#include "Types/TData.h"
 
 NS_RX_BEGIN
 
 enum VertexBufferAttriKind
 {
+    INVALID = 0,
     POSITION = 0x1, // xyz
     DIFFUSE  = 0x2, // rgba 4byte
     TEXCOORD = 0x4, // uv 2floats
@@ -26,8 +27,32 @@ constexpr std::uint32_t VertexBufferKindCount = 7;// (std::uint32_t)VertexBuffer
 
 struct VertexBuffer
 {
-    std::uint32_t mask = 0;
-    std::vector<std::uint8_t> buffer;
+    VertexBufferAttriKind kind = VertexBufferAttriKind::INVALID;
+    TData buffer;
+
+    void InitData(const void* data, std::uint32_t size)
+    {
+        buffer.resize(size);
+        memcpy(buffer.data(), data, size);
+    }
+};
+
+enum IndexType
+{
+    UINT32,
+    UINT16
+};
+
+struct IndexBuffer
+{
+    IndexType indexType = IndexType::UINT32;
+    TData buffer;
+
+    void InitData(const void* data, std::uint32_t size)
+    {
+        buffer.resize(size);
+        memcpy(buffer.data(), data, size);
+    }
 };
 
 

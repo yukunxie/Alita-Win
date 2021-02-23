@@ -24,14 +24,14 @@ public:
         return vbStreams_;
     }
 
-    std::vector<std::uint32_t>* GetIndexBuffer()
+    IndexBuffer* GetIndexBuffer()
     {
         return &indexBuffer_;
     }
     
 protected:
     std::vector<VertexBuffer*> vbStreams_;
-    std::vector<std::uint32_t> indexBuffer_;
+    IndexBuffer indexBuffer_;
 
     friend class MeshComponentBuilder;
 };

@@ -5,7 +5,8 @@
 #ifndef ALITA_PASS_H
 #define ALITA_PASS_H
 
-#include "../Base/ObjectBase.h"
+#include "Base/ObjectBase.h"
+#include "RHI.h"
 
 NS_RX_BEGIN
 
@@ -18,8 +19,23 @@ enum class PassType
 
 class Pass : public ObjectBase
 {
+public:
+    void SetupOutputAttachment(std::uint32_t index, RHI::TextureView* attachment)
+    {
+        attachments_.push_back({ index, attachment });
+    }
+    virtual void Execute() = 0;
+
 protected:
-    PassType passType_ = PassType::OPAQUE;
+    std::vector<std::pair<std::uint32_t, RHI::TextureView*>> attachments_;
+};
+
+class OpaquePass : public Pass
+{
+    virtual void Execute() override
+    {
+
+    }
 };
 
 NS_RX_END

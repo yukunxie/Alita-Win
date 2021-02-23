@@ -414,6 +414,9 @@
     <ClCompile Include="Sources\Loaders\EntityLoader.cpp">
       <Filter>源文件\Sources\Loader</Filter>
     </ClCompile>
+    <ClCompile Include="Sources\Graphics\RenderObject.cpp">
+      <Filter>源文件\Sources\Graphics\Private</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Sources\RHI\Include\BindGroup.h">
@@ -880,6 +883,9 @@
     </ClInclude>
     <ClInclude Include="Sources\Loaders\EntityLoader.h">
       <Filter>源文件\Sources\Loader</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Graphics\RenderObject.h">
+      <Filter>源文件\Sources\Graphics\Public</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

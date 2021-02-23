@@ -269,10 +269,8 @@ void RenderScene::AddPrimitive(MeshComponent* mesh)
 		rhiVertexBuffer_->Unmap();
 	}
 
-	
-
-	std::uint8_t* pIndexData = (std::uint8_t*)rhiIndexBuffer_->MapWriteAsync();
-	memcpy(pIndexData, geometry->GetIndexBuffer()->data(), geometry->GetIndexBuffer()->size() * 4);
+	/*std::uint8_t* pIndexData = (std::uint8_t*)rhiIndexBuffer_->MapWriteAsync();
+	memcpy(pIndexData, geometry->GetIndexBuffer()->buffer->data(), geometry->GetIndexBuffer()->buffer->size());
 	rhiIndexBuffer_->Unmap();
 
 	{
@@ -281,7 +279,7 @@ void RenderScene::AddPrimitive(MeshComponent* mesh)
 		tmp.resize(36);
 		memcpy(tmp.data(), pData, 36 * 4);
 		rhiIndexBuffer_->Unmap();
-	}
+	}*/
 }
 
 void RenderScene::testRotate()
