@@ -17,15 +17,15 @@ Engine::Engine(void* data)
 {
     gpuDevice_ = RHI::CreateDeviceHelper(RHI::DeviceType::VULKAN, data);
 
-    {
-        rhiCanvasContext_ = new RHI::VKCanvasContext();
-        RHI::SwapChainDescriptor swapChainDescriptor;
-        swapChainDescriptor.device = gpuDevice_;
-        swapChainDescriptor.format = RHI::TextureFormat::BGRA8UNORM;
-        rhiSwapChain_ = rhiCanvasContext_->ConfigureSwapChain(swapChainDescriptor);
+    //{
+    //    rhiCanvasContext_ = new RHI::VKCanvasContext();
+    //    RHI::SwapChainDescriptor swapChainDescriptor;
+    //    swapChainDescriptor.device = gpuDevice_;
+    //    swapChainDescriptor.format = RHI::TextureFormat::BGRA8UNORM;
+    //    rhiSwapChain_ = rhiCanvasContext_->ConfigureSwapChain(swapChainDescriptor);
 
-        //rhiCommandEncoder_ = gpuDevice_->CreateCommandEncoder();
-    }
+    //    //rhiCommandEncoder_ = gpuDevice_->CreateCommandEncoder();
+    //}
 }
 
 bool Engine::Init()

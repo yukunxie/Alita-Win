@@ -20,19 +20,39 @@ enum class PassType
 class Pass : public ObjectBase
 {
 public:
+    void SetupDepthStencilAttachemnt(RHI::TextureView* attachment)
+    {
+        dsAttachment_ = attachment;
+    }
+
     void SetupOutputAttachment(std::uint32_t index, RHI::TextureView* attachment)
     {
         attachments_.push_back({ index, attachment });
     }
-    virtual void Execute() = 0;
+
+    void Reset()
+    {
+        attachments_.clear();
+        dsAttachment_ = nullptr;
+    }
+
+    virtual void Execute(RHI::CommandEncoder* cmdEncoder) = 0;
 
 protected:
     std::vector<std::pair<std::uint32_t, RHI::TextureView*>> attachments_;
+    RHI::TextureView* dsAttachment_ = nullptr;
+};
+
+class IgniterPass : public Pass
+{
+public:
+    virtual void Execute(RHI::CommandEncoder* cmdEncoder) override;
 };
 
 class OpaquePass : public Pass
 {
-    virtual void Execute() override
+public:
+    virtual void Execute(RHI::CommandEncoder* cmdEncoder) override
     {
 
     }

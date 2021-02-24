@@ -4,6 +4,7 @@
 
 #include "Base/Macros.h"
 #include "World/MeshComponent.h"
+#include "GraphicPipeline.h"
 
 NS_RX_BEGIN
 
@@ -21,6 +22,9 @@ public:
     void testRotate();
 
 protected:
+
+    GraphicPipeline* graphicPipeline_ = nullptr;
+
 	/*RHI::Buffer* rhiVertexBuffer_ = nullptr;
 	RHI::Buffer* rhiIndexBuffer_ = nullptr;
 	RHI::CommandEncoder* rhiCommandEncoder_ = nullptr;
