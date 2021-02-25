@@ -19,6 +19,8 @@ RenderScene::RenderScene()
 {
 	graphicPipeline_ = new GraphicPipeline();
 
+	new Material("Shaders/CommonMaterial.json");
+
 	return;
 
 	//rhiDevice_ = Engine::GetGPUDevice();

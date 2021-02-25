@@ -9,6 +9,7 @@
 #include "Base/FileSystem.h"
 #include "Effect.h"
 
+#include "rapidjson/document.h"
 
 #include <list>
 
@@ -18,8 +19,17 @@ class Material : public ObjectBase
 {
 public:
     Material(const std::string& configFilename = "");
+
+    virtual void Build() {}
+
+protected:
+    RHI::BindGroupLayout* CreateBindGroupLayout(const rapidjson::Document& doc);
+
 protected:
     Effect* effect_ = nullptr;
+
+    // RHI
+    RHI::BindGroupLayout* rhiBindGroupLayout_ = nullptr;
 };
 
 NS_RX_END

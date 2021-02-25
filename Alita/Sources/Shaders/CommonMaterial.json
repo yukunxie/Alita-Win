@@ -22,33 +22,31 @@
             "location": 2
         }
     ],
-    "buffers": {
-        "locals": [
-            {
-                "name": "TransInfo",
-                "binding": 0,
-                "format": "Buffer",
-                "fileds": [
-                    {
-                        "name" : "model",
-                        "format": "mat4"
-                    },
-                    {
-                        "name" : "view",
-                        "format": "mat4"
-                    },
-                    {
-                        "name" : "proj",
-                        "format": "mat4"
-                    }
-                ]
-            },
-            {
-                "name": "texSampler",
-                "binding": 1,
-                "format": "Sampler2D",
-                "uri": "Textures/texture.jpg"
-            }
-        ]
-    }
+    "bindings": [
+        {
+            "name": "TransInfo",
+            "binding": 0,
+            "format": "Buffer",
+            "fileds": [
+                {
+                    "name": "model",
+                    "format": "mat4"
+                },
+                {
+                    "name": "view",
+                    "format": "mat4"
+                },
+                {
+                    "name": "proj",
+                    "format": "mat4"
+                }
+            ]
+        },
+        {
+            "name": "texSampler",
+            "binding": 1,
+            "format": "Sampler2D",
+            "uri": "Textures/texture.jpg"
+        }
+    ]
 }
