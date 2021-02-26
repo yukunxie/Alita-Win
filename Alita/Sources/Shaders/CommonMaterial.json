@@ -1,52 +1,56 @@
 {
-    "name": "CommonMaterial",
-    "code": {
-        "vs": "Shaders/shader.vert.gl",
-        "fs": "Shaders/shader.frag.gl"
+  "name": "CommonMaterial",
+  "code": {
+    "vs": "Shaders/shader.vert.gl",
+    "fs": "Shaders/shader.frag.gl"
+  },
+  "defines": [],
+  "attributes": [
+    {
+      "name": "pos",
+      "format": "float3",
+      "location": 0
     },
-    "defines": [],
-    "attributes": [
+    {
+      "name": "diffuse",
+      "format": "float4",
+      "location": 1
+    },
+    {
+      "name": "uv",
+      "format": "float2",
+      "location": 2
+    }
+  ],
+  "bindings": [
+    {
+      "name": "TransInfo",
+      "binding": 0,
+      "format": "Buffer",
+      "stride": 192,
+      "fields": [
         {
-            "name": "pos",
-            "format": "float3",
-            "location": 0
+          "name": "model",
+          "format": "mat4",
+          "offset": 0
         },
         {
-            "name": "diffuse",
-            "format": "float4",
-            "location": 1
+          "name": "view",
+          "format": "mat4",
+          "offset": 64
         },
         {
-            "name": "uv",
-            "format": "float2",
-            "location": 2
+          "name": "proj",
+          "format": "mat4",
+          "offset": 128
         }
-    ],
-    "bindings": [
-        {
-            "name": "TransInfo",
-            "binding": 0,
-            "format": "Buffer",
-            "fileds": [
-                {
-                    "name": "model",
-                    "format": "mat4"
-                },
-                {
-                    "name": "view",
-                    "format": "mat4"
-                },
-                {
-                    "name": "proj",
-                    "format": "mat4"
-                }
-            ]
-        },
-        {
-            "name": "texSampler",
-            "binding": 1,
-            "format": "Sampler2D",
-            "uri": "Textures/texture.jpg"
-        }
-    ]
+      ]
+    },
+    {
+      "name": "texSampler",
+      "binding": 1,
+      "format": "Sampler2D",
+      "uri": "Textures/texture.jpg"
+    }
+  ]
 }

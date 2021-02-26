@@ -15,6 +15,49 @@
 
 NS_RX_BEGIN
 
+enum class MaterialParameterType
+{
+    FLOAT,
+    FLOAT2,
+    FLOAT3,
+    FLOAT4,
+
+    INT,
+    INT2,
+    INT3,
+    INT4,
+
+    BOOL,
+    BOOL1,
+    BOOL2,
+    BOOL3,
+
+    MAT4,
+    MAT3,
+    MAT2,
+    MAT4x3,
+    MAT4x2,
+    MAT3x4,
+    MAT2x4,
+    MAT3x2,
+    MAT2x3, 
+};
+
+struct MaterialBufferParameter
+{
+    std::string name;
+    MaterialParameterType format;
+    std::uint32_t offset = 0;
+    RHI::Buffer* gpuBuffer_ = nullptr;
+};
+
+enum class MaterailBindingObjectType
+{
+    BUFFER,
+    SAMPLER2D,
+    TEXTURE2D,
+};
+
 class Material : public ObjectBase
 {
 public:

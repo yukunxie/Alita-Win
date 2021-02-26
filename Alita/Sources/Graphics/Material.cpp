@@ -48,31 +48,30 @@ RHI::BindGroupLayout* Material::CreateBindGroupLayout(const rapidjson::Document&
 
 	for (auto& cfg : doc["bindings"].GetArray())
 	{
-
-		/*{
-			"name": "TransInfo",
-				"binding" : 0,
-				"format" : "Buffer",
-				"fileds" : [
-			{
-				"name": "model",
-					"format" : "mat4"
-			},
-				{
-					"name": "view",
-					"format" : "mat4"
-				},
-				{
-					"name": "proj",
-					"format" : "mat4"
-				}
-				]
-		},*/
-
 		std::string name = cfg["name"].GetString();
 		std::uint32_t binding = cfg["binding"].GetUint();
 		std::string format = cfg["format"].GetString();
-		if (cfg.HasMember("fileds"))
+
+		std::vector<MaterialBufferParameter> fields;
+
+		if (cfg.HasMember("fields") && cfg["fields"].IsArray())
+		{
+			for (const auto& f : cfg["fields"].GetArray())
+			{
+				MaterialBufferParameter param;
+				param.name = f["name"].GetString();
+				param.offset = f["offset"].GetUint();
+				std::string format = f["format"].GetString();
+				if (format == "mat4")
+					param.format = MaterialParameterType::MAT4;
+				else
+					Assert(false);
+
+				fields.push_back(param);
+			}
+		}
+
+		if (fields.size() > 0)
 		{
 
 		}
