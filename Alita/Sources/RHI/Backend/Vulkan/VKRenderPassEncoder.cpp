@@ -139,6 +139,7 @@ void VKRenderPassEncoder::BeginPass(VkCommandBuffer vkCommandBuffer,
     VkFramebufferCreateInfo framebufferInfo;
     {
         framebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
+        framebufferInfo.flags = 0;
         framebufferInfo.pNext = nullptr;
         framebufferInfo.renderPass = renderPass_->GetNative();
         framebufferInfo.layers = 1;

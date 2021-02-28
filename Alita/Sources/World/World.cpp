@@ -17,12 +17,12 @@ World::World()
 
 	AddLevel(level);
 
-	auto model = EntityLoader::LoadModelFromGLTF("Models/cube.gltf");
-	if (model)
-	{
+	//auto model = EntityLoader::LoadModelFromGLTF("Models/cube.gltf");
+	//if (model)
+	//{
 
-	}
-	else
+	//}
+	//else
 	{
 		level->AddEntity(new Model());
 	}
@@ -39,6 +39,8 @@ void World::SetupDefaultCamera()
 
 void World::Tick(float dt)
 {
+	defaultCamera_->Tick(dt);
+
 	for (auto& level : levels_)
 	{
 		level->Tick(dt);

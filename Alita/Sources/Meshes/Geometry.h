@@ -7,6 +7,7 @@
 
 #include "../Base/ObjectBase.h"
 #include "VertexBuffer.h"
+#include "RHI.h"
 
 NS_RX_BEGIN
 
@@ -32,6 +33,10 @@ public:
 protected:
     std::vector<VertexBuffer*> vbStreams_;
     IndexBuffer indexBuffer_;
+
+public:
+   /* std::vector<RHI::Buffer*> vbGPUBuffers_;
+    RHI::Buffer* ibGPUBuffer_ = nullptr;*/
 
     friend class MeshComponentBuilder;
 };

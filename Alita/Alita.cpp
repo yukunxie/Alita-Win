@@ -15,12 +15,9 @@
 
 #pragma comment(lib, "glfw3.lib")
 #pragma comment(lib, "vulkan-1.lib")
+#pragma comment(lib, "VkLayer_utils.lib")
 
 #include <Windows.h>
-
-#include "rapidjson/document.h"
-#include "rapidjson/writer.h"
-#include "rapidjson/stringbuffer.h"
 
 int main() {
 
@@ -29,13 +26,6 @@ int main() {
         HWND hwnd = GetConsoleWindow();
         ShowWindow(hwnd, 1);
     }
-
-    const char* json = "{\"project\":\"rapidjson\",\"stars\":10}";
-    rapidjson::Document d;
-    d.Parse(json);
-
-    rapidjson::Value& s = d["project"];
-    auto k = s.GetString();
 
     glfwInit();
 
@@ -54,7 +44,7 @@ int main() {
     //auto test = matrix * vec/*;*/
 
     while (!glfwWindowShouldClose(window)) {
-        pEngine->Update(0.016);
+        pEngine->Update(0.016f);
         glfwPollEvents();
     }
 

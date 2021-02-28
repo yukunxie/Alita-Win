@@ -26,6 +26,11 @@ public:
         levels_.push_back(level);
     }
 
+    Camera* GetCamera() const
+    {
+        return defaultCamera_;
+    }
+
 private:
     void SetupDefaultCamera();
 

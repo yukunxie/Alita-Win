@@ -23,6 +23,8 @@ public:
 
 protected:
 
+    std::vector<MeshComponent*> meshComponents_;
+
     GraphicPipeline* graphicPipeline_ = nullptr;
 
 	/*RHI::Buffer* rhiVertexBuffer_ = nullptr;

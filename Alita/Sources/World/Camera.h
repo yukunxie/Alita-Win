@@ -14,14 +14,27 @@ NS_RX_BEGIN
 
 class Camera : public Entity
 {
-public:
+protected:
 	Camera();
+
+public:
 	virtual ~Camera();
 
 public:
-	virtual TMat4x4 GetViewMatrix() = 0;
-	virtual TMat4x4 GetProjectMatrix() = 0;
-	virtual TMat4x4 GetMVP() = 0;
+	TMat4x4 GetViewMatrix()
+	{
+		return viewMatrix_;
+	}
+
+	TMat4x4 GetProjectionMatrix()
+	{
+		return projMatrix_;
+	}
+	
+	TMat4x4 GetViewProjectionMatrix()
+	{
+		return viewMatrix_ * projMatrix_;
+	}
 
 public:
 	TColor4 GetBackgroundColor() const
@@ -38,6 +51,8 @@ public:
 	static Camera* CreatePerspectiveCamera(float fov, float aspect, float nearPlane, float farPlane);
 
 protected:
+	TMat4x4 viewMatrix_;
+	TMat4x4 projMatrix_;
 	TColor4 backgroudColor_ = { 0.0f, 0.0f, 0.0f, 1.0f };
 };
 
@@ -46,17 +61,13 @@ class PerspectiveCamera final: public Camera
 public:
 	PerspectiveCamera(float fov, float aspect, float nearPlane, float farPlane);
 
-	virtual TMat4x4 GetViewMatrix() override;
-	virtual TMat4x4 GetProjectMatrix() override;
-	virtual TMat4x4 GetMVP() override;
-
+public:
+	virtual void Tick(float dt) override;
 private:
 	float fov_;
 	float aspect_;
 	float nearPlane_;
 	float farPlane_;
-	/*TVector3 up_;
-	TVector3 forward_;*/
 };
 
 NS_RX_END

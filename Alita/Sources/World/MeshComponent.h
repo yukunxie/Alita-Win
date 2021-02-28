@@ -16,12 +16,12 @@ class MeshComponentBuilder;
 class MeshComponent : public Component
 {
 public:
-	Material* GetMaterial()
+	Material* GetMaterial() const
 	{
 		return material_;
 	}
 
-	Geometry* GetGeometry()
+	Geometry* GetGeometry() const
 	{
 		return geometry_;
 	}

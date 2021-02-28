@@ -1,5 +1,6 @@
 {
   "name": "CommonMaterial",
+  "indexFormat":  "uint32",
   "code": {
     "vs": "Shaders/shader.vert.gl",
     "fs": "Shaders/shader.frag.gl"
@@ -9,16 +10,19 @@
     {
       "name": "pos",
       "format": "float3",
+      "stride": 12,
       "location": 0
     },
     {
       "name": "diffuse",
-      "format": "float4",
+      "format": "float3",
+      "stride": 12,
       "location": 1
     },
     {
       "name": "uv",
       "format": "float2",
+      "stride": 8,
       "location": 2
     }
   ],
@@ -26,7 +30,7 @@
     {
       "name": "TransInfo",
       "binding": 0,
-      "format": "Buffer",
+      "type": "Buffer",
       "stride": 192,
       "fields": [
         {
@@ -45,12 +49,6 @@
           "offset": 128
         }
       ]
-    },
-    {
-      "name": "texSampler",
-      "binding": 1,
-      "format": "Sampler2D",
-      "uri": "Textures/texture.jpg"
     }
   ]
 }

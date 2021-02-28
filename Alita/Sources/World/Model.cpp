@@ -5,6 +5,7 @@
 #include "Model.h"
 #include "MeshComponent.h"
 #include "Engine/Engine.h"
+#include "Graphics/RenderScene.h"
 
 NS_RX_BEGIN
 

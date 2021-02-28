@@ -1,8 +1,10 @@
 #include "GraphicPipeline.h"
 #include "Engine/Engine.h"
+#include "World/MeshComponent.h"
 
 #include "Backend/Vulkan/VKDevice.h"
 #include "Backend/Vulkan/VKSwapChain.h"
+#include "Backend/Vulkan/VKCommandBuffer.h"
 
 NS_RX_BEGIN
 
@@ -35,28 +37,51 @@ GraphicPipeline::GraphicPipeline()
 	}
 }
 
-void GraphicPipeline::Execute()
+void GraphicPipeline::Execute(const std::vector<MeshComponent*>& meshComponents)
 {
 	RHI::TextureView* colorAttachment = rhiSwapChain_->GetCurrentTexture();
 
-	// init pass
-	{
-		igniterPass_.Reset();
-		igniterPass_.SetupDepthStencilAttachemnt(rhiDSTextureView_);
-		igniterPass_.SetupOutputAttachment(0, colorAttachment);
-		igniterPass_.Execute(rhiCommandEncoder_);
-	}
+	//// init pass
+	//{
+	//	igniterPass_.Reset();
+	//	igniterPass_.SetupDepthStencilAttachemnt(rhiDSTextureView_);
+	//	igniterPass_.SetupOutputAttachment(0, colorAttachment);
+	//	igniterPass_.Execute(rhiCommandEncoder_, meshComponents);
+	//}
 	
 	// draw opaque objects.
 	{
+		opaquePass_.Reset();
 		opaquePass_.SetupDepthStencilAttachemnt(rhiDSTextureView_);
 		opaquePass_.SetupOutputAttachment(0, colorAttachment);
-		opaquePass_.Execute(rhiCommandEncoder_);
+		opaquePass_.Execute(rhiCommandEncoder_, meshComponents);
 	}
 
 	// submit to gpu and present 
 	{
-		graphicQueue_->Submit(rhiCommandEncoder_->Finish());
+		VkImageMemoryBarrier prePresentBarrier = {};
+		prePresentBarrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+		prePresentBarrier.pNext = NULL;
+		prePresentBarrier.srcAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+		prePresentBarrier.dstAccessMask = VK_ACCESS_MEMORY_READ_BIT;
+		prePresentBarrier.oldLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+		prePresentBarrier.newLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+		prePresentBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+		prePresentBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+		prePresentBarrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+		prePresentBarrier.subresourceRange.baseMipLevel = 0;
+		prePresentBarrier.subresourceRange.levelCount = 1;
+		prePresentBarrier.subresourceRange.baseArrayLayer = 0;
+		prePresentBarrier.subresourceRange.layerCount = 1;
+		prePresentBarrier.image = RHI_CAST(RHI::VKTextureView*, colorAttachment)->GetVkImage();
+
+		RHI::CommandBuffer* cmdBuffer = rhiCommandEncoder_->Finish();
+
+		vkCmdPipelineBarrier(RHI_CAST(RHI::VKCommandBuffer*, cmdBuffer)->GetNative(), VK_PIPELINE_STAGE_ALL_COMMANDS_BIT,
+			VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT, 0, 0, NULL, 0,
+			NULL, 1, &prePresentBarrier);
+
+		graphicQueue_->Submit(cmdBuffer);
 		rhiSwapChain_->Present(graphicQueue_);
 	}
 }

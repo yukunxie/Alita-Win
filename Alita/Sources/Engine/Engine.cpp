@@ -5,6 +5,7 @@
 #include "Engine.h"
 #include "World/World.h"
 #include "Base/FileSystem.h"
+#include "Graphics/RenderScene.h"
 
 #include "Backend/Vulkan/VKCanvasContext.h"
 #include "Backend/Vulkan/ShaderHelper.h"

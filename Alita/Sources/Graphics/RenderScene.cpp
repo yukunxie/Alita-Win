@@ -1,5 +1,6 @@
 #include "RenderScene.h"
 #include "Engine/Engine.h"
+#include "World/Camera.h"
 #include "RHI.h"
 #include "Base/FileSystem.h"
 #include "Backend/Vulkan/ShaderHelper.h"
@@ -15,13 +16,15 @@ struct UniformBufferObject
 	TMat4x4 proj;
 };
 
+Material* gMaterial = nullptr;
+Camera* gCamera = nullptr;
+
 RenderScene::RenderScene()
 {
 	graphicPipeline_ = new GraphicPipeline();
 
-	new Material("Shaders/CommonMaterial.json");
-
-	return;
+	gMaterial = new Material("Shaders/CommonMaterial.json");
+	gCamera = new PerspectiveCamera(45.0, 800.0f / 1280.f, 0.1f, 100.f);
 
 	//rhiDevice_ = Engine::GetGPUDevice();
 
@@ -223,7 +226,6 @@ RenderScene::RenderScene()
 
 RenderScene::~RenderScene()
 {
-
 }
 
 void RenderScene::AddPrimitive(MeshComponent* mesh)
@@ -232,48 +234,49 @@ void RenderScene::AddPrimitive(MeshComponent* mesh)
 	{
 		return;
 	}
+	meshComponents_.push_back(mesh);
 
-	if (!rhiVertexBuffer_)
-	{
-		// Create VertexBuffer
-		{
-			// 1M bytes
-			RHI::BufferSize vertexBufferSize = 1024 * 1024;
+	//if (!rhiVertexBuffer_)
+	//{
+	//	// Create VertexBuffer
+	//	{
+	//		// 1M bytes
+	//		RHI::BufferSize vertexBufferSize = 1024 * 1024;
 
-			RHI::BufferDescriptor vertexBufferDescriptor;
-			{
-				vertexBufferDescriptor.usage = RHI::BufferUsage::VERTEX;
-				vertexBufferDescriptor.size = vertexBufferSize;
-			}
+	//		RHI::BufferDescriptor vertexBufferDescriptor;
+	//		{
+	//			vertexBufferDescriptor.usage = RHI::BufferUsage::VERTEX;
+	//			vertexBufferDescriptor.size = vertexBufferSize;
+	//		}
 
-			rhiVertexBuffer_ = Engine::GetEngine()->GetGPUDevice()->CreateBuffer(vertexBufferDescriptor);
-		}
+	//		rhiVertexBuffer_ = Engine::GetEngine()->GetGPUDevice()->CreateBuffer(vertexBufferDescriptor);
+	//	}
 
-		{
-			RHI::BufferSize indexBufferSize = 10 * 1024;
-			RHI::BufferDescriptor indexBufferDescriptor;
-			{
-				indexBufferDescriptor.usage = RHI::BufferUsage::INDEX;
-				indexBufferDescriptor.size = indexBufferSize;
-			}
-			rhiIndexBuffer_ = Engine::GetEngine()->GetGPUDevice()->CreateBuffer(indexBufferDescriptor);
+	//	{
+	//		RHI::BufferSize indexBufferSize = 10 * 1024;
+	//		RHI::BufferDescriptor indexBufferDescriptor;
+	//		{
+	//			indexBufferDescriptor.usage = RHI::BufferUsage::INDEX;
+	//			indexBufferDescriptor.size = indexBufferSize;
+	//		}
+	//		rhiIndexBuffer_ = Engine::GetEngine()->GetGPUDevice()->CreateBuffer(indexBufferDescriptor);
 
-		}
-	}
+	//	}
+	//}
 
-	std::uint8_t* pVertexData = (std::uint8_t*)rhiVertexBuffer_->MapWriteAsync();
-	auto geometry = mesh->GetGeometry();
-	VertexBuffer* buffer = geometry->GetVBStreams()[0];
-	memcpy(pVertexData, buffer->buffer.data(), buffer->buffer.size());
-	rhiVertexBuffer_->Unmap();
+	//std::uint8_t* pVertexData = (std::uint8_t*)rhiVertexBuffer_->MapWriteAsync();
+	//auto geometry = mesh->GetGeometry();
+	//VertexBuffer* buffer = geometry->GetVBStreams()[0];
+	//memcpy(pVertexData, buffer->buffer.data(), buffer->buffer.size());
+	//rhiVertexBuffer_->Unmap();
 
-	{
-		const void* pData = rhiVertexBuffer_->MapReadAsync();
-		std::vector<float> tmp;
-		tmp.resize(9 * 6 * 4);
-		memcpy(tmp.data(), pData, tmp.size() * 4);
-		rhiVertexBuffer_->Unmap();
-	}
+	//{
+	//	const void* pData = rhiVertexBuffer_->MapReadAsync();
+	//	std::vector<float> tmp;
+	//	tmp.resize(9 * 6 * 4);
+	//	memcpy(tmp.data(), pData, tmp.size() * 4);
+	//	rhiVertexBuffer_->Unmap();
+	//}
 
 	/*std::uint8_t* pIndexData = (std::uint8_t*)rhiIndexBuffer_->MapWriteAsync();
 	memcpy(pIndexData, geometry->GetIndexBuffer()->buffer->data(), geometry->GetIndexBuffer()->buffer->size());
@@ -312,33 +315,34 @@ void RenderScene::testRotate()
 
 void RenderScene::SubmitGPU()
 {
-	graphicPipeline_->Execute();
+	graphicPipeline_->Execute(meshComponents_);
+	meshComponents_.clear();
 
 	//testRotate();
 
-	//std::vector<RHI::RenderPassColorAttachmentDescriptor> colorAttachments = {
-	// RHI::RenderPassColorAttachmentDescriptor{
-	//	 .attachment = Engine::GetEngine()->GetSwapchain()->GetCurrentTexture(),
-	//	 .resolveTarget = nullptr,
-	//	 .loadValue = {0.0f, 0.0f, 0.0f, 1.0f},
-	//	 .loadOp = RHI::LoadOp::CLEAR,
-	//	 .storeOp = RHI::StoreOp::STORE,
-	// }
-	//};
+	/*std::vector<RHI::RenderPassColorAttachmentDescriptor> colorAttachments = {
+	 RHI::RenderPassColorAttachmentDescriptor{
+		 .attachment = Engine::GetEngine()->GetSwapchain()->GetCurrentTexture(),
+		 .resolveTarget = nullptr,
+		 .loadValue = {0.0f, 0.0f, 0.0f, 1.0f},
+		 .loadOp = RHI::LoadOp::CLEAR,
+		 .storeOp = RHI::StoreOp::STORE,
+	 }
+	};
 
-	//RHI::RenderPassDescriptor renderPassDescriptor;
-	//renderPassDescriptor.colorAttachments = std::move(colorAttachments);
-	//renderPassDescriptor.depthStencilAttachment = {
-	//	.attachment = rhiDSTextureView_,
-	//	.depthLoadOp = RHI::LoadOp::CLEAR,
-	//	.depthStoreOp = RHI::StoreOp::STORE,
-	//	.depthLoadValue = 1.0f,
-	//	.stencilLoadOp = RHI::LoadOp::CLEAR,
-	//	.stencilStoreOp = RHI::StoreOp::STORE,
-	//	.stencilLoadValue = 0,
-	//};
+	RHI::RenderPassDescriptor renderPassDescriptor;
+	renderPassDescriptor.colorAttachments = std::move(colorAttachments);
+	renderPassDescriptor.depthStencilAttachment = {
+		.attachment = rhiDSTextureView_,
+		.depthLoadOp = RHI::LoadOp::CLEAR,
+		.depthStoreOp = RHI::StoreOp::STORE,
+		.depthLoadValue = 1.0f,
+		.stencilLoadOp = RHI::LoadOp::CLEAR,
+		.stencilStoreOp = RHI::StoreOp::STORE,
+		.stencilLoadValue = 0,
+	};
 
-	//auto renderPassEncoder = rhiCommandEncoder_->BeginRenderPass(renderPassDescriptor);
+	auto renderPassEncoder = rhiCommandEncoder_->BeginRenderPass(renderPassDescriptor);*/
 
 	//// Render a tile with texture.
 	//{

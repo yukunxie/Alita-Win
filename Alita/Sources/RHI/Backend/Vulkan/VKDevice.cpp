@@ -140,22 +140,40 @@ void VKDevice::CreateInstance()
     // Get layer count using null pointer as last parameter
     uint32_t instance_layer_present_count = 0;
     vkEnumerateInstanceLayerProperties(&instance_layer_present_count, nullptr);
+
+    std::vector<VkLayerProperties> layer_props(instance_layer_present_count);
     
     // Enumerate layers with valid pointer in last parameter
-    VkLayerProperties* layer_props = (VkLayerProperties*) malloc(
-        instance_layer_present_count * sizeof(VkLayerProperties));
-    vkEnumerateInstanceLayerProperties(&instance_layer_present_count, layer_props);
+    //VkLayerProperties* layer_props = (VkLayerProperties*) malloc(
+        //instance_layer_present_count * sizeof(VkLayerProperties));
+    vkEnumerateInstanceLayerProperties(&instance_layer_present_count, layer_props.data());
     
     // Make sure the desired validation layer is available
-    const char* instance_layers[] = {
-        //"VK_LAYER_GOOGLE_threading",
+    std::vector<const char*> targetLayers = {
+        "VK_LAYER_GOOGLE_threading",
         "VK_LAYER_LUNARG_parameter_validation",
         "VK_LAYER_LUNARG_object_tracker",
         "VK_LAYER_LUNARG_core_validation",
-        //"VK_LAYER_GOOGLE_unique_objects"
+        "VK_LAYER_GOOGLE_unique_objects",
+        "VK_LAYER_KHRONOS_validation",
     };
+
+    std::vector<const char*> validLayers;
+
+    for (const char* name : targetLayers)
+    {
+        for (const VkLayerProperties& p : layer_props)
+        {
+            if (strcmp(p.layerName, name) == 0)
+            {
+                validLayers.push_back(name);
+                break;
+            }
+        }
+    }
+
     
-    uint32_t instance_layer_request_count = sizeof(instance_layers) / sizeof(instance_layers[0]);
+    /*uint32_t instance_layer_request_count = sizeof(instance_layers) / sizeof(instance_layers[0]);
     for (uint32_t i = 0; i < instance_layer_request_count; i++)
     {
         bool found = false;
@@ -170,7 +188,7 @@ void VKDevice::CreateInstance()
         {
             Assert(false);
         }
-    }
+    }*/
     
     VkApplicationInfo appInfo = {
         .sType = VK_STRUCTURE_TYPE_APPLICATION_INFO,
@@ -229,19 +247,27 @@ void VKDevice::CreateInstance()
     {
         instanceCreateInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
         instanceCreateInfo.pNext = nullptr;
+        instanceCreateInfo.flags = 0;
         instanceCreateInfo.pApplicationInfo = &appInfo;
         instanceCreateInfo.enabledExtensionCount = 0;// static_cast<uint32_t>(instanceExt.size());
         instanceCreateInfo.ppEnabledExtensionNames = instanceExt.data();
-        instanceCreateInfo.enabledLayerCount = 0;//instance_layer_request_count;
-        //instanceCreateInfo.ppEnabledLayerNames = instance_layers;
+        instanceCreateInfo.enabledLayerCount = validLayers.size();//insance_layer_request_count;
+        instanceCreateInfo.ppEnabledLayerNames = validLayers.data();
     };
 
 #ifdef WIN32
     uint32_t glfwExtensionCount = 0;
     const char** glfwExtensions;
     glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
-    instanceCreateInfo.enabledExtensionCount = glfwExtensionCount;
-    instanceCreateInfo.ppEnabledExtensionNames = glfwExtensions;
+    std::vector<const char*>  strExtensions;
+    {
+        for (int i = 0; i < glfwExtensionCount; ++i)
+        {
+            strExtensions.push_back(glfwExtensions[i]);
+        }
+    }
+    instanceCreateInfo.enabledExtensionCount = strExtensions.size();
+    instanceCreateInfo.ppEnabledExtensionNames = strExtensions.data();
 #endif
     
     CALL_VK(vkCreateInstance(&instanceCreateInfo, nullptr, &vkInstance_));
@@ -377,6 +403,7 @@ void VKDevice::CreateDevice()
     {
         deviceCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
         deviceCreateInfo.pNext = nullptr;
+        deviceCreateInfo.flags = 0;
         deviceCreateInfo.queueCreateInfoCount = 1;
         deviceCreateInfo.pQueueCreateInfos = &queueCreateInfo;
         deviceCreateInfo.enabledLayerCount = 0;
@@ -561,17 +588,19 @@ void VKDevice::CreateDescriptorPool()
     std::array<VkDescriptorPoolSize, 2> poolSizes = {
         VkDescriptorPoolSize{
             .type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-            .descriptorCount = 1, //static_cast<uint32_t>(swapChainImages_.size()),
+            .descriptorCount = 1024, //static_cast<uint32_t>(swapChainImages_.size()),
         },
         VkDescriptorPoolSize{
             .type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-            .descriptorCount = 1, //static_cast<uint32_t>(swapChainImages_.size()),
+            .descriptorCount = 1024, //static_cast<uint32_t>(swapChainImages_.size()),
         },
     };
     
     VkDescriptorPoolCreateInfo poolInfo;
     {
         poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
+        poolInfo.pNext = nullptr;
+        poolInfo.flags = 0;
         poolInfo.poolSizeCount = (std::uint32_t)poolSizes.size();
         poolInfo.pPoolSizes = poolSizes.data();
         poolInfo.maxSets = imageCount;

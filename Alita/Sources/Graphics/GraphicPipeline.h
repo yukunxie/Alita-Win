@@ -8,6 +8,8 @@
 
 NS_RX_BEGIN
 
+class MeshComponent;
+
 class GraphicPipeline
 {
 public:
@@ -23,7 +25,7 @@ public:
 	}
 
 public:
-	void Execute();
+	void Execute(const std::vector<MeshComponent*>& meshComponents);
 
 private:
 	IgniterPass igniterPass_;

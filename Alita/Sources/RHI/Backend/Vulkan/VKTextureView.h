@@ -22,6 +22,16 @@ public:
     
     VkImageView GetNative() const
     { return vkImageView_; }
+
+    VkImage GetVkImage()
+    {
+        return vkImage_;
+    }
+
+    void SetVkImage(VkImage img)
+    {
+        vkImage_ = img;
+    }
     
     Extent3D GetTextureSize() const
     { return textureSize_; }
@@ -32,6 +42,8 @@ public:
 private:
     VkDevice vkDevice_ = nullptr;
     VkImageView vkImageView_ = 0L;
+    VkImage vkImage_ = nullptr;
+
     VKTexture* texture_ = nullptr;
     
     Extent3D textureSize_;

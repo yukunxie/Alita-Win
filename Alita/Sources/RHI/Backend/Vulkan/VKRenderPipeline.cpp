@@ -46,7 +46,7 @@ VKRenderPipeline::VKRenderPipeline(VKDevice* device, const RenderPipelineDescrip
         inputAssembly.flags = 0;
         inputAssembly.topology = GetPrimitiveTopology(descriptor.primitiveTopology);
         // Primitive restart is always enabled in Dawn (because of Metal)
-        inputAssembly.primitiveRestartEnable = VK_TRUE;
+        inputAssembly.primitiveRestartEnable = VK_FALSE;
     }
     
     // A dummy viewport/scissor info. The validation layers force use to provide at least one
@@ -244,14 +244,14 @@ VKRenderPipeline::VKRenderPipeline(VKDevice* device, const RenderPipelineDescrip
         std::uint32_t attachmentCount = 0;
         for (auto &colorState : descriptor.colorStates)
         {
-            query.SetColor(attachmentCount, colorState.format, LoadOp::LOAD);
+            query.SetColor(attachmentCount, colorState.format, LoadOp::CLEAR);
             attachmentCount++;
         }
         
         if (descriptor.depthStencilState.has_value())
         {
             const auto &depthStencilState = descriptor.depthStencilState.value();
-            query.SetDepthStencil(depthStencilState.format, LoadOp::LOAD, LoadOp::LOAD);
+            query.SetDepthStencil(depthStencilState.format, LoadOp::CLEAR, LoadOp::CLEAR);
         }
         
         renderPass_ = RHI_CAST(VKRenderPass*, device->GetOrCreateRenderPass(query));

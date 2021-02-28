@@ -17,6 +17,8 @@ enum class PassType
     UI,
 };
 
+class MeshComponent;
+
 class Pass : public ObjectBase
 {
 public:
@@ -36,7 +38,7 @@ public:
         dsAttachment_ = nullptr;
     }
 
-    virtual void Execute(RHI::CommandEncoder* cmdEncoder) = 0;
+    virtual void Execute(RHI::CommandEncoder* cmdEncoder, const std::vector<MeshComponent*>& meshComponents) = 0;
 
 protected:
     std::vector<std::pair<std::uint32_t, RHI::TextureView*>> attachments_;
@@ -46,16 +48,13 @@ protected:
 class IgniterPass : public Pass
 {
 public:
-    virtual void Execute(RHI::CommandEncoder* cmdEncoder) override;
+    virtual void Execute(RHI::CommandEncoder* cmdEncoder, const std::vector<MeshComponent*>& meshComponents) override;
 };
 
 class OpaquePass : public Pass
 {
 public:
-    virtual void Execute(RHI::CommandEncoder* cmdEncoder) override
-    {
-
-    }
+    virtual void Execute(RHI::CommandEncoder* cmdEncoder, const std::vector<MeshComponent*>& meshComponents) override;
 };
 
 NS_RX_END

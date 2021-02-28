@@ -20,29 +20,29 @@
 #define RX_ASSERT(cond) Assert(cond, "")
 
 
-#ifdef ANDROID
-
-#ifndef kTAG
-// Android log function wrappers
-#define kTAG "RX";
-
-#define LOGI(...) \
-  ((void)__android_log_print(ANDROID_LOG_INFO, kTAG, __VA_ARGS__))
-  
-#define LOGW(...) \
-  ((void)__android_log_print(ANDROID_LOG_WARN, kTAG, __VA_ARGS__))
-  
-#define LOGE(...) \
-  ((void)__android_log_print(ANDROID_LOG_ERROR, kTAG, __VA_ARGS__))
-  
-#endif
-  
-#else
-
-#define LOGI(...)
-
-#define LOGW(...)
-
-#define LOGE(...)
-
-#endif
+//#ifdef ANDROID
+//
+//#ifndef kTAG
+//// Android log function wrappers
+//#define kTAG "RX";
+//
+//#define LOGI(...) \
+//  ((void)__android_log_print(ANDROID_LOG_INFO, kTAG, __VA_ARGS__))
+//  
+//#define LOGW(...) \
+//  ((void)__android_log_print(ANDROID_LOG_WARN, kTAG, __VA_ARGS__))
+//  
+//#define LOGE(...) \
+//  ((void)__android_log_print(ANDROID_LOG_ERROR, kTAG, __VA_ARGS__))
+//  
+//#endif
+//  
+//#else
+//
+//#define LOGI(...)
+//
+//#define LOGW(...)
+//
+//#define LOGE(...)
+//
+//#endif

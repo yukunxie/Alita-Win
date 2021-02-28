@@ -52,7 +52,7 @@ void VKSwapChain::CreateVulkanSwapChain(VkFormat targetSurfaceFormat)
         .imageArrayLayers = 1,
         .imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
         .preTransform = VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR,
-        .compositeAlpha = VK_COMPOSITE_ALPHA_INHERIT_BIT_KHR,
+        .compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR,
         .presentMode = VK_PRESENT_MODE_FIFO_KHR,
     };
     
@@ -107,6 +107,7 @@ void VKSwapChain::Init()
         createInfo.subresourceRange.layerCount = 1;
         
         auto textureImage = new VKTextureView(device_, createInfo, extent_);
+        textureImage->SetVkImage(swapChainImages[i]);
         RHI_SAFE_RETAIN(textureImage);
         swapChainImageViews_[i] = textureImage;
     }

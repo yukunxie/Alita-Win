@@ -8,8 +8,6 @@
 #include "RHI.h"
 #include "Base/Macros.h"
 
-#include "Graphics/RenderScene.h"
-
 #include <functional>
 #include <map>
 
@@ -24,6 +22,8 @@ struct SchedulerEntity
 };
 
 class World;
+
+class RenderScene;
 
 class Engine
 {
@@ -54,6 +54,11 @@ public:
     RHI::SwapChain* GetSwapchain()
     {
         return rhiSwapChain_;
+    }
+
+    World* GetWorld() const
+    {
+        return world_;
     }
 
 public:
