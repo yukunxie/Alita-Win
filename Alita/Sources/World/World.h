@@ -5,9 +5,8 @@
 #ifndef ALITA_WORLD_H
 #define ALITA_WORLD_H
 
-#include "../Base/Macros.h"
+#include "Base/Macros.h"
 #include "SceneComponent.h"
-#include "Level.h"
 #include "Camera.h"
 
 NS_RX_BEGIN
@@ -20,22 +19,22 @@ public:
     World();
     
     void Tick(float dt);
-    
-    void AddLevel(Level* level)
-    {
-        levels_.push_back(level);
-    }
 
     Camera* GetCamera() const
     {
         return defaultCamera_;
     }
 
+    void AddEntity(Entity* entity);
+
 private:
     void SetupDefaultCamera();
 
 protected:
-    std::vector<Level*> levels_;
+
+    std::vector<Entity*> entities_;
+
+    //std::vector<Level*> levels_;
 
     Camera* defaultCamera_ = nullptr;
 

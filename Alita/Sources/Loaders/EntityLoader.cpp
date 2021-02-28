@@ -12,7 +12,6 @@ namespace EntityLoader
 
 	Model* LoadModelFromGLTF(const std::string& gltfFilename)
 	{
-		//using namespace tinygltf;
 		tinygltf::Model model;
 		tinygltf::TinyGLTF loader;
 		std::string err;

@@ -73,6 +73,8 @@ VkDescriptorType GetVkDescriptorType(BindingType type)
             return VkDescriptorType::VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
         case BindingType::SAMPLER:
             return VkDescriptorType::VK_DESCRIPTOR_TYPE_SAMPLER;
+        case BindingType::TEXTURE:
+            return VkDescriptorType::VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE;
         case BindingType::SAMPLED_TEXTURE:
             return VkDescriptorType::VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
         case BindingType::STORAGE_TEXTURE:

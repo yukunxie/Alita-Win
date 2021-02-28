@@ -417,6 +417,9 @@
     <ClCompile Include="Sources\Graphics\RenderObject.cpp">
       <Filter>源文件\Sources\Graphics\Private</Filter>
     </ClCompile>
+    <ClCompile Include="Sources\Loaders\ImageLoader.cpp">
+      <Filter>源文件\Sources\Loader</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Sources\RHI\Include\BindGroup.h">
@@ -886,6 +889,9 @@
     </ClInclude>
     <ClInclude Include="Sources\Graphics\RenderObject.h">
       <Filter>源文件\Sources\Graphics\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Loaders\ImageLoader.h">
+      <Filter>源文件\Sources\Loader</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -20,6 +20,11 @@ public:
     
     ~VKCommandEncoder();
 
+    VKCommandBuffer* GetCommandBuffer()
+    {
+        return commandBuffer_;
+    }
+
 public:
     virtual RenderPassEncoder* BeginRenderPass(const RenderPassDescriptor &descriptor) override;
     

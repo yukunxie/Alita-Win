@@ -449,6 +449,7 @@ enum class BindingType
     STORAGE_BUFFER,
     READONLY_STORAGE_BUFFER,
     SAMPLER,
+    TEXTURE,
     SAMPLED_TEXTURE,
     STORAGE_TEXTURE
     // TODO: other binding types

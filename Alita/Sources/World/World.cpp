@@ -13,9 +13,9 @@ World::World()
 {
 	SetupDefaultCamera();
 
-	auto level = new Level(this);
+	/*auto level = new Level(this);
 
-	AddLevel(level);
+	AddLevel(level);*/
 
 	//auto model = EntityLoader::LoadModelFromGLTF("Models/cube.gltf");
 	//if (model)
@@ -24,7 +24,15 @@ World::World()
 	//}
 	//else
 	{
-		level->AddEntity(new Model());
+		AddEntity(new Model());
+	}
+}
+
+void World::AddEntity(Entity* entity)
+{
+	if (std::find(entities_.begin(), entities_.end(), entity) == entities_.end())
+	{
+		entities_.push_back(entity);
 	}
 }
 
@@ -41,9 +49,9 @@ void World::Tick(float dt)
 {
 	defaultCamera_->Tick(dt);
 
-	for (auto& level : levels_)
+	for (auto it : entities_)
 	{
-		level->Tick(dt);
+		it->Tick(dt);
 	}
 }
 

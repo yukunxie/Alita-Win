@@ -4,6 +4,7 @@
 
 #include "Material.h"
 #include "Engine/Engine.h"
+#include "Loaders/ImageLoader.h"
 
 #include "RHI.h"
 #include "Backend/Vulkan/ShaderHelper.h"
@@ -169,10 +170,30 @@ void Material::ParseBindGroupLayout(const rapidjson::Document& doc)
 				parameters_[field.name] = field;
 			}
 		}
-		else
+		else if (type == "Texture2D")
 		{
-			Assert(false);
+			bindingObject->type = MaterailBindingObjectType::TEXTURE2D;
+			bindingObject->name = cfg["name"].GetString();
+			bindingObject->binding = cfg["binding"].GetUint();
+			bindingObject->texture = ImageLoader::LoadTextureFromUri("");
 		}
+		else if (type == "Sampler2D")
+		{
+			bindingObject->type = MaterailBindingObjectType::SAMPLER2D;
+			bindingObject->name = cfg["name"].GetString();
+			bindingObject->binding = cfg["binding"].GetUint();
+
+			RHI::SamplerDescriptor descriptor;
+			{
+				descriptor.minFilter = RHI::FilterMode::LINEAR;
+				descriptor.magFilter = RHI::FilterMode::LINEAR;
+				descriptor.addressModeU = RHI::AddressMode::REPEAT;
+				descriptor.addressModeV = RHI::AddressMode::REPEAT;
+				descriptor.addressModeW = RHI::AddressMode::REPEAT;
+			}
+			bindingObject->sampler = Engine::GetGPUDevice()->CreateSampler(descriptor);
+		}
+		else Assert(false);
 
 	}
 
@@ -186,19 +207,25 @@ void Material::ParseBindGroupLayout(const rapidjson::Document& doc)
 	// TODO
 	{
 		RHI::BindGroupLayoutDescriptor descriptor;
-		descriptor.bindings = {
-			RHI::BindGroupLayoutBinding{
-				.binding = 0,
-				.visibility = RHI::ShaderStage::VERTEX,
-				.type = RHI::BindingType::UNIFORM_BUFFER,
+		for (const auto& bo : bindingObjects_)
+		{
+			RHI::BindGroupLayoutBinding target;
+			target.binding = bo->binding;
+			target.visibility = RHI::ShaderStage::VERTEX | RHI::ShaderStage::FRAGMENT;
+			switch (bo->type)
+			{
+			case MaterailBindingObjectType::BUFFER:
+				target.type = RHI::BindingType::UNIFORM_BUFFER;
+				break;
+			case MaterailBindingObjectType::TEXTURE2D:
+				target.type = RHI::BindingType::TEXTURE;
+				break;
+			case MaterailBindingObjectType::SAMPLER2D:
+				target.type = RHI::BindingType::SAMPLER;
+				break;
 			}
-			/*,
-			RHI::BindGroupLayoutBinding{
-				.binding = 1,
-				.type = RHI::BindingType::SAMPLED_TEXTURE,
-				.visibility = RHI::ShaderStage::FRAGMENT,
-			},*/
-		};
+			descriptor.bindings.push_back(target);
+		}
 		rhiBindGroupLayout_ = Engine::GetGPUDevice()->CreateBindGroupLayout(descriptor);
 	}
 
@@ -214,6 +241,24 @@ void Material::ParseBindGroupLayout(const rapidjson::Document& doc)
 			{
 				tmp.binding = it->binding;
 				tmp.resource = bufferBinding;
+			}
+			descriptor.bindings.push_back(tmp);
+		}
+		else if (it->type == MaterailBindingObjectType::TEXTURE2D)
+		{
+			RHI::BindGroupBinding tmp;
+			{
+				tmp.binding = it->binding;
+				tmp.resource = it->texture->CreateView();
+			}
+			descriptor.bindings.push_back(tmp);
+		}
+		else if (it->type == MaterailBindingObjectType::SAMPLER2D)
+		{
+			RHI::BindGroupBinding tmp;
+			{
+				tmp.binding = it->binding;
+				tmp.resource = it->sampler;
 			}
 			descriptor.bindings.push_back(tmp);
 		}

@@ -49,6 +49,17 @@
           "offset": 128
         }
       ]
+    },
+    {
+      "name" : "albedo",
+      "binding": 1,
+      "type": "Texture2D",
+      "uri" : "Textures/Texture.jpg"
+    },
+    {
+      "name" : "albedo_sampler",
+      "binding": 2,
+      "type": "Sampler2D"
     }
   ]
 }
