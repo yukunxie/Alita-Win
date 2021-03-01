@@ -12,12 +12,75 @@ NS_RX_BEGIN
 #define PI 3.1415926f
 #define ANGLE_TO_RAD(angle) ( (angle) * PI / 180.0f)
 
+static TMat4x4 _ComposeViewMatrix(const TVector3& position, const TVector3& rotation)
+{
+	auto viewMatrix = TMat4x4(1.0f);
+	viewMatrix = glm::rotate(viewMatrix, glm::radians(rotation.x), TVector3(1.0f, 0.0f, 0.0f));
+	viewMatrix = glm::rotate(viewMatrix, glm::radians(rotation.y), TVector3(0.0f, 1.0f, 0.0f));
+	viewMatrix = glm::rotate(viewMatrix, glm::radians(rotation.z), TVector3(0.0f, 0.0f, 1.0f));
+
+	//translate to init position
+	viewMatrix = glm::translate(viewMatrix, position * -1.f);
+	return viewMatrix;
+}
+
 Camera::Camera()
 {
 }
 
 Camera::~Camera()
 {
+}
+
+void Camera::_UpdateViewMatrix()
+{
+	viewMatrix_ = _ComposeViewMatrix(transform_.Position(), transform_.Rotation());
+}
+
+const float CAMERA_MOVE_SPEED = 15.0f;
+
+void Camera::MoveForward()
+{
+	_UpdateViewMatrix();
+
+	auto posInViewSpace = glm::vec4(0, 0, -CAMERA_MOVE_SPEED * 0.01, 1);
+
+	transform_.Position() = glm::inverse(viewMatrix_) * posInViewSpace;
+
+	_UpdateViewMatrix();
+}
+
+void Camera::MoveBack()
+{
+	_UpdateViewMatrix();
+
+	auto posInViewSpace = glm::vec4(0, 0, CAMERA_MOVE_SPEED * 0.01, 1);
+
+	transform_.Position() = glm::inverse(viewMatrix_) * posInViewSpace;
+
+	_UpdateViewMatrix();
+}
+
+void Camera::MoveRight()
+{
+	_UpdateViewMatrix();
+
+	auto posInViewSpace = glm::vec4(CAMERA_MOVE_SPEED * 0.01, 0, 0, 1);
+
+	transform_.Position() = glm::inverse(viewMatrix_) * posInViewSpace;
+
+	_UpdateViewMatrix();
+}
+
+void Camera::MoveLeft()
+{
+	_UpdateViewMatrix();
+
+	auto posInViewSpace = glm::vec4(-CAMERA_MOVE_SPEED * 0.01, 0, 0, 1);
+
+	transform_.Position() = glm::inverse(viewMatrix_) * posInViewSpace;
+
+	_UpdateViewMatrix();
 }
 
 Camera* Camera::CreatePerspectiveCamera(float fov, float aspect, float nearPlane, float farPlane)
@@ -42,36 +105,6 @@ PerspectiveCamera::PerspectiveCamera(float fov, float aspect, float nearPlane, f
 
 	
 	_UpdateViewMatrix();
-}
-
-TMat4x4 _ComposeViewMatrix(const TVector3& position, const TVector3& rotation)
-{
-	auto viewMatrix = TMat4x4(1.0f);
-	viewMatrix = glm::rotate(viewMatrix, glm::radians(rotation.x), TVector3(1.0f, 0.0f, 0.0f));
-	viewMatrix = glm::rotate(viewMatrix, glm::radians(rotation.y), TVector3(0.0f, 1.0f, 0.0f));
-	viewMatrix = glm::rotate(viewMatrix, glm::radians(rotation.z), TVector3(0.0f, 0.0f, 1.0f));
-
-	//translate to init position
-	viewMatrix = glm::translate(viewMatrix, position * -1.f);
-	return viewMatrix;
-}
-
-void PerspectiveCamera::_UpdateViewMatrix()
-{
-	viewMatrix_ = _ComposeViewMatrix(transform_.Position(), transform_.Rotation());
-
-	auto xxx = glm::vec3(viewMatrix_[3]);
-
-	if (xxx.length()) {}
-
-	//// rotate
-	//viewMatrix_ = TMat4x4(1.0f);
-	//viewMatrix_ = glm::rotate(viewMatrix_, glm::radians(transform_.Rotation().x), TVector3(1.0f, 0.0f, 0.0f));
-	//viewMatrix_ = glm::rotate(viewMatrix_, glm::radians(transform_.Rotation().y), TVector3(0.0f, 1.0f, 0.0f));
-	//viewMatrix_ = glm::rotate(viewMatrix_, glm::radians(transform_.Rotation().z), TVector3(0.0f, 0.0f, 1.0f));
-
-	////translate to init position
-	//viewMatrix_ = glm::translate(viewMatrix_, transform_.Position() * -1.f);
 }
 
 void PerspectiveCamera::Tick(float dt)

@@ -68,6 +68,11 @@ bool Material::SetFloat(const std::string& name, std::uint32_t offset, std::uint
 	return true;
 }
 
+bool Material::SetTexture(const std::string& name, RHI::Texture* texture)
+{
+	return false;
+}
+
 void Material::ParseInputAssembler(const rapidjson::Document& doc)
 {
 	if (!doc.HasMember("attributes"))

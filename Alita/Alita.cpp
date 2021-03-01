@@ -12,12 +12,30 @@
 #include "Engine/Engine.h"
 
 #include <iostream>
+#include <chrono>
 
 #pragma comment(lib, "glfw3.lib")
 #pragma comment(lib, "vulkan-1.lib")
 #pragma comment(lib, "VkLayer_utils.lib")
 
 #include <Windows.h>
+
+void mouse_callback(GLFWwindow* window, double xpos, double ypos)
+{
+    if (true) {}
+}
+
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
+{
+    if (true) {}
+}
+
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
+{
+    if (key == GLFW_KEY_RIGHT && action == GLFW_PRESS)
+    {
+    }
+}
 
 int main() {
 
@@ -34,18 +52,15 @@ int main() {
 
     NS_RX::Engine* pEngine = NS_RX::Engine::CreateEngine(window);
 
-   /* uint32_t extensionCount = 0;
-    vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, nullptr);
-
-    std::cout << extensionCount << " extensions supported" << std::endl;*/
-
-    //glm::mat4 matrix;
-    //glm::vec4 vec;
-    //auto test = matrix * vec/*;*/
+    bool firstFrame = true;
 
     while (!glfwWindowShouldClose(window)) {
+        if (!firstFrame)
+        {
+            glfwPollEvents();
+        }
+        firstFrame = false;
         pEngine->Update(0.016f);
-        glfwPollEvents();
     }
 
     glfwDestroyWindow(window);

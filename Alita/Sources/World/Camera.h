@@ -17,6 +17,8 @@ class Camera : public Entity
 protected:
 	Camera();
 
+	void _UpdateViewMatrix();
+
 public:
 	virtual ~Camera();
 
@@ -35,6 +37,14 @@ public:
 	{
 		return viewMatrix_ * projMatrix_;
 	}
+
+	void MoveForward();
+
+	void MoveBack();
+
+	void MoveRight();
+
+	void MoveLeft();
 
 public:
 	TColor4 GetBackgroundColor() const
@@ -63,9 +73,6 @@ public:
 
 public:
 	virtual void Tick(float dt) override;
-
-protected:
-	void _UpdateViewMatrix();
 
 private:
 	float fov_;

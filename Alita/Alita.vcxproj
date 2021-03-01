@@ -162,6 +162,7 @@ echo "xxxxx"</Command>
     <ClCompile Include="Sources\Base\FileSystem.cpp" />
     <ClCompile Include="Sources\Base\ObjectBase.cpp" />
     <ClCompile Include="Sources\Engine\Engine.cpp" />
+    <ClCompile Include="Sources\Event\EventSystem.cpp" />
     <ClCompile Include="Sources\Graphics\Effect.cpp" />
     <ClCompile Include="Sources\Graphics\GraphicPipeline.cpp" />
     <ClCompile Include="Sources\Graphics\Material.cpp" />
@@ -261,6 +262,7 @@ echo "xxxxx"</Command>
     <ClInclude Include="Sources\Base\Macros.h" />
     <ClInclude Include="Sources\Base\ObjectBase.h" />
     <ClInclude Include="Sources\Engine\Engine.h" />
+    <ClInclude Include="Sources\Event\EventSystem.h" />
     <ClInclude Include="Sources\Graphics\Effect.h" />
     <ClInclude Include="Sources\Graphics\GraphicPipeline.h" />
     <ClInclude Include="Sources\Graphics\Material.h" />

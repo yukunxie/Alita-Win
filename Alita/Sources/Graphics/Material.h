@@ -127,6 +127,8 @@ public:
 
 	bool SetFloat(const std::string& name, std::uint32_t offset, std::uint32_t count, float* data);
 
+	bool SetTexture(const std::string& name, RHI::Texture* texture);
+
 	void Apply(RHI::RenderPassEncoder& passEndcoder);
 
 protected:

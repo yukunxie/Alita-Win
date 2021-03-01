@@ -126,6 +126,9 @@
     <Filter Include="Sources\Loader">
       <UniqueIdentifier>{b3f8f413-e811-4933-9217-5c9d28840a79}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Sources\Event">
+      <UniqueIdentifier>{189c92ca-2386-4abf-a9e4-c3c9c309c3b4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Sources\RHI\Backend\Vulkan\ShaderHelper.cpp">
@@ -418,6 +421,9 @@
     </ClCompile>
     <ClCompile Include="Alita.cpp">
       <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Event\EventSystem.cpp">
+      <Filter>Sources\Event</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -894,6 +900,9 @@
     </ClInclude>
     <ClInclude Include="Sources\World\Terrain.h">
       <Filter>Sources\World\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Event\EventSystem.h">
+      <Filter>Sources\Event</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

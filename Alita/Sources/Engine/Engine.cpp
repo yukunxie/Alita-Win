@@ -6,6 +6,7 @@
 #include "World/World.h"
 #include "Base/FileSystem.h"
 #include "Graphics/RenderScene.h"
+#include "Event/EventSystem.h"
 
 #include "Backend/Vulkan/VKCanvasContext.h"
 #include "Backend/Vulkan/ShaderHelper.h"
@@ -14,38 +15,24 @@ NS_RX_BEGIN
 
 Engine* Engine::engine_ = nullptr;
 
-Engine::Engine(void* data)
+Engine::Engine(void* windowHandler)
 {
-    gpuDevice_ = RHI::CreateDeviceHelper(RHI::DeviceType::VULKAN, data);
-
-    //{
-    //    rhiCanvasContext_ = new RHI::VKCanvasContext();
-    //    RHI::SwapChainDescriptor swapChainDescriptor;
-    //    swapChainDescriptor.device = gpuDevice_;
-    //    swapChainDescriptor.format = RHI::TextureFormat::BGRA8UNORM;
-    //    rhiSwapChain_ = rhiCanvasContext_->ConfigureSwapChain(swapChainDescriptor);
-
-    //    //rhiCommandEncoder_ = gpuDevice_->CreateCommandEncoder();
-    //}
+    gpuDevice_ = RHI::CreateDeviceHelper(RHI::DeviceType::VULKAN, windowHandler);
+    windowHandler_ = windowHandler;
 }
 
 bool Engine::Init()
 {
-    /*std::string shaderText = FileSystem::GetInstance()->GetStringData("Shaders/shader.vert.gl");
-
-    auto spirv = RHI::CompileGLSLToSPIRV(shaderText, RHI::ShaderType::VERTEX);*/
-
-    //gpuDevice_->CreateShaderModule()
-
     world_ = new World();
     renderScene_ = new RenderScene();
+    eventSystem_ = new EventSystem(windowHandler_);
     return true;
 }
 
-Engine* Engine::CreateEngine(void* data)
+Engine* Engine::CreateEngine(void* windowHandler)
 {
     RX_ASSERT(nullptr == engine_);
-    Engine::engine_ = new Engine(data);
+    Engine::engine_ = new Engine(windowHandler);
     engine_->Init();
     return GetEngine();
 }
