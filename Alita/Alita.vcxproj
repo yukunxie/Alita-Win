@@ -206,6 +206,7 @@ echo "xxxxx"</Command>
     <ClCompile Include="Sources\World\Level.cpp" />
     <ClCompile Include="Sources\World\MeshComponent.cpp" />
     <ClCompile Include="Sources\World\Model.cpp" />
+    <ClCompile Include="Sources\World\Terrain.cpp" />
     <ClCompile Include="Sources\World\World.cpp" />
     <ClCompile Include="Third-Party\glslang\GenericCodeGen\CodeGen.cpp" />
     <ClCompile Include="Third-Party\glslang\GenericCodeGen\Link.cpp" />
@@ -334,6 +335,7 @@ echo "xxxxx"</Command>
     <ClInclude Include="Sources\World\Level.h" />
     <ClInclude Include="Sources\World\MeshComponent.h" />
     <ClInclude Include="Sources\World\Model.h" />
+    <ClInclude Include="Sources\World\Terrain.h" />
     <ClInclude Include="Sources\World\World.h" />
     <ClInclude Include="Third-Party\glm\common.hpp" />
     <ClInclude Include="Third-Party\glm\exponential.hpp" />

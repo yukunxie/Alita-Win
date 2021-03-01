@@ -420,6 +420,9 @@
     <ClCompile Include="Sources\Loaders\ImageLoader.cpp">
       <Filter>源文件\Sources\Loader</Filter>
     </ClCompile>
+    <ClCompile Include="Sources\World\Terrain.cpp">
+      <Filter>源文件\Sources\World\Private</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Sources\RHI\Include\BindGroup.h">
@@ -892,6 +895,9 @@
     </ClInclude>
     <ClInclude Include="Sources\Loaders\ImageLoader.h">
       <Filter>源文件\Sources\Loader</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\World\Terrain.h">
+      <Filter>源文件\Sources\World\Public</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
