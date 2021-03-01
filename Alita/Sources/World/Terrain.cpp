@@ -36,7 +36,7 @@ Terrain* Terrain::CreateFromHeightMap(const std::string& imgFilename, float minH
         vertices[idx].z = (iz - texHeight / 2) * unit;
         vertices[idx].y = pixels[idx] / 255.0f * (maxHeight - minHeight) - minHeight;
         
-        diffuse[idx] = { 1.0f, 0.0f, 1.0f };
+        //diffuse[idx] = { 1.0f, 0.0f, 1.0f };
 
         texCoords[idx] = { float(ix) / texWidth, float(iz) / texHeight };
     }
@@ -58,6 +58,22 @@ Terrain* Terrain::CreateFromHeightMap(const std::string& imgFilename, float minH
             indices[start + 3] = c;
             indices[start + 4] = d;
             indices[start + 5] = b;
+
+            {
+                auto d1 = vertices[c] - vertices[a];
+                auto d2 = vertices[b] - vertices[a];
+                auto n = glm::normalize(glm::cross(d1, d2));
+                diffuse[a] = diffuse[b] = diffuse[c] = n;
+            }
+
+            {
+                auto d1 = vertices[d] - vertices[c];
+                auto d2 = vertices[b] - vertices[c];
+                auto n = glm::normalize(glm::cross(d1, d2));
+                diffuse[d] = n;
+            }
+
+            /*glm::vec3 n1 = glm::cross(c - a, b - a);*/
         }
     }
 

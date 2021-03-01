@@ -56,9 +56,9 @@ public:
         return rhiSwapChain_;
     }
 
-    World* GetWorld() const
+    static World* GetWorld()
     {
-        return world_;
+        return Engine::GetEngine()->world_;
     }
 
 public:

@@ -25,6 +25,11 @@ public:
         return defaultCamera_;
     }
 
+    TVector3 GetCameraPosition()
+    {
+        return defaultCamera_->GetComponent<Transform>()->Position();
+    }
+
     void AddEntity(Entity* entity);
 
 private:

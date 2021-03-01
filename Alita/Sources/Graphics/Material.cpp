@@ -146,28 +146,44 @@ void Material::ParseBindGroupLayout(const rapidjson::Document& doc)
 					param.name = f["name"].GetString();
 					param.offset = f["offset"].GetUint();
 					std::string format = f["format"].GetString();
-					if (format == "mat4")
+					switch (_SimpleHash(format.c_str()))
+					{
+					case _SimpleHash("mat4"):
 						param.format = MaterialParameterType::MAT4;
-					else
-						Assert(false);
+						break;
+					case _SimpleHash("float"):
+						param.format = MaterialParameterType::FLOAT;
+						break;
+					case _SimpleHash("float2"):
+						param.format = MaterialParameterType::FLOAT2;
+						break;
+					case _SimpleHash("float3"):
+						param.format = MaterialParameterType::FLOAT3;
+						break;
+					case _SimpleHash("float4"):
+						param.format = MaterialParameterType::FLOAT4;
+						break;
+					default:
+						Assert(false, "invalid format");
+					}
 
 					fields.push_back(param);
 				}
-			}
 
-			if (Assert(bindingObject->stride > 0), "Binding buffer's size must be great than zero");
+				if (Assert(bindingObject->stride > 0), "Binding buffer's size must be great than zero");
 
-			RHI::BufferDescriptor bufferDescriptor;
-			{
-				bufferDescriptor.size = bindingObject->stride;
-				bufferDescriptor.usage = RHI::BufferUsage::UNIFORM;
-			};
-			bindingObject->buffer = Engine::GetGPUDevice()->CreateBuffer(bufferDescriptor);
+				RHI::BufferDescriptor bufferDescriptor;
+				{
+					bufferDescriptor.size = bindingObject->stride;
+					bufferDescriptor.usage = RHI::BufferUsage::UNIFORM;
+				};
+				bindingObject->buffer = Engine::GetGPUDevice()->CreateBuffer(bufferDescriptor);
 
-			for (auto& field : fields)
-			{
-				field.bindingObject = bindingObject;
-				parameters_[field.name] = field;
+				for (auto& field : fields)
+				{
+					field.bindingObject = bindingObject;
+					parameters_[field.name] = field;
+				}
 			}
 		}
 		else if (type == "Texture2D")
@@ -317,7 +333,7 @@ void Material::CreatePipelineState()
 				vaDesc.format = ia.ToRHIFormat();
 				vaDesc.offset = ia.offset;
 				vaDesc.shaderLocation = ia.location;
-				
+
 				vbDesc.attributeSet.push_back(vaDesc);
 
 				psoDesc.vertexInput.vertexBuffers.push_back(vbDesc);

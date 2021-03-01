@@ -2,16 +2,32 @@
 #extension GL_ARB_separate_shader_objects : enable
 #extension GL_ARB_shading_language_450pack : enable
 
-layout(location = 0) in vec3 fragColor;
-layout(location = 1) in vec2 texCoord;
+layout(binding = 0) uniform Global
+{
+    vec4 EyePos; // camera's world position
+    vec4 SunLight; // xyz direction
+    vec4 SunLightColor; // rgb as color, and a as intensity
 
-layout(binding = 1) uniform texture2D albedo;
-layout(binding = 2) uniform sampler albedo_sampler;
+    mat4 ViewMatrix;
+    mat4 ProjMatrix;
+    
+} uGlobal;
 
-layout(location = 0) out vec4 outColor;
+layout(location = 0) in vec3 _WorldNormal;
+layout(location = 1) in vec3 _WorldPosition;
+layout(location = 2) in vec2 _UV0;
+
+layout(binding = 2) uniform texture2D albedo;
+layout(binding = 3) uniform sampler albedo_sampler;
+
+layout(location = 0) out vec4 OutColor;
 
 void main() {
-    outColor = texture(sampler2D(albedo, albedo_sampler), texCoord);
-     // outColor = vec4(texCoord, 0.0, 1.0);
-    // outColor = texture(texSampler, texCoord * 2.0) * vec4(fragColor, 1.0);
+   // OutColor = texture(sampler2D(albedo, albedo_sampler), _UV0);
+   OutColor = vec4(_WorldNormal * uGlobal.SunLightColor.xyz, 1.0);
+
+   vec3 lightDir = normalize(uGlobal.EyePos.xyz - _WorldPosition);
+   float specular = clamp(dot(lightDir, normalize(_WorldNormal)), 0, 1);
+
+   OutColor = vec4(specular, specular, specular, 1.0);
 }

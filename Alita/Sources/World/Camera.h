@@ -63,6 +63,10 @@ public:
 
 public:
 	virtual void Tick(float dt) override;
+
+protected:
+	void _UpdateViewMatrix();
+
 private:
 	float fov_;
 	float aspect_;

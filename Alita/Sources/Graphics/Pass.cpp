@@ -83,9 +83,15 @@ void OpaquePass::Execute(RHI::CommandEncoder* cmdEncoder, const std::vector<Mesh
 			const TMat4x4& viewMatrix = world->GetCamera()->GetViewMatrix();
 			const TMat4x4& projMatrix = world->GetCamera()->GetProjectionMatrix();
 
-			material->SetFloat("model", 0, 16, (float*)&modelMatrix);
-			material->SetFloat("view", 0, 16, (float*)&viewMatrix);
-			material->SetFloat("proj", 0, 16, (float*)&projMatrix);
+			TVector3 camPos = Engine::GetWorld()->GetCameraPosition();
+			material->SetFloat("EyePos", 0, 3, (float*)&camPos.x);
+			TVector3 sunLightDir = TVector3(1, -1, -1);
+			material->SetFloat("SunLight", 0, 3, (float*)&sunLightDir.x);
+			TVector4 sunLightColor = TVector4(1.0f, 1.0f, 0.0f, 1.0f);
+			material->SetFloat("SunLightColor", 0, 4, (float*)&sunLightColor.x);
+			material->SetFloat("WorldMatrix", 0, 16, (float*)&modelMatrix);
+			material->SetFloat("ViewMatrix", 0, 16, (float*)&viewMatrix);
+			material->SetFloat("ProjMatrix", 0, 16, (float*)&projMatrix);
 
 			material->Apply(*renderPassEncoder);
 

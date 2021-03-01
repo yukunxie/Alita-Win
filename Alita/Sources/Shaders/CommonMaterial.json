@@ -28,37 +28,60 @@
   ],
   "bindings": [
     {
-      "name": "TransInfo",
+      "name": "uGlobal",
       "binding": 0,
       "type": "Buffer",
-      "stride": 192,
+      "stride": 176,
       "fields": [
         {
-          "name": "model",
-          "format": "mat4",
+          "name": "EyePos",
+          "format": "float4",
           "offset": 0
         },
         {
-          "name": "view",
-          "format": "mat4",
-          "offset": 64
+          "name": "SunLight",
+          "format": "float4",
+          "offset": 16
         },
         {
-          "name": "proj",
+          "name": "SunLightColor",
+          "format": "float4",
+          "offset": 32
+        },
+        {
+          "name": "ViewMatrix",
           "format": "mat4",
-          "offset": 128
+          "offset": 48
+        },
+        {
+          "name": "ProjMatrix",
+          "format": "mat4",
+          "offset": 112
+        }
+      ]
+    },
+    {
+      "name": "uBatch",
+      "binding": 1,
+      "type": "Buffer",
+      "stride": 64,
+      "fields": [
+        {
+          "name": "WorldMatrix",
+          "format": "mat4",
+          "offset": 0
         }
       ]
     },
     {
       "name" : "albedo",
-      "binding": 1,
+      "binding": 2,
       "type": "Texture2D",
       "uri" : "Textures/Texture.jpg"
     },
     {
       "name" : "albedo_sampler",
-      "binding": 2,
+      "binding": 3,
       "type": "Sampler2D"
     }
   ]
