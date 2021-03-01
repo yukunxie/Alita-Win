@@ -10,6 +10,9 @@ public:
     virtual ~Terrain();
 
 public:
+    static Terrain* CreateFromHeightMap(const std::string& imgFilename, float minHeight, float maxHeight, float unit);
+
+public:
 
     virtual void Tick(float dt) override;
 };
