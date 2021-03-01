@@ -99,7 +99,7 @@ void OpaquePass::Execute(RHI::CommandEncoder* cmdEncoder, const std::vector<Mesh
 			const RHI::Extent2D extent = { 1280, 800 };
 			renderPassEncoder->SetViewport(0, 0, extent.width, extent.height, 0, 1);
 			renderPassEncoder->SetScissorRect(0, 0, extent.width, extent.height);
-			renderPassEncoder->DrawIndxed(36, 0);
+			renderPassEncoder->DrawIndxed(geometry->GetIndexBuffer()->GetIndexCount(), 0);
 		}
 	}
 

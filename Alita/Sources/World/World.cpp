@@ -6,6 +6,7 @@
 #include "glm/glm.hpp"
 
 #include "Loaders/EntityLoader.h"
+#include "Terrain.h"
 
 NS_RX_BEGIN
 
@@ -25,6 +26,11 @@ World::World()
 	//else
 	{
 		AddEntity(new Model());
+	}
+
+	{
+		auto terrain = Terrain::CreateFromHeightMap("Textures/heightmap.png", -1.f, 2.f, 0.02f);
+		AddEntity(terrain);
 	}
 }
 

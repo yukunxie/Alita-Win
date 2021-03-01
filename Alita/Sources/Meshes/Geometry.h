@@ -12,6 +12,7 @@
 NS_RX_BEGIN
 
 class MeshComponentBuilder;
+class Terrain;
 
 class Geometry
 {
@@ -39,6 +40,7 @@ public:
     RHI::Buffer* ibGPUBuffer_ = nullptr;*/
 
     friend class MeshComponentBuilder;
+    friend class Terrain;
 };
 
 NS_RX_END

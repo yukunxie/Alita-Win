@@ -88,6 +88,11 @@ struct IndexBuffer
 
 		gpuBuffer->SetSubData(0, size, data);
 	}
+
+	std::uint32_t GetIndexCount()
+	{
+		return buffer.size() / (indexType == IndexType::UINT32 ? 4 : 2);
+	}
 };
 
 

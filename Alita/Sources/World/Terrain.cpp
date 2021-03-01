@@ -1,6 +1,8 @@
 #include "Terrain.h"
 #include "stb/stb_image.h"
 #include "Base/FileSystem.h"
+#include "World/MeshComponent.h"
+#include "Graphics/RenderScene.h"
 
 NS_RX_BEGIN
 
@@ -21,6 +23,9 @@ Terrain* Terrain::CreateFromHeightMap(const std::string& imgFilename, float minH
         &texHeight, &texChannels, STBI_grey);
 
     std::vector<TVector3> vertices(texWidth * texHeight);
+    std::vector<TVector3> diffuse(texWidth * texHeight);
+    std::vector<TVector2> texCoords(texWidth * texHeight);
+    std::vector<std::uint32_t> indices((texWidth - 1) * (texHeight - 1) * 6);
     
     for (int idx = 0; idx < vertices.size(); ++idx)
     {
@@ -30,23 +35,69 @@ Terrain* Terrain::CreateFromHeightMap(const std::string& imgFilename, float minH
         vertices[idx].x = (ix - texWidth / 2) * unit;
         vertices[idx].z = (iz - texHeight / 2) * unit;
         vertices[idx].y = pixels[idx] / 255.0f * (maxHeight - minHeight) - minHeight;
+        
+        diffuse[idx] = { 1.0f, 0.0f, 1.0f };
+
+        texCoords[idx] = { float(ix) / texWidth, float(iz) / texHeight };
     }
 
-    /*for (int i = 0; i < texWidth; ++i)
+    for (int z = 0; z < texHeight - 1; ++z)
     {
-        for (int j = 0; j < texHeight; ++j)
+        for (int x = 0; x < texWidth - 1; ++x)
         {
+            int start = (z * (texWidth - 1) + x) * 6;
 
+            int a = z * texWidth + x;
+            int b = a + 1;
+            int c = (z + 1) * texWidth + x;
+            int d = c + 1;
+
+            indices[start + 0] = a;
+            indices[start + 1] = c;
+            indices[start + 2] = b;
+            indices[start + 3] = c;
+            indices[start + 4] = d;
+            indices[start + 5] = b;
         }
-    }*/
+    }
 
-    return nullptr;
+    MeshComponent* meshComp = new MeshComponent();
+    meshComp->geometry_ = new Geometry;
+    meshComp->material_ = new Material("Shaders/CommonMaterial.json");
+
+    {
+        auto vbBuffer = new VertexBuffer();
+        vbBuffer->kind = VertexBufferAttriKind::POSITION;
+        vbBuffer->InitData(vertices.data(), vertices.size() * sizeof(vertices[0]));
+        meshComp->geometry_->AppendVertexBuffer(vbBuffer);
+    }
+
+    {
+        auto vbBuffer = new VertexBuffer();
+        vbBuffer->kind = VertexBufferAttriKind::DIFFUSE;
+        vbBuffer->InitData(diffuse.data(), diffuse.size() * sizeof(diffuse[0]));
+        meshComp->geometry_->AppendVertexBuffer(vbBuffer);
+    }
+
+    {
+        auto vbBuffer = new VertexBuffer();
+        vbBuffer->kind = VertexBufferAttriKind::TEXCOORD;
+        vbBuffer->InitData(texCoords.data(), texCoords.size() * sizeof(texCoords[0]));
+        meshComp->geometry_->AppendVertexBuffer(vbBuffer);
+    }
+
+    meshComp->geometry_->indexBuffer_.indexType = IndexType::UINT32;
+    meshComp->geometry_->indexBuffer_.InitData(indices.data(), indices.size() * sizeof(indices[0]));
+
+    auto terrain = new Terrain();
+    terrain->AddComponment(meshComp);
+    return terrain;
 }
 
 void Terrain::Tick(float dt)
 {
-    /*auto mesh = GetComponent<MeshComponent>();
-    Engine::GetEngine()->GetRenderScene()->AddPrimitive(mesh);*/
+    auto mesh = GetComponent<MeshComponent>();
+    Engine::GetEngine()->GetRenderScene()->AddPrimitive(mesh);
 }
 
 NS_RX_END

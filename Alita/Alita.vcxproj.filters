@@ -1,908 +1,904 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="源文件">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
-    </Filter>
-    <Filter Include="头文件">
+    <Filter Include="Headers">
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
     </Filter>
-    <Filter Include="资源文件">
+    <Filter Include="Resources">
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="源文件\Sources">
-      <UniqueIdentifier>{f09a77ed-6366-49f7-85a3-a2e50e9495c7}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="源文件\Sources\Engine">
-      <UniqueIdentifier>{4677c1a2-f0c4-42c2-aedc-16509fe16df0}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="源文件\Third-Party">
+    <Filter Include="Third-Party">
       <UniqueIdentifier>{46550b2f-ba05-4883-bdcf-c4e2787bafcb}</UniqueIdentifier>
     </Filter>
-    <Filter Include="源文件\Sources\RHI">
-      <UniqueIdentifier>{8e69034d-4fba-419c-95bd-6b09440b014b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="源文件\Sources\RHI\Include">
-      <UniqueIdentifier>{a707e5d5-c957-4870-bccc-05b28a9aa6f7}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="源文件\Sources\RHI\Backend">
-      <UniqueIdentifier>{bf847b89-e3e2-437c-940c-701ed0af92b6}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="源文件\Sources\RHI\Backend\Vulkan">
-      <UniqueIdentifier>{4c38e4e4-8e78-42e4-bd67-b2d12d8945c5}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="源文件\Sources\Platform">
-      <UniqueIdentifier>{59f5fa2a-5414-42ff-bd62-8973ee20da09}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="源文件\Sources\Platform\Windows">
-      <UniqueIdentifier>{428940ee-cfe7-40aa-b483-6e236f8fb8a9}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="源文件\Third-Party\StandAlone">
+    <Filter Include="Third-Party\StandAlone">
       <UniqueIdentifier>{3ef4508e-dd04-48a6-8a46-b7106e7b2efd}</UniqueIdentifier>
     </Filter>
-    <Filter Include="源文件\Third-Party\glslang">
+    <Filter Include="Third-Party\glslang">
       <UniqueIdentifier>{16d2d10d-8ee9-4a82-9839-de82f3074b38}</UniqueIdentifier>
     </Filter>
-    <Filter Include="源文件\Third-Party\glslang\Include">
+    <Filter Include="Third-Party\glslang\Include">
       <UniqueIdentifier>{92ab1953-16f7-47c4-a87b-289badec927e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="源文件\Third-Party\glslang\Public">
+    <Filter Include="Third-Party\glslang\Public">
       <UniqueIdentifier>{be53dcf8-b4c7-451e-9b66-8a9c87a61b5a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="源文件\Third-Party\glslang\GenericCodeGen">
+    <Filter Include="Third-Party\glslang\GenericCodeGen">
       <UniqueIdentifier>{065dd62e-4597-455f-b120-5a2254f88c2f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="源文件\Third-Party\glslang\MachineIndependent">
+    <Filter Include="Third-Party\glslang\MachineIndependent">
       <UniqueIdentifier>{dca79589-84b8-4b0e-9443-e9f5baae9d99}</UniqueIdentifier>
     </Filter>
-    <Filter Include="源文件\Third-Party\glslang\MachineIndependent\preprocessor">
+    <Filter Include="Third-Party\glslang\MachineIndependent\preprocessor">
       <UniqueIdentifier>{f958febb-b39d-4336-af8f-5b9fefe6c5c0}</UniqueIdentifier>
     </Filter>
-    <Filter Include="源文件\Third-Party\SPIRV">
-      <UniqueIdentifier>{f4030557-c007-49f1-b702-424f32897548}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="源文件\Third-Party\OGLCompilersDLL">
-      <UniqueIdentifier>{49c7f2bd-cddf-4964-a068-195b9bd5daab}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="源文件\Third-Party\glslang\OSDependent">
+    <Filter Include="Third-Party\glslang\OSDependent">
       <UniqueIdentifier>{d1897d0d-494a-4414-891b-539db1610aff}</UniqueIdentifier>
     </Filter>
-    <Filter Include="源文件\Third-Party\glslang\OSDependent\Windows">
+    <Filter Include="Third-Party\glslang\OSDependent\Windows">
       <UniqueIdentifier>{d8237ab2-e799-40af-8215-4ddda831179c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="源文件\Sources\Engine\Publlic">
-      <UniqueIdentifier>{288935be-c935-49ac-9e62-530f749173df}</UniqueIdentifier>
+    <Filter Include="Third-Party\SPIRV">
+      <UniqueIdentifier>{f4030557-c007-49f1-b702-424f32897548}</UniqueIdentifier>
     </Filter>
-    <Filter Include="源文件\Sources\Engine\Private">
-      <UniqueIdentifier>{55aabc01-f451-4ab6-b648-a845238b1dc2}</UniqueIdentifier>
+    <Filter Include="Third-Party\OGLCompilersDLL">
+      <UniqueIdentifier>{49c7f2bd-cddf-4964-a068-195b9bd5daab}</UniqueIdentifier>
     </Filter>
-    <Filter Include="源文件\Sources\Base">
-      <UniqueIdentifier>{496d5ef7-41a4-4d6a-a9f4-2a3378bde418}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="源文件\Sources\Base\Public">
-      <UniqueIdentifier>{d216f354-67b5-43d7-8754-e34a78ca26b3}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="源文件\Sources\Base\Private">
-      <UniqueIdentifier>{c5ad468c-995f-4aa5-8e4b-ae3857da8729}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="源文件\Sources\Platform\Windows\Public">
-      <UniqueIdentifier>{e02f3f4a-950d-4312-af7f-e4b7307edd81}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="源文件\Sources\Platform\Windows\Private">
-      <UniqueIdentifier>{8508cba2-48a2-4bfb-b7d0-d31e689eb827}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="源文件\Sources\World">
-      <UniqueIdentifier>{a8e91f62-4467-43a1-8b51-ba37bccc7231}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="源文件\Sources\World\Public">
-      <UniqueIdentifier>{fe958d49-e0c7-44b5-96ec-5efdb1871aff}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="源文件\Sources\World\Private">
-      <UniqueIdentifier>{a6987e5d-aae0-4241-8642-7bd259ba6a6e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="源文件\Sources\Graphics">
-      <UniqueIdentifier>{a6120a36-60dc-445b-bf72-8f1d855d665f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="源文件\Sources\Types">
-      <UniqueIdentifier>{580c3cdb-f379-4b47-bee7-02d3cde4f21a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="源文件\Sources\Components">
-      <UniqueIdentifier>{ed8a34d6-16ff-4da4-8c18-f29f00261519}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="源文件\Third-Party\glm">
+    <Filter Include="Third-Party\glm">
       <UniqueIdentifier>{5d40f512-faf5-4fbd-9961-cd1cf3fa020a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="源文件\Sources\Graphics\Private">
+    <Filter Include="Sources">
+      <UniqueIdentifier>{f09a77ed-6366-49f7-85a3-a2e50e9495c7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources\Engine">
+      <UniqueIdentifier>{4677c1a2-f0c4-42c2-aedc-16509fe16df0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources\Engine\Publlic">
+      <UniqueIdentifier>{288935be-c935-49ac-9e62-530f749173df}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources\Engine\Private">
+      <UniqueIdentifier>{55aabc01-f451-4ab6-b648-a845238b1dc2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources\RHI">
+      <UniqueIdentifier>{8e69034d-4fba-419c-95bd-6b09440b014b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources\RHI\Include">
+      <UniqueIdentifier>{a707e5d5-c957-4870-bccc-05b28a9aa6f7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources\RHI\Backend">
+      <UniqueIdentifier>{bf847b89-e3e2-437c-940c-701ed0af92b6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources\RHI\Backend\Vulkan">
+      <UniqueIdentifier>{4c38e4e4-8e78-42e4-bd67-b2d12d8945c5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources\Platform">
+      <UniqueIdentifier>{59f5fa2a-5414-42ff-bd62-8973ee20da09}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources\Platform\Windows">
+      <UniqueIdentifier>{428940ee-cfe7-40aa-b483-6e236f8fb8a9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources\Platform\Windows\Public">
+      <UniqueIdentifier>{e02f3f4a-950d-4312-af7f-e4b7307edd81}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources\Platform\Windows\Private">
+      <UniqueIdentifier>{8508cba2-48a2-4bfb-b7d0-d31e689eb827}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources\Base">
+      <UniqueIdentifier>{496d5ef7-41a4-4d6a-a9f4-2a3378bde418}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources\Base\Public">
+      <UniqueIdentifier>{d216f354-67b5-43d7-8754-e34a78ca26b3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources\Base\Private">
+      <UniqueIdentifier>{c5ad468c-995f-4aa5-8e4b-ae3857da8729}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources\World">
+      <UniqueIdentifier>{a8e91f62-4467-43a1-8b51-ba37bccc7231}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources\World\Public">
+      <UniqueIdentifier>{fe958d49-e0c7-44b5-96ec-5efdb1871aff}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources\World\Private">
+      <UniqueIdentifier>{a6987e5d-aae0-4241-8642-7bd259ba6a6e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources\Graphics">
+      <UniqueIdentifier>{a6120a36-60dc-445b-bf72-8f1d855d665f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources\Graphics\Private">
       <UniqueIdentifier>{6d3e31f8-e310-4962-a40f-d29c0215ead3}</UniqueIdentifier>
     </Filter>
-    <Filter Include="源文件\Sources\Graphics\Public">
+    <Filter Include="Sources\Graphics\Public">
       <UniqueIdentifier>{2b7757ae-32e3-4e98-a0e9-aecac3527e91}</UniqueIdentifier>
     </Filter>
-    <Filter Include="源文件\Sources\Material">
+    <Filter Include="Sources\Types">
+      <UniqueIdentifier>{580c3cdb-f379-4b47-bee7-02d3cde4f21a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources\Components">
+      <UniqueIdentifier>{ed8a34d6-16ff-4da4-8c18-f29f00261519}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources\Material">
       <UniqueIdentifier>{ba1f0e67-e316-4881-bbaf-6212be9d7dab}</UniqueIdentifier>
     </Filter>
-    <Filter Include="源文件\Sources\Meshes">
+    <Filter Include="Sources\Meshes">
       <UniqueIdentifier>{2c5ef1c1-2ea3-447f-9d0f-93f2775ee973}</UniqueIdentifier>
     </Filter>
-    <Filter Include="源文件\Sources\Loader">
+    <Filter Include="Sources\Loader">
       <UniqueIdentifier>{b3f8f413-e811-4933-9217-5c9d28840a79}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Alita.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="Sources\RHI\Backend\Vulkan\ShaderHelper.cpp">
-      <Filter>源文件\Sources\RHI\Backend\Vulkan</Filter>
+      <Filter>Sources\RHI\Backend\Vulkan</Filter>
     </ClCompile>
     <ClCompile Include="Sources\RHI\Backend\Vulkan\VKBindGroup.cpp">
-      <Filter>源文件\Sources\RHI\Backend\Vulkan</Filter>
+      <Filter>Sources\RHI\Backend\Vulkan</Filter>
     </ClCompile>
     <ClCompile Include="Sources\RHI\Backend\Vulkan\VKBindGroupLayout.cpp">
-      <Filter>源文件\Sources\RHI\Backend\Vulkan</Filter>
+      <Filter>Sources\RHI\Backend\Vulkan</Filter>
     </ClCompile>
     <ClCompile Include="Sources\RHI\Backend\Vulkan\VKBuffer.cpp">
-      <Filter>源文件\Sources\RHI\Backend\Vulkan</Filter>
+      <Filter>Sources\RHI\Backend\Vulkan</Filter>
     </ClCompile>
     <ClCompile Include="Sources\RHI\Backend\Vulkan\VKCanvasContext.cpp">
-      <Filter>源文件\Sources\RHI\Backend\Vulkan</Filter>
+      <Filter>Sources\RHI\Backend\Vulkan</Filter>
     </ClCompile>
     <ClCompile Include="Sources\RHI\Backend\Vulkan\VKCommandBuffer.cpp">
-      <Filter>源文件\Sources\RHI\Backend\Vulkan</Filter>
+      <Filter>Sources\RHI\Backend\Vulkan</Filter>
     </ClCompile>
     <ClCompile Include="Sources\RHI\Backend\Vulkan\VKCommandEncoder.cpp">
-      <Filter>源文件\Sources\RHI\Backend\Vulkan</Filter>
+      <Filter>Sources\RHI\Backend\Vulkan</Filter>
     </ClCompile>
     <ClCompile Include="Sources\RHI\Backend\Vulkan\VKDevice.cpp">
-      <Filter>源文件\Sources\RHI\Backend\Vulkan</Filter>
+      <Filter>Sources\RHI\Backend\Vulkan</Filter>
     </ClCompile>
     <ClCompile Include="Sources\RHI\Backend\Vulkan\VKPipelineLayout.cpp">
-      <Filter>源文件\Sources\RHI\Backend\Vulkan</Filter>
+      <Filter>Sources\RHI\Backend\Vulkan</Filter>
     </ClCompile>
     <ClCompile Include="Sources\RHI\Backend\Vulkan\VKQueue.cpp">
-      <Filter>源文件\Sources\RHI\Backend\Vulkan</Filter>
+      <Filter>Sources\RHI\Backend\Vulkan</Filter>
     </ClCompile>
     <ClCompile Include="Sources\RHI\Backend\Vulkan\VKRenderPass.cpp">
-      <Filter>源文件\Sources\RHI\Backend\Vulkan</Filter>
+      <Filter>Sources\RHI\Backend\Vulkan</Filter>
     </ClCompile>
     <ClCompile Include="Sources\RHI\Backend\Vulkan\VKRenderPassEncoder.cpp">
-      <Filter>源文件\Sources\RHI\Backend\Vulkan</Filter>
+      <Filter>Sources\RHI\Backend\Vulkan</Filter>
     </ClCompile>
     <ClCompile Include="Sources\RHI\Backend\Vulkan\VKRenderPipeline.cpp">
-      <Filter>源文件\Sources\RHI\Backend\Vulkan</Filter>
+      <Filter>Sources\RHI\Backend\Vulkan</Filter>
     </ClCompile>
     <ClCompile Include="Sources\RHI\Backend\Vulkan\VKRenderQueue.cpp">
-      <Filter>源文件\Sources\RHI\Backend\Vulkan</Filter>
+      <Filter>Sources\RHI\Backend\Vulkan</Filter>
     </ClCompile>
     <ClCompile Include="Sources\RHI\Backend\Vulkan\VKSampler.cpp">
-      <Filter>源文件\Sources\RHI\Backend\Vulkan</Filter>
+      <Filter>Sources\RHI\Backend\Vulkan</Filter>
     </ClCompile>
     <ClCompile Include="Sources\RHI\Backend\Vulkan\VKShader.cpp">
-      <Filter>源文件\Sources\RHI\Backend\Vulkan</Filter>
+      <Filter>Sources\RHI\Backend\Vulkan</Filter>
     </ClCompile>
     <ClCompile Include="Sources\RHI\Backend\Vulkan\VKSwapChain.cpp">
-      <Filter>源文件\Sources\RHI\Backend\Vulkan</Filter>
+      <Filter>Sources\RHI\Backend\Vulkan</Filter>
     </ClCompile>
     <ClCompile Include="Sources\RHI\Backend\Vulkan\VKTexture.cpp">
-      <Filter>源文件\Sources\RHI\Backend\Vulkan</Filter>
+      <Filter>Sources\RHI\Backend\Vulkan</Filter>
     </ClCompile>
     <ClCompile Include="Sources\RHI\Backend\Vulkan\VKTextureView.cpp">
-      <Filter>源文件\Sources\RHI\Backend\Vulkan</Filter>
+      <Filter>Sources\RHI\Backend\Vulkan</Filter>
     </ClCompile>
     <ClCompile Include="Sources\RHI\Backend\Vulkan\VKTypes.cpp">
-      <Filter>源文件\Sources\RHI\Backend\Vulkan</Filter>
+      <Filter>Sources\RHI\Backend\Vulkan</Filter>
     </ClCompile>
     <ClCompile Include="Third-Party\StandAlone\ResourceLimits.cpp">
-      <Filter>源文件\Third-Party\StandAlone</Filter>
+      <Filter>Third-Party\StandAlone</Filter>
     </ClCompile>
     <ClCompile Include="Third-Party\StandAlone\spirv-remap.cpp">
-      <Filter>源文件\Third-Party\StandAlone</Filter>
+      <Filter>Third-Party\StandAlone</Filter>
     </ClCompile>
     <ClCompile Include="Third-Party\StandAlone\StandAlone.cpp">
-      <Filter>源文件\Third-Party\StandAlone</Filter>
+      <Filter>Third-Party\StandAlone</Filter>
     </ClCompile>
     <ClCompile Include="Third-Party\glslang\GenericCodeGen\CodeGen.cpp">
-      <Filter>源文件\Third-Party\glslang\GenericCodeGen</Filter>
+      <Filter>Third-Party\glslang\GenericCodeGen</Filter>
     </ClCompile>
     <ClCompile Include="Third-Party\glslang\GenericCodeGen\Link.cpp">
-      <Filter>源文件\Third-Party\glslang\GenericCodeGen</Filter>
+      <Filter>Third-Party\glslang\GenericCodeGen</Filter>
     </ClCompile>
     <ClCompile Include="Third-Party\glslang\MachineIndependent\ParseContextBase.cpp">
-      <Filter>源文件\Third-Party\glslang\MachineIndependent</Filter>
+      <Filter>Third-Party\glslang\MachineIndependent</Filter>
     </ClCompile>
     <ClCompile Include="Third-Party\glslang\MachineIndependent\ParseHelper.cpp">
-      <Filter>源文件\Third-Party\glslang\MachineIndependent</Filter>
+      <Filter>Third-Party\glslang\MachineIndependent</Filter>
     </ClCompile>
     <ClCompile Include="Third-Party\glslang\MachineIndependent\pch.cpp">
-      <Filter>源文件\Third-Party\glslang\MachineIndependent</Filter>
+      <Filter>Third-Party\glslang\MachineIndependent</Filter>
     </ClCompile>
     <ClCompile Include="Third-Party\glslang\MachineIndependent\PoolAlloc.cpp">
-      <Filter>源文件\Third-Party\glslang\MachineIndependent</Filter>
+      <Filter>Third-Party\glslang\MachineIndependent</Filter>
     </ClCompile>
     <ClCompile Include="Third-Party\glslang\MachineIndependent\propagateNoContraction.cpp">
-      <Filter>源文件\Third-Party\glslang\MachineIndependent</Filter>
+      <Filter>Third-Party\glslang\MachineIndependent</Filter>
     </ClCompile>
     <ClCompile Include="Third-Party\glslang\MachineIndependent\reflection.cpp">
-      <Filter>源文件\Third-Party\glslang\MachineIndependent</Filter>
+      <Filter>Third-Party\glslang\MachineIndependent</Filter>
     </ClCompile>
     <ClCompile Include="Third-Party\glslang\MachineIndependent\RemoveTree.cpp">
-      <Filter>源文件\Third-Party\glslang\MachineIndependent</Filter>
+      <Filter>Third-Party\glslang\MachineIndependent</Filter>
     </ClCompile>
     <ClCompile Include="Third-Party\glslang\MachineIndependent\Scan.cpp">
-      <Filter>源文件\Third-Party\glslang\MachineIndependent</Filter>
+      <Filter>Third-Party\glslang\MachineIndependent</Filter>
     </ClCompile>
     <ClCompile Include="Third-Party\glslang\MachineIndependent\ShaderLang.cpp">
-      <Filter>源文件\Third-Party\glslang\MachineIndependent</Filter>
+      <Filter>Third-Party\glslang\MachineIndependent</Filter>
     </ClCompile>
     <ClCompile Include="Third-Party\glslang\MachineIndependent\SymbolTable.cpp">
-      <Filter>源文件\Third-Party\glslang\MachineIndependent</Filter>
+      <Filter>Third-Party\glslang\MachineIndependent</Filter>
     </ClCompile>
     <ClCompile Include="Third-Party\glslang\MachineIndependent\Versions.cpp">
-      <Filter>源文件\Third-Party\glslang\MachineIndependent</Filter>
+      <Filter>Third-Party\glslang\MachineIndependent</Filter>
     </ClCompile>
     <ClCompile Include="Third-Party\glslang\MachineIndependent\attribute.cpp">
-      <Filter>源文件\Third-Party\glslang\MachineIndependent</Filter>
+      <Filter>Third-Party\glslang\MachineIndependent</Filter>
     </ClCompile>
     <ClCompile Include="Third-Party\glslang\MachineIndependent\Constant.cpp">
-      <Filter>源文件\Third-Party\glslang\MachineIndependent</Filter>
+      <Filter>Third-Party\glslang\MachineIndependent</Filter>
     </ClCompile>
     <ClCompile Include="Third-Party\glslang\MachineIndependent\glslang_tab.cpp">
-      <Filter>源文件\Third-Party\glslang\MachineIndependent</Filter>
+      <Filter>Third-Party\glslang\MachineIndependent</Filter>
     </ClCompile>
     <ClCompile Include="Third-Party\glslang\MachineIndependent\InfoSink.cpp">
-      <Filter>源文件\Third-Party\glslang\MachineIndependent</Filter>
+      <Filter>Third-Party\glslang\MachineIndependent</Filter>
     </ClCompile>
     <ClCompile Include="Third-Party\glslang\MachineIndependent\Initialize.cpp">
-      <Filter>源文件\Third-Party\glslang\MachineIndependent</Filter>
+      <Filter>Third-Party\glslang\MachineIndependent</Filter>
     </ClCompile>
     <ClCompile Include="Third-Party\glslang\MachineIndependent\Intermediate.cpp">
-      <Filter>源文件\Third-Party\glslang\MachineIndependent</Filter>
+      <Filter>Third-Party\glslang\MachineIndependent</Filter>
     </ClCompile>
     <ClCompile Include="Third-Party\glslang\MachineIndependent\intermOut.cpp">
-      <Filter>源文件\Third-Party\glslang\MachineIndependent</Filter>
+      <Filter>Third-Party\glslang\MachineIndependent</Filter>
     </ClCompile>
     <ClCompile Include="Third-Party\glslang\MachineIndependent\IntermTraverse.cpp">
-      <Filter>源文件\Third-Party\glslang\MachineIndependent</Filter>
+      <Filter>Third-Party\glslang\MachineIndependent</Filter>
     </ClCompile>
     <ClCompile Include="Third-Party\glslang\MachineIndependent\iomapper.cpp">
-      <Filter>源文件\Third-Party\glslang\MachineIndependent</Filter>
+      <Filter>Third-Party\glslang\MachineIndependent</Filter>
     </ClCompile>
     <ClCompile Include="Third-Party\glslang\MachineIndependent\limits.cpp">
-      <Filter>源文件\Third-Party\glslang\MachineIndependent</Filter>
+      <Filter>Third-Party\glslang\MachineIndependent</Filter>
     </ClCompile>
     <ClCompile Include="Third-Party\glslang\MachineIndependent\linkValidate.cpp">
-      <Filter>源文件\Third-Party\glslang\MachineIndependent</Filter>
+      <Filter>Third-Party\glslang\MachineIndependent</Filter>
     </ClCompile>
     <ClCompile Include="Third-Party\glslang\MachineIndependent\parseConst.cpp">
-      <Filter>源文件\Third-Party\glslang\MachineIndependent</Filter>
+      <Filter>Third-Party\glslang\MachineIndependent</Filter>
     </ClCompile>
     <ClCompile Include="Third-Party\glslang\MachineIndependent\preprocessor\PpAtom.cpp">
-      <Filter>源文件\Third-Party\glslang\MachineIndependent\preprocessor</Filter>
+      <Filter>Third-Party\glslang\MachineIndependent\preprocessor</Filter>
     </ClCompile>
     <ClCompile Include="Third-Party\glslang\MachineIndependent\preprocessor\PpContext.cpp">
-      <Filter>源文件\Third-Party\glslang\MachineIndependent\preprocessor</Filter>
+      <Filter>Third-Party\glslang\MachineIndependent\preprocessor</Filter>
     </ClCompile>
     <ClCompile Include="Third-Party\glslang\MachineIndependent\preprocessor\PpScanner.cpp">
-      <Filter>源文件\Third-Party\glslang\MachineIndependent\preprocessor</Filter>
+      <Filter>Third-Party\glslang\MachineIndependent\preprocessor</Filter>
     </ClCompile>
     <ClCompile Include="Third-Party\glslang\MachineIndependent\preprocessor\PpTokens.cpp">
-      <Filter>源文件\Third-Party\glslang\MachineIndependent\preprocessor</Filter>
+      <Filter>Third-Party\glslang\MachineIndependent\preprocessor</Filter>
     </ClCompile>
     <ClCompile Include="Third-Party\glslang\MachineIndependent\preprocessor\Pp.cpp">
-      <Filter>源文件\Third-Party\glslang\MachineIndependent\preprocessor</Filter>
+      <Filter>Third-Party\glslang\MachineIndependent\preprocessor</Filter>
     </ClCompile>
     <ClCompile Include="Third-Party\SPIRV\doc.cpp">
-      <Filter>源文件\Third-Party\SPIRV</Filter>
+      <Filter>Third-Party\SPIRV</Filter>
     </ClCompile>
     <ClCompile Include="Third-Party\SPIRV\GlslangToSpv.cpp">
-      <Filter>源文件\Third-Party\SPIRV</Filter>
+      <Filter>Third-Party\SPIRV</Filter>
     </ClCompile>
     <ClCompile Include="Third-Party\SPIRV\InReadableOrder.cpp">
-      <Filter>源文件\Third-Party\SPIRV</Filter>
+      <Filter>Third-Party\SPIRV</Filter>
     </ClCompile>
     <ClCompile Include="Third-Party\SPIRV\Logger.cpp">
-      <Filter>源文件\Third-Party\SPIRV</Filter>
+      <Filter>Third-Party\SPIRV</Filter>
     </ClCompile>
     <ClCompile Include="Third-Party\SPIRV\SpvBuilder.cpp">
-      <Filter>源文件\Third-Party\SPIRV</Filter>
+      <Filter>Third-Party\SPIRV</Filter>
     </ClCompile>
     <ClCompile Include="Third-Party\SPIRV\SpvPostProcess.cpp">
-      <Filter>源文件\Third-Party\SPIRV</Filter>
+      <Filter>Third-Party\SPIRV</Filter>
     </ClCompile>
     <ClCompile Include="Third-Party\SPIRV\SPVRemapper.cpp">
-      <Filter>源文件\Third-Party\SPIRV</Filter>
+      <Filter>Third-Party\SPIRV</Filter>
     </ClCompile>
     <ClCompile Include="Third-Party\SPIRV\SpvTools.cpp">
-      <Filter>源文件\Third-Party\SPIRV</Filter>
+      <Filter>Third-Party\SPIRV</Filter>
     </ClCompile>
     <ClCompile Include="Third-Party\SPIRV\disassemble.cpp">
-      <Filter>源文件\Third-Party\SPIRV</Filter>
+      <Filter>Third-Party\SPIRV</Filter>
     </ClCompile>
     <ClCompile Include="Third-Party\OGLCompilersDLL\InitializeDll.cpp">
-      <Filter>源文件\Third-Party\OGLCompilersDLL</Filter>
+      <Filter>Third-Party\OGLCompilersDLL</Filter>
     </ClCompile>
     <ClCompile Include="Third-Party\glslang\OSDependent\Windows\main.cpp">
-      <Filter>源文件\Third-Party\glslang\OSDependent\Windows</Filter>
+      <Filter>Third-Party\glslang\OSDependent\Windows</Filter>
     </ClCompile>
     <ClCompile Include="Third-Party\glslang\OSDependent\Windows\ossource.cpp">
-      <Filter>源文件\Third-Party\glslang\OSDependent\Windows</Filter>
+      <Filter>Third-Party\glslang\OSDependent\Windows</Filter>
     </ClCompile>
     <ClCompile Include="Sources\Engine\Engine.cpp">
-      <Filter>源文件\Sources\Engine\Private</Filter>
+      <Filter>Sources\Engine\Private</Filter>
     </ClCompile>
     <ClCompile Include="Sources\Base\Component.cpp">
-      <Filter>源文件\Sources\Base\Private</Filter>
+      <Filter>Sources\Base\Private</Filter>
     </ClCompile>
     <ClCompile Include="Sources\Base\Entity.cpp">
-      <Filter>源文件\Sources\Base\Private</Filter>
+      <Filter>Sources\Base\Private</Filter>
     </ClCompile>
     <ClCompile Include="Sources\Base\ObjectBase.cpp">
-      <Filter>源文件\Sources\Base\Private</Filter>
+      <Filter>Sources\Base\Private</Filter>
     </ClCompile>
     <ClCompile Include="Sources\Platform\Windows\Windows.cpp">
-      <Filter>源文件\Sources\Platform\Windows\Private</Filter>
+      <Filter>Sources\Platform\Windows\Private</Filter>
     </ClCompile>
     <ClCompile Include="Sources\World\Camera.cpp">
-      <Filter>源文件\Sources\World\Private</Filter>
+      <Filter>Sources\World\Private</Filter>
     </ClCompile>
     <ClCompile Include="Sources\World\Level.cpp">
-      <Filter>源文件\Sources\World\Private</Filter>
+      <Filter>Sources\World\Private</Filter>
     </ClCompile>
     <ClCompile Include="Sources\World\MeshComponent.cpp">
-      <Filter>源文件\Sources\World\Private</Filter>
+      <Filter>Sources\World\Private</Filter>
     </ClCompile>
     <ClCompile Include="Sources\World\Model.cpp">
-      <Filter>源文件\Sources\World\Private</Filter>
+      <Filter>Sources\World\Private</Filter>
     </ClCompile>
     <ClCompile Include="Sources\World\World.cpp">
-      <Filter>源文件\Sources\World\Private</Filter>
+      <Filter>Sources\World\Private</Filter>
     </ClCompile>
     <ClCompile Include="Sources\Types\TData.cpp">
-      <Filter>源文件\Sources\Types</Filter>
+      <Filter>Sources\Types</Filter>
     </ClCompile>
     <ClCompile Include="Sources\Graphics\Effect.cpp">
-      <Filter>源文件\Sources\Graphics\Private</Filter>
+      <Filter>Sources\Graphics\Private</Filter>
     </ClCompile>
     <ClCompile Include="Sources\Graphics\Material.cpp">
-      <Filter>源文件\Sources\Graphics\Private</Filter>
+      <Filter>Sources\Graphics\Private</Filter>
     </ClCompile>
     <ClCompile Include="Sources\Graphics\Pass.cpp">
-      <Filter>源文件\Sources\Graphics\Private</Filter>
+      <Filter>Sources\Graphics\Private</Filter>
     </ClCompile>
     <ClCompile Include="Sources\Graphics\Technique.cpp">
-      <Filter>源文件\Sources\Graphics\Private</Filter>
+      <Filter>Sources\Graphics\Private</Filter>
     </ClCompile>
     <ClCompile Include="Sources\Meshes\AbstractMesh.cpp">
-      <Filter>源文件\Sources\Meshes</Filter>
+      <Filter>Sources\Meshes</Filter>
     </ClCompile>
     <ClCompile Include="Sources\Meshes\Buffer.cpp">
-      <Filter>源文件\Sources\Meshes</Filter>
+      <Filter>Sources\Meshes</Filter>
     </ClCompile>
     <ClCompile Include="Sources\Meshes\DataBuffer.cpp">
-      <Filter>源文件\Sources\Meshes</Filter>
+      <Filter>Sources\Meshes</Filter>
     </ClCompile>
     <ClCompile Include="Sources\Meshes\Geometry.cpp">
-      <Filter>源文件\Sources\Meshes</Filter>
+      <Filter>Sources\Meshes</Filter>
     </ClCompile>
     <ClCompile Include="Sources\Meshes\IndexBuffer.cpp">
-      <Filter>源文件\Sources\Meshes</Filter>
+      <Filter>Sources\Meshes</Filter>
     </ClCompile>
     <ClCompile Include="Sources\Meshes\Mesh.cpp">
-      <Filter>源文件\Sources\Meshes</Filter>
+      <Filter>Sources\Meshes</Filter>
     </ClCompile>
     <ClCompile Include="Sources\Meshes\MeshBuilder.cpp">
-      <Filter>源文件\Sources\Meshes</Filter>
+      <Filter>Sources\Meshes</Filter>
     </ClCompile>
     <ClCompile Include="Sources\Meshes\SubMesh.cpp">
-      <Filter>源文件\Sources\Meshes</Filter>
+      <Filter>Sources\Meshes</Filter>
     </ClCompile>
     <ClCompile Include="Sources\Meshes\VertexBuffer.cpp">
-      <Filter>源文件\Sources\Meshes</Filter>
+      <Filter>Sources\Meshes</Filter>
     </ClCompile>
     <ClCompile Include="Sources\Graphics\GraphicPipeline.cpp">
-      <Filter>源文件\Sources\Graphics\Private</Filter>
+      <Filter>Sources\Graphics\Private</Filter>
     </ClCompile>
     <ClCompile Include="Sources\Graphics\RenderScene.cpp">
-      <Filter>源文件\Sources\Graphics\Private</Filter>
+      <Filter>Sources\Graphics\Private</Filter>
     </ClCompile>
     <ClCompile Include="Sources\Base\FileSystem.cpp">
-      <Filter>源文件\Sources\Base\Private</Filter>
+      <Filter>Sources\Base\Private</Filter>
     </ClCompile>
     <ClCompile Include="Sources\Loaders\EntityLoader.cpp">
-      <Filter>源文件\Sources\Loader</Filter>
+      <Filter>Sources\Loader</Filter>
     </ClCompile>
     <ClCompile Include="Sources\Graphics\RenderObject.cpp">
-      <Filter>源文件\Sources\Graphics\Private</Filter>
+      <Filter>Sources\Graphics\Private</Filter>
     </ClCompile>
     <ClCompile Include="Sources\Loaders\ImageLoader.cpp">
-      <Filter>源文件\Sources\Loader</Filter>
+      <Filter>Sources\Loader</Filter>
     </ClCompile>
     <ClCompile Include="Sources\World\Terrain.cpp">
-      <Filter>源文件\Sources\World\Private</Filter>
+      <Filter>Sources\World\Private</Filter>
+    </ClCompile>
+    <ClCompile Include="Alita.cpp">
+      <Filter>Sources</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Sources\RHI\Include\BindGroup.h">
-      <Filter>源文件\Sources\RHI\Include</Filter>
+      <Filter>Sources\RHI\Include</Filter>
     </ClInclude>
     <ClInclude Include="Sources\RHI\Include\BindGroupLayout.h">
-      <Filter>源文件\Sources\RHI\Include</Filter>
+      <Filter>Sources\RHI\Include</Filter>
     </ClInclude>
     <ClInclude Include="Sources\RHI\Include\BindingResource.h">
-      <Filter>源文件\Sources\RHI\Include</Filter>
+      <Filter>Sources\RHI\Include</Filter>
     </ClInclude>
     <ClInclude Include="Sources\RHI\Include\Buffer.h">
-      <Filter>源文件\Sources\RHI\Include</Filter>
+      <Filter>Sources\RHI\Include</Filter>
     </ClInclude>
     <ClInclude Include="Sources\RHI\Include\CanvasContext.h">
-      <Filter>源文件\Sources\RHI\Include</Filter>
+      <Filter>Sources\RHI\Include</Filter>
     </ClInclude>
     <ClInclude Include="Sources\RHI\Include\CommandBuffer.h">
-      <Filter>源文件\Sources\RHI\Include</Filter>
+      <Filter>Sources\RHI\Include</Filter>
     </ClInclude>
     <ClInclude Include="Sources\RHI\Include\CommandEncoder.h">
-      <Filter>源文件\Sources\RHI\Include</Filter>
+      <Filter>Sources\RHI\Include</Filter>
     </ClInclude>
     <ClInclude Include="Sources\RHI\Include\Constants.h">
-      <Filter>源文件\Sources\RHI\Include</Filter>
+      <Filter>Sources\RHI\Include</Filter>
     </ClInclude>
     <ClInclude Include="Sources\RHI\Include\Descriptors.h">
-      <Filter>源文件\Sources\RHI\Include</Filter>
+      <Filter>Sources\RHI\Include</Filter>
     </ClInclude>
     <ClInclude Include="Sources\RHI\Include\Device.h">
-      <Filter>源文件\Sources\RHI\Include</Filter>
+      <Filter>Sources\RHI\Include</Filter>
     </ClInclude>
     <ClInclude Include="Sources\RHI\Include\Flags.h">
-      <Filter>源文件\Sources\RHI\Include</Filter>
+      <Filter>Sources\RHI\Include</Filter>
     </ClInclude>
     <ClInclude Include="Sources\RHI\Include\PipelineLayout.h">
-      <Filter>源文件\Sources\RHI\Include</Filter>
+      <Filter>Sources\RHI\Include</Filter>
     </ClInclude>
     <ClInclude Include="Sources\RHI\Include\Queue.h">
-      <Filter>源文件\Sources\RHI\Include</Filter>
+      <Filter>Sources\RHI\Include</Filter>
     </ClInclude>
     <ClInclude Include="Sources\RHI\Include\RenderPass.h">
-      <Filter>源文件\Sources\RHI\Include</Filter>
+      <Filter>Sources\RHI\Include</Filter>
     </ClInclude>
     <ClInclude Include="Sources\RHI\Include\RenderPassEncoder.h">
-      <Filter>源文件\Sources\RHI\Include</Filter>
+      <Filter>Sources\RHI\Include</Filter>
     </ClInclude>
     <ClInclude Include="Sources\RHI\Include\RenderPipeine.h">
-      <Filter>源文件\Sources\RHI\Include</Filter>
+      <Filter>Sources\RHI\Include</Filter>
     </ClInclude>
     <ClInclude Include="Sources\RHI\Include\RenderQueue.h">
-      <Filter>源文件\Sources\RHI\Include</Filter>
+      <Filter>Sources\RHI\Include</Filter>
     </ClInclude>
     <ClInclude Include="Sources\RHI\Include\RenderTarget.h">
-      <Filter>源文件\Sources\RHI\Include</Filter>
+      <Filter>Sources\RHI\Include</Filter>
     </ClInclude>
     <ClInclude Include="Sources\RHI\Include\RHI.h">
-      <Filter>源文件\Sources\RHI\Include</Filter>
+      <Filter>Sources\RHI\Include</Filter>
     </ClInclude>
     <ClInclude Include="Sources\RHI\Include\RHIObjectBase.h">
-      <Filter>源文件\Sources\RHI\Include</Filter>
+      <Filter>Sources\RHI\Include</Filter>
     </ClInclude>
     <ClInclude Include="Sources\RHI\Include\Sampler.h">
-      <Filter>源文件\Sources\RHI\Include</Filter>
+      <Filter>Sources\RHI\Include</Filter>
     </ClInclude>
     <ClInclude Include="Sources\RHI\Include\Shader.h">
-      <Filter>源文件\Sources\RHI\Include</Filter>
+      <Filter>Sources\RHI\Include</Filter>
     </ClInclude>
     <ClInclude Include="Sources\RHI\Include\SwapChain.h">
-      <Filter>源文件\Sources\RHI\Include</Filter>
+      <Filter>Sources\RHI\Include</Filter>
     </ClInclude>
     <ClInclude Include="Sources\RHI\Include\Texture.h">
-      <Filter>源文件\Sources\RHI\Include</Filter>
+      <Filter>Sources\RHI\Include</Filter>
     </ClInclude>
     <ClInclude Include="Sources\RHI\Include\TextureView.h">
-      <Filter>源文件\Sources\RHI\Include</Filter>
+      <Filter>Sources\RHI\Include</Filter>
     </ClInclude>
     <ClInclude Include="Sources\RHI\Include\xxhash64.h">
-      <Filter>源文件\Sources\RHI\Include</Filter>
+      <Filter>Sources\RHI\Include</Filter>
     </ClInclude>
     <ClInclude Include="Sources\RHI\Backend\Vulkan\ShaderHelper.h">
-      <Filter>源文件\Sources\RHI\Backend\Vulkan</Filter>
+      <Filter>Sources\RHI\Backend\Vulkan</Filter>
     </ClInclude>
     <ClInclude Include="Sources\RHI\Backend\Vulkan\VKBindGroup.h">
-      <Filter>源文件\Sources\RHI\Backend\Vulkan</Filter>
+      <Filter>Sources\RHI\Backend\Vulkan</Filter>
     </ClInclude>
     <ClInclude Include="Sources\RHI\Backend\Vulkan\VKBindGroupLayout.h">
-      <Filter>源文件\Sources\RHI\Backend\Vulkan</Filter>
+      <Filter>Sources\RHI\Backend\Vulkan</Filter>
     </ClInclude>
     <ClInclude Include="Sources\RHI\Backend\Vulkan\VKBuffer.h">
-      <Filter>源文件\Sources\RHI\Backend\Vulkan</Filter>
+      <Filter>Sources\RHI\Backend\Vulkan</Filter>
     </ClInclude>
     <ClInclude Include="Sources\RHI\Backend\Vulkan\VKCanvasContext.h">
-      <Filter>源文件\Sources\RHI\Backend\Vulkan</Filter>
+      <Filter>Sources\RHI\Backend\Vulkan</Filter>
     </ClInclude>
     <ClInclude Include="Sources\RHI\Backend\Vulkan\VKCommandBuffer.h">
-      <Filter>源文件\Sources\RHI\Backend\Vulkan</Filter>
+      <Filter>Sources\RHI\Backend\Vulkan</Filter>
     </ClInclude>
     <ClInclude Include="Sources\RHI\Backend\Vulkan\VKCommandEncoder.h">
-      <Filter>源文件\Sources\RHI\Backend\Vulkan</Filter>
+      <Filter>Sources\RHI\Backend\Vulkan</Filter>
     </ClInclude>
     <ClInclude Include="Sources\RHI\Backend\Vulkan\VKDevice.h">
-      <Filter>源文件\Sources\RHI\Backend\Vulkan</Filter>
+      <Filter>Sources\RHI\Backend\Vulkan</Filter>
     </ClInclude>
     <ClInclude Include="Sources\RHI\Backend\Vulkan\VKPipelineLayout.h">
-      <Filter>源文件\Sources\RHI\Backend\Vulkan</Filter>
+      <Filter>Sources\RHI\Backend\Vulkan</Filter>
     </ClInclude>
     <ClInclude Include="Sources\RHI\Backend\Vulkan\VKQueue.h">
-      <Filter>源文件\Sources\RHI\Backend\Vulkan</Filter>
+      <Filter>Sources\RHI\Backend\Vulkan</Filter>
     </ClInclude>
     <ClInclude Include="Sources\RHI\Backend\Vulkan\VKRenderPass.h">
-      <Filter>源文件\Sources\RHI\Backend\Vulkan</Filter>
+      <Filter>Sources\RHI\Backend\Vulkan</Filter>
     </ClInclude>
     <ClInclude Include="Sources\RHI\Backend\Vulkan\VKRenderPassEncoder.h">
-      <Filter>源文件\Sources\RHI\Backend\Vulkan</Filter>
+      <Filter>Sources\RHI\Backend\Vulkan</Filter>
     </ClInclude>
     <ClInclude Include="Sources\RHI\Backend\Vulkan\VKRenderPipeline.h">
-      <Filter>源文件\Sources\RHI\Backend\Vulkan</Filter>
+      <Filter>Sources\RHI\Backend\Vulkan</Filter>
     </ClInclude>
     <ClInclude Include="Sources\RHI\Backend\Vulkan\VKRenderQueue.h">
-      <Filter>源文件\Sources\RHI\Backend\Vulkan</Filter>
+      <Filter>Sources\RHI\Backend\Vulkan</Filter>
     </ClInclude>
     <ClInclude Include="Sources\RHI\Backend\Vulkan\VKSampler.h">
-      <Filter>源文件\Sources\RHI\Backend\Vulkan</Filter>
+      <Filter>Sources\RHI\Backend\Vulkan</Filter>
     </ClInclude>
     <ClInclude Include="Sources\RHI\Backend\Vulkan\VKShader.h">
-      <Filter>源文件\Sources\RHI\Backend\Vulkan</Filter>
+      <Filter>Sources\RHI\Backend\Vulkan</Filter>
     </ClInclude>
     <ClInclude Include="Sources\RHI\Backend\Vulkan\VKSwapChain.h">
-      <Filter>源文件\Sources\RHI\Backend\Vulkan</Filter>
+      <Filter>Sources\RHI\Backend\Vulkan</Filter>
     </ClInclude>
     <ClInclude Include="Sources\RHI\Backend\Vulkan\VKTexture.h">
-      <Filter>源文件\Sources\RHI\Backend\Vulkan</Filter>
+      <Filter>Sources\RHI\Backend\Vulkan</Filter>
     </ClInclude>
     <ClInclude Include="Sources\RHI\Backend\Vulkan\VKTextureView.h">
-      <Filter>源文件\Sources\RHI\Backend\Vulkan</Filter>
+      <Filter>Sources\RHI\Backend\Vulkan</Filter>
     </ClInclude>
     <ClInclude Include="Sources\RHI\Backend\Vulkan\VKTypes.h">
-      <Filter>源文件\Sources\RHI\Backend\Vulkan</Filter>
+      <Filter>Sources\RHI\Backend\Vulkan</Filter>
     </ClInclude>
     <ClInclude Include="Sources\RHI\Backend\Vulkan\VulkanMarcos.h">
-      <Filter>源文件\Sources\RHI\Backend\Vulkan</Filter>
+      <Filter>Sources\RHI\Backend\Vulkan</Filter>
     </ClInclude>
     <ClInclude Include="Sources\Platform\Platform.h">
-      <Filter>源文件\Sources\Platform</Filter>
+      <Filter>Sources\Platform</Filter>
     </ClInclude>
     <ClInclude Include="Sources\RHI\Macros.h">
-      <Filter>源文件\Sources</Filter>
+      <Filter>Sources</Filter>
     </ClInclude>
     <ClInclude Include="Third-Party\StandAlone\DirStackFileIncluder.h">
-      <Filter>源文件\Third-Party\StandAlone</Filter>
+      <Filter>Third-Party\StandAlone</Filter>
     </ClInclude>
     <ClInclude Include="Third-Party\StandAlone\ResourceLimits.h">
-      <Filter>源文件\Third-Party\StandAlone</Filter>
+      <Filter>Third-Party\StandAlone</Filter>
     </ClInclude>
     <ClInclude Include="Third-Party\StandAlone\Worklist.h">
-      <Filter>源文件\Third-Party\StandAlone</Filter>
+      <Filter>Third-Party\StandAlone</Filter>
     </ClInclude>
     <ClInclude Include="Third-Party\glslang\Include\arrays.h">
-      <Filter>源文件\Third-Party\glslang\Include</Filter>
+      <Filter>Third-Party\glslang\Include</Filter>
     </ClInclude>
     <ClInclude Include="Third-Party\glslang\Include\BaseTypes.h">
-      <Filter>源文件\Third-Party\glslang\Include</Filter>
+      <Filter>Third-Party\glslang\Include</Filter>
     </ClInclude>
     <ClInclude Include="Third-Party\glslang\Include\Common.h">
-      <Filter>源文件\Third-Party\glslang\Include</Filter>
+      <Filter>Third-Party\glslang\Include</Filter>
     </ClInclude>
     <ClInclude Include="Third-Party\glslang\Include\ConstantUnion.h">
-      <Filter>源文件\Third-Party\glslang\Include</Filter>
+      <Filter>Third-Party\glslang\Include</Filter>
     </ClInclude>
     <ClInclude Include="Third-Party\glslang\Include\InfoSink.h">
-      <Filter>源文件\Third-Party\glslang\Include</Filter>
+      <Filter>Third-Party\glslang\Include</Filter>
     </ClInclude>
     <ClInclude Include="Third-Party\glslang\Include\InitializeGlobals.h">
-      <Filter>源文件\Third-Party\glslang\Include</Filter>
+      <Filter>Third-Party\glslang\Include</Filter>
     </ClInclude>
     <ClInclude Include="Third-Party\glslang\Include\intermediate.h">
-      <Filter>源文件\Third-Party\glslang\Include</Filter>
+      <Filter>Third-Party\glslang\Include</Filter>
     </ClInclude>
     <ClInclude Include="Third-Party\glslang\Include\PoolAlloc.h">
-      <Filter>源文件\Third-Party\glslang\Include</Filter>
+      <Filter>Third-Party\glslang\Include</Filter>
     </ClInclude>
     <ClInclude Include="Third-Party\glslang\Include\ResourceLimits.h">
-      <Filter>源文件\Third-Party\glslang\Include</Filter>
+      <Filter>Third-Party\glslang\Include</Filter>
     </ClInclude>
     <ClInclude Include="Third-Party\glslang\Include\revision.h">
-      <Filter>源文件\Third-Party\glslang\Include</Filter>
+      <Filter>Third-Party\glslang\Include</Filter>
     </ClInclude>
     <ClInclude Include="Third-Party\glslang\Include\ShHandle.h">
-      <Filter>源文件\Third-Party\glslang\Include</Filter>
+      <Filter>Third-Party\glslang\Include</Filter>
     </ClInclude>
     <ClInclude Include="Third-Party\glslang\Include\Types.h">
-      <Filter>源文件\Third-Party\glslang\Include</Filter>
+      <Filter>Third-Party\glslang\Include</Filter>
     </ClInclude>
     <ClInclude Include="Third-Party\glslang\Public\ShaderLang.h">
-      <Filter>源文件\Third-Party\glslang\Public</Filter>
+      <Filter>Third-Party\glslang\Public</Filter>
     </ClInclude>
     <ClInclude Include="Third-Party\glslang\MachineIndependent\ParseHelper.h">
-      <Filter>源文件\Third-Party\glslang\MachineIndependent</Filter>
+      <Filter>Third-Party\glslang\MachineIndependent</Filter>
     </ClInclude>
     <ClInclude Include="Third-Party\glslang\MachineIndependent\parseVersions.h">
-      <Filter>源文件\Third-Party\glslang\MachineIndependent</Filter>
+      <Filter>Third-Party\glslang\MachineIndependent</Filter>
     </ClInclude>
     <ClInclude Include="Third-Party\glslang\MachineIndependent\pch.h">
-      <Filter>源文件\Third-Party\glslang\MachineIndependent</Filter>
+      <Filter>Third-Party\glslang\MachineIndependent</Filter>
     </ClInclude>
     <ClInclude Include="Third-Party\glslang\MachineIndependent\propagateNoContraction.h">
-      <Filter>源文件\Third-Party\glslang\MachineIndependent</Filter>
+      <Filter>Third-Party\glslang\MachineIndependent</Filter>
     </ClInclude>
     <ClInclude Include="Third-Party\glslang\MachineIndependent\reflection.h">
-      <Filter>源文件\Third-Party\glslang\MachineIndependent</Filter>
+      <Filter>Third-Party\glslang\MachineIndependent</Filter>
     </ClInclude>
     <ClInclude Include="Third-Party\glslang\MachineIndependent\RemoveTree.h">
-      <Filter>源文件\Third-Party\glslang\MachineIndependent</Filter>
+      <Filter>Third-Party\glslang\MachineIndependent</Filter>
     </ClInclude>
     <ClInclude Include="Third-Party\glslang\MachineIndependent\Scan.h">
-      <Filter>源文件\Third-Party\glslang\MachineIndependent</Filter>
+      <Filter>Third-Party\glslang\MachineIndependent</Filter>
     </ClInclude>
     <ClInclude Include="Third-Party\glslang\MachineIndependent\ScanContext.h">
-      <Filter>源文件\Third-Party\glslang\MachineIndependent</Filter>
+      <Filter>Third-Party\glslang\MachineIndependent</Filter>
     </ClInclude>
     <ClInclude Include="Third-Party\glslang\MachineIndependent\SymbolTable.h">
-      <Filter>源文件\Third-Party\glslang\MachineIndependent</Filter>
+      <Filter>Third-Party\glslang\MachineIndependent</Filter>
     </ClInclude>
     <ClInclude Include="Third-Party\glslang\MachineIndependent\Versions.h">
-      <Filter>源文件\Third-Party\glslang\MachineIndependent</Filter>
+      <Filter>Third-Party\glslang\MachineIndependent</Filter>
     </ClInclude>
     <ClInclude Include="Third-Party\glslang\MachineIndependent\attribute.h">
-      <Filter>源文件\Third-Party\glslang\MachineIndependent</Filter>
+      <Filter>Third-Party\glslang\MachineIndependent</Filter>
     </ClInclude>
     <ClInclude Include="Third-Party\glslang\MachineIndependent\gl_types.h">
-      <Filter>源文件\Third-Party\glslang\MachineIndependent</Filter>
+      <Filter>Third-Party\glslang\MachineIndependent</Filter>
     </ClInclude>
     <ClInclude Include="Third-Party\glslang\MachineIndependent\glslang_tab.cpp.h">
-      <Filter>源文件\Third-Party\glslang\MachineIndependent</Filter>
+      <Filter>Third-Party\glslang\MachineIndependent</Filter>
     </ClInclude>
     <ClInclude Include="Third-Party\glslang\MachineIndependent\Initialize.h">
-      <Filter>源文件\Third-Party\glslang\MachineIndependent</Filter>
+      <Filter>Third-Party\glslang\MachineIndependent</Filter>
     </ClInclude>
     <ClInclude Include="Third-Party\glslang\MachineIndependent\iomapper.h">
-      <Filter>源文件\Third-Party\glslang\MachineIndependent</Filter>
+      <Filter>Third-Party\glslang\MachineIndependent</Filter>
     </ClInclude>
     <ClInclude Include="Third-Party\glslang\MachineIndependent\LiveTraverser.h">
-      <Filter>源文件\Third-Party\glslang\MachineIndependent</Filter>
+      <Filter>Third-Party\glslang\MachineIndependent</Filter>
     </ClInclude>
     <ClInclude Include="Third-Party\glslang\MachineIndependent\localintermediate.h">
-      <Filter>源文件\Third-Party\glslang\MachineIndependent</Filter>
+      <Filter>Third-Party\glslang\MachineIndependent</Filter>
     </ClInclude>
     <ClInclude Include="Third-Party\glslang\MachineIndependent\preprocessor\PpContext.h">
-      <Filter>源文件\Third-Party\glslang\MachineIndependent\preprocessor</Filter>
+      <Filter>Third-Party\glslang\MachineIndependent\preprocessor</Filter>
     </ClInclude>
     <ClInclude Include="Third-Party\glslang\MachineIndependent\preprocessor\PpTokens.h">
-      <Filter>源文件\Third-Party\glslang\MachineIndependent\preprocessor</Filter>
+      <Filter>Third-Party\glslang\MachineIndependent\preprocessor</Filter>
     </ClInclude>
     <ClInclude Include="Third-Party\SPIRV\bitutils.h">
-      <Filter>源文件\Third-Party\SPIRV</Filter>
+      <Filter>Third-Party\SPIRV</Filter>
     </ClInclude>
     <ClInclude Include="Third-Party\SPIRV\disassemble.h">
-      <Filter>源文件\Third-Party\SPIRV</Filter>
+      <Filter>Third-Party\SPIRV</Filter>
     </ClInclude>
     <ClInclude Include="Third-Party\SPIRV\doc.h">
-      <Filter>源文件\Third-Party\SPIRV</Filter>
+      <Filter>Third-Party\SPIRV</Filter>
     </ClInclude>
     <ClInclude Include="Third-Party\SPIRV\GLSL.ext.AMD.h">
-      <Filter>源文件\Third-Party\SPIRV</Filter>
+      <Filter>Third-Party\SPIRV</Filter>
     </ClInclude>
     <ClInclude Include="Third-Party\SPIRV\GLSL.ext.EXT.h">
-      <Filter>源文件\Third-Party\SPIRV</Filter>
+      <Filter>Third-Party\SPIRV</Filter>
     </ClInclude>
     <ClInclude Include="Third-Party\SPIRV\GLSL.ext.KHR.h">
-      <Filter>源文件\Third-Party\SPIRV</Filter>
+      <Filter>Third-Party\SPIRV</Filter>
     </ClInclude>
     <ClInclude Include="Third-Party\SPIRV\GLSL.ext.NV.h">
-      <Filter>源文件\Third-Party\SPIRV</Filter>
+      <Filter>Third-Party\SPIRV</Filter>
     </ClInclude>
     <ClInclude Include="Third-Party\SPIRV\GLSL.std.450.h">
-      <Filter>源文件\Third-Party\SPIRV</Filter>
+      <Filter>Third-Party\SPIRV</Filter>
     </ClInclude>
     <ClInclude Include="Third-Party\SPIRV\GlslangToSpv.h">
-      <Filter>源文件\Third-Party\SPIRV</Filter>
+      <Filter>Third-Party\SPIRV</Filter>
     </ClInclude>
     <ClInclude Include="Third-Party\SPIRV\hex_float.h">
-      <Filter>源文件\Third-Party\SPIRV</Filter>
+      <Filter>Third-Party\SPIRV</Filter>
     </ClInclude>
     <ClInclude Include="Third-Party\SPIRV\Logger.h">
-      <Filter>源文件\Third-Party\SPIRV</Filter>
+      <Filter>Third-Party\SPIRV</Filter>
     </ClInclude>
     <ClInclude Include="Third-Party\SPIRV\spirv.hpp">
-      <Filter>源文件\Third-Party\SPIRV</Filter>
+      <Filter>Third-Party\SPIRV</Filter>
     </ClInclude>
     <ClInclude Include="Third-Party\SPIRV\SpvBuilder.h">
-      <Filter>源文件\Third-Party\SPIRV</Filter>
+      <Filter>Third-Party\SPIRV</Filter>
     </ClInclude>
     <ClInclude Include="Third-Party\SPIRV\spvIR.h">
-      <Filter>源文件\Third-Party\SPIRV</Filter>
+      <Filter>Third-Party\SPIRV</Filter>
     </ClInclude>
     <ClInclude Include="Third-Party\SPIRV\SPVRemapper.h">
-      <Filter>源文件\Third-Party\SPIRV</Filter>
+      <Filter>Third-Party\SPIRV</Filter>
     </ClInclude>
     <ClInclude Include="Third-Party\SPIRV\SpvTools.h">
-      <Filter>源文件\Third-Party\SPIRV</Filter>
+      <Filter>Third-Party\SPIRV</Filter>
     </ClInclude>
     <ClInclude Include="Third-Party\OGLCompilersDLL\InitializeDll.h">
-      <Filter>源文件\Third-Party\OGLCompilersDLL</Filter>
+      <Filter>Third-Party\OGLCompilersDLL</Filter>
     </ClInclude>
     <ClInclude Include="Third-Party\glslang\OSDependent\osinclude.h">
-      <Filter>源文件\Third-Party\glslang\OSDependent</Filter>
+      <Filter>Third-Party\glslang\OSDependent</Filter>
     </ClInclude>
     <ClInclude Include="Sources\Engine\Engine.h">
-      <Filter>源文件\Sources\Engine\Publlic</Filter>
+      <Filter>Sources\Engine\Publlic</Filter>
     </ClInclude>
     <ClInclude Include="Sources\Base\Entity.h">
-      <Filter>源文件\Sources\Base\Public</Filter>
+      <Filter>Sources\Base\Public</Filter>
     </ClInclude>
     <ClInclude Include="Sources\Base\Macros.h">
-      <Filter>源文件\Sources\Base\Public</Filter>
+      <Filter>Sources\Base\Public</Filter>
     </ClInclude>
     <ClInclude Include="Sources\Base\ObjectBase.h">
-      <Filter>源文件\Sources\Base\Public</Filter>
+      <Filter>Sources\Base\Public</Filter>
     </ClInclude>
     <ClInclude Include="Sources\Base\Component.h">
-      <Filter>源文件\Sources\Base\Public</Filter>
+      <Filter>Sources\Base\Public</Filter>
     </ClInclude>
     <ClInclude Include="Sources\Platform\Windows\Windows.h">
-      <Filter>源文件\Sources\Platform\Windows\Public</Filter>
+      <Filter>Sources\Platform\Windows\Public</Filter>
     </ClInclude>
     <ClInclude Include="Sources\World\Level.h">
-      <Filter>源文件\Sources\World\Public</Filter>
+      <Filter>Sources\World\Public</Filter>
     </ClInclude>
     <ClInclude Include="Sources\World\MeshComponent.h">
-      <Filter>源文件\Sources\World\Public</Filter>
+      <Filter>Sources\World\Public</Filter>
     </ClInclude>
     <ClInclude Include="Sources\World\Model.h">
-      <Filter>源文件\Sources\World\Public</Filter>
+      <Filter>Sources\World\Public</Filter>
     </ClInclude>
     <ClInclude Include="Sources\World\World.h">
-      <Filter>源文件\Sources\World\Public</Filter>
+      <Filter>Sources\World\Public</Filter>
     </ClInclude>
     <ClInclude Include="Sources\World\Camera.h">
-      <Filter>源文件\Sources\World\Public</Filter>
+      <Filter>Sources\World\Public</Filter>
     </ClInclude>
     <ClInclude Include="Sources\Types\TData.h">
-      <Filter>源文件\Sources\Types</Filter>
+      <Filter>Sources\Types</Filter>
     </ClInclude>
     <ClInclude Include="Sources\Types\Types.h">
-      <Filter>源文件\Sources\Types</Filter>
+      <Filter>Sources\Types</Filter>
     </ClInclude>
     <ClInclude Include="Third-Party\glm\fwd.hpp">
-      <Filter>源文件\Third-Party\glm</Filter>
+      <Filter>Third-Party\glm</Filter>
     </ClInclude>
     <ClInclude Include="Third-Party\glm\geometric.hpp">
-      <Filter>源文件\Third-Party\glm</Filter>
+      <Filter>Third-Party\glm</Filter>
     </ClInclude>
     <ClInclude Include="Third-Party\glm\glm.hpp">
-      <Filter>源文件\Third-Party\glm</Filter>
+      <Filter>Third-Party\glm</Filter>
     </ClInclude>
     <ClInclude Include="Third-Party\glm\integer.hpp">
-      <Filter>源文件\Third-Party\glm</Filter>
+      <Filter>Third-Party\glm</Filter>
     </ClInclude>
     <ClInclude Include="Third-Party\glm\mat2x2.hpp">
-      <Filter>源文件\Third-Party\glm</Filter>
+      <Filter>Third-Party\glm</Filter>
     </ClInclude>
     <ClInclude Include="Third-Party\glm\mat2x3.hpp">
-      <Filter>源文件\Third-Party\glm</Filter>
+      <Filter>Third-Party\glm</Filter>
     </ClInclude>
     <ClInclude Include="Third-Party\glm\mat2x4.hpp">
-      <Filter>源文件\Third-Party\glm</Filter>
+      <Filter>Third-Party\glm</Filter>
     </ClInclude>
     <ClInclude Include="Third-Party\glm\mat3x2.hpp">
-      <Filter>源文件\Third-Party\glm</Filter>
+      <Filter>Third-Party\glm</Filter>
     </ClInclude>
     <ClInclude Include="Third-Party\glm\mat3x3.hpp">
-      <Filter>源文件\Third-Party\glm</Filter>
+      <Filter>Third-Party\glm</Filter>
     </ClInclude>
     <ClInclude Include="Third-Party\glm\mat3x4.hpp">
-      <Filter>源文件\Third-Party\glm</Filter>
+      <Filter>Third-Party\glm</Filter>
     </ClInclude>
     <ClInclude Include="Third-Party\glm\mat4x2.hpp">
-      <Filter>源文件\Third-Party\glm</Filter>
+      <Filter>Third-Party\glm</Filter>
     </ClInclude>
     <ClInclude Include="Third-Party\glm\mat4x3.hpp">
-      <Filter>源文件\Third-Party\glm</Filter>
+      <Filter>Third-Party\glm</Filter>
     </ClInclude>
     <ClInclude Include="Third-Party\glm\mat4x4.hpp">
-      <Filter>源文件\Third-Party\glm</Filter>
+      <Filter>Third-Party\glm</Filter>
     </ClInclude>
     <ClInclude Include="Third-Party\glm\matrix.hpp">
-      <Filter>源文件\Third-Party\glm</Filter>
+      <Filter>Third-Party\glm</Filter>
     </ClInclude>
     <ClInclude Include="Third-Party\glm\packing.hpp">
-      <Filter>源文件\Third-Party\glm</Filter>
+      <Filter>Third-Party\glm</Filter>
     </ClInclude>
     <ClInclude Include="Third-Party\glm\trigonometric.hpp">
-      <Filter>源文件\Third-Party\glm</Filter>
+      <Filter>Third-Party\glm</Filter>
     </ClInclude>
     <ClInclude Include="Third-Party\glm\vec2.hpp">
-      <Filter>源文件\Third-Party\glm</Filter>
+      <Filter>Third-Party\glm</Filter>
     </ClInclude>
     <ClInclude Include="Third-Party\glm\vec3.hpp">
-      <Filter>源文件\Third-Party\glm</Filter>
+      <Filter>Third-Party\glm</Filter>
     </ClInclude>
     <ClInclude Include="Third-Party\glm\vec4.hpp">
-      <Filter>源文件\Third-Party\glm</Filter>
+      <Filter>Third-Party\glm</Filter>
     </ClInclude>
     <ClInclude Include="Third-Party\glm\vector_relational.hpp">
-      <Filter>源文件\Third-Party\glm</Filter>
+      <Filter>Third-Party\glm</Filter>
     </ClInclude>
     <ClInclude Include="Third-Party\glm\common.hpp">
-      <Filter>源文件\Third-Party\glm</Filter>
+      <Filter>Third-Party\glm</Filter>
     </ClInclude>
     <ClInclude Include="Third-Party\glm\exponential.hpp">
-      <Filter>源文件\Third-Party\glm</Filter>
+      <Filter>Third-Party\glm</Filter>
     </ClInclude>
     <ClInclude Include="Third-Party\glm\ext.hpp">
-      <Filter>源文件\Third-Party\glm</Filter>
+      <Filter>Third-Party\glm</Filter>
     </ClInclude>
     <ClInclude Include="Sources\Graphics\Effect.h">
-      <Filter>源文件\Sources\Graphics\Public</Filter>
+      <Filter>Sources\Graphics\Public</Filter>
     </ClInclude>
     <ClInclude Include="Sources\Graphics\Material.h">
-      <Filter>源文件\Sources\Graphics\Public</Filter>
+      <Filter>Sources\Graphics\Public</Filter>
     </ClInclude>
     <ClInclude Include="Sources\Graphics\Pass.h">
-      <Filter>源文件\Sources\Graphics\Public</Filter>
+      <Filter>Sources\Graphics\Public</Filter>
     </ClInclude>
     <ClInclude Include="Sources\Graphics\Technique.h">
-      <Filter>源文件\Sources\Graphics\Public</Filter>
+      <Filter>Sources\Graphics\Public</Filter>
     </ClInclude>
     <ClInclude Include="Sources\Meshes\AbstractMesh.h">
-      <Filter>源文件\Sources\Meshes</Filter>
+      <Filter>Sources\Meshes</Filter>
     </ClInclude>
     <ClInclude Include="Sources\Meshes\Buffer.h">
-      <Filter>源文件\Sources\Meshes</Filter>
+      <Filter>Sources\Meshes</Filter>
     </ClInclude>
     <ClInclude Include="Sources\Meshes\DataBuffer.h">
-      <Filter>源文件\Sources\Meshes</Filter>
+      <Filter>Sources\Meshes</Filter>
     </ClInclude>
     <ClInclude Include="Sources\Meshes\Geometry.h">
-      <Filter>源文件\Sources\Meshes</Filter>
+      <Filter>Sources\Meshes</Filter>
     </ClInclude>
     <ClInclude Include="Sources\Meshes\IndexBuffer.h">
-      <Filter>源文件\Sources\Meshes</Filter>
+      <Filter>Sources\Meshes</Filter>
     </ClInclude>
     <ClInclude Include="Sources\Meshes\Mesh.h">
-      <Filter>源文件\Sources\Meshes</Filter>
+      <Filter>Sources\Meshes</Filter>
     </ClInclude>
     <ClInclude Include="Sources\Meshes\MeshBuilder.h">
-      <Filter>源文件\Sources\Meshes</Filter>
+      <Filter>Sources\Meshes</Filter>
     </ClInclude>
     <ClInclude Include="Sources\Meshes\SubMesh.h">
-      <Filter>源文件\Sources\Meshes</Filter>
+      <Filter>Sources\Meshes</Filter>
     </ClInclude>
     <ClInclude Include="Sources\Meshes\VertexBuffer.h">
-      <Filter>源文件\Sources\Meshes</Filter>
+      <Filter>Sources\Meshes</Filter>
     </ClInclude>
     <ClInclude Include="Sources\Graphics\GraphicPipeline.h">
-      <Filter>源文件\Sources\Graphics\Public</Filter>
+      <Filter>Sources\Graphics\Public</Filter>
     </ClInclude>
     <ClInclude Include="Sources\Graphics\RenderScene.h">
-      <Filter>源文件\Sources\Graphics\Public</Filter>
+      <Filter>Sources\Graphics\Public</Filter>
     </ClInclude>
     <ClInclude Include="Sources\Base\FileSystem.h">
-      <Filter>源文件\Sources\Base\Public</Filter>
+      <Filter>Sources\Base\Public</Filter>
     </ClInclude>
     <ClInclude Include="Sources\Loaders\EntityLoader.h">
-      <Filter>源文件\Sources\Loader</Filter>
+      <Filter>Sources\Loader</Filter>
     </ClInclude>
     <ClInclude Include="Sources\Graphics\RenderObject.h">
-      <Filter>源文件\Sources\Graphics\Public</Filter>
+      <Filter>Sources\Graphics\Public</Filter>
     </ClInclude>
     <ClInclude Include="Sources\Loaders\ImageLoader.h">
-      <Filter>源文件\Sources\Loader</Filter>
+      <Filter>Sources\Loader</Filter>
     </ClInclude>
     <ClInclude Include="Sources\World\Terrain.h">
-      <Filter>源文件\Sources\World\Public</Filter>
+      <Filter>Sources\World\Public</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Third-Party\glslang\Include\revision.template">
-      <Filter>源文件\Third-Party\glslang\Include</Filter>
+      <Filter>Third-Party\glslang\Include</Filter>
     </None>
   </ItemGroup>
 </Project>

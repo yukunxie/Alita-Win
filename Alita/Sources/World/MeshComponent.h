@@ -12,6 +12,7 @@
 NS_RX_BEGIN
 
 class MeshComponentBuilder;
+class Terrain;
 
 class MeshComponent : public Component
 {
@@ -31,6 +32,7 @@ protected:
 	Geometry* geometry_ = nullptr;
 
 	friend class MeshComponentBuilder;
+	friend class Terrain;
 };
 
 class MeshComponentBuilder
