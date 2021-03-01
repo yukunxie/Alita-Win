@@ -22,6 +22,7 @@ FileSystem::FileSystem()
 	}
 
 	searchPaths_.push_back(std::string(workingDir) + "/Assets/");
+	searchPaths_.push_back(std::string(workingDir) + "/Sources/");
 
 	// todo realxie
 #if defined(WIN32) && defined(_DEBUG)
