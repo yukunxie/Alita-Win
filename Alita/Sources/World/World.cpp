@@ -29,7 +29,7 @@ World::World()
 	}
 
 	{
-		auto terrain = Terrain::CreateFromHeightMap("Textures/heightmap.png", -1.f, 2.f, 0.05f);
+		auto terrain = Terrain::CreateFromHeightMap("Textures/heightmap.png", -3.f, .0f, 0.05f);
 		AddEntity(terrain);
 	}
 }

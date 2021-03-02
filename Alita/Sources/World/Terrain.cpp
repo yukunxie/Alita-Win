@@ -34,7 +34,7 @@ Terrain* Terrain::CreateFromHeightMap(const std::string& imgFilename, float minH
         
         vertices[idx].x = (ix - texWidth / 2) * unit;
         vertices[idx].z = (iz - texHeight / 2) * unit;
-        vertices[idx].y = pixels[idx] / 255.0f * (maxHeight - minHeight) - minHeight;
+        vertices[idx].y = pixels[idx] / 255.0f * (maxHeight - minHeight) + minHeight;
         
         //diffuse[idx] = { 1.0f, 0.0f, 1.0f };
 

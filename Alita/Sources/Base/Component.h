@@ -25,7 +25,7 @@ protected:
 class Transform : Component
 {
 public:
-    TVector3& Position()
+    TVector3& Position() const
     {
         return position_;
     }
@@ -35,7 +35,7 @@ public:
         position_ = position;
     }
 
-    TVector3& Scale()
+    TVector3& Scale() const
     {
         return scale_;
     }
@@ -45,7 +45,7 @@ public:
         scale_ = scale;
     }
 
-    TVector3& Rotation()
+    TVector3& Rotation() const
     {
         return rotation_;
     }
@@ -56,9 +56,9 @@ public:
     }
     
 protected:
-    TVector3 position_ = { 0, 0, 0 };
-    TVector3 scale_ = { 1, 1, 1 };
-    TVector3 rotation_ = { 0, 0, 0 };
+    mutable TVector3 position_ = { 0, 0, 0 };
+    mutable TVector3 scale_ = { 1, 1, 1 };
+    mutable TVector3 rotation_ = { 0, 0, 0 };
 };
 
 
