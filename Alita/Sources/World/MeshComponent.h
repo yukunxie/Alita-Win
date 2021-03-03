@@ -8,6 +8,7 @@
 #include "Base/Component.h"
 #include "Graphics/Material.h"
 #include "Meshes/Geometry.h"
+#include "Graphics/RenderObject.h"
 
 NS_RX_BEGIN
 
@@ -27,7 +28,13 @@ public:
 		return geometry_;
 	}
 
+	virtual void Tick(float dt) override;
+
 protected:
+	void SetupRenderObject();
+
+protected:
+	RenderObject renderObject_;
 	Material* material_ = nullptr;
 	Geometry* geometry_ = nullptr;
 

@@ -42,7 +42,13 @@ public:
 		return nullptr;
 	}
 
-	virtual void Tick(float dt) {}
+	virtual void Tick(float dt)
+	{
+		for (auto& cm : components_)
+		{
+			cm->Tick(dt);
+		}
+	}
 
 	TVector3 GetPosition()
 	{

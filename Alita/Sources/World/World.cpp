@@ -14,16 +14,6 @@ World::World()
 {
 	SetupDefaultCamera();
 
-	/*auto level = new Level(this);
-
-	AddLevel(level);*/
-
-	//auto model = EntityLoader::LoadModelFromGLTF("Models/cube.gltf");
-	//if (model)
-	//{
-
-	//}
-	//else
 	{
 		AddEntity(new Model());
 	}
@@ -59,6 +49,11 @@ void World::Tick(float dt)
 	{
 		it->Tick(dt);
 	}
+}
+
+void World::Render()
+{
+	
 }
 
 

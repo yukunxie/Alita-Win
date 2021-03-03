@@ -20,8 +20,7 @@ Model::~Model()
 
 void Model::Tick(float dt)
 {
-    auto mesh = GetComponent<MeshComponent>();
-    Engine::GetEngine()->GetRenderScene()->AddPrimitive(mesh);
+    Entity::Tick(dt);
 }
 
 NS_RX_END

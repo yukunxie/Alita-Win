@@ -3,9 +3,52 @@
 //
 
 #include "MeshComponent.h"
+#include "Base/Entity.h"
+#include "Graphics/RenderScene.h"
 
 NS_RX_BEGIN
 
+void MeshComponent::SetupRenderObject()
+{
+	if (renderObject_.materialObject)
+	{
+		return;
+	}
+	renderObject_.materialObject = material_;
+	auto& ib = renderObject_.indexBuffer;
+	{
+		ib.gpuBuffer = geometry_->GetIndexBuffer()->gpuBuffer;
+		ib.indexCount = geometry_->GetIndexBuffer()->GetIndexCount();
+		ib.instanceCount = 0;
+		ib.indexType = IndexType::UINT32;
+		ib.offset = 0;
+	}
+
+	renderObject_.vertexBuffers.clear();
+	int slot = 0;
+	for (auto& vbs : geometry_->GetVBStreams())
+	{
+		RenderObject::VertexBufferInfo vb;
+		{
+			vb.gpuBuffer = vbs->gpuBuffer;
+			vb.offset = 0;
+			vb.slot = slot++;
+		}
+		renderObject_.vertexBuffers.push_back(vb);
+	}
+}
+
+void MeshComponent::Tick(float dt)
+{
+	SetupRenderObject();
+
+	const auto* etOwner = GetOwner();
+
+	const TMat4x4 worldMatrix = etOwner->GetWorldMatrix();
+	material_->SetFloat("WorldMatrix", 0, 16, (float*)&worldMatrix);
+
+	Engine::GetRenderScene()->AddRenderObject(&renderObject_);
+}
 
 MeshComponent* MeshComponentBuilder::CreateBox()
 {

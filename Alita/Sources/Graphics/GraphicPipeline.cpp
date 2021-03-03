@@ -37,7 +37,7 @@ GraphicPipeline::GraphicPipeline()
 	}
 }
 
-void GraphicPipeline::Execute(const std::vector<MeshComponent*>& meshComponents)
+void GraphicPipeline::Execute(const std::vector<RenderObject*>& renderObjects)
 {
 	RHI::TextureView* colorAttachment = rhiSwapChain_->GetCurrentTexture();
 
@@ -54,7 +54,7 @@ void GraphicPipeline::Execute(const std::vector<MeshComponent*>& meshComponents)
 		opaquePass_.Reset();
 		opaquePass_.SetupDepthStencilAttachemnt(rhiDSTextureView_);
 		opaquePass_.SetupOutputAttachment(0, colorAttachment);
-		opaquePass_.Execute(rhiCommandEncoder_, meshComponents);
+		opaquePass_.Execute(rhiCommandEncoder_, renderObjects);
 	}
 
 	// submit to gpu and present 

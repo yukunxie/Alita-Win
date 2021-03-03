@@ -6,10 +6,11 @@
 #include "World/MeshComponent.h"
 #include "World/World.h"
 #include "World/Camera.h"
+#include "RenderObject.h"
 
 NS_RX_BEGIN
 
-void IgniterPass::Execute(RHI::CommandEncoder* cmdEncoder, const std::vector<MeshComponent*>& meshComponents)
+void IgniterPass::Execute(RHI::CommandEncoder* cmdEncoder, const std::vector<RenderObject*>& renderObjects)
 {
 	/*RHI::RenderPassDescriptor renderPassDescriptor;
 
@@ -43,7 +44,7 @@ void IgniterPass::Execute(RHI::CommandEncoder* cmdEncoder, const std::vector<Mes
 	Reset();*/
 }
 
-void OpaquePass::Execute(RHI::CommandEncoder* cmdEncoder, const std::vector<MeshComponent*>& meshComponents)
+void OpaquePass::Execute(RHI::CommandEncoder* cmdEncoder, const std::vector<RenderObject*>& renderObjects)
 {
 	RHI::RenderPassDescriptor renderPassDescriptor;
 
@@ -72,41 +73,13 @@ void OpaquePass::Execute(RHI::CommandEncoder* cmdEncoder, const std::vector<Mesh
 
 	auto renderPassEncoder = cmdEncoder->BeginRenderPass(renderPassDescriptor);
 
-	for (const auto mesh : meshComponents)
+	const RHI::Extent2D extent = { 1280, 800 };
+	renderPassEncoder->SetViewport(0, 0, extent.width, extent.height, 0, 1);
+	renderPassEncoder->SetScissorRect(0, 0, extent.width, extent.height);
+
+	for (const auto ro : renderObjects)
 	{
-		auto material = mesh->GetMaterial();
-		auto geometry = mesh->GetGeometry();
-
-		{
-			TMat4x4 modelMatrix(1.0f);
-			const World* world = Engine::GetEngine()->GetWorld();
-			const TMat4x4& viewMatrix = world->GetCamera()->GetViewMatrix();
-			const TMat4x4& projMatrix = world->GetCamera()->GetProjectionMatrix();
-
-			TVector3 camPos = Engine::GetWorld()->GetCameraPosition();
-			material->SetFloat("EyePos", 0, 3, (float*)&camPos.x);
-			TVector3 sunLightDir = TVector3(1, -1, -1);
-			material->SetFloat("SunLight", 0, 3, (float*)&sunLightDir.x);
-			TVector4 sunLightColor = TVector4(1.0f, 1.0f, 0.0f, 1.0f);
-			material->SetFloat("SunLightColor", 0, 4, (float*)&sunLightColor.x);
-			material->SetFloat("WorldMatrix", 0, 16, (float*)&modelMatrix);
-			material->SetFloat("ViewMatrix", 0, 16, (float*)&viewMatrix);
-			material->SetFloat("ProjMatrix", 0, 16, (float*)&projMatrix);
-
-			material->Apply(*renderPassEncoder);
-
-			int idx = 0;
-			for (auto vb : geometry->GetVBStreams())
-			{
-				renderPassEncoder->SetVertexBuffer(vb->gpuBuffer, 0, idx++);
-			}
-			renderPassEncoder->SetIndexBuffer(geometry->GetIndexBuffer()->gpuBuffer, 0);
-
-			const RHI::Extent2D extent = { 1280, 800 };
-			renderPassEncoder->SetViewport(0, 0, extent.width, extent.height, 0, 1);
-			renderPassEncoder->SetScissorRect(0, 0, extent.width, extent.height);
-			renderPassEncoder->DrawIndxed(geometry->GetIndexBuffer()->GetIndexCount(), 0);
-		}
+		ro->Render(*renderPassEncoder);
 	}
 
 	renderPassEncoder->EndPass();

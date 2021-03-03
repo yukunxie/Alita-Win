@@ -8,7 +8,6 @@ NS_RX_BEGIN
 
 Terrain::Terrain()
 {
-    //AddComponment(MeshComponentBuilder::CreateBox());
 }
 
 Terrain::~Terrain()
@@ -110,10 +109,5 @@ Terrain* Terrain::CreateFromHeightMap(const std::string& imgFilename, float minH
     return terrain;
 }
 
-void Terrain::Tick(float dt)
-{
-    auto mesh = GetComponent<MeshComponent>();
-    Engine::GetEngine()->GetRenderScene()->AddPrimitive(mesh);
-}
 
 NS_RX_END

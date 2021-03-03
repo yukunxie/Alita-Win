@@ -20,6 +20,8 @@ public:
     
     void Tick(float dt);
 
+    void Render();
+
     Camera* GetCamera() const
     {
         return defaultCamera_;

@@ -1,9 +1,11 @@
 #pragma once
 #include "Base/Entity.h"
 
+#include "Model.h"
+
 NS_RX_BEGIN
 
-class Terrain : public Entity
+class Terrain : public Model
 {
 public:
     Terrain();
@@ -11,10 +13,6 @@ public:
 
 public:
     static Terrain* CreateFromHeightMap(const std::string& imgFilename, float minHeight, float maxHeight, float unit);
-
-public:
-
-    virtual void Tick(float dt) override;
 };
 
 NS_RX_END

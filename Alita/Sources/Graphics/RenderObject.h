@@ -3,15 +3,36 @@
 #include "RHI.h"
 
 #include "Base/ObjectBase.h"
+#include "Meshes/VertexBuffer.h"
+#include "Material.h"
 
 
 NS_RX_BEGIN
 
-class RenderObject
+struct RenderObject
 {
-protected:
-	std::vector<RHI::Buffer*> vertexBuffers_;
-	RHI::Buffer* indexBuffer_ = nullptr;
+	void Render(RHI::RenderPassEncoder& passEndcoder);
+
+	struct VertexBufferInfo
+	{
+		RHI::Buffer* gpuBuffer = nullptr;
+		std::uint32_t	offset = 0;
+		std::uint32_t	slot = 0xFFFFFFFF;
+	};
+
+	struct IndexBufferInfo
+	{
+		RHI::Buffer* gpuBuffer = nullptr;
+		std::uint32_t	offset = 0;
+		std::uint32_t	indexCount = 0;
+		std::uint32_t	instanceCount = 0;
+		IndexType		indexType = IndexType::UINT32;
+
+	};
+
+	Material* materialObject;
+	std::vector<VertexBufferInfo> vertexBuffers;
+	IndexBufferInfo indexBuffer;
 };
 
 NS_RX_END

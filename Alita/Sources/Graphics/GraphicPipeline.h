@@ -9,6 +9,7 @@
 NS_RX_BEGIN
 
 class MeshComponent;
+class RenderObject;
 
 class GraphicPipeline
 {
@@ -25,7 +26,7 @@ public:
 	}
 
 public:
-	void Execute(const std::vector<MeshComponent*>& meshComponents);
+	void Execute(const std::vector<RenderObject*>& renderObjects);
 
 private:
 	IgniterPass igniterPass_;

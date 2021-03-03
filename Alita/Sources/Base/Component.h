@@ -18,6 +18,13 @@ class Component : public ObjectBase
 public:
     void SetEntity(Entity* entity);
 
+    Entity* GetOwner()
+    {
+        return owner_;
+    }
+
+    virtual void Tick(float dt) {}
+
 protected:
     Entity* owner_ = nullptr;
 };

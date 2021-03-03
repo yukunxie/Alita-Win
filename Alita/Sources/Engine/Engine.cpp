@@ -56,6 +56,8 @@ void Engine::Update(float dt)
     
     world_->Tick(dt);
 
+    renderScene_->Tick(dt);
+
     renderScene_->SubmitGPU();
 }
 

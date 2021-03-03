@@ -5,6 +5,7 @@
 #include "Material.h"
 #include "Engine/Engine.h"
 #include "Loaders/ImageLoader.h"
+#include "RenderScene.h"
 
 #include "RHI.h"
 #include "Backend/Vulkan/ShaderHelper.h"
@@ -50,6 +51,15 @@ Material::Material(const std::string& configFilename)
 
 void Material::Apply(RHI::RenderPassEncoder& passEndcoder)
 {
+	{
+		const GobalRenderParams& params = Engine::GetRenderScene()->GetGobalRenderParams();
+		SetFloat("EyePos", 0, 3, (float*)&params.cameraWorldPosition.x);
+		SetFloat("SunLight", 0, 3, (float*)&params.sunLightDirection.x);
+		SetFloat("SunLightColor", 0, 4, (float*)&params.sunLightColor.x);
+		SetFloat("ViewMatrix", 0, 16, (float*)&params.viewMatrix);
+		SetFloat("ProjMatrix", 0, 16, (float*)&params.projMatrix);
+	}
+
 	passEndcoder.SetGraphicPipeline(rhiPipelineState_);
 	passEndcoder.SetBindGroup(0, rhiBindGroup_);
 }

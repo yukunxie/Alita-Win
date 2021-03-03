@@ -5,8 +5,18 @@
 #include "Base/Macros.h"
 #include "World/MeshComponent.h"
 #include "GraphicPipeline.h"
+#include "RenderObject.h"
 
 NS_RX_BEGIN
+
+struct GobalRenderParams
+{
+	TVector3 cameraWorldPosition;
+	TVector3 sunLightDirection;
+	TVector4 sunLightColor;
+	TMat4x4  viewMatrix;
+	TMat4x4  projMatrix;
+};
 
 class RenderScene
 {
@@ -17,44 +27,31 @@ public:
 public:
 	void AddPrimitive(MeshComponent* mesh);
 
+	void AddRenderObject(RenderObject* obj)
+	{
+		renderObjects_.push_back(obj);
+	}
+
+	const GobalRenderParams& GetGobalRenderParams() const
+	{
+		return gobalRenderParams_;
+	}
+
+	void Tick(float dt);
+
 	void SubmitGPU();
 
     void testRotate();
 
 protected:
 
+	GobalRenderParams gobalRenderParams_;
+
+	std::vector<RenderObject*> renderObjects_;
+
     std::vector<MeshComponent*> meshComponents_;
 
     GraphicPipeline* graphicPipeline_ = nullptr;
-
-	/*RHI::Buffer* rhiVertexBuffer_ = nullptr;
-	RHI::Buffer* rhiIndexBuffer_ = nullptr;
-	RHI::CommandEncoder* rhiCommandEncoder_ = nullptr;
-
-	RHI::Shader* rhiVertShader_ = nullptr;
-	RHI::Shader* rhiFragShader_ = nullptr;*/
-
-    // for testing.
-    RHI::CanvasContext* rhiCanvasContext_ = nullptr;
-    RHI::Device* rhiDevice_ = nullptr;
-    RHI::Buffer* rhiVertexBuffer_ = nullptr;
-    RHI::Buffer* rhiIndexBuffer_ = nullptr;
-    RHI::Buffer* rhiUniformBuffer_ = nullptr;
-    RHI::BindGroup* rhiBindGroup_ = nullptr;
-    RHI::BindingResource* rhiBindingBuffer_ = nullptr;
-    RHI::BindingResource* rhiBindingCombined_ = nullptr;
-    RHI::PipelineLayout* rhiPipelineLayout_ = nullptr;
-    RHI::BindGroupLayout* rhiBindGroupLayout_ = nullptr;
-    RHI::Texture* rhiTexture_ = nullptr;
-    RHI::TextureView* rhiTextureView_ = nullptr;
-    RHI::Texture* rhiDSTexture_ = nullptr;
-    RHI::TextureView* rhiDSTextureView_ = nullptr;
-    RHI::Sampler* rhiSampler_ = nullptr;
-    RHI::RenderPipeline* rhiGraphicPipeline_ = nullptr;
-    RHI::Shader* rhiVertShader_ = nullptr;
-    RHI::Shader* rhiFragShader_ = nullptr;
-    RHI::CommandEncoder* rhiCommandEncoder_ = nullptr;
-    RHI::SwapChain* rhiSwapChain_ = nullptr;
 };
 
 NS_RX_END
