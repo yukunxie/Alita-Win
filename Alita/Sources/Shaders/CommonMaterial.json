@@ -77,7 +77,7 @@
       "name" : "albedo",
       "binding": 2,
       "type": "Texture2D",
-      "uri" : "Textures/Texture.jpg"
+      "uri" : "Textures/default-512.png"
     },
     {
       "name" : "albedo_sampler",

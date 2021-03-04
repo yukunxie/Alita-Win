@@ -14,7 +14,7 @@ namespace ImageLoader
 	RHI::Texture* LoadTextureFromUri(const std::string& filename)
 	{
 		int texWidth, texHeight, texChannels;
-		const TData& imageData = FileSystem::GetInstance()->GetBinaryData("Textures/spiderman.jpg");
+		const TData& imageData = FileSystem::GetInstance()->GetBinaryData(filename.c_str());
 		stbi_uc* pixels = stbi_load_from_memory(imageData.data(), imageData.size(), &texWidth,
 			&texHeight, &texChannels, STBI_rgb_alpha);
 		VkDeviceSize imageSize = texWidth * texHeight * 4;

@@ -136,6 +136,8 @@ protected:
 	void ParseBindGroupLayout(const rapidjson::Document& doc);
 	void ParseInputAssembler(const rapidjson::Document& doc);
 
+	void ApplyModifyToBindGroup();
+
 protected:
 	Effect* effect_ = nullptr;
 
@@ -150,6 +152,8 @@ protected:
 	RHI::Shader* rhiVertShader_ = nullptr;
 	RHI::Shader* rhiFragShader_ = nullptr;
 	RHI::RenderPipeline* rhiPipelineState_ = nullptr;
+
+	bool bindingDirty_ = true;
 };
 
 NS_RX_END
