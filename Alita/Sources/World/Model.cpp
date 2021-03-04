@@ -11,7 +11,7 @@ NS_RX_BEGIN
 
 Model::Model()
 {
-    AddComponment(MeshComponentBuilder::CreateBox());
+    //AddComponment(MeshComponentBuilder::CreateBox());
 }
 
 Model::~Model()

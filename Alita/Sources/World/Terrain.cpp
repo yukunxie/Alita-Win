@@ -4,6 +4,8 @@
 #include "World/MeshComponent.h"
 #include "Graphics/RenderScene.h"
 
+#include <math.h>
+
 NS_RX_BEGIN
 
 Terrain::Terrain()
@@ -14,7 +16,7 @@ Terrain::~Terrain()
 {
 }
 
-Terrain* Terrain::CreateFromHeightMap(const std::string& imgFilename, float minHeight, float maxHeight, float unit)
+Terrain* Terrain::CreateFromHeightMap(const std::string& imgFilename, float minHeight, float maxHeight, float unit, const TVector2& texCoordScale)
 {
     int texWidth, texHeight, texChannels;
     const TData& imageData = FileSystem::GetInstance()->GetBinaryData(imgFilename.c_str());
@@ -37,7 +39,7 @@ Terrain* Terrain::CreateFromHeightMap(const std::string& imgFilename, float minH
         
         //diffuse[idx] = { 1.0f, 0.0f, 1.0f };
 
-        texCoords[idx] = { float(ix) / texWidth, float(iz) / texHeight };
+        texCoords[idx] = { fmod(ix * texCoordScale.x / texWidth, 1.0f), fmod(iz * texCoordScale.y / texHeight, 1.0f) };
     }
 
     for (int z = 0; z < texHeight - 1; ++z)
@@ -71,8 +73,6 @@ Terrain* Terrain::CreateFromHeightMap(const std::string& imgFilename, float minH
                 auto n = glm::normalize(glm::cross(d1, d2));
                 diffuse[d] = n;
             }
-
-            /*glm::vec3 n1 = glm::cross(c - a, b - a);*/
         }
     }
 

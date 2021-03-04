@@ -12,7 +12,7 @@ public:
     virtual ~Terrain();
 
 public:
-    static Terrain* CreateFromHeightMap(const std::string& imgFilename, float minHeight, float maxHeight, float unit);
+    static Terrain* CreateFromHeightMap(const std::string& imgFilename, float minHeight, float maxHeight, float unit, const TVector2& texCoordScale = {1, 1});
 };
 
 NS_RX_END
