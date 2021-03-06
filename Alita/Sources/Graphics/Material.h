@@ -132,6 +132,68 @@ struct InputAttribute
 	}
 };
 
+class InputAssembler
+{
+public:
+	InputAssembler()
+	{
+	}
+
+	InputAssembler(const InputAssembler& other)
+	{
+		hash_ = other.hash_;
+		inputAttributes_ = other.inputAttributes_;
+		indexType_ = other.indexType_;
+	}
+
+	InputAssembler(const std::vector<InputAttribute>& inputAttributes, IndexType indexType)
+	{
+		hash_ = 1;
+		inputAttributes_ = inputAttributes;
+		indexType_ = indexType;
+	}
+
+	RHI::VertexInputDescriptor ToRHIDescriptor()
+	{
+		RHI::VertexInputDescriptor ret;
+		ret.indexFormat = indexType_ == IndexType::UINT32? RHI::IndexFormat::UINT32 : RHI::IndexFormat::UINT16;
+		for (const auto& ia : inputAttributes_)
+		{
+			RHI::VertexBufferDescriptor vbDesc;
+			vbDesc.stepMode = RHI::InputStepMode::VERTEX;
+			vbDesc.stride = ia.stride;
+
+			RHI::VertexAttributeDescriptor vaDesc;
+			vaDesc.format = ia.ToRHIFormat();
+			vaDesc.offset = ia.offset;
+			vaDesc.shaderLocation = ia.location;
+
+			vbDesc.attributeSet.push_back(vaDesc);
+
+			ret.vertexBuffers.push_back(vbDesc);
+		}
+		return ret;
+	}
+
+	InputAssembler& operator= (const InputAssembler& other)
+	{
+		hash_ = other.hash_;
+		inputAttributes_ = other.inputAttributes_;
+		indexType_ = other.indexType_;
+		return *this;
+	}
+
+	bool IsValid()
+	{
+		return hash_ != 0;
+	}
+
+protected:
+	std::uint64_t hash_ = 0;
+	std::vector<InputAttribute> inputAttributes_;
+	IndexType indexType_;
+};
+
 class Material : public ObjectBase
 {
 public:
@@ -150,15 +212,23 @@ public:
 		return inputAttributes_;
 	}
 
+	void SetInputAssembler(const InputAssembler& IA)
+	{
+		inputAssembler_ = IA;
+		RHI_SAFE_RELEASE(rhiPipelineState_);
+	}
+
 protected:
 	void CreatePipelineState();
 	void ParseBindGroupLayout(const rapidjson::Document& doc);
 	void ParseInputAssembler(const rapidjson::Document& doc);
 
 	void ApplyModifyToBindGroup();
+	void BindPSO();
 
 protected:
 	Effect* effect_ = nullptr;
+	InputAssembler inputAssembler_;
 
 	std::map<std::string, MaterialParameter> parameters_;
 	std::vector<MaterialBindingObject*> bindingObjects_;
@@ -172,7 +242,7 @@ protected:
 	RHI::Shader* rhiFragShader_ = nullptr;
 	RHI::RenderPipeline* rhiPipelineState_ = nullptr;
 
-	bool bindingDirty_ = true;
+	bool bBindingDirty_ = true;
 };
 
 NS_RX_END

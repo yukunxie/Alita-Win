@@ -44,17 +44,6 @@ void MeshComponent::SetupRenderObject()
 		}
 	}
 	Assert(renderObject_.vertexBuffers.size() == IAs.size(), "invalid vertex buffer count.");
-	/*int slot = 0;
-	for (auto& vbs : geometry_->GetVBStreams())
-	{
-		RenderObject::VertexBufferInfo vb;
-		{
-			vb.gpuBuffer = vbs->gpuBuffer;
-			vb.offset = 0;
-			vb.slot = slot++;
-		}
-		renderObject_.vertexBuffers.push_back(vb);
-	}*/
 }
 
 void MeshComponent::Tick(float dt)

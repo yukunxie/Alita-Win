@@ -150,16 +150,16 @@ bool Material::SetTexture(const std::string& name, RHI::Texture* texture)
 	if (param.bindingObject->texture == texture)
 		return true;
 	param.bindingObject->texture = texture;
-	bindingDirty_ = true;
+	bBindingDirty_ = true;
 	return true;
 }
 
 void Material::ApplyModifyToBindGroup()
 {
-	if (!bindingDirty_)
+	if (!bBindingDirty_)
 		return;
 
-	bindingDirty_ = false;
+	bBindingDirty_ = false;
 	RHI_SAFE_RELEASE(rhiBindGroup_);
 
 	RHI::BindGroupDescriptor descriptor;
@@ -468,6 +468,14 @@ void Material::CreatePipelineState()
 	}
 
 	rhiPipelineState_ = Engine::GetGPUDevice()->CreateRenderPipeline(psoDesc);
+}
+
+void Material::BindPSO()
+{
+	if (!rhiPipelineState_)
+	{
+		CreatePipelineState();
+	}
 }
 
 NS_RX_END

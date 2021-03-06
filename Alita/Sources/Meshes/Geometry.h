@@ -35,10 +35,6 @@ protected:
     std::vector<VertexBuffer*> vbStreams_;
     IndexBuffer indexBuffer_;
 
-public:
-   /* std::vector<RHI::Buffer*> vbGPUBuffers_;
-    RHI::Buffer* ibGPUBuffer_ = nullptr;*/
-
     friend class MeshComponentBuilder;
     friend class Terrain;
 };
