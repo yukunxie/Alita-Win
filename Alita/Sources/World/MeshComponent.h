@@ -33,7 +33,7 @@ public:
 protected:
 	void SetupRenderObject();
 
-protected:
+public:
 	RenderObject renderObject_;
 	Material* material_ = nullptr;
 	Geometry* geometry_ = nullptr;

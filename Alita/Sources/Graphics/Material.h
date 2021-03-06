@@ -9,6 +9,7 @@
 #include "Base/FileSystem.h"
 #include "Effect.h"
 #include "RHI.h"
+#include "Meshes/VertexBuffer.h"
 
 #include "rapidjson/document.h"
 
@@ -92,6 +93,18 @@ struct MaterialBindingObject
 	};
 };
 
+enum InputAttributeLocation
+{
+	IA_LOCATION_POSITION = 0,
+	IA_LOCATION_NORMAL = 1,
+	IA_LOCATION_TEXCOORD = 2,
+	IA_LOCATION_DIFFUSE = 3,
+	IA_LOCATION_TANGENT = 4,
+	IA_LOCATION_BINORMAL = 5,
+	IA_LOCATION_BITANGENT = 6,
+	IA_LOCATION_TEXCOORD2 = 7,
+};
+
 struct InputAttribute
 {
 	std::string name;
@@ -99,6 +112,7 @@ struct InputAttribute
 	std::uint32_t offset = 0;
 	std::uint32_t stride = 0;
 	InputAttributeFormat format;
+	VertexBufferAttriKind kind = VertexBufferAttriKind::INVALID;
 
 	RHI::VertexFormat ToRHIFormat() const
 	{
@@ -130,6 +144,11 @@ public:
 	bool SetTexture(const std::string& name, RHI::Texture* texture);
 
 	void Apply(RHI::RenderPassEncoder& passEndcoder);
+
+	const std::vector<InputAttribute>& GetInputAttributes() const
+	{
+		return inputAttributes_;
+	}
 
 protected:
 	void CreatePipelineState();

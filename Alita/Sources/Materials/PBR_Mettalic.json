@@ -1,0 +1,88 @@
+{
+  "name": "CommonMaterial",
+  "indexFormat":  "uint32",
+  "code": {
+    "vs": "Shaders/shader.vert.gl",
+    "fs": "Shaders/shader.frag.gl"
+  },
+  "defines": [],
+  "attributes": [
+    {
+      "name": "POSITION",
+      "format": "float3",
+      "stride": 12,
+      "location": 0
+    },
+    {
+      "name": "NORMAL",
+      "format": "float3",
+      "stride": 12,
+      "location": 1
+    },
+    {
+      "name": "TEXCOORD",
+      "format": "float2",
+      "stride": 8,
+      "location": 2
+    }
+  ],
+  "bindings": [
+    {
+      "name": "uGlobal",
+      "binding": 0,
+      "type": "Buffer",
+      "stride": 176,
+      "fields": [
+        {
+          "name": "EyePos",
+          "format": "float4",
+          "offset": 0
+        },
+        {
+          "name": "SunLight",
+          "format": "float4",
+          "offset": 16
+        },
+        {
+          "name": "SunLightColor",
+          "format": "float4",
+          "offset": 32
+        },
+        {
+          "name": "ViewMatrix",
+          "format": "mat4",
+          "offset": 48
+        },
+        {
+          "name": "ProjMatrix",
+          "format": "mat4",
+          "offset": 112
+        }
+      ]
+    },
+    {
+      "name": "uBatch",
+      "binding": 1,
+      "type": "Buffer",
+      "stride": 64,
+      "fields": [
+        {
+          "name": "WorldMatrix",
+          "format": "mat4",
+          "offset": 0
+        }
+      ]
+    },
+    {
+      "name" : "albedo",
+      "binding": 2,
+      "type": "Texture2D",
+      "uri" : "Textures/default-512.png"
+    },
+    {
+      "name" : "albedo_sampler",
+      "binding": 3,
+      "type": "Sampler2D"
+    }
+  ]
+}

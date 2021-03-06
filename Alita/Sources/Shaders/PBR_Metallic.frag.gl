@@ -1,0 +1,39 @@
+
+#ifndef USE_NORMAL
+#define USE_NORMAL 0
+#endif
+
+#ifndef USE_UV0
+#define USE_UV0 0
+#endif
+
+layout(location = 0) in vec3 _WorldPosition;
+
+#if USE_NORMAL
+layout(location = 1) in vec3 _WorldNormal;
+#endif
+
+#if USE_UV0
+layout(location = 2) in vec2 _UV0;
+#endif
+
+layout(binding = 2) uniform texture2D   tAlbedo;
+layout(binding = 3) uniform sampler     sAlbedo;
+
+layout(location = 0) out vec4 OutColor;
+
+void main() {
+    vec4 diffuse = vec4(1.0);
+
+#if USE_UV0
+    diffuse = texture(sampler2D(tAlbedo, sAlbedo), _UV0);
+#endif
+
+#if USE_NORMAL
+    vec3 lightDir = normalize(uGlobal.EyePos.xyz - _WorldPosition);
+    float specular = clamp(dot(lightDir, normalize(_WorldNormal)), 0, 1);
+    diffuse.xyz *= specular * uGlobal.SunLightColor.xyz * uGlobal.SunLightColor.a;
+#endif
+
+    OutColor = vec4(diffuse.xyz, 1.0);
+}

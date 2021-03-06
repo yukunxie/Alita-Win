@@ -21,7 +21,8 @@ enum VertexBufferAttriKind
 	NORMAL = 0x8,  // xyz
 	TANGENT = 0x10, // xyz
 	BINORMAL = 0x20, // xyz
-	BITANGENT = 0x30, // xyz
+	BITANGENT = 0x40, // xyz
+	TEXCOORD2 = 0x80, // uv2 2floats
 };
 
 constexpr std::uint32_t VertexBufferKindCount = 7;// (std::uint32_t)VertexBufferKind::MAX_COUNT;
@@ -53,6 +54,9 @@ struct VertexBuffer
 
 		gpuBuffer->SetSubData(0, size, data);
 	}
+
+public:
+	static VertexBufferAttriKind NameToVBAttrKind(const std::string& name);
 };
 
 enum IndexType

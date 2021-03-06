@@ -12,7 +12,60 @@
 
 NS_RX_BEGIN
 
-constexpr std::uint32_t _SimpleHash(const char* p)
+static const std::string sShaderExtensions =
+"#version 450\n"
+"#extension GL_ARB_separate_shader_objects : enable\n"
+"#extension GL_ARB_shading_language_450pack : enable\n";
+
+static const std::string sShaderGlobalConstantBuffer =
+"layout(binding = 0) uniform Global	                            \n"
+"{	                                                            \n"
+"    vec4 EyePos; // camera's world position	                \n"
+"    vec4 SunLight; // xyz direction	                        \n"
+"    vec4 SunLightColor; // rgb as color, and a as intensity    \n"
+"    mat4 ViewMatrix;	                                        \n"
+"    mat4 ProjMatrix;	                                        \n"
+"} uGlobal;                                                     \n";
+
+//static const std::string sShaderIALocationDefine =
+//"#define IA_LOCATION_POSITION 0      \n"
+//"#define IA_LOCATION_NORMAL 1        \n"
+//"#define IA_LOCATION_TEXCOORD 2      \n"
+//"#define IA_LOCATION_DIFFUSE 3       \n"
+//"#define IA_LOCATION_TANGENT 4       \n"
+//"#define IA_LOCATION_BINORMAL 5      \n"
+//"#define IA_LOCATION_BITANGENT 6     \n"
+//"#define IA_LOCATION_TEXCOORD2 7     \n";
+
+static std::string _GenShaderIALocationDefines()
+{
+	static const char* format =
+		"#define IA_LOCATION_POSITION     %d  \n"
+		"#define IA_LOCATION_NORMAL       %d  \n"
+		"#define IA_LOCATION_TEXCOORD     %d  \n"
+		"#define IA_LOCATION_DIFFUSE      %d  \n"
+		"#define IA_LOCATION_TANGENT      %d  \n"
+		"#define IA_LOCATION_BINORMAL     %d  \n"
+		"#define IA_LOCATION_BITANGENT    %d  \n"
+		"#define IA_LOCATION_TEXCOORD2    %d  \n";
+
+	char buffer[1024] = { 0 };
+
+	std::snprintf(buffer, sizeof(buffer), format,
+		(int)InputAttributeLocation::IA_LOCATION_POSITION,
+		(int)InputAttributeLocation::IA_LOCATION_NORMAL,
+		(int)InputAttributeLocation::IA_LOCATION_TEXCOORD,
+		(int)InputAttributeLocation::IA_LOCATION_DIFFUSE,
+		(int)InputAttributeLocation::IA_LOCATION_TANGENT,
+		(int)InputAttributeLocation::IA_LOCATION_BINORMAL,
+		(int)InputAttributeLocation::IA_LOCATION_BITANGENT,
+		(int)InputAttributeLocation::IA_LOCATION_TEXCOORD2
+	);
+	return std::string(buffer);
+}
+
+
+static constexpr std::uint32_t _SimpleHash(const char* p)
 {
 	std::uint32_t hash = 0;
 	for (; *p; p++)
@@ -24,7 +77,12 @@ constexpr std::uint32_t _SimpleHash(const char* p)
 
 static RHI::ShaderModule* _CreateShader(const std::string& filename, RHI::ShaderType shaderType)
 {
-	std::string shaderText = FileSystem::GetInstance()->GetStringData(filename.c_str());
+	std::string data = FileSystem::GetInstance()->GetStringData(filename.c_str());
+
+	std::string shaderText = sShaderExtensions 
+		+ _GenShaderIALocationDefines()
+		+ sShaderGlobalConstantBuffer
+		+ data;
 
 	auto spirV = RHI::CompileGLSLToSPIRV(shaderText, shaderType);
 	RHI::ShaderModuleDescriptor descriptor;
@@ -161,6 +219,8 @@ void Material::ParseInputAssembler(const rapidjson::Document& doc)
 		attri.offset = cfg.HasMember("offset") ? cfg["offest"].GetUint() : 0;
 		attri.stride = cfg.HasMember("stride") ? cfg["stride"].GetUint() : 0;
 		std::string format = cfg["format"].GetString();
+
+		attri.kind = VertexBuffer::NameToVBAttrKind(attri.name);
 
 		switch (_SimpleHash(format.c_str()))
 		{

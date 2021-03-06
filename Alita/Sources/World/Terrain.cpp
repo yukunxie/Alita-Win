@@ -89,7 +89,7 @@ Terrain* Terrain::CreateFromHeightMap(const std::string& imgFilename, float minH
 
     {
         auto vbBuffer = new VertexBuffer();
-        vbBuffer->kind = VertexBufferAttriKind::DIFFUSE;
+        vbBuffer->kind = VertexBufferAttriKind::NORMAL;
         vbBuffer->InitData(diffuse.data(), diffuse.size() * sizeof(diffuse[0]));
         meshComp->geometry_->AppendVertexBuffer(vbBuffer);
     }

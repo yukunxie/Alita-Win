@@ -425,6 +425,9 @@
     <ClCompile Include="Sources\Event\EventSystem.cpp">
       <Filter>Sources\Event</Filter>
     </ClCompile>
+    <ClCompile Include="Sources\Loaders\GLTFLoader.cpp">
+      <Filter>Sources\Loader</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Sources\RHI\Include\BindGroup.h">
@@ -903,6 +906,9 @@
     </ClInclude>
     <ClInclude Include="Sources\Event\EventSystem.h">
       <Filter>Sources\Event</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Loaders\GLTFLoader.h">
+      <Filter>Sources\Loader</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -25,7 +25,26 @@ void MeshComponent::SetupRenderObject()
 	}
 
 	renderObject_.vertexBuffers.clear();
-	int slot = 0;
+
+	const auto& IAs = material_->GetInputAttributes();
+	for (const auto& IA : IAs)
+	{
+		for (auto& vbs : geometry_->GetVBStreams())
+		{
+			if (vbs->kind == IA.kind)
+			{
+				RenderObject::VertexBufferInfo vb;
+				{
+					vb.gpuBuffer = vbs->gpuBuffer;
+					vb.offset = 0;
+					vb.slot = IA.location;
+				}
+				renderObject_.vertexBuffers.push_back(vb);
+			}
+		}
+	}
+	Assert(renderObject_.vertexBuffers.size() == IAs.size(), "invalid vertex buffer count.");
+	/*int slot = 0;
 	for (auto& vbs : geometry_->GetVBStreams())
 	{
 		RenderObject::VertexBufferInfo vb;
@@ -35,7 +54,7 @@ void MeshComponent::SetupRenderObject()
 			vb.slot = slot++;
 		}
 		renderObject_.vertexBuffers.push_back(vb);
-	}
+	}*/
 }
 
 void MeshComponent::Tick(float dt)
@@ -160,7 +179,7 @@ MeshComponent* MeshComponentBuilder::CreateBox()
 	};
 
 	BindVertexBufferHandle(VertexBufferAttriKind::POSITION, positions);
-	BindVertexBufferHandle(VertexBufferAttriKind::DIFFUSE, colors);
+	BindVertexBufferHandle(VertexBufferAttriKind::NORMAL, colors);
 	BindVertexBufferHandle(VertexBufferAttriKind::TEXCOORD, texCoords);
 
 	std::vector<std::uint32_t> indices = {

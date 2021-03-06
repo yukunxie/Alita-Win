@@ -8,19 +8,19 @@
   "defines": [],
   "attributes": [
     {
-      "name": "pos",
+      "name": "POSITION",
       "format": "float3",
       "stride": 12,
       "location": 0
     },
     {
-      "name": "diffuse",
+      "name": "NORMAL",
       "format": "float3",
       "stride": 12,
       "location": 1
     },
     {
-      "name": "uv",
+      "name": "TEXCOORD",
       "format": "float2",
       "stride": 8,
       "location": 2

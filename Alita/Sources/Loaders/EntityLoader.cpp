@@ -1,16 +1,16 @@
 #include "EntityLoader.h"
 
-#define TINYGLTF_IMPLEMENTATION
-#define STB_IMAGE_IMPLEMENTATION
-#define STB_IMAGE_WRITE_IMPLEMENTATION
-#include "tinygltf/tiny_gltf.h"
+//#define TINYGLTF_IMPLEMENTATION
+//#define STB_IMAGE_IMPLEMENTATION
+//#define STB_IMAGE_WRITE_IMPLEMENTATION
+//#include "tinygltf/tiny_gltf.h"
 
 NS_RX_BEGIN
 
 namespace EntityLoader
 {
 
-	Model* LoadModelFromGLTF(const std::string& gltfFilename)
+	/*Model* LoadModelFromGLTF(const std::string& gltfFilename)
 	{
 		tinygltf::Model model;
 		tinygltf::TinyGLTF loader;
@@ -23,7 +23,7 @@ namespace EntityLoader
 		if (!ret) {
 			return nullptr;
 		}
-	}
+	}*/
 
 
 }

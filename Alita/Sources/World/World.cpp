@@ -6,6 +6,7 @@
 #include "glm/glm.hpp"
 
 #include "Loaders/EntityLoader.h"
+#include "Loaders/GLTFLoader.h"
 #include "Loaders/ImageLoader.h"
 #include "Terrain.h"
 #include "MeshComponent.h"
@@ -20,12 +21,20 @@ World::World()
 		AddEntity(new Model());
 	}*/
 
+	//{
+	//	auto terrain = Terrain::CreateFromHeightMap("Textures/heightmap.png", -3.f, .0f, 0.05f, { 5, 5 });
+	//	AddEntity(terrain);
+	//	auto tex = ImageLoader::LoadTextureFromUri("Textures/grass.jpg");
+	//	auto mesh = terrain->GetComponent<MeshComponent>();
+	//	mesh->GetMaterial()->SetTexture("albedo", tex);
+	//}
+
 	{
-		auto terrain = Terrain::CreateFromHeightMap("Textures/heightmap.png", -3.f, .0f, 0.05f, { 5, 5 });
-		AddEntity(terrain);
-		auto tex = ImageLoader::LoadTextureFromUri("Textures/grass.jpg");
-		auto mesh = terrain->GetComponent<MeshComponent>();
-		mesh->GetMaterial()->SetTexture("albedo", tex);
+		auto model = GLTFLoader::LoadModelFromGLTF("Models/chinesedragon.gltf");
+		if (model)
+		{
+			AddEntity(model);
+		}
 	}
 }
 
