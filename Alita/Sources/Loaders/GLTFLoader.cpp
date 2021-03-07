@@ -1,4 +1,5 @@
 #include "GLTFLoader.h"
+#include "ImageLoader.h"
 #include "World/MeshComponent.h"
 #include "Graphics/Material.h"
 #include <glm/gtx/matrix_decompose.hpp>
@@ -31,6 +32,17 @@ namespace GLTFLoader
 		return InputAttributeFormat::FLOAT;
 	}
 
+	RHI::Texture* _LoadTexture(const tinygltf::Image& tImage)
+	{
+		auto width = tImage.width;
+		auto height = tImage.height;
+		auto component = tImage.component;
+
+		Assert(tImage.pixel_type == TINYGLTF_COMPONENT_TYPE_UNSIGNED_BYTE, "");
+
+		return ImageLoader::LoadTextureFromData(width, height, component, tImage.image.data(), tImage.image.size());
+	}
+
 
 	void _LoadPrimitives(Entity* model, tinygltf::Model& tModel, const tinygltf::Mesh& tMesh)
 	{
@@ -51,23 +63,45 @@ namespace GLTFLoader
 					}
 					mc->material_->SetFloat("emissiveFactor", 0, std::min(3, (int)tmp.size()), tmp.data());
 				}
+
+				const tinygltf::PbrMetallicRoughness& pbrMetallicRoughness = tMaterial.pbrMetallicRoughness;
 				{
-					tmp.resize(tMaterial.pbrMetallicRoughness.baseColorFactor.size());
+					pbrMetallicRoughness.baseColorFactor.size();
 					for (int i = 0; i < tmp.size(); ++i)
 					{
-						auto v = tMaterial.pbrMetallicRoughness.baseColorFactor[i];
+						auto v = pbrMetallicRoughness.baseColorFactor[i];
 						tmp[i] = (float)v;
 					}
 					mc->material_->SetFloat("baseColorFactor", 0, std::min(4, (int)tmp.size()), tmp.data());
 				}
 				{
-					float metallicFactor = (float)tMaterial.pbrMetallicRoughness.metallicFactor;
+					float metallicFactor = (float)pbrMetallicRoughness.metallicFactor;
 					mc->material_->SetFloat("metallicFactor", 0, 1, &metallicFactor);
 
-					float roughnessFactor = (float)tMaterial.pbrMetallicRoughness.roughnessFactor;
+					float roughnessFactor = (float)pbrMetallicRoughness.roughnessFactor;
 					mc->material_->SetFloat("roughnessFactor", 0, 1, &roughnessFactor);
 				}
-				
+				if (pbrMetallicRoughness.baseColorTexture.index != -1)
+				{
+					auto tIdx = pbrMetallicRoughness.baseColorTexture.index;
+					const tinygltf::Image& image = tModel.images[tModel.textures[tIdx].source];
+
+					auto texture = _LoadTexture(image);
+					if (texture)
+					{
+						mc->material_->SetTexture("albedo", texture);
+					}
+					/*if (image.mimeType.empty())
+					{
+						if (!image.uri.empty())
+						{
+							auto texture = ImageLoader::LoadTextureFromUri(image.uri);
+						}
+					}*/
+
+					/*auto texture = ImageLoader::LoadTextureFromData(image.image.data(), image.image.size());
+					if (texture);*/
+				}
 			}
 
 			for (const auto& [attriName, aIdx] : primitive.attributes)
