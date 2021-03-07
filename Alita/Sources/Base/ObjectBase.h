@@ -6,6 +6,7 @@
 #define ALITA_OBJECTBASE_H
 
 #include "Macros.h"
+#include "Types/Enums.h"
 
 #include <stdint.h>
 #include <string>

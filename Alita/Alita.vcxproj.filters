@@ -910,6 +910,9 @@
     <ClInclude Include="Sources\Loaders\GLTFLoader.h">
       <Filter>Sources\Loader</Filter>
     </ClInclude>
+    <ClInclude Include="Sources\Types\Enums.h">
+      <Filter>Sources\Types</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Third-Party\glslang\Include\revision.template">

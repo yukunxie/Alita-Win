@@ -2,30 +2,10 @@
   "name": "CommonMaterial",
   "indexFormat":  "uint32",
   "code": {
-    "vs": "Shaders/shader.vert.gl",
-    "fs": "Shaders/shader.frag.gl"
+    "vs": "Shaders/PBR_Metallic.vert.gl",
+    "fs": "Shaders/PBR_Metallic.frag.gl"
   },
   "defines": [],
-  "attributes": [
-    {
-      "name": "POSITION",
-      "format": "float3",
-      "stride": 12,
-      "location": 0
-    },
-    {
-      "name": "NORMAL",
-      "format": "float3",
-      "stride": 12,
-      "location": 1
-    },
-    {
-      "name": "TEXCOORD",
-      "format": "float2",
-      "stride": 8,
-      "location": 2
-    }
-  ],
   "bindings": [
     {
       "name": "uGlobal",

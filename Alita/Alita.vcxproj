@@ -333,6 +333,7 @@ echo "xxxxx"</Command>
     <ClInclude Include="Sources\RHI\Include\TextureView.h" />
     <ClInclude Include="Sources\RHI\Include\xxhash64.h" />
     <ClInclude Include="Sources\RHI\Macros.h" />
+    <ClInclude Include="Sources\Types\Enums.h" />
     <ClInclude Include="Sources\Types\TData.h" />
     <ClInclude Include="Sources\Types\Types.h" />
     <ClInclude Include="Sources\World\Camera.h" />

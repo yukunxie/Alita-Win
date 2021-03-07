@@ -9,7 +9,7 @@
 #include "Base/FileSystem.h"
 #include "Effect.h"
 #include "RHI.h"
-#include "Meshes/VertexBuffer.h"
+//#include "Meshes/VertexBuffer.h"
 
 #include "rapidjson/document.h"
 
@@ -18,45 +18,7 @@
 
 NS_RX_BEGIN
 
-enum class MaterialParameterType
-{
-	FLOAT,
-	FLOAT2,
-	FLOAT3,
-	FLOAT4,
-
-	INT,
-	INT2,
-	INT3,
-	INT4,
-
-	BOOL,
-	BOOL1,
-	BOOL2,
-	BOOL3,
-
-	MAT4,
-	MAT3,
-	MAT2,
-	MAT4x3,
-	MAT4x2,
-	MAT3x4,
-	MAT2x4,
-	MAT3x2,
-	MAT2x3,
-
-	BUFFER,
-	SAMPLER2D,
-	TEXTURE2D,
-};
-
-enum class InputAttributeFormat
-{
-	FLOAT,
-	FLOAT2,
-	FLOAT3,
-	FLOAT4,
-};
+class Material;
 
 struct MaterialBindingObject;
 
@@ -70,13 +32,6 @@ struct MaterialParameter
 		std::uint32_t binding;
 	};
 	MaterialBindingObject* bindingObject = nullptr;
-};
-
-enum class MaterailBindingObjectType
-{
-	BUFFER,
-	SAMPLER2D,
-	TEXTURE2D,
 };
 
 struct MaterialBindingObject
@@ -93,21 +48,14 @@ struct MaterialBindingObject
 	};
 };
 
-enum InputAttributeLocation
-{
-	IA_LOCATION_POSITION = 0,
-	IA_LOCATION_NORMAL = 1,
-	IA_LOCATION_TEXCOORD = 2,
-	IA_LOCATION_DIFFUSE = 3,
-	IA_LOCATION_TANGENT = 4,
-	IA_LOCATION_BINORMAL = 5,
-	IA_LOCATION_BITANGENT = 6,
-	IA_LOCATION_TEXCOORD2 = 7,
-};
+std::uint32_t GetInputAttributeLocation(VertexBufferAttriKind kind);
+
+std::uint32_t GetFormatSize(InputAttributeFormat format);
+
 
 struct InputAttribute
 {
-	std::string name;
+	//std::string name;
 	std::uint32_t location = 0;
 	std::uint32_t offset = 0;
 	std::uint32_t stride = 0;
@@ -130,6 +78,11 @@ struct InputAttribute
 		Assert(false, "invalid format");
 		return RHI::VertexFormat::FLOAT;
 	}
+
+	bool operator < (const InputAttribute& other)
+	{
+		return location < other.location;
+	}
 };
 
 class InputAssembler
@@ -151,6 +104,9 @@ public:
 		hash_ = 1;
 		inputAttributes_ = inputAttributes;
 		indexType_ = indexType;
+		
+		// sort by location
+		std::sort(inputAttributes_.begin(), inputAttributes_.end());
 	}
 
 	RHI::VertexInputDescriptor ToRHIDescriptor()
@@ -192,6 +148,8 @@ protected:
 	std::uint64_t hash_ = 0;
 	std::vector<InputAttribute> inputAttributes_;
 	IndexType indexType_;
+
+	friend class Material;
 };
 
 class Material : public ObjectBase
@@ -223,10 +181,13 @@ protected:
 	void ParseBindGroupLayout(const rapidjson::Document& doc);
 	void ParseInputAssembler(const rapidjson::Document& doc);
 
-	void ApplyModifyToBindGroup();
-	void BindPSO();
+	void ApplyModifyToBindGroup(RHI::RenderPassEncoder& passEndcoder);
+	void BindPSO(RHI::RenderPassEncoder& passEndcoder);
 
 protected:
+	std::string vsFilename_;
+	std::string fsFilename_;
+
 	Effect* effect_ = nullptr;
 	InputAssembler inputAssembler_;
 

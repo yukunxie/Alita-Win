@@ -56,17 +56,26 @@ namespace GLTFLoader
 			{
 				MeshComponent* mc = new MeshComponent();
 				mc->geometry_ = new Geometry;
-				mc->material_ = new Material("Shaders/CommonMaterial.json");
+				mc->material_ = new Material("Materials/PBR_Metallic.json");
 
 				for (const auto& [attriName, aIdx] : primitive.attributes)
 				{
+					auto vaKind = VertexBuffer::NameToVBAttrKind(attriName);
+					if (vaKind == VertexBufferAttriKind::INVALID)
+					{
+						continue;
+					}
 					const tinygltf::Accessor& accessor = tModel.accessors[aIdx];
 					const tinygltf::BufferView& bufferView = tModel.bufferViews[accessor.bufferView];
 					const tinygltf::Buffer& tBuffer = tModel.buffers[bufferView.buffer];
 					VertexBuffer* vBuffer = new VertexBuffer();
-					vBuffer->kind = VertexBuffer::NameToVBAttrKind(attriName);
-					const unsigned char* tData = tBuffer.data.data() + bufferView.byteOffset;
-					vBuffer->InitData(tData, bufferView.byteLength);
+					{
+						vBuffer->kind = vaKind;
+						vBuffer->format = _GLTFTypeToIAFormat(accessor.type);
+						vBuffer->byteStride = bufferView.byteStride;
+						const unsigned char* tData = tBuffer.data.data() + bufferView.byteOffset;
+						vBuffer->InitData(tData, bufferView.byteLength);
+					}
 					mc->GetGeometry()->AppendVertexBuffer(vBuffer);
 				}
 
@@ -103,7 +112,7 @@ namespace GLTFLoader
 		return models;
 	}
 
-	Model* LoadModelFromGLTF(const std::string& filename)
+	std::vector<Model*> LoadModelFromGLTF(const std::string& filename)
 	{
 		tinygltf::Model tModel;
 		tinygltf::TinyGLTF loader;
@@ -114,19 +123,15 @@ namespace GLTFLoader
 
 		bool ret = loader.LoadASCIIFromFile(&tModel, &err, &warn, modelFile);
 		if (!ret) {
-			return nullptr;
+			return {};
 		}
 
 		for (const auto& tScene : tModel.scenes)
 		{
-			std::vector<Model*> models = _LoadModelsFromGLTFScene(tModel, tScene);
-			if (!models.empty())
-			{
-				return models[0];
-			}
+			return _LoadModelsFromGLTFScene(tModel, tScene);
 		}
 
-		return nullptr;
+		return {};
 	}
 }
 

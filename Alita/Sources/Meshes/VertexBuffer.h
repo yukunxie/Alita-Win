@@ -9,27 +9,16 @@
 #include "Engine/Engine.h"
 #include "Types/TData.h"
 #include "RHI.h"
+#include "Graphics/Material.h"
 
 NS_RX_BEGIN
-
-enum VertexBufferAttriKind
-{
-	INVALID = 0,
-	POSITION = 0x1, // xyz
-	DIFFUSE = 0x2, // rgba 4byte
-	TEXCOORD = 0x4, // uv 2floats
-	NORMAL = 0x8,  // xyz
-	TANGENT = 0x10, // xyz
-	BINORMAL = 0x20, // xyz
-	BITANGENT = 0x40, // xyz
-	TEXCOORD2 = 0x80, // uv2 2floats
-};
-
-constexpr std::uint32_t VertexBufferKindCount = 7;// (std::uint32_t)VertexBufferKind::MAX_COUNT;
 
 struct VertexBuffer
 {
 	VertexBufferAttriKind kind = VertexBufferAttriKind::INVALID;
+	InputAttributeFormat format;
+	std::uint32_t byteStride = 0;
+
 	TData buffer;
 	RHI::Buffer* gpuBuffer = nullptr;
 
@@ -57,12 +46,6 @@ struct VertexBuffer
 
 public:
 	static VertexBufferAttriKind NameToVBAttrKind(const std::string& name);
-};
-
-enum IndexType
-{
-	UINT32,
-	UINT16
 };
 
 struct IndexBuffer

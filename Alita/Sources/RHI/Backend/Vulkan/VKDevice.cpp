@@ -585,14 +585,18 @@ void VKDevice::CreateDescriptorPool()
     uint32_t imageCount = 3;
 //    vkGetSwapchainImagesKHR(vkDevice_, vkSwapchain_, &imageCount, nullptr);
     
-    std::array<VkDescriptorPoolSize, 2> poolSizes = {
+    std::array<VkDescriptorPoolSize, 4> poolSizes = {
         VkDescriptorPoolSize{
             .type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-            .descriptorCount = 1024, //static_cast<uint32_t>(swapChainImages_.size()),
+            .descriptorCount = 1024, 
         },
         VkDescriptorPoolSize{
             .type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-            .descriptorCount = 1024, //static_cast<uint32_t>(swapChainImages_.size()),
+            .descriptorCount = 1024,
+        },
+        VkDescriptorPoolSize{
+            .type = VK_DESCRIPTOR_TYPE_SAMPLER,
+            .descriptorCount = 1024,
         },
     };
     
