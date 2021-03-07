@@ -60,17 +60,15 @@ void Entity::UpdateWorldMatrix() const
         return;
 
     isTransformDirty_ = false;
-    
-    worldMatrix_ = glm::mat4(1);
+
+    //translate
+    worldMatrix_ = glm::translate(glm::mat4(1), transform_.Position());
 
     worldMatrix_ = glm::rotate(worldMatrix_, glm::radians(transform_.Rotation().x), TVector3(1.0f, 0.0f, 0.0f));
     worldMatrix_ = glm::rotate(worldMatrix_, glm::radians(transform_.Rotation().y), TVector3(0.0f, 1.0f, 0.0f));
     worldMatrix_ = glm::rotate(worldMatrix_, glm::radians(transform_.Rotation().z), TVector3(0.0f, 0.0f, 1.0f));
 
     worldMatrix_ = glm::scale(worldMatrix_, transform_.Scale());
-
-    //translate
-    worldMatrix_ = glm::translate(worldMatrix_, transform_.Position());
 }
 
 void Entity::Tick(float dt)

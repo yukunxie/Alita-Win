@@ -35,7 +35,7 @@ void main() {
     _WorldPosition = (uBatch.WorldMatrix * vec4(inPosition, 1.0)).xyz;
 
 #if USE_NORMAL
-    _WorldNormal =  (uBatch.WorldMatrix * vec4(inNormal, 1.0)).xyz;
+    _WorldNormal =  (transpose(inverse(uBatch.WorldMatrix)) * vec4(inNormal, 1.0)).xyz;
 #endif
 
 #if USE_UV0
