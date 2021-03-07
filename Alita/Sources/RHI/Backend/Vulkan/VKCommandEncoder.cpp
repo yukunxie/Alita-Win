@@ -58,7 +58,7 @@ void VKCommandEncoder::CopyBufferToTexture(
 {
     auto buffer = RHI_CAST(const VKBuffer*, source.buffer);
     auto texture = RHI_CAST(const VKTexture*, destination.texture);
-    auto dstImageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+    auto dstImageLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
     
     VkBufferImageCopy bufferImageCopy;
     {

@@ -11,6 +11,8 @@
 #include "RHI.h"
 //#include "Meshes/VertexBuffer.h"
 
+#define RAPIDJSON_ASSERT(x) Assert(x, "")
+
 #include "rapidjson/document.h"
 
 #include <list>

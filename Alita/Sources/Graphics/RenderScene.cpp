@@ -45,7 +45,7 @@ void RenderScene::Tick(float dt)
 {
 	gobalRenderParams_.cameraWorldPosition = Engine::GetWorld()->GetCameraPosition();
 	gobalRenderParams_.sunLightDirection = TVector3(1, -1, -1);
-	gobalRenderParams_.sunLightColor = TVector4(1.0f, 1.0f, 0.0f, 1.0f);;
+	gobalRenderParams_.sunLightColor = TVector4(1.0f, 1.0f, 1.0f, 1.0f);;
 	gobalRenderParams_.viewMatrix = Engine::GetWorld()->GetCamera()->GetViewMatrix();
 	gobalRenderParams_.projMatrix = Engine::GetWorld()->GetCamera()->GetProjectionMatrix();
 }

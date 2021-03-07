@@ -39,6 +39,36 @@ namespace GLTFLoader
 			MeshComponent* mc = new MeshComponent();
 			mc->geometry_ = new Geometry;
 			mc->material_ = new Material("Materials/PBR_Metallic.json");
+			{
+				const tinygltf::Material& tMaterial = tModel.materials[primitive.material];
+				std::vector<float> tmp;
+				{
+					tmp.resize(tMaterial.emissiveFactor.size());
+					for (int i = 0; i < tmp.size(); ++i)
+					{
+						auto v = tMaterial.emissiveFactor[i];
+						tmp[i] = (float)v;
+					}
+					mc->material_->SetFloat("emissiveFactor", 0, std::min(3, (int)tmp.size()), tmp.data());
+				}
+				{
+					tmp.resize(tMaterial.pbrMetallicRoughness.baseColorFactor.size());
+					for (int i = 0; i < tmp.size(); ++i)
+					{
+						auto v = tMaterial.pbrMetallicRoughness.baseColorFactor[i];
+						tmp[i] = (float)v;
+					}
+					mc->material_->SetFloat("baseColorFactor", 0, std::min(4, (int)tmp.size()), tmp.data());
+				}
+				{
+					float metallicFactor = (float)tMaterial.pbrMetallicRoughness.metallicFactor;
+					mc->material_->SetFloat("metallicFactor", 0, 1, &metallicFactor);
+
+					float roughnessFactor = (float)tMaterial.pbrMetallicRoughness.roughnessFactor;
+					mc->material_->SetFloat("roughnessFactor", 0, 1, &roughnessFactor);
+				}
+				
+			}
 
 			for (const auto& [attriName, aIdx] : primitive.attributes)
 			{

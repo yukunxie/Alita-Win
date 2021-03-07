@@ -132,7 +132,8 @@
     </Link>
     <PreBuildEvent>
       <Command>xcopy /Y /E $(ProjectDir)Sources\Shaders  $(OutDir)Shaders\
-xcopy /Y /E $(ProjectDir)Assets  $(OutDir)Assets\</Command>
+xcopy /Y /E $(ProjectDir)Assets  $(OutDir)Assets\
+xcopy /Y /E $(ProjectDir)Sources\Materials  $(OutDir)Materials\</Command>
     </PreBuildEvent>
     <CustomBuildStep>
       <Command>echo $(ProjectDir)

@@ -39,49 +39,49 @@ void Camera::_UpdateViewMatrix()
 
 const float CAMERA_MOVE_SPEED = 15.0f;
 
-void Camera::MoveForward()
+void Camera::MoveForward(float speedScale)
 {
 	_UpdateViewMatrix();
 
-	auto posInViewSpace = glm::vec4(0, 0, -CAMERA_MOVE_SPEED * 0.01, 1);
+	auto posInViewSpace = glm::vec4(0, 0, -CAMERA_MOVE_SPEED * 0.01f * speedScale, 1);
 
 	transform_.Position() = glm::inverse(viewMatrix_) * posInViewSpace;
 
 	_UpdateViewMatrix();
 }
 
-void Camera::MoveBack()
+void Camera::MoveUp(float speedScale)
 {
 	_UpdateViewMatrix();
 
-	auto posInViewSpace = glm::vec4(0, 0, CAMERA_MOVE_SPEED * 0.01, 1);
+	auto posInViewSpace = glm::vec4(0, CAMERA_MOVE_SPEED * 0.01f * speedScale, 0, 1);
 
 	transform_.Position() = glm::inverse(viewMatrix_) * posInViewSpace;
 
 	_UpdateViewMatrix();
 }
 
-void Camera::MoveRight()
+void Camera::MoveRight(float speedScale)
 {
 	_UpdateViewMatrix();
 
-	auto posInViewSpace = glm::vec4(CAMERA_MOVE_SPEED * 0.01, 0, 0, 1);
+	auto posInViewSpace = glm::vec4(CAMERA_MOVE_SPEED * 0.01f * speedScale, 0, 0, 1);
 
 	transform_.Position() = glm::inverse(viewMatrix_) * posInViewSpace;
 
 	_UpdateViewMatrix();
 }
 
-void Camera::MoveLeft()
-{
-	_UpdateViewMatrix();
-
-	auto posInViewSpace = glm::vec4(-CAMERA_MOVE_SPEED * 0.01, 0, 0, 1);
-
-	transform_.Position() = glm::inverse(viewMatrix_) * posInViewSpace;
-
-	_UpdateViewMatrix();
-}
+//void Camera::MoveLeft()
+//{
+//	_UpdateViewMatrix();
+//
+//	auto posInViewSpace = glm::vec4(-CAMERA_MOVE_SPEED * 0.01, 0, 0, 1);
+//
+//	transform_.Position() = glm::inverse(viewMatrix_) * posInViewSpace;
+//
+//	_UpdateViewMatrix();
+//}
 
 Camera* Camera::CreatePerspectiveCamera(float fov, float aspect, float nearPlane, float farPlane)
 {

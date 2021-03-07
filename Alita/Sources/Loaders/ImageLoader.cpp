@@ -95,7 +95,7 @@ namespace ImageLoader
 			prePresentBarrier.pNext = NULL;
 			prePresentBarrier.srcAccessMask = VK_ACCESS_MEMORY_READ_BIT;
 			prePresentBarrier.dstAccessMask = VK_ACCESS_MEMORY_WRITE_BIT;
-			prePresentBarrier.oldLayout = VK_IMAGE_LAYOUT_PREINITIALIZED;
+			prePresentBarrier.oldLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 			prePresentBarrier.newLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
 			prePresentBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
 			prePresentBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;

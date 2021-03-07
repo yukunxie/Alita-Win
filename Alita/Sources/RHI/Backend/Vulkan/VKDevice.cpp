@@ -596,6 +596,10 @@ void VKDevice::CreateDescriptorPool()
         VkDescriptorPoolSize{
             .type = VK_DESCRIPTOR_TYPE_SAMPLER,
             .descriptorCount = 1024,
+        },       
+        VkDescriptorPoolSize{
+            .type = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE,
+            .descriptorCount = 1024,
         },
     };
     

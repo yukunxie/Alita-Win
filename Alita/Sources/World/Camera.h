@@ -38,13 +38,11 @@ public:
 		return viewMatrix_ * projMatrix_;
 	}
 
-	void MoveForward();
+	void MoveForward(float speedScale = 1.0f);
 
-	void MoveBack();
+	void MoveUp(float speedScale = 1.0f);
 
-	void MoveRight();
-
-	void MoveLeft();
+	void MoveRight(float speedScale = 1.0f);
 
 public:
 	TColor4 GetBackgroundColor() const
