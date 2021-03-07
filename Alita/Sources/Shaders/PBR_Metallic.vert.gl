@@ -11,6 +11,9 @@ layout(location = IA_LOCATION_POSITION) in vec3 inPosition;
 #if USE_NORMAL
 layout(location = IA_LOCATION_NORMAL) in vec3 inNormal;
 #endif 
+#if USE_TANGENT
+layout(location = IA_LOCATION_TANGENT) in vec3 inTangent;
+#endif 
 #if USE_UV0
 layout(location = IA_LOCATION_TEXCOORD) in vec2 inTexCoord;
 #endif

@@ -32,7 +32,8 @@ World::World()
 	{
 		//const auto& models = GLTFLoader::LoadModelFromGLTF("Models/chinesedragon.gltf");
 		//const auto& models = GLTFLoader::LoadModelFromGLTF("Models/color_teapot_spheres.gltf");
-		const auto& models = GLTFLoader::LoadModelFromGLTF("Models/deer.gltf");
+		//const auto& models = GLTFLoader::LoadModelFromGLTF("Models/deer.gltf");
+		const auto& models = GLTFLoader::LoadModelFromGLTF("Models/armor/armor.gltf");
 		for (auto model : models)
 		{
 			AddEntity(model);
