@@ -21,6 +21,12 @@ public:
 
 	void AddComponment(Component* componment);
 
+	void AddChild(Entity* child);
+
+	void RemoveChild(Entity* child);
+
+	void SetParent(Entity* parent);
+
 	/*
 	 * Get component with RTTI
 	 * */
@@ -42,15 +48,9 @@ public:
 		return nullptr;
 	}
 
-	virtual void Tick(float dt)
-	{
-		for (auto& cm : components_)
-		{
-			cm->Tick(dt);
-		}
-	}
+	virtual void Tick(float dt);
 
-	TVector3 GetPosition()
+	TVector3& GetPosition()
 	{
 		return transform_.Position();
 	}
@@ -73,7 +73,7 @@ public:
 		transform_.Scale() = scale;
 	}
 
-	TVector3 GetScale()
+	TVector3& GetScale()
 	{
 		return transform_.Scale();
 	}
@@ -87,7 +87,7 @@ public:
 		transform_.Rotation() = rotation;
 	}
 
-	TVector3 GetRotation()
+	TVector3& GetRotation()
 	{
 		return transform_.Rotation();
 	}
@@ -102,7 +102,8 @@ public:
 	void UpdateWorldMatrix() const;
 
 protected:
-	//Entity* parentEntity_ = nullptr;
+	Entity* parent_ = nullptr;
+	std::vector<Entity*> children_;
 
 	std::list<Component*> components_;
 

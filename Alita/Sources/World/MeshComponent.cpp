@@ -51,26 +51,6 @@ void MeshComponent::SetupRenderObject()
 	}
 
 	material_->SetInputAssembler({ attributes , IndexType::UINT32 });
-
-
-	/*const auto& IAs = material_->GetInputAttributes();
-	for (const auto& IA : IAs)
-	{
-		for (auto& vbs : geometry_->GetVBStreams())
-		{
-			if (vbs->kind == IA.kind)
-			{
-				RenderObject::VertexBufferInfo vb;
-				{
-					vb.gpuBuffer = vbs->gpuBuffer;
-					vb.offset = 0;
-					vb.slot = IA.location;
-				}
-				renderObject_.vertexBuffers.push_back(vb);
-			}
-		}
-	}*/
-	//Assert(renderObject_.vertexBuffers.size() == IAs.size(), "invalid vertex buffer count.");
 }
 
 void MeshComponent::Tick(float dt)

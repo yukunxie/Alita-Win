@@ -22,6 +22,38 @@ void Entity::AddComponment(Component* componment)
     componment->SetEntity(this);
 }
 
+void Entity::AddChild(Entity* child)
+{
+    auto it = std::find(children_.begin(), children_.end(), child);
+    if (it != children_.end())
+        return;
+    children_.push_back(child);
+    child->parent_ = this;
+}
+
+void Entity::RemoveChild(Entity* child)
+{
+    auto it = std::find(children_.begin(), children_.end(), child);
+    if (it != children_.end())
+    {
+        children_.erase(it);
+        child->parent_ = nullptr;
+    }
+}
+
+void Entity::SetParent(Entity* parent)
+{
+    if (parent_ && parent_ != parent)
+    {
+        parent_->RemoveChild(this);
+    }
+
+    if (parent)
+        parent->AddChild(this);
+    else
+        parent_ = nullptr;
+}
+
 void Entity::UpdateWorldMatrix() const
 {
     if (!isTransformDirty_)
@@ -39,6 +71,19 @@ void Entity::UpdateWorldMatrix() const
 
     //translate
     worldMatrix_ = glm::translate(worldMatrix_, transform_.Position());
+}
+
+void Entity::Tick(float dt)
+{
+    for (auto& cm : components_)
+    {
+        cm->Tick(dt);
+    }
+
+    for (auto child : children_)
+    {
+        child->Tick(dt);
+    }
 }
 
 NS_RX_END

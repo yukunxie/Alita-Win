@@ -9,7 +9,7 @@ NS_RX_BEGIN
 
 namespace GLTFLoader
 {
-	std::vector<Model*> LoadModelFromGLTF(const std::string& filename);
+	std::vector<Entity*> LoadModelFromGLTF(const std::string& filename);
 }
 
 NS_RX_END

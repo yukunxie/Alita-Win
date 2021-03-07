@@ -582,10 +582,9 @@ void VKDevice::CreateCommandPool()
 
 void VKDevice::CreateDescriptorPool()
 {
-    uint32_t imageCount = 3;
-//    vkGetSwapchainImagesKHR(vkDevice_, vkSwapchain_, &imageCount, nullptr);
+    uint32_t masSets = 1024 * 1024;
     
-    std::array<VkDescriptorPoolSize, 4> poolSizes = {
+    std::vector<VkDescriptorPoolSize> poolSizes = {
         VkDescriptorPoolSize{
             .type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
             .descriptorCount = 1024, 
@@ -607,7 +606,7 @@ void VKDevice::CreateDescriptorPool()
         poolInfo.flags = 0;
         poolInfo.poolSizeCount = (std::uint32_t)poolSizes.size();
         poolInfo.pPoolSizes = poolSizes.data();
-        poolInfo.maxSets = imageCount;
+        poolInfo.maxSets = masSets;
     };
     
     CALL_VK(vkCreateDescriptorPool(vkDevice_, &poolInfo, nullptr, &vkDescriptorPool_));

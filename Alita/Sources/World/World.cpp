@@ -30,9 +30,9 @@ World::World()
 	//}
 
 	{
-		const std::vector<Model*>& models = GLTFLoader::LoadModelFromGLTF("Models/chinesedragon.gltf");
-		//const std::vector<Model*>& models = GLTFLoader::LoadModelFromGLTF("Models/color_teapot_spheres.gltf");
-		for (Model* model : models)
+		//const auto& models = GLTFLoader::LoadModelFromGLTF("Models/chinesedragon.gltf");
+		const auto& models = GLTFLoader::LoadModelFromGLTF("Models/color_teapot_spheres.gltf");
+		for (auto model : models)
 		{
 			AddEntity(model);
 		}
