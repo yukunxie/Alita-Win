@@ -44,6 +44,42 @@ void IgniterPass::Execute(RHI::CommandEncoder* cmdEncoder, const std::vector<Ren
 	Reset();*/
 }
 
+ShadowMapGenPass::ShadowMapGenPass()
+{
+	{
+		RHI::TextureDescriptor descriptor;
+		{
+			descriptor.sampleCount = 1;
+			descriptor.format = RHI::TextureFormat::DEPTH24PLUS_STENCIL8;
+			descriptor.usage = RHI::TextureUsage::OUTPUT_ATTACHMENT;
+			descriptor.size = { shadowMapSize_.width, shadowMapSize_.height };
+			descriptor.arrayLayerCount = 1;
+			descriptor.mipLevelCount = 1;
+			descriptor.dimension = RHI::TextureDimension::TEXTURE_2D;
+		};
+		dsTexture_ = Engine::GetGPUDevice()->CreateTexture(descriptor);
+	}
+
+	{
+		RHI::TextureDescriptor descriptor;
+		{
+			descriptor.sampleCount = 1;
+			descriptor.format = RHI::TextureFormat::R32FLOAT;
+			descriptor.usage = RHI::TextureUsage::OUTPUT_ATTACHMENT;
+			descriptor.size = { shadowMapSize_.width, shadowMapSize_.height };
+			descriptor.arrayLayerCount = 1;
+			descriptor.mipLevelCount = 1;
+			descriptor.dimension = RHI::TextureDimension::TEXTURE_2D;
+		};
+		shadowMapTexture_ = Engine::GetGPUDevice()->CreateTexture(descriptor);
+	}
+}
+
+void ShadowMapGenPass::Execute(RHI::CommandEncoder* cmdEncoder, const std::vector<RenderObject*>& renderObjects)
+{
+	//glm::orthoRH_NO()
+}
+
 void OpaquePass::Execute(RHI::CommandEncoder* cmdEncoder, const std::vector<RenderObject*>& renderObjects)
 {
 	RHI::RenderPassDescriptor renderPassDescriptor;

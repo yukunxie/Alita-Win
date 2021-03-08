@@ -78,11 +78,12 @@ Terrain* Terrain::CreateFromHeightMap(const std::string& imgFilename, float minH
 
     MeshComponent* meshComp = new MeshComponent();
     meshComp->geometry_ = new Geometry;
-    meshComp->material_ = new Material("Shaders/CommonMaterial.json");
+    meshComp->material_ = new Material("Materials/PBR_Metallic.json");
 
     {
         auto vbBuffer = new VertexBuffer();
         vbBuffer->kind = VertexBufferAttriKind::POSITION;
+        vbBuffer->format = InputAttributeFormat::FLOAT3;
         vbBuffer->InitData(vertices.data(), vertices.size() * sizeof(vertices[0]));
         meshComp->geometry_->AppendVertexBuffer(vbBuffer);
     }
@@ -90,6 +91,7 @@ Terrain* Terrain::CreateFromHeightMap(const std::string& imgFilename, float minH
     {
         auto vbBuffer = new VertexBuffer();
         vbBuffer->kind = VertexBufferAttriKind::NORMAL;
+        vbBuffer->format = InputAttributeFormat::FLOAT3;
         vbBuffer->InitData(diffuse.data(), diffuse.size() * sizeof(diffuse[0]));
         meshComp->geometry_->AppendVertexBuffer(vbBuffer);
     }
@@ -97,6 +99,7 @@ Terrain* Terrain::CreateFromHeightMap(const std::string& imgFilename, float minH
     {
         auto vbBuffer = new VertexBuffer();
         vbBuffer->kind = VertexBufferAttriKind::TEXCOORD;
+        vbBuffer->format = InputAttributeFormat::FLOAT2;
         vbBuffer->InitData(texCoords.data(), texCoords.size() * sizeof(texCoords[0]));
         meshComp->geometry_->AppendVertexBuffer(vbBuffer);
     }

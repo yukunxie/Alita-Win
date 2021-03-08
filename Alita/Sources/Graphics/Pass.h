@@ -7,6 +7,7 @@
 
 #include "Base/ObjectBase.h"
 #include "RHI.h"
+#include "Types/Types.h"
 
 NS_RX_BEGIN
 
@@ -51,6 +52,23 @@ class IgniterPass : public Pass
 {
 public:
     virtual void Execute(RHI::CommandEncoder* cmdEncoder, const std::vector<RenderObject*>& renderObjects) override;
+};
+
+class ShadowMapGenPass : public Pass
+{
+public:
+    ShadowMapGenPass();
+    virtual ~ShadowMapGenPass()
+    {
+
+    }
+
+    virtual void Execute(RHI::CommandEncoder* cmdEncoder, const std::vector<RenderObject*>& renderObjects) override;
+
+protected:
+    TExtent2D     shadowMapSize_ = { 2048, 2048 };
+    RHI::Texture* shadowMapTexture_ = nullptr;
+    RHI::Texture* dsTexture_ = nullptr;
 };
 
 class OpaquePass : public Pass
