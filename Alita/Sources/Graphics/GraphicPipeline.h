@@ -29,6 +29,7 @@ public:
 	void Execute(const std::vector<RenderObject*>& renderObjects);
 
 private:
+	ShadowMapGenPass shadowGenPass_;
 	IgniterPass igniterPass_;
 	OpaquePass opaquePass_;
 	TExtent2D  windowSize_;

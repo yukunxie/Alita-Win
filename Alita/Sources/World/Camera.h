@@ -38,6 +38,8 @@ public:
 		return viewMatrix_ * projMatrix_;
 	}
 
+	void LookAt(const TVector3& from, const TVector3& center, const TVector3& up = { 0, 1, 0 });
+
 	void MoveForward(float speedScale = 1.0f);
 
 	void MoveUp(float speedScale = 1.0f);
@@ -62,6 +64,14 @@ protected:
 	TMat4x4 viewMatrix_;
 	TMat4x4 projMatrix_;
 	TColor4 backgroudColor_ = { 0.0f, 0.0f, 0.0f, 1.0f };
+};
+
+class OrthoCamera final : public Camera
+{
+public:
+	OrthoCamera(float left, float right, float bottom, float top, float zNear, float zFar);
+
+	virtual void Tick(float dt) override;
 };
 
 class PerspectiveCamera final: public Camera

@@ -37,6 +37,24 @@ void Camera::_UpdateViewMatrix()
 	viewMatrix_ = _ComposeViewMatrix(transform_.Position(), transform_.Rotation());
 }
 
+void Camera::LookAt(const TVector3& from, const TVector3& center, const TVector3& up)
+{
+	TMat4x4 mat = glm::lookAtRH(from, center, up);
+	auto k = mat * TVector4{ 0, 0, 0, 1 };
+	glm::vec3 scale;
+	glm::quat rotation;
+	glm::vec3 translation;
+	glm::vec3 skew;
+	glm::vec4 perspective;
+	bool ret = glm::decompose(mat, scale, rotation, translation, skew, perspective);
+
+	rotation = glm::conjugate(rotation);
+	auto e = glm::eulerAngles(rotation);
+	auto angles = glm::degrees(e);
+
+	if (true);
+}
+
 const float CAMERA_MOVE_SPEED = 15.0f;
 
 void Camera::MoveForward(float speedScale)
@@ -72,16 +90,17 @@ void Camera::MoveRight(float speedScale)
 	_UpdateViewMatrix();
 }
 
-//void Camera::MoveLeft()
-//{
-//	_UpdateViewMatrix();
-//
-//	auto posInViewSpace = glm::vec4(-CAMERA_MOVE_SPEED * 0.01, 0, 0, 1);
-//
-//	transform_.Position() = glm::inverse(viewMatrix_) * posInViewSpace;
-//
-//	_UpdateViewMatrix();
-//}
+OrthoCamera::OrthoCamera(float left, float right, float bottom, float top, float zNear, float zFar)
+{
+	projMatrix_ = glm::orthoRH(left, right, bottom, top, zNear, zFar);
+
+	_UpdateViewMatrix();
+}
+
+void OrthoCamera::Tick(float dt)
+{
+	_UpdateViewMatrix();
+}
 
 Camera* Camera::CreatePerspectiveCamera(float fov, float aspect, float nearPlane, float farPlane)
 {
@@ -109,50 +128,22 @@ PerspectiveCamera::PerspectiveCamera(float fov, float aspect, float nearPlane, f
 
 void PerspectiveCamera::Tick(float dt)
 {
-	return;
-
-	// rotate camera
-
-	static auto startTime = std::chrono::high_resolution_clock::now();
-	auto currentTime = std::chrono::high_resolution_clock::now();
-	float time = std::chrono::duration<float, std::chrono::seconds::period>(
-		currentTime - startTime).count();
-
 	_UpdateViewMatrix();
+	//return;
 
-	TMat4x4 mat(1);
-	mat = glm::rotate(mat, time * glm::radians(90.0f) * 0.2f, glm::vec3(0.0f, 1.0f, 0.0f));
-	
-	viewMatrix_ = viewMatrix_ * mat;
+	//// rotate camera
 
-	/*{
-		glm::vec3 scale;
-		glm::quat rotation;
-		glm::vec3 translation;
-		glm::vec3 skew;
-		glm::vec4 perspective;
-		glm::decompose(viewMatrix_, scale, rotation, translation, skew, perspective);
+	//static auto startTime = std::chrono::high_resolution_clock::now();
+	//auto currentTime = std::chrono::high_resolution_clock::now();
+	//float time = std::chrono::duration<float, std::chrono::seconds::period>(
+	//	currentTime - startTime).count();
 
-		glm::vec3 eulerRotation = glm::degrees(glm::eulerAngles(rotation));
+	//_UpdateViewMatrix();
 
-		auto tmp = TMat4x4(1.0f);
-		tmp = glm::rotate(tmp, -1.f * glm::radians(eulerRotation.x), TVector3(1.0f, 0.0f, 0.0f));
-		tmp = glm::rotate(tmp, -1.f * glm::radians(eulerRotation.y), TVector3(0.0f, 1.0f, 0.0f));
-		tmp = glm::rotate(tmp, -1.f * glm::radians(eulerRotation.z), TVector3(0.0f, 0.0f, 1.0f));
-
-		auto k = tmp * viewMatrix_;
-
-		auto x = k[0][0];
-		auto y = k[1][0];
-		auto z = k[2][0];
-		auto w = k[3][3];
-
-		auto xxx = glm::vec3(viewMatrix_[3]);
-
-		rotation = glm::conjugate(rotation);
-	}*/
-	
-
+	//TMat4x4 mat(1);
+	//mat = glm::rotate(mat, time * glm::radians(90.0f) * 0.2f, glm::vec3(0.0f, 1.0f, 0.0f));
+	//
+	//viewMatrix_ = viewMatrix_ * mat;
 }
 
 NS_RX_END

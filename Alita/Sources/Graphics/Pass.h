@@ -8,6 +8,7 @@
 #include "Base/ObjectBase.h"
 #include "RHI.h"
 #include "Types/Types.h"
+#include "World/Camera.h"
 
 NS_RX_BEGIN
 
@@ -58,6 +59,7 @@ class ShadowMapGenPass : public Pass
 {
 public:
     ShadowMapGenPass();
+
     virtual ~ShadowMapGenPass()
     {
 
@@ -67,6 +69,7 @@ public:
 
 protected:
     TExtent2D     shadowMapSize_ = { 2048, 2048 };
+    OrthoCamera   orthoCamera_;
     RHI::Texture* shadowMapTexture_ = nullptr;
     RHI::Texture* dsTexture_ = nullptr;
 };

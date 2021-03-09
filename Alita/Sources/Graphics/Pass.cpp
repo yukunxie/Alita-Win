@@ -45,7 +45,12 @@ void IgniterPass::Execute(RHI::CommandEncoder* cmdEncoder, const std::vector<Ren
 }
 
 ShadowMapGenPass::ShadowMapGenPass()
+	: orthoCamera_(-100, 100, -100, 100, 0.1, 1000)
 {
+	//orthoCamera_.SetPosition({ -1, 1, 1});
+
+	orthoCamera_.LookAt({ -1, 1, 1 }, { 0, 0, 0 });
+
 	{
 		RHI::TextureDescriptor descriptor;
 		{
@@ -77,7 +82,17 @@ ShadowMapGenPass::ShadowMapGenPass()
 
 void ShadowMapGenPass::Execute(RHI::CommandEncoder* cmdEncoder, const std::vector<RenderObject*>& renderObjects)
 {
+	//auto viewMatrix = TMat4x4(1.0f);
+
+	//viewMatrix = glm::rotate(viewMatrix, glm::radians(rotation.x), TVector3(1.0f, 0.0f, 0.0f));
+	//viewMatrix = glm::rotate(viewMatrix, glm::radians(rotation.y), TVector3(0.0f, 1.0f, 0.0f));
+	//viewMatrix = glm::rotate(viewMatrix, glm::radians(rotation.z), TVector3(0.0f, 0.0f, 1.0f));
+
+	////translate to init position
+	//viewMatrix = glm::translate(viewMatrix, position * -1.f);
+	
 	//glm::orthoRH_NO()
+	//glm::lookAt()
 }
 
 void OpaquePass::Execute(RHI::CommandEncoder* cmdEncoder, const std::vector<RenderObject*>& renderObjects)
