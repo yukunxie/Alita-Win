@@ -162,12 +162,8 @@ Material::Material(const std::string& configFilename)
     vsFilename_ = doc["code"]["vs"].GetString();
     fsFilename_ = doc["code"]["fs"].GetString();
 
-    /*rhiVertShader_ = _CreateShader(doc["code"]["vs"].GetString(), RHI::ShaderType::VERTEX);
-    rhiFragShader_ = _CreateShader(doc["code"]["fs"].GetString(), RHI::ShaderType::FRAGMENT);*/
-
     ParseBindGroupLayout(doc);
     ParseInputAssembler(doc);
-    //CreatePipelineState();
 }
 
 void Material::Apply(RHI::RenderPassEncoder& passEndcoder)
@@ -195,7 +191,7 @@ bool Material::SetFloat(const std::string& name, std::uint32_t offset, std::uint
 
     const MaterialParameter& param = it->second;
     Assert(param.bindingObject->type == MaterailBindingObjectType::BUFFER, "");
-    Assert(param.offset + offset + size < param.bindingObject->stride);
+    Assert(param.offset + offset + size < param.bindingObject->stride, "");
     param.bindingObject->buffer->SetSubData(param.offset + offset, count * sizeof(float), data);
 
     return true;
@@ -259,7 +255,7 @@ void Material::ApplyModifyToBindGroup(RHI::RenderPassEncoder& passEndcoder)
             descriptor.bindings.push_back(tmp);
         }
         else
-            Assert(false);
+            Assert(false, "");
     }
 
     rhiBindGroup_ = Engine::GetGPUDevice()->CreateBindGroup(descriptor);
@@ -320,7 +316,7 @@ void Material::ParseBindGroupLayout(const rapidjson::Document& doc)
     {
         return;
     }
-    Assert(doc["bindings"].IsArray());
+    //Assert(doc["bindings"].IsArray(), "");
 
     for (auto& cfg : doc["bindings"].GetArray())
     {
@@ -369,7 +365,7 @@ void Material::ParseBindGroupLayout(const rapidjson::Document& doc)
                     fields.push_back(param);
                 }
 
-                if (Assert(bindingObject->stride > 0), "Binding buffer's size must be great than zero");
+                //Assert(bindingObject->stride > 0, "Binding buffer's size must be great than zero");
 
                 RHI::BufferDescriptor bufferDescriptor;
                 {
@@ -421,7 +417,7 @@ void Material::ParseBindGroupLayout(const rapidjson::Document& doc)
             }
             bindingObject->sampler = Engine::GetGPUDevice()->CreateSampler(descriptor);
         }
-        else Assert(false);
+        else Assert(false, "");
 
     }
 

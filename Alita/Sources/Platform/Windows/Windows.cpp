@@ -28,3 +28,8 @@ void _OutputLog(LogLevel level, const char* format, ...)
 
     std::cout << "LOG: " << szBuff << std::endl;
 }
+
+void AssertImpl(const char* filename, const char* function, int lineno, const char* format, ...)
+{
+    if (true);
+}

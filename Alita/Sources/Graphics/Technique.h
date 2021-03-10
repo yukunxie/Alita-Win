@@ -10,11 +10,19 @@
 
 NS_RX_BEGIN
 
-class Technique
-{
-protected:
-    std::list<Pass*> renderPasses_;
-};
+//enum class TechniqueMask : std::uint64_t
+//{
+//    Tech_Opaque = 1 << 0,
+//    Tech_Transparent = 1 << 1,
+//    Tech_ShadowMapGen = 1 << 2,
+//};
+//
+//using TechniqueFlags = std::uint64_t;
+//
+//class Technique
+//{
+//public:
+//};
 
 NS_RX_END
 

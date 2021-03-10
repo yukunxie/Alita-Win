@@ -48,6 +48,9 @@ void GraphicPipeline::Execute(const std::vector<RenderObject*>& renderObjects)
 	//	igniterPass_.SetupOutputAttachment(0, colorAttachment);
 	//	igniterPass_.Execute(rhiCommandEncoder_, meshComponents);
 	//}
+
+	shadowGenPass_.Reset();
+	shadowGenPass_.Execute(rhiCommandEncoder_, renderObjects);
 	
 	// draw opaque objects.
 	{

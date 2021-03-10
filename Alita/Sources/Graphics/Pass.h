@@ -69,9 +69,8 @@ public:
 
 protected:
     TExtent2D     shadowMapSize_ = { 2048, 2048 };
-    OrthoCamera   orthoCamera_;
-    RHI::Texture* shadowMapTexture_ = nullptr;
-    RHI::Texture* dsTexture_ = nullptr;
+    RHI::TextureView* shadowMapTexture_ = nullptr;
+    RHI::TextureView* dsTexture_ = nullptr;
 };
 
 class OpaquePass : public Pass

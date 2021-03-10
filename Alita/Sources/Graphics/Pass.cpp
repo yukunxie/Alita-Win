@@ -45,12 +45,7 @@ void IgniterPass::Execute(RHI::CommandEncoder* cmdEncoder, const std::vector<Ren
 }
 
 ShadowMapGenPass::ShadowMapGenPass()
-	: orthoCamera_(-100, 100, -100, 100, 0.1, 1000)
 {
-	//orthoCamera_.SetPosition({ -1, 1, 1});
-
-	orthoCamera_.LookAt({ -1, 1, 1 }, { 0, 0, 0 });
-
 	{
 		RHI::TextureDescriptor descriptor;
 		{
@@ -62,7 +57,7 @@ ShadowMapGenPass::ShadowMapGenPass()
 			descriptor.mipLevelCount = 1;
 			descriptor.dimension = RHI::TextureDimension::TEXTURE_2D;
 		};
-		dsTexture_ = Engine::GetGPUDevice()->CreateTexture(descriptor);
+		dsTexture_ = Engine::GetGPUDevice()->CreateTexture(descriptor)->CreateView();
 	}
 
 	{
@@ -76,23 +71,46 @@ ShadowMapGenPass::ShadowMapGenPass()
 			descriptor.mipLevelCount = 1;
 			descriptor.dimension = RHI::TextureDimension::TEXTURE_2D;
 		};
-		shadowMapTexture_ = Engine::GetGPUDevice()->CreateTexture(descriptor);
+		shadowMapTexture_ = Engine::GetGPUDevice()->CreateTexture(descriptor)->CreateView();
 	}
 }
 
 void ShadowMapGenPass::Execute(RHI::CommandEncoder* cmdEncoder, const std::vector<RenderObject*>& renderObjects)
 {
-	//auto viewMatrix = TMat4x4(1.0f);
+	RHI::RenderPassDescriptor renderPassDescriptor;
 
-	//viewMatrix = glm::rotate(viewMatrix, glm::radians(rotation.x), TVector3(1.0f, 0.0f, 0.0f));
-	//viewMatrix = glm::rotate(viewMatrix, glm::radians(rotation.y), TVector3(0.0f, 1.0f, 0.0f));
-	//viewMatrix = glm::rotate(viewMatrix, glm::radians(rotation.z), TVector3(0.0f, 0.0f, 1.0f));
+	RHI::RenderPassColorAttachmentDescriptor descriptor;
+	{
+		descriptor.attachment = shadowMapTexture_;
+		descriptor.resolveTarget = nullptr;
+		descriptor.loadValue = { 1.0f, 1.0f, 1.0f, 1.0f };
+		descriptor.loadOp = RHI::LoadOp::CLEAR;
+		descriptor.storeOp = RHI::StoreOp::STORE;
+	}
+	renderPassDescriptor.colorAttachments.push_back(descriptor);
 
-	////translate to init position
-	//viewMatrix = glm::translate(viewMatrix, position * -1.f);
-	
-	//glm::orthoRH_NO()
-	//glm::lookAt()
+	renderPassDescriptor.depthStencilAttachment = {
+		.attachment = dsTexture_,
+		.depthLoadOp = RHI::LoadOp::CLEAR,
+		.depthStoreOp = RHI::StoreOp::STORE,
+		.depthLoadValue = 1.0f,
+		.stencilLoadOp = RHI::LoadOp::CLEAR,
+		.stencilStoreOp = RHI::StoreOp::STORE,
+		.stencilLoadValue = 0,
+	};
+
+	auto renderPassEncoder = cmdEncoder->BeginRenderPass(renderPassDescriptor);
+
+	const RHI::Extent2D extent = { 1280, 800 };
+	renderPassEncoder->SetViewport(0, 0, extent.width, extent.height, 0, 1);
+	renderPassEncoder->SetScissorRect(0, 0, extent.width, extent.height);
+
+	for (const auto ro : renderObjects)
+	{
+		ro->Render(*renderPassEncoder);
+	}
+
+	renderPassEncoder->EndPass();
 }
 
 void OpaquePass::Execute(RHI::CommandEncoder* cmdEncoder, const std::vector<RenderObject*>& renderObjects)

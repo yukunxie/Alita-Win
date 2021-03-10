@@ -55,7 +55,11 @@ void World::SetupDefaultCamera()
 	{
 		return;
 	}
-	defaultCamera_ = Camera::CreatePerspectiveCamera(45.0f,  800.0f / 1280.0f, 1.f, 1000.0f);
+	defaultCamera_ = Camera::CreatePerspectiveCamera(45.0, 1280.f / 800.0f, 0.1f, 100.f);
+	defaultCamera_->LookAt({ 0, 15, 15 }, { 0, 0, 0 }, { 0, 1, 0 });
+
+	shadowMapCamera_ = new OrthoCamera(-100, 100, -100, 100, 0.1, 100);
+	shadowMapCamera_->LookAt({ -20, 20, 20 }, { 0, 0, 0 }, { 0, 1, 0 });
 }
 
 void World::Tick(float dt)
@@ -70,7 +74,6 @@ void World::Tick(float dt)
 
 void World::Render()
 {
-	
 }
 
 

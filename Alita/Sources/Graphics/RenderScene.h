@@ -41,15 +41,11 @@ public:
 
 	void SubmitGPU();
 
-    void testRotate();
-
 protected:
 
 	GobalRenderParams gobalRenderParams_;
 
 	std::vector<RenderObject*> renderObjects_;
-
-    std::vector<MeshComponent*> meshComponents_;
 
     GraphicPipeline* graphicPipeline_ = nullptr;
 };

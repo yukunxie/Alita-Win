@@ -13,7 +13,7 @@ NS_RX_BEGIN
 class Effect : public ObjectBase
 {
 public:
-    std::vector<Technique*> techniques_;
+    //std::vector<Technique*> techniques_;
 };
 
 NS_RX_END

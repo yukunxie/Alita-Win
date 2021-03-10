@@ -32,6 +32,11 @@ public:
         return defaultCamera_->GetComponent<Transform>()->Position();
     }
 
+    Camera* GetShadowMapCamera()
+    {
+        return shadowMapCamera_;
+    }
+
     void AddEntity(Entity* entity);
 
 private:
@@ -44,6 +49,7 @@ protected:
     //std::vector<Level*> levels_;
 
     Camera* defaultCamera_ = nullptr;
+    Camera* shadowMapCamera_ = nullptr;
 
 };
 
