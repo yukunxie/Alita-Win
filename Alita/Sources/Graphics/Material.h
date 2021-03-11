@@ -154,6 +154,14 @@ protected:
 	friend class Material;
 };
 
+constexpr std::uint32_t kMaxAttachmentCount = 6;
+struct ShadingStateHasher
+{
+	RHI::Format attachments[kMaxAttachmentCount];
+	RHI::FrontFace frontFace : 1;
+	RHI::CullMode cullMode : 2; 
+};
+
 class Material : public ObjectBase
 {
 public:
