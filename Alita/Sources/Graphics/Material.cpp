@@ -127,7 +127,7 @@ static constexpr std::uint32_t _SimpleHash(const char* p)
     return hash;
 }
 
-static RHI::Shader* _CreateShader(const std::string& filename, RHI::ShaderType shaderType, const std::vector<std::string>& userDefines = {})
+static RHI::Shader* _CreateShader(const std::string& filename, RHI::ShaderType shaderType, ETechniqueType techType, const std::vector<std::string>& userDefines = {})
 {
     std::string data = FileSystem::GetInstance()->GetStringData(filename.c_str());
 
@@ -143,7 +143,31 @@ static RHI::Shader* _CreateShader(const std::string& filename, RHI::ShaderType s
         + sShaderGlobalConstantBuffer + "\n"
         + data;
 
+    std::string techEntryName = "";
+    switch (techType)
+    {
+    case ETechniqueType::TShading:
+        techEntryName = "void TShading()";
+        break;
+    case ETechniqueType::TGBufferGen:
+        techEntryName = "void TGBufferGen()";
+        break;
+    }
+    RHI_ASSERT(techEntryName.size() > 0);
+
+    auto npos = shaderText.find(techEntryName.c_str(), 0);
+    RHI_ASSERT(npos != std::string::npos);
+
+    shaderText = shaderText.replace(npos, techEntryName.size(), "void main()");
+
+    //strstr(shaderText.c_str())
+
     const std::vector<uint32>& spirV = RHI::CompileGLSLToSPIRV(shaderText, shaderType);
+
+    //auto tmp = "E:\\Programs\\Alita-Win\\Alita\\x64\\Debug\\" + filename + ".spirv";
+    //auto fd = fopen(tmp.c_str(), "wb");
+    //fwrite(spirV.data(), sizeof(uint32), spirV.size(), fd);
+    //fclose(fd);
     
     RHI::ShaderModuleDescriptor descriptor;
     {
@@ -564,8 +588,8 @@ void Material::BindPSO(RHI::RenderPassEncoder& passEndcoder)
         }
     }
 
-    rhiVertShader_ = _CreateShader(vsFilename_, RHI::ShaderType::VERTEX, userDefines);
-    rhiFragShader_ = _CreateShader(fsFilename_, RHI::ShaderType::FRAGMENT, userDefines);
+    rhiVertShader_ = _CreateShader(vsFilename_, RHI::ShaderType::VERTEX, ETechniqueType::TShading, userDefines);
+    rhiFragShader_ = _CreateShader(fsFilename_, RHI::ShaderType::FRAGMENT, ETechniqueType::TShading, userDefines);
 
 
     if (!rhiPipelineState_)

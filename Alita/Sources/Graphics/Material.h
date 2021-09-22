@@ -162,6 +162,74 @@ struct ShadingStateHasher
 	RHI::CullMode cullMode : 2; 
 };
 
+struct PSOKey
+{
+	PSOKey() noexcept
+	{
+		memset(this, 0, sizeof(*this));
+	}
+
+	PSOKey(const PSOKey& lhr) noexcept
+	{
+		memcpy(this, &lhr, sizeof(*this));
+	}
+
+	inline bool operator==(const PSOKey& lhr) noexcept
+	{
+		return 0 == memcmp(this, &lhr, sizeof(lhr));
+	}
+	
+	uint8 Technique : 8;
+	uint8 DepthWrite : 1;
+	uint8 DepthCmpFunc : 3;
+	uint8 StencilWrite : 1;
+	uint8 StencilCmpFunc : 3;
+	uint8 StencilFailOp : 3;
+	uint8 StencilDepthFailOp : 3;
+	uint8 StencilPassOp : 3;
+	uint8 StencilMask : 8;
+	uint8 FrontFace : 1;
+	uint8 CullMode : 2;
+	uint8 AttachmentFormat0 : 8;
+	uint8 AttachmentFormat1 : 8;
+	uint8 AttachmentFormat2 : 8;
+	uint8 AttachmentFormat3 : 8;
+	uint8 AttachmentFormat4 : 8;
+	uint8 AttachmentFormat5 : 8;
+};
+
+NS_RX_END
+
+namespace std
+{
+	template<>
+	struct hash<rx::PSOKey>
+	{
+		std::size_t operator()(const rx::PSOKey& s) const
+		{
+			const unsigned _FNV_offset_basis = 2166136261U;
+			const unsigned _FNV_prime = 16777619U;
+			unsigned _Val = _FNV_offset_basis;
+			size_t _Count = sizeof(rx::PSOKey);
+			const char* _First = (const char*)&s;
+			for (size_t _Next = 0; _Next < _Count; ++_Next)
+			{
+				_Val ^= (unsigned)_First[_Next];
+				_Val *= _FNV_prime;
+			}
+
+			return _Val;
+		}
+	};
+
+	inline bool operator==(const rx::PSOKey& lhs, const rx::PSOKey& lhr) noexcept
+	{
+		return 0 == memcmp(&lhs, &lhr, sizeof(lhs));
+	}
+}
+
+NS_RX_BEGIN
+
 class Material : public ObjectBase
 {
 public:
@@ -213,7 +281,9 @@ protected:
 	RHI::Shader* rhiFragShader_ = nullptr;
 	RHI::RenderPipeline* rhiPipelineState_ = nullptr;
 
-	RHI::RenderPipeline* rhiPipelineStateObjects_[(uint32)TechniqueType::TMaxCount] = { nullptr };
+	std::unordered_map< PSOKey, RHI::RenderPipeline*> rhiPSOMap_;
+
+	RHI::RenderPipeline* rhiPipelineStateObjects_[(uint32)ETechniqueType::TMaxCount] = { nullptr };
 
 	bool bBindingDirty_ = true;
 };

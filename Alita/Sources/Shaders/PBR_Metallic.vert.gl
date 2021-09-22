@@ -33,19 +33,6 @@ layout(location = 1) out vec3 _WorldNormal;
 layout(location = 2) out vec2 _UV0;
 #endif
 
-void main() {
-    gl_Position = uGlobal.ProjMatrix * uGlobal.ViewMatrix * uBatch.WorldMatrix * vec4(inPosition, 1.0);
-    _WorldPosition = (uBatch.WorldMatrix * vec4(inPosition, 1.0)).xyz;
-
-#if USE_NORMAL
-    _WorldNormal =  (transpose(inverse(uBatch.WorldMatrix)) * vec4(inNormal, 1.0)).xyz;
-#endif
-
-#if USE_UV0
-    _UV0  = inTexCoord;
-#endif
-}
-
 void TShading() {
     gl_Position = uGlobal.ProjMatrix * uGlobal.ViewMatrix * uBatch.WorldMatrix * vec4(inPosition, 1.0);
     _WorldPosition = (uBatch.WorldMatrix * vec4(inPosition, 1.0)).xyz;

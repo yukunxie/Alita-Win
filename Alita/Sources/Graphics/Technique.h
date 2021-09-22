@@ -10,7 +10,7 @@
 
 NS_RX_BEGIN
 
-enum class TechniqueType
+enum class ETechniqueType
 {
     TShading    = 0, 
     TGBufferGen,
@@ -18,10 +18,10 @@ enum class TechniqueType
     TMaxCount,
 };
 
-enum TechniqueMask : std::uint64_t
+enum ETechniqueMask : std::uint64_t
 {
-    TShading    = 1 << (uint32)TechniqueType::TShading,
-    TGBufferGen = 1 << (uint32)TechniqueType::TGBufferGen,
+    TShading    = 1 << (uint32)ETechniqueType::TShading,
+    TGBufferGen = 1 << (uint32)ETechniqueType::TGBufferGen,
 };
 
 using TechniqueFlags = std::uint64_t;
