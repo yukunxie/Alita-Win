@@ -2,33 +2,35 @@
 // Created by realxie on 2019-10-04.
 //
 
-#ifndef ALITA_VKSHADER_H
-#define ALITA_VKSHADER_H
+#ifndef RHI_VKSHADER_H
+#define RHI_VKSHADER_H
 
 #include "VKDevice.h"
 
 NS_RHI_BEGIN
 
-class VKShader : public Shader
+class VKShader final : public Shader
 {
 protected:
-    VKShader() = default;
+    VKShader(VKDevice* device);
     
-    bool Init(VKDevice* device, const ShaderModuleDescriptor &descriptor);
-
 public:
-    static VKShader* Create(VKDevice* device, const ShaderModuleDescriptor &descriptor);
+    
+    bool Init(const ShaderModuleDescriptor &descriptor);
     
     virtual ~VKShader();
     
     VkShaderModule GetNative() const
     { return vkShaderModule_; }
+    
+    virtual void Dispose() override;
 
 private:
-    VkDevice vkDevice_ = nullptr;
-    VkShaderModule vkShaderModule_ = 0;
+    VkShaderModule vkShaderModule_ = VK_NULL_HANDLE;
+    
+    friend class VKDevice;
 };
 
 NS_RHI_END
 
-#endif //ALITA_VKSHADER_H
+#endif //RHI_VKSHADER_H

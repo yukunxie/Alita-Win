@@ -1,6 +1,6 @@
 #pragma once
 
-#include "RHI.h"
+#include "RHI/RHI.h"
 
 #include "Base/ObjectBase.h"
 #include "Meshes/VertexBuffer.h"

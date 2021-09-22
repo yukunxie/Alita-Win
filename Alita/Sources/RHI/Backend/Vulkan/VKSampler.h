@@ -2,8 +2,8 @@
 // Created by realxie on 2019-10-07.
 //
 
-#ifndef ALITA_VKSAMPLER_H
-#define ALITA_VKSAMPLER_H
+#ifndef RHI_VKSAMPLER_H
+#define RHI_VKSAMPLER_H
 
 #include "VKDevice.h"
 
@@ -12,19 +12,21 @@ NS_RHI_BEGIN
 class VKSampler final : public Sampler
 {
 protected:
-    VKSampler() = default;
-
-public:
-    bool Init(VKDevice* device, const SamplerDescriptor &descriptor);
+    VKSampler(VKDevice* device);
     
     virtual ~VKSampler();
     
+public:
+    
+    bool Init(const SamplerDescriptor &descriptor);
+    
     VkSampler GetNative() const
     { return vkSampler_; }
+    
+    virtual void Dispose() override;
 
 private:
-    VkDevice vkDevice_ = nullptr;
-    VkSampler vkSampler_ = 0;
+    VkSampler vkSampler_ = VK_NULL_HANDLE;
     
     friend class VKDevice;
 };
@@ -32,4 +34,4 @@ private:
 NS_RHI_END
 
 
-#endif //ALITA_VKSAMPLER_H
+#endif //RHI_VKSAMPLER_H

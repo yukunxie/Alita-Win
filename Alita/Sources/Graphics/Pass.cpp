@@ -46,33 +46,33 @@ void IgniterPass::Execute(RHI::CommandEncoder* cmdEncoder, const std::vector<Ren
 
 ShadowMapGenPass::ShadowMapGenPass()
 {
-	{
-		RHI::TextureDescriptor descriptor;
-		{
-			descriptor.sampleCount = 1;
-			descriptor.format = RHI::TextureFormat::DEPTH24PLUS_STENCIL8;
-			descriptor.usage = RHI::TextureUsage::OUTPUT_ATTACHMENT;
-			descriptor.size = { shadowMapSize_.width, shadowMapSize_.height };
-			descriptor.arrayLayerCount = 1;
-			descriptor.mipLevelCount = 1;
-			descriptor.dimension = RHI::TextureDimension::TEXTURE_2D;
-		};
-		dsTexture_ = Engine::GetGPUDevice()->CreateTexture(descriptor)->CreateView();
-	}
+	//{
+	//	RHI::TextureDescriptor descriptor;
+	//	{
+	//		descriptor.sampleCount = 1;
+	//		descriptor.format = RHI::TextureFormat::DEPTH24PLUS_STENCIL8;
+	//		descriptor.usage = RHI::TextureUsage::OUTPUT_ATTACHMENT;
+	//		descriptor.size = { shadowMapSize_.width, shadowMapSize_.height };
+	//		descriptor.arrayLayerCount = 1;
+	//		descriptor.mipLevelCount = 1;
+	//		descriptor.dimension = RHI::TextureDimension::TEXTURE_2D;
+	//	};
+	//	dsTexture_ = Engine::GetGPUDevice()->CreateTexture(descriptor)->CreateView();
+	//}
 
-	{
-		RHI::TextureDescriptor descriptor;
-		{
-			descriptor.sampleCount = 1;
-			descriptor.format = RHI::TextureFormat::R32FLOAT;
-			descriptor.usage = RHI::TextureUsage::OUTPUT_ATTACHMENT;
-			descriptor.size = { shadowMapSize_.width, shadowMapSize_.height };
-			descriptor.arrayLayerCount = 1;
-			descriptor.mipLevelCount = 1;
-			descriptor.dimension = RHI::TextureDimension::TEXTURE_2D;
-		};
-		shadowMapTexture_ = Engine::GetGPUDevice()->CreateTexture(descriptor)->CreateView();
-	}
+	//{
+	//	RHI::TextureDescriptor descriptor;
+	//	{
+	//		descriptor.sampleCount = 1;
+	//		descriptor.format = RHI::TextureFormat::R32FLOAT;
+	//		descriptor.usage = RHI::TextureUsage::OUTPUT_ATTACHMENT;
+	//		descriptor.size = { shadowMapSize_.width, shadowMapSize_.height };
+	//		descriptor.arrayLayerCount = 1;
+	//		descriptor.mipLevelCount = 1;
+	//		descriptor.dimension = RHI::TextureDimension::TEXTURE_2D;
+	//	};
+	//	shadowMapTexture_ = Engine::GetGPUDevice()->CreateTexture(descriptor)->CreateView();
+	//}
 }
 
 void ShadowMapGenPass::Execute(RHI::CommandEncoder* cmdEncoder, const std::vector<RenderObject*>& renderObjects)
@@ -123,7 +123,7 @@ void OpaquePass::Execute(RHI::CommandEncoder* cmdEncoder, const std::vector<Rend
 		{
 			descriptor.attachment = tp.second;
 			descriptor.resolveTarget = nullptr;
-			descriptor.loadValue = { 1.0f, 0.0f, 0.0f, 1.0f };
+			descriptor.loadValue = { 1.0f, 1.0f, 0.0f, 1.0f };
 			descriptor.loadOp = RHI::LoadOp::CLEAR;
 			descriptor.storeOp = RHI::StoreOp::STORE;
 		}

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "RHI.h"
+#include "RHI/RHI.h"
 
 #include "Base/Macros.h"
 #include "World/MeshComponent.h"

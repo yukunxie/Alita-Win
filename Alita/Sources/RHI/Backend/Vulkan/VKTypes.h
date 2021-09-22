@@ -2,78 +2,110 @@
 // Created by realxie on 2019-10-04.
 //
 
-#ifndef ALITA_VKTYPES_H
-#define ALITA_VKTYPES_H
+#ifndef RHI_VKTYPES_H
+#define RHI_VKTYPES_H
 
 #include "Macros.h"
-#include "../../Include/Flags.h"
-#include "../../Include/Descriptors.h"
+#include "RHI/Flags.h"
+#include "RHI/Descriptors.h"
 
 #include <vulkan/vulkan.h>
 
 NS_RHI_BEGIN
 
-VkFormat ToVkFormat(Format format);
+template<typename _Tp>
+bool IsZero(const _Tp &value)
+{
+    return abs(value - 0) < 1e-5;
+}
 
-VkSampleCountFlagBits ToVkSampleCountFlagBits(SampleCountFlagBits bit);
+const char* GetVkResultString(VkResult code);
 
-VkAttachmentLoadOp ToVkAttachmentLoadOp(AttachmentLoadOp op);
+VkFrontFace ToVulkanType(const FrontFace &value);
 
-VkAttachmentStoreOp ToVkAttachmentStoreOp(AttachmentStoreOp op);
+VkCullModeFlagBits ToVulkanType(const CullMode &value);
 
-VkImageLayout ToVkImageLayout(ImageLayout layout);
+VkFormat ToVulkanType(Format format);
 
-VkShaderStageFlagBits ToVkShaderStageFlagBits(ShaderStageFlagBits bits);
+VkSampleCountFlagBits ToVulkanType(SampleCountFlagBits bit);
 
-VkVertexInputRate ToVkVertexInputRate(VertexInputRate inputRate);
+VkAttachmentLoadOp ToVulkanType(AttachmentLoadOp op);
 
-VkSharingMode ToVkSharingMode(SharingMode sharingMode);
+VkAttachmentStoreOp ToVulkanType(AttachmentStoreOp op);
 
-VkImageTiling ToVkImageTiling(ImageTiling imageTiling);
+VkImageLayout ToVulkanType(ImageLayout layout);
 
-VkImageUsageFlags ToVkImageUsageFlags(ImageUsageFlags imageUsageFlags);
+VkShaderStageFlagBits ToVulkanType(ShaderStageFlagBits bits);
 
-VkImageType ToVkImageType(ImageType imageType);
+VkVertexInputRate ToVulkanType(VertexInputRate inputRate);
 
-VkDescriptorType GetVkDescriptorType(BindingType type);
+VkSharingMode ToVulkanType(SharingMode sharingMode);
 
-VkShaderStageFlags GetVkShaderStageFlags(ShaderStageFlags flag);
+VkImageTiling ToVulkanType(ImageTiling imageTiling);
 
-VkPrimitiveTopology GetPrimitiveTopology(PrimitiveTopology topology);
+VkImageType ToVulkanType(ImageType imageType);
 
-VkVertexInputRate GetVertexInputRate(InputStepMode mode);
+VkDescriptorType ToVulkanType(BindingType type);
 
-std::uint32_t GetVertexFormatSize(VertexFormat format);
+VkPrimitiveTopology ToVulkanType(PrimitiveTopology topology);
 
-VkFormat GetVkFormat(VertexFormat format);
+VkVertexInputRate ToVulkanType(InputStepMode mode);
 
-VkFormat GetVkFormat(TextureFormat format);
+VkFormat ToVulkanType(VertexFormat format);
+
+VkFormat ToVulkanType(TextureFormat format);
 
 std::uint32_t GetTextureFormatPixelSize(TextureFormat format);
 
-TextureFormat GetTextureFormat(VkFormat format);
+TextureFormat ToVulkanType(VkFormat format);
 
-VkBool32 GetVkBoolean(bool b);
+VkBool32 ToVulkanType(bool b);
 
-VkCompareOp GetCompareOp(CompareFunction compareFunction);
+VkCompareOp ToVulkanType(CompareFunction compareFunction);
 
-VkAttachmentLoadOp GetLoadOp(LoadOp op);
+VkAttachmentLoadOp ToVulkanType(LoadOp op);
 
-VkBufferUsageFlags GetVkBufferUsageFlags(BufferUsageFlags flags);
+VkAttachmentStoreOp ToVulkanType(StoreOp op);
 
-VkImageType GetVkImageType(TextureDimension dim);
+VkImageType ToVulkanType(TextureDimension dim);
+
+VkFilter ToVulkanType(FilterMode mode);
+
+VkSamplerAddressMode ToVulkanType(AddressMode mode);
+
+VkBlendFactor ToVulkanType(BlendFactor factor);
+
+VkBlendOp ToVulkanType(BlendOp op);
+
+VkImageAspectFlags ToVulkanType(TextureAspect aspect, VkFormat format);
+
+VkImageViewType ToVulkanType(TextureViewDimension dim);
+
+VkStencilOp ToVulkanType(StencilOperation op);
+
+VkImageUsageFlags ToVkImageUsageFlags(ImageUsageFlags imageUsageFlags);
+
+std::uint32_t GetVertexFormatSize(VertexFormat format);
+
+VkShaderStageFlags GetVkShaderStageFlags(ShaderStageFlags flag);
 
 VkImageUsageFlags
 GetVkImageUsageFlags(TextureUsageFlags flags, TextureFormat format = TextureFormat::RGBA8UNORM);
 
-VkSampleCountFlagBits GetVkSampleCountFlagBits(std::uint32_t sampleCount);
+VkBufferUsageFlags GetVkBufferUsageFlags(BufferUsageFlags flags);
 
-VkFilter GetVkFilter(FilterMode mode);
+VkSampleCountFlagBits GetVkSampleCountFlagBits(std::uint32_t sampleCount);
 
 VkSamplerMipmapMode GetVkSamplerMipmapMode(FilterMode mode);
 
-VkSamplerAddressMode GetVkSamplerAddressMode(AddressMode mode);
+VkAccessFlags VulkanAccessFlags(TextureUsageFlags usage, TextureFormat format);
+
+VkImageLayout GetVulkanImageLayout(TextureUsageFlags usage, TextureFormat format);
+
+VkPipelineStageFlags VulkanPipelineStage(TextureUsageFlags usage, TextureFormat format);
+
+VkImageAspectFlags VulkanAspectMask(TextureFormat format);
 
 NS_RHI_END
 
-#endif //ALITA_VKTYPES_H
+#endif //RHI_VKTYPES_H

@@ -4,10 +4,12 @@
 
 #include "ShaderHelper.h"
 
+#include "RHI/RHI.h"
+
 #include "glslang/Public/ShaderLang.h"
-#include "glslang/Include/ResourceLimits.h"
 #include "SPIRV/GlslangToSpv.h"
 #include "StandAlone/DirStackFileIncluder.h"
+#include <regex>
 
 NS_RHI_BEGIN
 
@@ -119,15 +121,53 @@ const TBuiltInResource DefaultTBuiltInResource = {
                            /* .generalConstantMatrixVectorIndexing = */ 1,
                        }};
 
-std::vector<std::uint8_t>
+std::vector<std::uint32_t>
 CompileGLSLToSPIRV(const std::string &code, ShaderType type, const std::string &includeSearchPath)
 {
     return CompileGLSLToSPIRV(code.c_str(), type, includeSearchPath);
 }
 
-std::vector<std::uint8_t>
-CompileGLSLToSPIRV(const char* code, ShaderType type, const std::string &includeSearchPath)
+std::vector<std::uint32_t>
+CompileGLSLToSPIRV(const char* source, ShaderType type, const std::string &includeSearchPath)
 {
+    extern bool gIsDeviceSupportNegativeViewport;
+    std::string vertexShaderCodeTmp(source);
+    //if (ShaderType::VERTEX == type && !gIsDeviceSupportNegativeViewport)
+    //{
+    //    // Vulkan的NDC与openGL是反的，将y进行翻转即可
+    //    const static std::regex mainPattern("void\\s+main\\s*\\(\\s*(void)?\\s*\\)");
+    //    const char* shaderEntry = R"(
+    //            void main()
+    //            {
+    //                _Main_Vulkan_VS();
+    //                gl_Position.y *= -1.0;
+    //            })";
+    //    vertexShaderCodeTmp = std::regex_replace(source, mainPattern, "void _Main_Vulkan_VS()") + shaderEntry;
+    //}
+    //
+    //const static std::regex versionPattern("#version.+\\n");
+    //vertexShaderCodeTmp = std::regex_replace(vertexShaderCodeTmp, versionPattern, "");
+    //
+    //std::string shaderHeader = "#version 450\n#define USE_VULKAN 1\n";
+    //
+    //const static std::regex floatPrecisionPattern("precision\\s+(?:highp|lowp|mediump)\\s+float");
+    //if (!std::regex_search(vertexShaderCodeTmp, floatPrecisionPattern))
+    //{
+    //    shaderHeader += "precision highp float;\n";
+    //}
+    //
+    //const static std::regex samplerPrecisionPattern("precision\\s+(?:highp|lowp|mediump)\\s+sampler");
+    //if (!std::regex_search(vertexShaderCodeTmp, samplerPrecisionPattern))
+    //{
+    //    shaderHeader += "precision highp sampler;\n";
+    //}
+    //
+    //vertexShaderCodeTmp = shaderHeader + vertexShaderCodeTmp;
+    
+    const char* glslShaderCode = vertexShaderCodeTmp.c_str();
+    
+    RHI_SCOPED_PROFILING_GUARD("CompileGLSLToSPIRV");
+    
     if (!glslangInitialized)
     {
         glslang::InitializeProcess();
@@ -152,7 +192,7 @@ CompileGLSLToSPIRV(const char* code, ShaderType type, const std::string &include
     }
     
     glslang::TShader shader(shaderType);
-    shader.setStrings(&code, 1);
+    shader.setStrings(&glslShaderCode, 1);
     
     int ClientInputSemanticsVersion = 100; // maps to, say, #define VULKAN 100
     glslang::EShTargetClientVersion VulkanClientVersion = glslang::EShTargetVulkan_1_0;
@@ -202,12 +242,8 @@ CompileGLSLToSPIRV(const char* code, ShaderType type, const std::string &include
     spv::SpvBuildLogger logger;
     glslang::SpvOptions spvOptions;
     glslang::GlslangToSpv(*Program.getIntermediate(shaderType), spirVShader, &logger, &spvOptions);
-
-    std::vector<std::uint8_t> spirvShaderCode8;
-    spirvShaderCode8.resize(spirVShader.size() * sizeof(spirVShader[0]));
-    memcpy(spirvShaderCode8.data(), spirVShader.data(), spirvShaderCode8.size());
     
-    return std::move(spirvShaderCode8);
+    return spirVShader;
 }
 
 NS_RHI_END

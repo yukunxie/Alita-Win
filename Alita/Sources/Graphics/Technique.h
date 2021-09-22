@@ -10,14 +10,21 @@
 
 NS_RX_BEGIN
 
-//enum class TechniqueMask : std::uint64_t
-//{
-//    Tech_Opaque = 1 << 0,
-//    Tech_Transparent = 1 << 1,
-//    Tech_ShadowMapGen = 1 << 2,
-//};
-//
-//using TechniqueFlags = std::uint64_t;
+enum class TechniqueType
+{
+    TShading    = 0, 
+    TGBufferGen,
+
+    TMaxCount,
+};
+
+enum TechniqueMask : std::uint64_t
+{
+    TShading    = 1 << (uint32)TechniqueType::TShading,
+    TGBufferGen = 1 << (uint32)TechniqueType::TGBufferGen,
+};
+
+using TechniqueFlags = std::uint64_t;
 //
 //class Technique
 //{

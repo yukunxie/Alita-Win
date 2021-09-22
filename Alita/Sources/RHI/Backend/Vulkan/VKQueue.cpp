@@ -4,59 +4,124 @@
 
 #include "VKQueue.h"
 #include "VKCommandBuffer.h"
+#include "VKFence.h"
+#include "VKSwapChain.h"
+#include "RenderThreading.h"
+#include <chrono>
 
 NS_RHI_BEGIN
 
 VKQueue::VKQueue(VKDevice* device)
-    : device_(device)
+    : Queue(device)
 {
-    vkDevice_ = device->GetDevice();
+}
+
+void VKQueue::Dispose()
+{
+    RHI_DISPOSE_BEGIN();
     
-    vkGetDeviceQueue(vkDevice_, device->GetQueueFamilyIndices().presentFamily, 0, &vkQueue_);
+    for (auto cmdBuffer : commandBufferCaches_)
+    {
+        RHI_SAFE_RELEASE(cmdBuffer);
+    }
+    commandBufferCaches_.clear();
     
-    VkFenceCreateInfo fenceCreateInfo = {
-        .sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO,
-        .pNext = nullptr,
-        .flags = 0
-    };
-    CALL_VK(vkCreateFence(vkDevice_, &fenceCreateInfo, nullptr, &vkFence_));
+    if (vkQueue_)
+    {
+        // vkQueueWaitIdle(vkQueue_);
+        vkQueue_ = VK_NULL_HANDLE;
+    }
+    
+    RHI_DISPOSE_END();
 }
 
 VKQueue::~VKQueue()
 {
-    // TODO release vulkan resource
+    Dispose();
 }
 
-void VKQueue::Submit(CommandBuffer* commandBuffer)
+bool VKQueue::Init()
 {
-    auto vkCommandBuffer = RHI_CAST(VKCommandBuffer*, commandBuffer)->GetNative();
-    CALL_VK(vkEndCommandBuffer(vkCommandBuffer));
-    
-    auto waitingSemaphores = device_->GetWaitingSemaphores();
-    
-    VkSubmitInfo submitInfo = {};
-    submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-    VkPipelineStageFlags waitStages[] = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
-    submitInfo.waitSemaphoreCount = waitingSemaphores.size();
-    submitInfo.pWaitSemaphores = waitingSemaphores.data();
-    submitInfo.pWaitDstStageMask = waitStages;
-    
-    submitInfo.commandBufferCount = 1;
-    submitInfo.pCommandBuffers = &vkCommandBuffer;
-    
-    
-    submitInfo.signalSemaphoreCount = 0;
-    submitInfo.pSignalSemaphores = nullptr;
-    
-    CALL_VK(vkResetFences(vkDevice_, 1, &vkFence_));
-    if (auto code = vkQueueSubmit(vkQueue_, 1, &submitInfo, vkFence_); code != VK_SUCCESS)
+    auto device = VKDEVICE();
+    vkGetDeviceQueue(device->GetNative(), device->GetQueueFamilyIndices().presentFamily, 0,
+                       &vkQueue_);
+    return VK_NULL_HANDLE != vkQueue_;
+}
+
+void VKQueue::Signal(Fence* fence, std::uint64_t signalValue)
+{
+    auto it = std::find(waitingFences_.begin(), waitingFences_.end(), fence);
+    if (it == waitingFences_.end())
     {
-        throw std::runtime_error("failed to submit draw command buffer!");
+        waitingFences_.push_back(fence);
     }
-    CALL_VK(
-        vkWaitForFences(vkDevice_, 1, &vkFence_, VK_TRUE, std::numeric_limits<uint64_t>::max()));
+    fence->SetWaitingSignalValue(signalValue);
+}
+
+void VKQueue::WaitQueueIdle()
+{
+    vkQueueWaitIdle(vkQueue_);
+}
+
+void VKQueue::Submit(std::uint32_t commandBufferCount, CommandBuffer* const* commandBuffers)
+{
+    for (int i = 0; i < commandBufferCount; ++i)
+    {
+        auto cmdBuffer = RHI_CAST(VKCommandBuffer*, commandBuffers[i]);
+        RHI_SAFE_RETAIN(cmdBuffer);
+        commandBufferCaches_.push_back(cmdBuffer);
+    }
+}
+
+void VKQueue::SubmitInternal()
+{
+    if (commandBufferCaches_.empty())
+    {
+        return;
+    }
     
-    device_->ClearWaitingSemaphores();
+    VKDevice* device = VKDEVICE();
+    VKSwapChain* swapChain = device->GetSwapChain();
+    FrameResource* frameResource = swapChain->GetFrameResource();
+    
+    device->ScheduleAsyncTask<AsyncTaskSumbitCommandBufferAndPresent>(device,
+                                                                      frameResource,
+                                                                      commandBufferCaches_.size(),
+                                                                      commandBufferCaches_.data());
+    
+    for (auto cmdBuffer : commandBufferCaches_)
+    {
+        RHI_SAFE_RELEASE(cmdBuffer);
+    }
+    commandBufferCaches_.clear();
+    
+    imageLayoutInitCommandBuffer_ = nullptr;
+    
+    for (auto fence : waitingFences_)
+    {
+        device->ScheduleAsyncTask<AsyncTaskFenceCompletion>(device,
+                                                            this,
+                                                            RHI_CAST(VKFence*, fence));
+    }
+    waitingFences_.clear();
+    
+    swapChain->AcquireNextImage();
+}
+
+Fence* VKQueue::CreateFence(const FenceDescriptor &descriptor)
+{
+    return VKDEVICE()->CreateFence(descriptor);
+}
+
+VKCommandBuffer* VKQueue::GetImageLayoutInitCommandBuffer()
+{
+    if (!imageLayoutInitCommandBuffer_)
+    {
+        imageLayoutInitCommandBuffer_ = VKDEVICE()->CreateCommandBuffer();
+        RHI_SAFE_RETAIN(imageLayoutInitCommandBuffer_);
+        commandBufferCaches_.insert(commandBufferCaches_.begin(),imageLayoutInitCommandBuffer_);
+    }
+    return imageLayoutInitCommandBuffer_;
 }
 
 NS_RHI_END

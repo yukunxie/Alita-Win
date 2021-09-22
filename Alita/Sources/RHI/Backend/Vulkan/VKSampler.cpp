@@ -6,37 +6,53 @@
 
 NS_RHI_BEGIN
 
-bool VKSampler::Init(VKDevice* device, const SamplerDescriptor &descriptor)
+VKSampler::VKSampler(VKDevice* device)
+    : Sampler(device)
 {
-    vkDevice_ = device->GetDevice();
+}
+
+void VKSampler::Dispose()
+{
+    RHI_DISPOSE_BEGIN();
     
+    if (vkSampler_)
+    {
+        vkDestroySampler(VKDEVICE()->GetNative(), vkSampler_, nullptr);
+        vkSampler_ = VK_NULL_HANDLE;
+    }
+    
+    RHI_DISPOSE_END();
+}
+
+VKSampler::~VKSampler()
+{
+    Dispose();
+}
+
+bool VKSampler::Init(const SamplerDescriptor &descriptor)
+{
     VkSamplerCreateInfo samplerInfo = {
         .sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO,
         .pNext = nullptr,
         .flags = 0,
-        .magFilter = GetVkFilter(descriptor.magFilter),
-        .minFilter = GetVkFilter(descriptor.minFilter),
+        .magFilter = ToVulkanType(descriptor.magFilter),
+        .minFilter = ToVulkanType(descriptor.minFilter),
         .mipmapMode = GetVkSamplerMipmapMode(descriptor.minFilter),
-        .addressModeU = GetVkSamplerAddressMode(descriptor.addressModeU),
-        .addressModeV = GetVkSamplerAddressMode(descriptor.addressModeV),
-        .addressModeW = GetVkSamplerAddressMode(descriptor.addressModeW),
+        .addressModeU = ToVulkanType(descriptor.addressModeU),
+        .addressModeV = ToVulkanType(descriptor.addressModeV),
+        .addressModeW = ToVulkanType(descriptor.addressModeW),
         .mipLodBias = 0.0f,
         .maxAnisotropy = 1,
-        .compareOp = GetCompareOp(descriptor.compare),
+        .compareOp = ToVulkanType(descriptor.compare),
         .minLod = descriptor.lodMinClamp,
         .maxLod = descriptor.lodMaxClamp,
         .borderColor = VK_BORDER_COLOR_FLOAT_OPAQUE_WHITE,
         .unnormalizedCoordinates = VK_FALSE,
     };
     
-    CALL_VK(vkCreateSampler(vkDevice_, &samplerInfo, nullptr, &vkSampler_));
+    CALL_VK(vkCreateSampler(VKDEVICE()->GetNative(), &samplerInfo, nullptr, &vkSampler_));
     
-    return true;
-}
-
-VKSampler::~VKSampler()
-{
-    vkDestroySampler(vkDevice_, vkSampler_, nullptr);
+    return VK_NULL_HANDLE != vkSampler_;
 }
 
 NS_RHI_END

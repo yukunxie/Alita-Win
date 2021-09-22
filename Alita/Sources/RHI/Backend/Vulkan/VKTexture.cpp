@@ -5,140 +5,80 @@
 #include "VKTexture.h"
 #include "VKTypes.h"
 #include "VKTextureView.h"
+#include "VKTextureViewManager.h"
 #include "VKQueue.h"
-
+#include "DeferredRenderCommands.h"
+#include "VKCommandBuffer.h"
 
 NS_RHI_BEGIN
 
-//VKTexture::VKTexture(VKDevice* device, const ImageCreateInfo& imageCreateInfo)
-//    : device_(device)
-//{
-//    vkDevice_ = device->GetDevice();
-//    std::uint32_t queueFamilyIndex = device->GetGraphicQueueFamilyIndex();
-//
-//    vkFormat_ = ToVkFormat(imageCreateInfo.format);
-//
-//    textureFormat_ = GetTextureFormat(vkFormat_);
-//
-//    // Check for linear supportability
-//    VkFormatProperties props;
-//    bool needBlit = true;
-//    vkGetPhysicalDeviceFormatProperties(device->GetPhysicalDevice(), ToVkFormat(imageCreateInfo.format), &props);
-//    assert((props.linearTilingFeatures | props.optimalTilingFeatures) &
-//           VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT);
-//
-//    if (props.linearTilingFeatures & VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT) {
-//        // linear format supporting the required texture
-//        needBlit = false;
-//    }
-//
-//    textureSize_ = imageCreateInfo.extent;
-//
-//    VkImageCreateInfo imageInfo = {
-//            .sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO,
-//            .pNext = nullptr,
-//            .format = ToVkFormat(imageCreateInfo.format),
-//            .imageType = ToVkImageType(imageCreateInfo.imageType),
-//            .extent = {
-//                    .width = imageCreateInfo.extent.width,
-//                    .height = imageCreateInfo.extent.height,
-//                    .depth = imageCreateInfo.extent.depth,
-//            },
-//            .mipLevels = imageCreateInfo.mipLevels,
-//            .arrayLayers = imageCreateInfo.arrayLayers,
-//            .tiling = ToVkImageTiling(imageCreateInfo.tiling),
-//            .initialLayout = VK_IMAGE_LAYOUT_PREINITIALIZED,
-//            .sharingMode =  ToVkSharingMode(imageCreateInfo.sharingMode),
-//            .usage =(needBlit ? VK_IMAGE_USAGE_TRANSFER_SRC_BIT : VK_IMAGE_USAGE_SAMPLED_BIT),
-//            .samples = ToVkSampleCountFlagBits(imageCreateInfo.samples),
-//            .queueFamilyIndexCount = 1,
-//            .pQueueFamilyIndices = &queueFamilyIndex,
-//            .flags = 0,
-//    };
-//
-//    VkMemoryPropertyFlags memoryPropertyFlags = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT;
-//    if (vkFormat_ == VkFormat::VK_FORMAT_D24_UNORM_S8_UINT)
-//    {
-//        imageInfo.usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
-//        memoryPropertyFlags = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;
-//    }
-//
-//    CALL_VK(vkCreateImage(vkDevice_, &imageInfo, nullptr, &vkImage_));
-//
-//    VkMemoryRequirements memRequirements;
-//    vkGetImageMemoryRequirements(vkDevice_, vkImage_, &memRequirements);
-//
-//    VkMemoryAllocateInfo allocInfo {
-//            .sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO,
-//            .allocationSize = memRequirements.size,
-//            .memoryTypeIndex = device->FindMemoryType(memRequirements.memoryTypeBits, memoryPropertyFlags),
-//    };
-//
-//    CALL_VK(vkAllocateMemory(vkDevice_, &allocInfo, nullptr, &vkDeviceMemory_));
-//    CALL_VK(vkBindImageMemory(vkDevice_, vkImage_, vkDeviceMemory_, 0));
-//
-////    RHI_ASSERT(imageCreateInfo.format == Format::R8G8B8A8_UNORM);
-//
-//    if (imageCreateInfo.imageData)
-//    {
-//        const VkImageSubresource subres = {
-//                .aspectMask = VK_IMAGE_ASPECT_COLOR_BIT, .mipLevel = 0, .arrayLayer = 0,
-//        };
-//        VkSubresourceLayout layout;
-//        vkGetImageSubresourceLayout(vkDevice_, vkImage_, &subres,
-//                                    &layout);
-//
-//        VkDeviceSize imageSize = imageCreateInfo.extent.width * imageCreateInfo.extent.height * 4;
-//
-//        void* data;
-//        vkMapMemory(vkDevice_, vkDeviceMemory_, 0, imageSize, 0, &data);
-//        memcpy(data, imageCreateInfo.imageData, static_cast<size_t>(imageSize));
-//        vkUnmapMemory(vkDevice_, vkDeviceMemory_);
-//    }
-//
-//    SetImageLayout(device);
-//}
-
-bool VKTexture::Init(VKDevice* device, const TextureDescriptor &descriptor)
+VKTexture::VKTexture(VKDevice* device)
+    : Texture(device)
 {
-    device_ = device;
-    vkDevice_ = device->GetDevice();
-    vkFormat_ = GetVkFormat(descriptor.format);
-    textureFormat_ = descriptor.format;
+
+}
+
+void VKTexture::Dispose()
+{
+    RHI_DISPOSE_BEGIN();
+    
+    DisposeNativeHandle();
+    
+    RHI_DISPOSE_END();
+}
+
+VKTexture::~VKTexture()
+{
+    Dispose();
+}
+
+bool VKTexture::Init(const TextureDescriptor &descriptor)
+{
+    Texture::Init(descriptor);
+    auto device = VKDEVICE();
+    vkDevice_ = device->GetNative();
+    vkFormat_ = ToVulkanType(textureFormat_);
+    textureUsage_ = descriptor.usage;
     
     std::uint32_t queueFamilyIndex = device->GetGraphicQueueFamilyIndex();
     
-    textureSize_ = descriptor.size;
-    
-    VkImageCreateInfo imageInfo; 
+    VkImageCreateInfo imageInfo;
     {
         imageInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
-        imageInfo.flags = 0;
+        imageInfo.flags = arrayLayerCount_ >= 6 ? (std::uint32_t)VK_IMAGE_CREATE_CUBE_COMPATIBLE_BIT : 0;
         imageInfo.pNext = nullptr;
         imageInfo.format = vkFormat_;
-        imageInfo.imageType = GetVkImageType(descriptor.dimension);
+        imageInfo.imageType = ToVulkanType(textureDimension_);
         imageInfo.extent = { textureSize_.width, textureSize_.height, textureSize_.depth };
-        imageInfo.mipLevels = descriptor.mipLevelCount;
-        imageInfo.arrayLayers = descriptor.arrayLayerCount;
+        imageInfo.mipLevels = mipLevelCount_;
+        imageInfo.arrayLayers = arrayLayerCount_;
         imageInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
         imageInfo.initialLayout = VK_IMAGE_LAYOUT_PREINITIALIZED;
         imageInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
-        imageInfo.usage = GetVkImageUsageFlags(descriptor.usage, descriptor.format);
-        imageInfo.samples = GetVkSampleCountFlagBits(descriptor.sampleCount);
+        imageInfo.usage = GetVkImageUsageFlags(descriptor.usage, textureFormat_);
+        imageInfo.samples = GetVkSampleCountFlagBits(sampleCount_);
         imageInfo.queueFamilyIndexCount = 1;
         imageInfo.pQueueFamilyIndices = &queueFamilyIndex;
     }
+
+    memoryUsage_ = textureSize_.width * textureSize_.height *  GetTextureFormatPixelSize(textureFormat_);
+
+
+#if USE_VULKAN_MEMORY_ALLCATOR
+    VmaAllocationCreateInfo vmaAllocCreateInfo = {};
+    vmaAllocCreateInfo.usage = VMA_MEMORY_USAGE_GPU_ONLY;
+    vmaAllocCreateInfo.flags = 0;
+    vmaAllocCreateInfo.preferredFlags = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;
     
+    vmaCreateImage(VKDEVICE()->GetVmaAllocator(), &imageInfo, &vmaAllocCreateInfo, &vkImage_,
+                   &vmaAllocation_, &vmaAllocationInfo_);
+#else
     CALL_VK(vkCreateImage(vkDevice_, &imageInfo, nullptr, &vkImage_));
     
     VkMemoryRequirements memRequirements;
     vkGetImageMemoryRequirements(vkDevice_, vkImage_, &memRequirements);
     
     VkMemoryPropertyFlags memoryPropertyFlags = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;
-    //    if (vkFormat_ == VkFormat::VK_FORMAT_D24_UNORM_S8_UINT)
-    //    {
-    //        memoryPropertyFlags = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;
-    //    }
     
     VkMemoryAllocateInfo allocInfo{
         .sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO,
@@ -149,106 +89,165 @@ bool VKTexture::Init(VKDevice* device, const TextureDescriptor &descriptor)
     
     CALL_VK(vkAllocateMemory(vkDevice_, &allocInfo, nullptr, &vkDeviceMemory_));
     CALL_VK(vkBindImageMemory(vkDevice_, vkImage_, vkDeviceMemory_, 0));
+#endif
     
-    SetImageLayout(device);
+    if (textureUsage_ & TextureUsage::PRESENT)
+    {
+        VKCommandBuffer* commandBuffer = RHI_CAST(VKQueue*, VKDEVICE()->GetQueue())->GetImageLayoutInitCommandBuffer();
+        commandBuffer->RecordCommand<DeferredCmdPipelineBarrier>(this, TextureUsage::UNDEFINED, TextureUsage::PRESENT);
+        commandBuffer->AddBindingObject(this);
+        currentTexUsageForMemLayout_ = TextureUsage::PRESENT;
+    }
+    
+    return vkImage_ != VK_NULL_HANDLE;
+}
+
+bool VKTexture::Init(VkImage vkImage, const TextureDescriptor &descriptor)
+{
+    Texture::Init(descriptor);
+    
+    isVkImageWrapper_ = true;
+    vkImage_ = vkImage;
+    
+    auto device = VKDEVICE();
+    vkDevice_ = device->GetNative();
+    vkFormat_ = ToVulkanType(descriptor.format);
+    
+    if (textureUsage_ & TextureUsage::PRESENT)
+    {
+        VKCommandBuffer* commandBuffer = RHI_CAST(VKQueue*, VKDEVICE()->GetQueue())->GetImageLayoutInitCommandBuffer();
+        commandBuffer->RecordCommand<DeferredCmdPipelineBarrier>(this, TextureUsage::UNDEFINED, TextureUsage::PRESENT);
+        commandBuffer->AddBindingObject(this);
+        currentTexUsageForMemLayout_ = TextureUsage::PRESENT;
+    }
     
     return true;
 }
 
-VKTexture::~VKTexture()
+void VKTexture::DisposeNativeHandle()
 {
+#if !defined(USE_VULKAN_MEMORY_ALLCATOR) || !USE_VULKAN_MEMORY_ALLCATOR
     if (vkDeviceMemory_)
     {
-        vkFreeMemory(vkDevice_, vkDeviceMemory_, nullptr);
+        if (!isVkImageWrapper_)
+        {
+            vkFreeMemory(vkDevice_, vkDeviceMemory_, nullptr);
+        }
+        vkDeviceMemory_ = VK_NULL_HANDLE;
     }
+#endif
     
     if (vkImage_)
     {
-        vkDestroyImage(vkDevice_, vkImage_, nullptr);
+        if (!isVkImageWrapper_)
+        {
+#if USE_VULKAN_MEMORY_ALLCATOR
+            vmaDestroyImage(VKDEVICE()->GetVmaAllocator(), vkImage_, vmaAllocation_);
+            vmaAllocation_ = nullptr;
+#else
+            vkDestroyImage(vkDevice_, vkImage_, nullptr);
+#endif
+        }
+        vkImage_ = VK_NULL_HANDLE;
     }
 }
 
-
-void VKTexture::SetImageLayout(const VKDevice* device)
+void VKTexture::SetVkImageHandleDirectly(VkImage vkImage)
 {
-    VkCommandPoolCreateInfo cmdPoolCreateInfo{
-        .sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO,
-        .pNext = nullptr,
-        .flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT,
-        .queueFamilyIndex = device->GetGraphicQueueFamilyIndex(),
-    };
+    RHI_ASSERT(vkImage_ == VK_NULL_HANDLE);
     
-    VkCommandPool cmdPool;
-    CALL_VK(vkCreateCommandPool(vkDevice_, &cmdPoolCreateInfo, nullptr, &cmdPool));
+    vkImage_ = vkImage;
+    currentTexUsageForMemLayout_ = TextureUsage::UNDEFINED;
     
-    VkCommandBuffer gfxCmd;
-    const VkCommandBufferAllocateInfo cmd = {
-        .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,
-        .pNext = nullptr,
-        .commandPool = cmdPool,
-        .level = VK_COMMAND_BUFFER_LEVEL_PRIMARY,
-        .commandBufferCount = 1,
-    };
-    
-    CALL_VK(vkAllocateCommandBuffers(vkDevice_, &cmd, &gfxCmd));
-    VkCommandBufferBeginInfo cmd_buf_info = {
-        .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
-        .pNext = nullptr,
-        .flags = 0,
-        .pInheritanceInfo = nullptr};
-    CALL_VK(vkBeginCommandBuffer(gfxCmd, &cmd_buf_info));
-    
-    if (vkFormat_ == VkFormat::VK_FORMAT_D24_UNORM_S8_UINT)
+    if (textureUsage_ & TextureUsage::PRESENT)
     {
-        device->SetImageLayout(gfxCmd, vkImage_, VK_IMAGE_LAYOUT_UNDEFINED,
-                               VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL,
-                               VK_PIPELINE_STAGE_HOST_BIT,
-                               VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT);
-    }
-    else
-    {
-        device->SetImageLayout(gfxCmd, vkImage_, VK_IMAGE_LAYOUT_UNDEFINED,
-                               VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
-                               VK_PIPELINE_STAGE_HOST_BIT,
-                               VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT);
+        VKCommandBuffer* commandBuffer = RHI_CAST(VKQueue*, VKDEVICE()->GetQueue())->GetImageLayoutInitCommandBuffer();
+        commandBuffer->RecordCommand<DeferredCmdPipelineBarrier>(this, TextureUsage::UNDEFINED, TextureUsage::PRESENT);
+        commandBuffer->AddBindingObject(this);
+        currentTexUsageForMemLayout_ = TextureUsage::PRESENT;
     }
     
-    CALL_VK(vkEndCommandBuffer(gfxCmd));
-    VkFenceCreateInfo fenceInfo = {
-        .sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO,
-        .pNext = nullptr,
-        .flags = 0,
-    };
-    VkFence fence;
-    CALL_VK(vkCreateFence(vkDevice_, &fenceInfo, nullptr, &fence));
-    vkResetFences(vkDevice_, 1, &fence);
-    
-    VkSubmitInfo submitInfo;
+    const auto& tvs = VKDEVICE()->GetTextureViewManager()->GetAllCreatedTextureViews(this);
+    for (VKTextureView* tv : tvs)
     {
-        submitInfo.pNext = nullptr;
-        submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-        submitInfo.waitSemaphoreCount = 0;
-        submitInfo.pWaitSemaphores = nullptr;
-        submitInfo.pWaitDstStageMask = nullptr;
-        submitInfo.commandBufferCount = 1;
-        submitInfo.pCommandBuffers = &gfxCmd;
-        submitInfo.signalSemaphoreCount = 0;
-        submitInfo.pSignalSemaphores = nullptr;
+        tv->Recreate();
     }
-    const VKQueue* queue = RHI_CAST(const VKQueue*, device->GetQueue());
-    CALL_VK(vkQueueSubmit(queue->GetNative(), 1, &submitInfo, fence));
-    CALL_VK(vkWaitForFences(vkDevice_, 1, &fence, VK_TRUE, 100000000));
-    
-    vkDestroyFence(vkDevice_, fence, nullptr);
-    vkFreeCommandBuffers(vkDevice_, cmdPool, 1, &gfxCmd);
-    vkDestroyCommandPool(vkDevice_, cmdPool, nullptr);
 }
 
-TextureView* VKTexture::CreateView()
+TextureView* VKTexture::CreateView(const TextureViewDescriptor &descriptor)
 {
-    TextureView* textureView = new VKTextureView(device_, this);
-    RHI_SAFE_RETAIN(textureView);
-    return textureView;
+    return VKDEVICE()->CreateTextureView(this, descriptor);
+}
+
+void VKTexture::TransToCopySrcImageLayout(VKCommandBuffer* commandBuffer)
+{
+    if (currentTexUsageForMemLayout_ == TextureUsage::COPY_SRC)
+    {
+        return;
+    }
+    TransToTargetImageLayout_(commandBuffer, TextureUsage::COPY_SRC);
+}
+
+void VKTexture::TransToCopyDstImageLayout(VKCommandBuffer* commandBuffer)
+{
+    if (currentTexUsageForMemLayout_ == TextureUsage::COPY_DST)
+    {
+        return;
+    }
+    TransToTargetImageLayout_(commandBuffer, TextureUsage::COPY_DST);
+}
+
+void VKTexture::TransToOutputAttachmentImageLayout(VKCommandBuffer* commandBuffer)
+{
+    TextureUsageFlags targetTextureUsage = IsSwapchainImage() ?  TextureUsage::PRESENT : TextureUsage::OUTPUT_ATTACHMENT;
+    
+    if (currentTexUsageForMemLayout_ == targetTextureUsage)
+    {
+        return;
+    }
+    
+    TransToTargetImageLayout_(commandBuffer, targetTextureUsage);
+}
+
+void VKTexture::TransToSampledImageLayout(VKCommandBuffer* commandBuffer)
+{
+    if (currentTexUsageForMemLayout_ == TextureUsage::SAMPLED)
+    {
+        return;
+    }
+    TransToTargetImageLayout_(commandBuffer, TextureUsage::SAMPLED);
+}
+
+void VKTexture::TransToTargetImageLayout_(VKCommandBuffer* commandBuffer, TextureUsageFlags targetTextureUsage)
+{
+    // commandBuffer->RecordCommand<DeferredCmdPipelineBarrier>(this, currentImageLayout_, targetTextureUsage);
+    VkPipelineStageFlags srcStages = VulkanPipelineStage(currentTexUsageForMemLayout_, textureFormat_);
+    VkPipelineStageFlags dstStages = VulkanPipelineStage(targetTextureUsage, textureFormat_);
+
+    TextureFormat format = GetFormat();
+
+    VkImageMemoryBarrier barrier;
+    barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+    barrier.pNext = nullptr;
+    barrier.srcAccessMask = VulkanAccessFlags(currentTexUsageForMemLayout_, format);
+    barrier.dstAccessMask = VulkanAccessFlags(targetTextureUsage, format);
+    barrier.oldLayout = GetVulkanImageLayout(currentTexUsageForMemLayout_, format);
+    barrier.newLayout = GetVulkanImageLayout(targetTextureUsage, format);
+    barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+    barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+    barrier.image = vkImage_;
+
+    // This transitions the whole resource but assumes it is a 2D texture
+    RHI_ASSERT(textureDimension_ == TextureDimension::TEXTURE_2D);
+    barrier.subresourceRange.aspectMask = VulkanAspectMask(format);
+    barrier.subresourceRange.baseMipLevel = 0;
+    barrier.subresourceRange.levelCount = mipLevelCount_;
+    barrier.subresourceRange.baseArrayLayer = 0;
+    barrier.subresourceRange.layerCount = arrayLayerCount_;
+
+    vkCmdPipelineBarrier(commandBuffer->GetNative(), srcStages, dstStages, 0, 0, NULL, 0, NULL, 1, &barrier);
+    
+    currentTexUsageForMemLayout_ = targetTextureUsage;
 }
 
 NS_RHI_END

@@ -2,36 +2,37 @@
 // Created by realxie on 2019-10-04.
 //
 
-#ifndef ALITA_VKRENDERPASS_H
-#define ALITA_VKRENDERPASS_H
+#ifndef RHI_VKRENDERPASS_H
+#define RHI_VKRENDERPASS_H
 
 #include "VKDevice.h"
 
 NS_RHI_BEGIN
 
 
-class VKRenderPass : public RenderPass
+class VKRenderPass final : public RenderPass
 {
-public:
-    VKRenderPass(VKDevice* device, const RenderPassCacheQuery &query);
+protected:
+    VKRenderPass(VKDevice* device);
     
-    //    VKRenderPass(VKDevice* device, const RenderPassCreateInfo& createInfo);
     virtual ~VKRenderPass();
+
+public:
+    
+    bool Init(const RenderPassCacheQuery &query);
     
     VkRenderPass GetNative()
     { return vkRenderPass_; }
-
-protected:
-    //    void ParseAttachmentDescriptions(const RenderPassCreateInfo& createInfo, std::vector<VkAttachmentDescription>& descriptions);
-    //    void ParseSubpassDescriptions(const RenderPassCreateInfo& createInfo, std::vector<VkSubpassDescription>& descriptions, std::vector<std::vector<VkAttachmentReference>>& references);
-    //    void ParseAttachmentReferences(const std::vector<AttachmentReference>& attachments, std::vector<VkAttachmentReference>& attachmentReferences);
+    
+    virtual void Dispose() override;
 
 private:
-    VKDevice* device_ = nullptr;
-    VkRenderPass vkRenderPass_ = 0L;
+    VkRenderPass vkRenderPass_ = VK_NULL_HANDLE;
+    
+    friend class VKDevice;
 };
 
 NS_RHI_END
 
 
-#endif //ALITA_VKRENDERPASS_H
+#endif //RHI_VKRENDERPASS_H

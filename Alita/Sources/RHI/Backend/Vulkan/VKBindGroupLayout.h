@@ -2,34 +2,56 @@
 // Created by realxie on 2019-10-10.
 //
 
-#ifndef ALITA_VKBINDGROUPLAYOUT_H
-#define ALITA_VKBINDGROUPLAYOUT_H
+#ifndef RHI_VKBINDGROUPLAYOUT_H
+#define RHI_VKBINDGROUPLAYOUT_H
 
 #include "VKDevice.h"
 
 NS_RHI_BEGIN
 
 
-class VKBindGroupLayout : public BindGroupLayout
+class VKBindGroupLayout final : public BindGroupLayout
 {
 protected:
-    VKBindGroupLayout() = default;
-    bool Init(VKDevice* device, const BindGroupLayoutDescriptor& descriptor);
+    VKBindGroupLayout(VKDevice* device);
     
-public:
-    static VKBindGroupLayout* Create(VKDevice* device, const BindGroupLayoutDescriptor& descriptor);
-    
-public:
     virtual ~VKBindGroupLayout();
-
-    VkDescriptorSetLayout GetNative() const {return vkBindGroupLayout_;}
+    
+public:
+    
+    bool Init(const BindGroupLayoutDescriptor &descriptor);
+    
+    
+    VkDescriptorSetLayout GetNative() const
+    { return vkBindGroupLayout_; }
+    
+    VkDescriptorType GetDescriptorType(std::uint32_t bindingPoint) const
+    {
+        for (auto &tp : vkDescriptorTypes_)
+        {
+            if (tp.first == bindingPoint)
+            {
+                return tp.second;
+            }
+        }
+        RHI_ASSERT(false);
+        return VK_DESCRIPTOR_TYPE_MAX_ENUM;
+    }
+    
+    std::uint32_t GetDynamicOffsetCount()
+    { return dynamicOffsetCount_; }
+    
+    virtual void Dispose() override;
 
 private:
-    VkDevice         vkDevice_          = nullptr;
-    VkDescriptorSetLayout vkBindGroupLayout_  = 0L;
+    VkDescriptorSetLayout vkBindGroupLayout_ = VK_NULL_HANDLE;
+    std::vector<std::pair<std::uint32_t, VkDescriptorType>> vkDescriptorTypes_;
+    std::uint32_t dynamicOffsetCount_ = 0;
+    
+    friend class VKDevice;
 };
 
 NS_RHI_END
 
 
-#endif //ALITA_VKBINDGROUPLAYOUT_H
+#endif //RHI_VKBINDGROUPLAYOUT_H

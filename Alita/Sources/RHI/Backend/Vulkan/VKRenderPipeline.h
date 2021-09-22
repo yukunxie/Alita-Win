@@ -2,8 +2,8 @@
 // Created by realxie on 2019-10-04.
 //
 
-#ifndef ALITA_VKRENDERPIPELINE_H
-#define ALITA_VKRENDERPIPELINE_H
+#ifndef RHI_VKRENDERPIPELINE_H
+#define RHI_VKRENDERPIPELINE_H
 
 #include "VKDevice.h"
 
@@ -11,24 +11,34 @@ NS_RHI_BEGIN
 
 class VKRenderPass;
 
-class VKRenderPipeline : public RenderPipeline
+class VKPipelineLayout;
+
+class VKRenderPipeline final : public RenderPipeline
 {
-public:
-    VKRenderPipeline(VKDevice* device, const RenderPipelineDescriptor &descriptor);
+protected:
+    VKRenderPipeline(VKDevice* device);
     
     virtual ~VKRenderPipeline();
+
+public:
+    
+    bool Init(const RenderPipelineDescriptor &descriptor);
     
     VkPipeline GetNative() const
     { return vkGraphicsPipeline_; }
     
-    VkPipelineLayout GetPipelineLayout() const
-    { return vkPipelineLayout_; }
+    VkPipelineLayout GetPipelineLayout() const;
+    
+    virtual void Dispose() override;
+    
+    VkPipelineBindPoint GetPipelineBindPoint()
+    {
+        return VkPipelineBindPoint::VK_PIPELINE_BIND_POINT_GRAPHICS;
+    }
 
 private:
-
-private:
-    VkPipeline vkGraphicsPipeline_ = 0;
-    VkPipelineLayout vkPipelineLayout_ = 0;
+    VKPipelineLayout* pipelineLayout_ = nullptr;
+    VkPipeline vkGraphicsPipeline_ = VK_NULL_HANDLE;
     VKRenderPass* renderPass_ = nullptr;
     
     friend class VKDevice;
@@ -37,4 +47,4 @@ private:
 NS_RHI_END
 
 
-#endif //ALITA_VKRENDERPIPELINE_H
+#endif //RHI_VKRENDERPIPELINE_H

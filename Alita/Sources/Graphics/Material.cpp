@@ -7,7 +7,6 @@
 #include "Loaders/ImageLoader.h"
 #include "RenderScene.h"
 
-#include "RHI.h"
 #include "Backend/Vulkan/ShaderHelper.h"
 
 NS_RX_BEGIN
@@ -128,7 +127,7 @@ static constexpr std::uint32_t _SimpleHash(const char* p)
     return hash;
 }
 
-static RHI::ShaderModule* _CreateShader(const std::string& filename, RHI::ShaderType shaderType, const std::vector<std::string>& userDefines = {})
+static RHI::Shader* _CreateShader(const std::string& filename, RHI::ShaderType shaderType, const std::vector<std::string>& userDefines = {})
 {
     std::string data = FileSystem::GetInstance()->GetStringData(filename.c_str());
 
@@ -144,10 +143,15 @@ static RHI::ShaderModule* _CreateShader(const std::string& filename, RHI::Shader
         + sShaderGlobalConstantBuffer + "\n"
         + data;
 
-    auto spirV = RHI::CompileGLSLToSPIRV(shaderText, shaderType);
+    const std::vector<uint32>& spirV = RHI::CompileGLSLToSPIRV(shaderText, shaderType);
+    
     RHI::ShaderModuleDescriptor descriptor;
-    descriptor.binaryCode = std::move(spirV);
-    descriptor.codeType = RHI::ShaderCodeType::BINARY;
+    {
+        descriptor.code.resize(spirV.size() * sizeof(spirV[0]));
+        memcpy(descriptor.code.data(), spirV.data(), descriptor.code.size());
+        descriptor.codeType = RHI::ShaderCodeType::BINARY;
+    }
+   
     return Engine::GetGPUDevice()->CreateShaderModule(descriptor);
 }
 
@@ -179,8 +183,8 @@ void Material::Apply(RHI::RenderPassEncoder& passEndcoder)
     }
     BindPSO(passEndcoder);
     ApplyModifyToBindGroup(passEndcoder);
-    passEndcoder.SetGraphicPipeline(rhiPipelineState_);
-    passEndcoder.SetBindGroup(0, rhiBindGroup_);
+    passEndcoder.SetPipeline(rhiPipelineState_);
+    passEndcoder.SetBindGroup(0, rhiBindGroup_, 0, nullptr);
 }
 
 bool Material::SetFloat(const std::string& name, std::uint32_t offset, std::uint32_t count, float* data)
@@ -209,6 +213,7 @@ bool Material::SetTexture(const std::string& name, RHI::Texture* texture)
     if (param.bindingObject->texture == texture)
         return true;
     param.bindingObject->texture = texture;
+    RHI_SAFE_RETAIN(param.bindingObject->texture);
     bBindingDirty_ = true;
     return true;
 }
@@ -228,31 +233,36 @@ void Material::ApplyModifyToBindGroup(RHI::RenderPassEncoder& passEndcoder)
     {
         if (it->type == MaterailBindingObjectType::BUFFER)
         {
-            auto bufferBinding = new RHI::BufferBinding(it->buffer, 0, it->stride);
+            auto resource = Engine::GetGPUDevice()->CreateBufferBinding(it->buffer, 0, it->stride);
+            RHI_SAFE_RETAIN(resource);
             RHI::BindGroupBinding tmp;
             {
                 tmp.binding = it->binding;
-                tmp.resource = bufferBinding;
+                tmp.resource = resource;
             }
-            descriptor.bindings.push_back(tmp);
+            descriptor.entries.push_back(tmp);
         }
         else if (it->type == MaterailBindingObjectType::TEXTURE2D)
         {
+            auto resource = Engine::GetGPUDevice()->CreateTextureViewBinding(it->texture->CreateView({}));
+            RHI_SAFE_RETAIN(resource);
             RHI::BindGroupBinding tmp;
             {
                 tmp.binding = it->binding;
-                tmp.resource = it->texture->CreateView();
+                tmp.resource = resource;
             }
-            descriptor.bindings.push_back(tmp);
+            descriptor.entries.push_back(tmp);
         }
         else if (it->type == MaterailBindingObjectType::SAMPLER2D)
         {
+            auto resource = Engine::GetGPUDevice()->CreateSamplerBinding(it->sampler);
+            RHI_SAFE_RETAIN(resource);
             RHI::BindGroupBinding tmp;
             {
                 tmp.binding = it->binding;
-                tmp.resource = it->sampler;
+                tmp.resource = resource;
             }
-            descriptor.bindings.push_back(tmp);
+            descriptor.entries.push_back(tmp);
         }
         else
             Assert(false, "");
@@ -373,6 +383,7 @@ void Material::ParseBindGroupLayout(const rapidjson::Document& doc)
                     bufferDescriptor.usage = RHI::BufferUsage::UNIFORM;
                 };
                 bindingObject->buffer = Engine::GetGPUDevice()->CreateBuffer(bufferDescriptor);
+                RHI_SAFE_RETAIN(bindingObject->buffer);
 
                 for (auto& field : fields)
                 {
@@ -392,6 +403,7 @@ void Material::ParseBindGroupLayout(const rapidjson::Document& doc)
                 uri = cfg["uri"].GetString();
             }
             bindingObject->texture = ImageLoader::LoadTextureFromUri(uri);
+            RHI_SAFE_RETAIN(bindingObject->texture);
 
             MaterialParameter param;
             param.name = bindingObject->name;
@@ -416,6 +428,7 @@ void Material::ParseBindGroupLayout(const rapidjson::Document& doc)
                 descriptor.addressModeW = RHI::AddressMode::REPEAT;
             }
             bindingObject->sampler = Engine::GetGPUDevice()->CreateSampler(descriptor);
+            RHI_SAFE_RETAIN(bindingObject->sampler);
         }
         else Assert(false, "");
 
@@ -442,13 +455,13 @@ void Material::ParseBindGroupLayout(const rapidjson::Document& doc)
             target.type = RHI::BindingType::UNIFORM_BUFFER;
             break;
         case MaterailBindingObjectType::TEXTURE2D:
-            target.type = RHI::BindingType::TEXTURE;
+            target.type = RHI::BindingType::SAMPLED_TEXTURE;
             break;
         case MaterailBindingObjectType::SAMPLER2D:
             target.type = RHI::BindingType::SAMPLER;
             break;
         }
-        descriptor.bindings.push_back(target);
+        descriptor.entries.push_back(target);
     }
     rhiBindGroupLayout_ = Engine::GetGPUDevice()->CreateBindGroupLayout(descriptor);
 
@@ -471,38 +484,38 @@ void Material::CreatePipelineState()
         psoDesc.primitiveTopology = RHI::PrimitiveTopology::TRIANGLE_LIST;
 
         {
-            psoDesc.vertexStage.shaderModule = rhiVertShader_;
+            psoDesc.vertexStage.shader = rhiVertShader_;
             psoDesc.vertexStage.entryPoint = "main";
-            psoDesc.fragmentStage.shaderModule = rhiFragShader_;
+            psoDesc.fragmentStage.shader = rhiFragShader_;
             psoDesc.fragmentStage.entryPoint = "main";
         }
 
         // TODO read from json
         {
             psoDesc.depthStencilState = RHI::DepthStencilStateDescriptor();
-            psoDesc.depthStencilState->format = RHI::TextureFormat::DEPTH24PLUS_STENCIL8;
-            psoDesc.depthStencilState->depthWriteEnabled = true;
-            psoDesc.depthStencilState->depthCompare = RHI::CompareFunction::LESS;
-            psoDesc.depthStencilState->stencilFront = {};
-            psoDesc.depthStencilState->stencilBack = {};
+            psoDesc.depthStencilState.format = RHI::TextureFormat::DEPTH24PLUS_STENCIL8;
+            psoDesc.depthStencilState.depthWriteEnabled = true;
+            psoDesc.depthStencilState.depthCompare = RHI::CompareFunction::LESS;
+            psoDesc.depthStencilState.stencilFront = {};
+            psoDesc.depthStencilState.stencilBack = {};
         }
 
         Assert(inputAssembler_.IsValid(), "invalid InputAssembler");
-        psoDesc.vertexInput = inputAssembler_.ToRHIDescriptor();
+        psoDesc.vertexState = inputAssembler_.ToRHIDescriptor();
 
         psoDesc.rasterizationState = {
             .frontFace = RHI::FrontFace::COUNTER_CLOCKWISE,
             .cullMode = RHI::CullMode::BACK_BIT,
         };
 
-        psoDesc.colorStates = {
-            RHI::ColorStateDescriptor{
-                .format = RHI::TextureFormat::BGRA8UNORM,
-                .alphaBlend = {},
-                .colorBlend = {},
-                .writeMask = RHI::ColorWrite::ALL,
-            }
-        };
+        RHI::ColorStateDescriptor csd;
+        {
+            csd.format = RHI::TextureFormat::BGRA8UNORM;
+            csd.alphaBlend = {};
+            csd.colorBlend = {};
+            csd.writeMask = RHI::ColorWrite::ALL;
+        }
+        psoDesc.colorStates.push_back(csd);
 
         psoDesc.sampleCount = 1;
         psoDesc.sampleMask = 0xFFFFFFFF;

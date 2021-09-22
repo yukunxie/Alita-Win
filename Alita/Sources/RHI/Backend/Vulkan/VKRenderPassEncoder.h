@@ -2,31 +2,39 @@
 // Created by realxie on 2019-10-18.
 //
 
-#ifndef ALITA_VKRENDERPASSENCODER_H
-#define ALITA_VKRENDERPASSENCODER_H
+#ifndef RHI_VKRENDERPASSENCODER_H
+#define RHI_VKRENDERPASSENCODER_H
 
 
 #include "VKDevice.h"
+#include "VKFramebuffer.h"
 
 NS_RHI_BEGIN
 
 class VKRenderPass;
 
-class VKRenderPassEncoder : public RenderPassEncoder
+class VKRenderPipeline;
+
+class VKCommandBuffer;
+
+class VKBuffer;
+
+class VKRenderPassEncoder final : public RenderPassEncoder
 {
-public:
+protected:
     VKRenderPassEncoder(VKDevice* device);
     
     virtual ~VKRenderPassEncoder();
-    
-    void BeginPass(VkCommandBuffer vkCommandBuffer, const RenderPassDescriptor &descriptor);
 
 public:
-    virtual void SetGraphicPipeline(const RenderPipeline* pipeline) override;
     
-    virtual void SetIndexBuffer(const Buffer* buffer, std::uint32_t offset = 0) override;
+    bool Init(VKCommandBuffer* commandBuffer, const RenderPassDescriptor &descriptor);
     
-    virtual void SetVertexBuffer(const Buffer* buffer, std::uint32_t offset = 0,
+    virtual void SetPipeline(RenderPipeline* pipeline) override;
+    
+    virtual void SetIndexBuffer(Buffer* buffer, std::uint32_t offset = 0) override;
+    
+    virtual void SetVertexBuffer(Buffer* buffer, std::uint32_t offset = 0,
                                  std::uint32_t slot = 0) override;
     
     virtual void
@@ -38,8 +46,12 @@ public:
     virtual void DrawIndxed(std::uint32_t indexCount, std::uint32_t firstIndex) override;
     
     virtual void DrawIndexed(std::uint32_t indexCount, std::uint32_t instanceCount,
-                             std::uint32_t firstIndex, std::uint32_t baseVertex,
+                             std::uint32_t firstIndex, int32_t baseVertex,
                              std::uint32_t firstInstance) override;
+    
+    virtual void DrawIndirect(Buffer* indirectBuffer, BufferSize indirectOffset) override;
+    
+    virtual void DrawIndexedIndirect(Buffer* indirectBuffer, BufferSize indirectOffset) override;
     
     virtual void SetViewport(float x, float y, float width, float height, float minDepth,
                              float maxDepth) override;
@@ -49,24 +61,42 @@ public:
     
     virtual void SetStencilReference(std::uint32_t reference) override;
     
-    virtual void SetBindGroup(std::uint32_t index, const BindGroup* bindGroup,
-                              const std::vector<std::uint32_t> &dynamicOffsets = {}) override;
+    virtual void
+    SetBindGroup(std::uint32_t index, BindGroup* bindGroup, std::uint32_t dynamicOffsetCount,
+                 const std::uint32_t* dynamicOffsets) override;
+    
+    virtual void PushDebugGroup(const std::string &groupLabel) override;
+    
+    virtual void PopDebugGroup() override;
+    
+    virtual void InsertDebugMarker(const std::string &markerLabel) override;
+    
+    virtual void SetBlendColor(const Color &color) override;
+    
+    virtual void ExecuteBundles(std::uint32_t count, RenderBundle** bundles) override;
+    
+    virtual void BeginOcclusionQuery(std::uint32_t queryIndex) override;
+    
+    virtual void EndOcclusionQuery(std::uint32_t queryIndex) override;
     
     virtual void EndPass() override;
-
+    
+    virtual void Dispose() override;
+    
 private:
-    VKDevice* device_ = nullptr;
-    VkDevice vkDevice_ = nullptr;
-    VkCommandBuffer vkCommandBuffer_ = 0L;
-    //    VkRenderPass    vkRenderPass_       = 0L;
-    VkFramebuffer vkFramebuffer_ = 0L;
+    VKCommandBuffer* commandBuffer_ = nullptr;
+    VKFramebuffer* vkFramebuffer_ = VK_NULL_HANDLE;
+    VKRenderPass* renderPass_ = nullptr;
+    Vector<TextureView*> attachments_;
+    Vector<TextureView*> resolveTargets_;
+    TextureView* depthStencilAttachemnt_ = nullptr;
     
-    const RenderPipeline* graphicPipeline_ = nullptr;
+    bool hasSwapchainImage_ = false;
     
-    class VKRenderPass* renderPass_ = nullptr;
+    friend class VKDevice;
 };
 
 NS_RHI_END
 
 
-#endif //ALITA_VKRENDERPASSENCODER_H
+#endif //RHI_VKRENDERPASSENCODER_H

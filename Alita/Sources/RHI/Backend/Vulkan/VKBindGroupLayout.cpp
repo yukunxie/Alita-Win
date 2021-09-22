@@ -7,20 +7,42 @@
 
 NS_RHI_BEGIN
 
-bool VKBindGroupLayout::Init(VKDevice* device, const BindGroupLayoutDescriptor &descriptor)
+VKBindGroupLayout::VKBindGroupLayout(VKDevice* device)
+    : BindGroupLayout(device)
 {
-    vkDevice_ = device->GetDevice();
+}
+
+bool VKBindGroupLayout::Init(const BindGroupLayoutDescriptor &descriptor)
+{
     std::vector<VkDescriptorSetLayoutBinding> layoutBindings;
-    for (const auto &binding : descriptor.bindings)
+    for (size_t i = 0; i < descriptor.entries.size(); ++i)
     {
+        const auto &binding = descriptor.entries[i];
+        
         VkDescriptorSetLayoutBinding layoutBinding{
             .binding = binding.binding,
-            .descriptorType = GetVkDescriptorType(binding.type),
+            .descriptorType = ToVulkanType(binding.type),
             .descriptorCount= 1,
             .stageFlags = GetVkShaderStageFlags(binding.visibility),
             .pImmutableSamplers = nullptr,
         };
         layoutBindings.push_back(layoutBinding);
+        vkDescriptorTypes_.push_back({binding.binding, layoutBinding.descriptorType});
+        
+        /**
+         * https://www.khronos.org/registry/vulkan/specs/1.2-extensions/man/html/vkCmdBindDescriptorSets.html
+         * If any of the sets being bound include dynamic uniform or storage buffers, then pDynamicOffsets includes one element for each array
+         * element in each dynamic descriptor type binding in each set. Values are taken from pDynamicOffsets in an order such that all
+         * entries for set N come before set N+1; within a set, entries are ordered by the binding numbers in the descriptor set layouts; and
+         * within a binding array, elements are in order. dynamicOffsetCount must equal the total number of dynamic descriptors in the sets
+         * being bound.
+         */
+        if (layoutBinding.descriptorType == VK_DESCRIPTOR_TYPE_STORAGE_BUFFER ||
+            layoutBinding.descriptorType == VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC ||
+            layoutBinding.descriptorType == VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC)
+        {
+            dynamicOffsetCount_++;
+        }
     }
     
     VkDescriptorSetLayoutCreateInfo layoutInfo = {
@@ -30,27 +52,29 @@ bool VKBindGroupLayout::Init(VKDevice* device, const BindGroupLayoutDescriptor &
         .pBindings = layoutBindings.data(),
     };
     
-    CALL_VK(vkCreateDescriptorSetLayout(vkDevice_, &layoutInfo, nullptr, &vkBindGroupLayout_));
+    CALL_VK(vkCreateDescriptorSetLayout(VKDEVICE()->GetNative(), &layoutInfo, nullptr,
+                                          &vkBindGroupLayout_));
     
-    return true;
+    return VK_NULL_HANDLE != vkBindGroupLayout_;
 }
 
-VKBindGroupLayout*
-VKBindGroupLayout::Create(VKDevice* device, const BindGroupLayoutDescriptor &descriptor)
+void VKBindGroupLayout::Dispose()
 {
-    auto ret = new VKBindGroupLayout();
-    if (ret && ret->Init(device, descriptor))
+    RHI_DISPOSE_BEGIN();
+    
+    if (vkBindGroupLayout_)
     {
-        RHI_SAFE_RETAIN(ret);
-        return ret;
+        VkDevice deviceVk = RHI_CAST(VKDevice*, GetGPUDevice())->GetNative();
+        vkDestroyDescriptorSetLayout(deviceVk, vkBindGroupLayout_, nullptr);
+        vkBindGroupLayout_ = VK_NULL_HANDLE;
     }
-    if (ret) delete ret;
-    return nullptr;
+    
+    RHI_DISPOSE_END();
 }
 
 VKBindGroupLayout::~VKBindGroupLayout()
 {
-    vkDestroyDescriptorSetLayout(vkDevice_, vkBindGroupLayout_, nullptr);
+    Dispose();
 }
 
 NS_RHI_END

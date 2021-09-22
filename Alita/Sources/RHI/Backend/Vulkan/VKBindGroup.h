@@ -2,40 +2,55 @@
 // Created by realxie on 2019-10-10.
 //
 
-#ifndef ALITA_VKBINDGROUP_H
-#define ALITA_VKBINDGROUP_H
+#ifndef RHI_VKBINDGROUP_H
+#define RHI_VKBINDGROUP_H
 
 #include "VKDevice.h"
 #include "VKBindGroupLayout.h"
+#include "VKComputePipeline.h"
+#include "VKCommandBuffer.h"
 
 NS_RHI_BEGIN
 
-class VKBindGroup : public BindGroup
+class VKBuffer;
+
+class VKBindGroup final : public BindGroup
 {
 protected:
-    VKBindGroup() = default;
-    bool Init(VKDevice* device, const BindGroupDescriptor& descriptor);
-    
-public:
-    static VKBindGroup* Create(VKDevice* device, const BindGroupDescriptor& descriptor);
+    VKBindGroup(VKDevice* device);
     
     ~VKBindGroup();
 
-    VkDescriptorSet GetNative() const {return vkDescriptorSet_;}
+public:
+    
+    bool Init(BindGroupDescriptor &descriptor);
+    
+    VkDescriptorSet GetNative()
+    { return vkDescriptorSet_; }
+    
+    VKBindGroupLayout* GetBindGroupLayout()
+    { return bindGroupLayout_.Get(); }
+    
+    virtual void Dispose() override;
+    
+    void UpdateDescriptorSetAsync();
+    
+    void TransImageLayoutToSampled(VKCommandBuffer *commandBuffer);
 
-    void WriteToGPU() const;
-
-    void BindToCommandBuffer(std::uint32_t index, VkCommandBuffer vkCommandBuffer, VkPipelineLayout vkPipelineLayout) const;
+    std::vector<VKBuffer *> getBindingBuffers();
 
 private:
-    VkDevice                    vkDevice_           = nullptr;
-    VkDescriptorPool            vkDescriptorPool_   = 0L;
-    VkDescriptorSet             vkDescriptorSet_    = 0L;
-
-    std::vector<BindGroupBinding> bindingResources_;
+    RHIObjectWrapper<VKBindGroupLayout> bindGroupLayout_;
+    
+    VkDescriptorSet vkDescriptorSet_ = VK_NULL_HANDLE;
+    TurboVector<BindGroupBinding> bindingResources_;
+    
+    bool hasUpdateDescriptorSet_ = false;
+    
+    friend class VKDevice;
 };
 
 NS_RHI_END
 
 
-#endif //ALITA_VKBINDGROUP_H
+#endif //RHI_VKBINDGROUP_H

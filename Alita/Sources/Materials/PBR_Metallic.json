@@ -1,11 +1,23 @@
 {
   "name": "CommonMaterial",
-  "indexFormat":  "uint32",
+  "indexFormat": "uint32",
   "code": {
     "vs": "Shaders/PBR_Metallic.vert.gl",
     "fs": "Shaders/PBR_Metallic.frag.gl"
   },
   "defines": [],
+  "techniques": {
+    "Shading":
+    {
+      "vs_entry": "TShading",
+      "fs_entry": "TShading"
+    },
+    "GBufferGen":
+    {
+      "vs_entry": "TGBufferGen",
+      "fs_entry": "TGBufferGen"
+    }
+  },
   "bindings": [
     {
       "name": "uGlobal",
@@ -82,13 +94,13 @@
       ]
     },
     {
-      "name" : "albedo",
+      "name": "albedo",
       "binding": 11,
       "type": "Texture2D",
-      "uri" : "Textures/default-512.png"
+      "uri": "Textures/default-512.png"
     },
     {
-      "name" : "albedo_sampler",
+      "name": "albedo_sampler",
       "binding": 12,
       "type": "Sampler2D"
     }

@@ -2,7 +2,7 @@
 #include "Engine/Engine.h"
 #include "World/Camera.h"
 #include "World/World.h"
-#include "RHI.h"
+#include "RHI/RHI.h"
 #include "Base/FileSystem.h"
 #include "Backend/Vulkan/ShaderHelper.h"
 

@@ -2,42 +2,72 @@
 // Created by realxie on 2019-10-02.
 //
 
-#ifndef ALITA_VKBUFFER_H
-#define ALITA_VKBUFFER_H
+#ifndef RHI_VKBUFFER_H
+#define RHI_VKBUFFER_H
 
 #include "VKDevice.h"
 
 NS_RHI_BEGIN
 
-class VKBuffer : public Buffer
+class VKBuffer final : public Buffer
 {
-public:
-    VKBuffer(VKDevice* device, const BufferDescriptor& descriptor);
-
-    VkBuffer GetNative() const {return vkBuffer_;}
-
-    void UpdateBuffer(const void* data, std::uint32_t offset, std::uint32_t size);
-
-    virtual const void* MapReadAsync(std::uint32_t offset, std::uint32_t size) override;
-    virtual void* MapWriteAsync(std::uint32_t offset, std::uint32_t size) override;
-    virtual const void* MapReadAsync() override ;
-    virtual void* MapWriteAsync() override ;
-    virtual void Unmap() override;
-    virtual void Destroy() override;
-    virtual void SetSubData(std::uint32_t offset, std::uint32_t byteSize, const void* data) override ;
-
 protected:
+    VKBuffer(VKDevice* device);
+    
     virtual ~VKBuffer();
 
-private:
-    VkDevice        vkDevice_       = nullptr;
-    VkBuffer        vkBuffer_       = 0;
-    VkDeviceMemory  vkBufferMemory_ = 0;
-    void*           pData_          = nullptr;
+public:
+    
+    bool Init(const BufferDescriptor &descriptor);
+    
+    VkBuffer GetNative() const
+    { return vkBuffer_; }
+    
+    void UpdateBuffer(const void* data, std::uint32_t offset, std::uint32_t size);
+    
+    virtual const void* MapRead(std::uint32_t offset, std::uint32_t size) override;
+    
+    virtual void* MapWrite(std::uint32_t offset, std::uint32_t size) override;
+    
+    virtual void
+    MapReadAsync(const std::function<void(bool, Buffer*, const void*)> &onMapReadReady, 
+        std::uint32_t offset = 0, std::uint32_t size = 0) override;
+    
+    virtual void
+    MapWriteAsync(const std::function<void(bool, Buffer*, void*)> &onMapWriteReady, 
+        std::uint32_t offset = 0, std::uint32_t size = 0) override;
+    
+    virtual void Unmap() override;
+    
+    virtual void Destroy() override;
+    
+    virtual void
+    SetSubData(std::uint32_t offset, std::uint32_t byteSize, const void* data) override;
+    
+    virtual void Dispose() override;
+    
+    void CallMapReadCallback(std::uint32_t offset = 0, std::uint32_t size = 0);
+    
+    void CallMapWriteCallback(std::uint32_t offset = 0, std::uint32_t size = 0);
 
+private:
+    VkBuffer vkBuffer_ = VK_NULL_HANDLE;
+    void* pData_ = nullptr;
+
+#if USE_VULKAN_MEMORY_ALLCATOR
+    VmaAllocation vmaAllocation_ = nullptr;
+    VmaAllocationInfo vmaAllocationInfo_ = {};
+#else
+    VkDeviceMemory vkBufferMemory_ = VK_NULL_HANDLE;
+#endif
+    
+    std::function<void(bool, Buffer*, const void*)> onMapReadReady_ = nullptr;
+    std::function<void(bool, Buffer*, void*)> onMapWriteReady_ = nullptr;
+    
+    friend class VKDevice;
 };
 
 NS_RHI_END
 
 
-#endif //ALITA_VKBUFFER_H
+#endif //RHI_VKBUFFER_H

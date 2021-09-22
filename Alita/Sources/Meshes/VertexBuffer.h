@@ -8,7 +8,7 @@
 #include "Base/ObjectBase.h"
 #include "Engine/Engine.h"
 #include "Types/TData.h"
-#include "RHI.h"
+#include "RHI/RHI.h"
 #include "Graphics/Material.h"
 
 NS_RX_BEGIN
@@ -38,7 +38,7 @@ struct VertexBuffer
 				vertexBufferDescriptor.usage = RHI::BufferUsage::VERTEX;
 				vertexBufferDescriptor.size = size;
 			}
-			gpuBuffer = Engine::GetEngine()->GetGPUDevice()->CreateBuffer(vertexBufferDescriptor);
+			RHI_PTR_ASSIGN(gpuBuffer, Engine::GetEngine()->GetGPUDevice()->CreateBuffer(vertexBufferDescriptor));
 		}
 
 		gpuBuffer->SetSubData(0, size, data);
@@ -70,7 +70,7 @@ struct IndexBuffer
 				vertexBufferDescriptor.usage = RHI::BufferUsage::INDEX;
 				vertexBufferDescriptor.size = size;
 			}
-			gpuBuffer = Engine::GetEngine()->GetGPUDevice()->CreateBuffer(vertexBufferDescriptor);
+			RHI_PTR_ASSIGN(gpuBuffer, Engine::GetEngine()->GetGPUDevice()->CreateBuffer(vertexBufferDescriptor));
 		}
 
 		gpuBuffer->SetSubData(0, size, data);

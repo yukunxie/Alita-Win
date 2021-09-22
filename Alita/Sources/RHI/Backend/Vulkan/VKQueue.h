@@ -2,34 +2,55 @@
 // Created by realxie on 2019-10-18.
 //
 
-#ifndef ALITA_VKQUEUE_H
-#define ALITA_VKQUEUE_H
+#ifndef RHI_VKQUEUE_H
+#define RHI_VKQUEUE_H
 
 #include "VKDevice.h"
 
 NS_RHI_BEGIN
 
-class VKQueue : public Queue
+class VKQueue final : public Queue
 {
-public:
+protected:
     VKQueue(VKDevice* device);
     
     virtual ~VKQueue();
+
+public:
+    
+    bool Init();
     
     VkQueue GetNative() const
     { return vkQueue_; }
 
 public:
-    virtual void Submit(CommandBuffer* commandBuffer) override;
-
+    virtual void
+    Submit(std::uint32_t commandBufferCount, CommandBuffer* const* commandBuffers) override;
+    
+    void SubmitInternal();
+    
+    virtual Fence* CreateFence(const FenceDescriptor &descriptor) override;
+    
+    virtual void Dispose() override;
+    
+    virtual void Signal(Fence* fence, std::uint64_t signalValue) override;
+    
+    virtual void WaitQueueIdle() override;
+    
+    VKCommandBuffer* GetImageLayoutInitCommandBuffer();
+    
 private:
-    VKDevice* device_ = nullptr;
-    VkDevice vkDevice_ = nullptr;
-    VkQueue vkQueue_ = 0L;
-    VkFence vkFence_ = 0L;
+    std::vector<Fence*> waitingFences_;
+    VkQueue vkQueue_ = VK_NULL_HANDLE;
+    VkFence vkFence_ = VK_NULL_HANDLE;
+    
+    VKCommandBuffer* imageLayoutInitCommandBuffer_ = nullptr;
+    std::vector<VKCommandBuffer*> commandBufferCaches_;
+    
+    friend class VKDevice;
 };
 
 NS_RHI_END
 
 
-#endif //ALITA_VKQUEUE_H
+#endif //RHI_VKQUEUE_H

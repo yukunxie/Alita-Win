@@ -7,64 +7,98 @@
 
 NS_RHI_BEGIN
 
-VKTextureView::VKTextureView(VKDevice* device, VKTexture* vkTexture)
+VKTextureView::VKTextureView(VKDevice* device)
+    : TextureView(device)
 {
-	vkDevice_ = device->GetDevice();
-
-	texture_ = vkTexture;
-	RHI_SAFE_RETAIN(texture_);
-
-	textureSize_ = vkTexture->GetTextureSize();
-	textureFormat_ = vkTexture->GetFormat();
-
-	VkImageAspectFlags aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-	if (vkTexture->GetNativeFormat() == VkFormat::VK_FORMAT_D24_UNORM_S8_UINT)
-	{
-		aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT;
-	}
-
-	VkImageViewCreateInfo viewInfo;
-	{
-		viewInfo.pNext = nullptr;
-		viewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
-		viewInfo.image = vkTexture->GetNative();
-		viewInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
-		viewInfo.format = vkTexture->GetNativeFormat();
-		viewInfo.components = {
-			.r = VK_COMPONENT_SWIZZLE_R,
-			.g = VK_COMPONENT_SWIZZLE_G,
-			.b = VK_COMPONENT_SWIZZLE_B,
-			.a = VK_COMPONENT_SWIZZLE_A,
-		};
-		viewInfo.subresourceRange = {
-			.aspectMask = aspectMask,
-			.baseMipLevel = 0,
-			.levelCount = 1,
-			.baseArrayLayer = 0,
-			.layerCount = 1,
-		};
-		viewInfo.flags = 0;
-	};
-	CALL_VK(vkCreateImageView(vkDevice_, &viewInfo, nullptr, &vkImageView_));
 }
 
-VKTextureView::VKTextureView(VKDevice* device, const VkImageViewCreateInfo& imageViewCreateInfo,
-	const Extent3D& textureSize)
+void VKTextureView::Recreate()
 {
-	vkDevice_ = device->GetDevice();
-	textureSize_ = textureSize;
-	textureFormat_ = GetTextureFormat(imageViewCreateInfo.format);
-	CALL_VK(vkCreateImageView(vkDevice_, &imageViewCreateInfo, nullptr, &vkImageView_));
+    if (vkImageView_)
+    {
+        vkDestroyImageView(VKDEVICE()->GetNative(), vkImageView_,
+                             nullptr);
+        vkImageView_ = VK_NULL_HANDLE;
+    }
+    
+    Init(texture_.Get(), textureViewDescriptor_);
+}
+
+void VKTextureView::Dispose()
+{
+    RHI_DISPOSE_BEGIN();
+    
+    if (vkImageView_)
+    {
+        vkDestroyImageView(VKDEVICE()->GetNative(), vkImageView_,
+                             nullptr);
+        vkImageView_ = VK_NULL_HANDLE;
+    }
+    texture_.Reset();
+    
+    RHI_DISPOSE_END();
 }
 
 VKTextureView::~VKTextureView()
 {
-	if (vkImageView_)
-	{
-		vkDestroyImageView(vkDevice_, vkImageView_, nullptr);
-	}
+    Dispose();
+}
 
-	RHI_SAFE_RELEASE(texture_);
+bool VKTextureView::Init(VKTexture* vkTexture, const TextureViewDescriptor &descriptor)
+{
+    if (vkTexture->IsSwapchainImage())
+    {
+        MarkSwapchainImage();
+    }
+    
+    texture_ = vkTexture;
+    textureViewDescriptor_ = descriptor;
+    
+    textureSize_ = texture_->GetTextureSize();
+    textureFormat_ = texture_->GetFormat();
+    
+    VkImageViewCreateInfo viewInfo = {};
+    {
+        viewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+        viewInfo.flags = 0;
+        viewInfo.image = texture_->GetNative();
+        viewInfo.viewType = ToVulkanType(textureViewDescriptor_.dimension);
+        viewInfo.format = texture_->GetNativeFormat();
+        
+        viewInfo.components = {};
+        {
+            viewInfo.components.r = VK_COMPONENT_SWIZZLE_R;
+            viewInfo.components.g = VK_COMPONENT_SWIZZLE_G;
+            viewInfo.components.b = VK_COMPONENT_SWIZZLE_B;
+            viewInfo.components.a = VK_COMPONENT_SWIZZLE_A;
+        }
+        
+        viewInfo.subresourceRange = {};
+        {
+            auto aspectMask = ToVulkanType(textureViewDescriptor_.aspect,
+                                           texture_->GetNativeFormat());
+            viewInfo.subresourceRange.aspectMask = aspectMask;
+            
+            std::uint32_t levelCount = textureViewDescriptor_.mipLevelCount;
+            if (0 == levelCount)
+            {
+                levelCount = texture_->GetMipLevelCount() - textureViewDescriptor_.baseMipLevel;
+            }
+            viewInfo.subresourceRange.baseMipLevel = textureViewDescriptor_.baseMipLevel;
+            viewInfo.subresourceRange.levelCount = levelCount;
+            
+            std::uint32_t layerCount = textureViewDescriptor_.arrayLayerCount;
+            if (0 == layerCount)
+            {
+                layerCount = texture_->GetArrayLayerCount() - textureViewDescriptor_.baseArrayLayer;
+            }
+            viewInfo.subresourceRange.baseArrayLayer = textureViewDescriptor_.baseArrayLayer;
+            viewInfo.subresourceRange.layerCount = layerCount;
+        }
+    }
+    CALL_VK(vkCreateImageView(VKDEVICE()->GetNative(), &viewInfo, nullptr, &vkImageView_));
+    
+    return VK_NULL_HANDLE != vkImageView_;
 }
 
 NS_RHI_END

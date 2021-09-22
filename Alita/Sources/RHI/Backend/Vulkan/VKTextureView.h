@@ -2,57 +2,71 @@
 // Created by realxie on 2019-10-10.
 //
 
-#ifndef ALITA_VKTEXTUREVIEW_H
-#define ALITA_VKTEXTUREVIEW_H
+#ifndef RHI_VKTEXTUREVIEW_H
+#define RHI_VKTEXTUREVIEW_H
 
 #include "VKDevice.h"
 #include "VKTexture.h"
 
 NS_RHI_BEGIN
 
+class VKTextureViewManager;
+
 class VKTextureView final : public TextureView
 {
-public:
-    VKTextureView(VKDevice* device, VKTexture* vkTexture);
-    
-    VKTextureView(VKDevice* device, const VkImageViewCreateInfo &imageViewCreateInfo,
-                  const Extent3D &textureSize);
+protected:
+    VKTextureView(VKDevice* device);
     
     virtual ~VKTextureView();
     
+    void Recreate();
+
+public:
+    
+    bool Init(VKTexture* vkTexture, const TextureViewDescriptor &descriptor);
+    
     VkImageView GetNative() const
     { return vkImageView_; }
-
-    VkImage GetVkImage()
-    {
-        return vkImage_;
-    }
-
-    void SetVkImage(VkImage img)
-    {
-        vkImage_ = img;
-    }
     
     Extent3D GetTextureSize() const
     { return textureSize_; }
     
+    std::uint32_t GetSampleCount() const
+    {
+        return texture_ ? texture_->GetSampleCount() : 1;
+    }
+    
     virtual TextureFormat GetFormat() const override
     { return textureFormat_; }
+    
+    virtual void Dispose() override;
+    
+    VkImage GetImage()
+    {
+        return texture_ ? texture_->GetNative() : VK_NULL_HANDLE;
+    }
+    
+    VKTexture* GetTexture()
+    { return texture_.Get(); }
 
 private:
-    VkDevice vkDevice_ = nullptr;
-    VkImageView vkImageView_ = 0L;
-    VkImage vkImage_ = nullptr;
-
-    VKTexture* texture_ = nullptr;
+    RHIObjectWrapper<VKTexture> texture_ = nullptr;
+    
+    VkImageView vkImageView_ = VK_NULL_HANDLE;
     
     Extent3D textureSize_;
     TextureFormat textureFormat_;
     
+    TextureViewDescriptor textureViewDescriptor_;
     
+    friend class VKDevice;
+    
+    friend class VKTextureViewManager;
+    
+    friend class VKTexture;
 };
 
 NS_RHI_END
 
 
-#endif //ALITA_VKTEXTUREVIEW_H
+#endif //RHI_VKTEXTUREVIEW_H

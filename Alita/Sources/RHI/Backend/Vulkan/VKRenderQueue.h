@@ -2,22 +2,39 @@
 // Created by realxie on 2019-10-11.
 //
 
-#ifndef ALITA_VKRENDERQUEUE_H
-#define ALITA_VKRENDERQUEUE_H
+#ifndef RHI_VKRENDERQUEUE_H
+#define RHI_VKRENDERQUEUE_H
 
 #include "VKDevice.h"
 
 NS_RHI_BEGIN
 
-class VKRenderQueue : public RenderQueue
+class VKRenderQueue final : public RenderQueue
 {
-public:
-    VKRenderQueue();
+protected:
+    VKRenderQueue(VKDevice* device);
     
     virtual ~VKRenderQueue();
+
+public:
+    
+    bool Init()
+    {
+        return true;
+    }
+    
+    virtual void Dispose() override;
+    
+    virtual void Submit(const CommandBuffer* commandBuffer) override
+    {
+        RHI_ASSERT(false, "unimplemented.");
+    }
+
+private:
+    friend class VKDevice;
 };
 
 NS_RHI_END
 
 
-#endif //ALITA_VKRENDERQUEUE_H
+#endif //RHI_VKRENDERQUEUE_H

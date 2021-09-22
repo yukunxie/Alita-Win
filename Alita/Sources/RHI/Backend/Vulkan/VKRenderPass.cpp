@@ -11,22 +11,44 @@
 #include <array>
 #include <vulkan/vulkan.h>
 
-#include "../../Include/xxhash64.h"
+#include "RHI/xxhash64.h"
 
 NS_RHI_BEGIN
 
-VKRenderPass::VKRenderPass(VKDevice* device, const RenderPassCacheQuery &query)
-    : device_(device)
+VKRenderPass::VKRenderPass(VKDevice* device)
+    : RenderPass(device)
 {
-    std::array<VkAttachmentReference, kMaxColorAttachments + 1> attachmentRefs;
+}
+
+void VKRenderPass::Dispose()
+{
+    RHI_DISPOSE_BEGIN();
+    
+    if (VK_NULL_HANDLE != vkRenderPass_)
+    {
+        vkDestroyRenderPass(VKDEVICE()->GetNative(), vkRenderPass_, nullptr);
+        vkRenderPass_ = VK_NULL_HANDLE;
+    }
+    
+    RHI_DISPOSE_END();
+}
+
+VKRenderPass::~VKRenderPass()
+{
+    Dispose();
+}
+
+bool VKRenderPass::Init(const RenderPassCacheQuery &query)
+{
+    std::array<VkAttachmentReference, kMaxColorAttachments * 2 + 1> attachmentRefs;
     
     // Contains the attachment description that will be chained in the create info
-    std::array<VkAttachmentDescription, kMaxColorAttachments + 1> attachmentDescs = {};
+    std::array<VkAttachmentDescription, kMaxColorAttachments * 2 + 1> attachmentDescs = {};
     
     uint32_t attachmentCount = 0;
-    for (size_t i = 0; i < query.colorMask.size(); ++i)
+    for (std::uint32_t i = 0; i < query.GetColorAttachmentCount(); ++i)
     {
-        if (false == query.colorMask.test(i))
+        if (!query.TestColorAttachment(i))
         {
             continue;
         }
@@ -38,19 +60,53 @@ VKRenderPass::VKRenderPass(VKDevice* device, const RenderPassCacheQuery &query)
         attachmentRef.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
         
         attachmentDesc.flags = 0;
-        attachmentDesc.format = GetVkFormat(query.colorFormats[i]);
-        attachmentDesc.samples = VK_SAMPLE_COUNT_1_BIT;
-        attachmentDesc.loadOp = GetLoadOp(query.colorLoadOp[i]);
+        attachmentDesc.format = ToVulkanType(query.colorFormats[i]);
+        attachmentDesc.samples = (VkSampleCountFlagBits) query.sampleCounts[i];
+        attachmentDesc.loadOp = ToVulkanType(query.colorLoadOps[i]);
         attachmentDesc.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
         attachmentDesc.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-        attachmentDesc.finalLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+        attachmentDesc.finalLayout = query.TestResolvedColorAttachment(i)
+                                     || !query.bIsSwapchainTextures[i] ?
+                                     VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL :
+                                     VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
         
         attachmentCount++;
     }
     uint32_t colorAttachmentCount = attachmentCount;
     
+    // Resolve attachments
+    std::uint32_t resolveAttachmentCount = 0;
+    std::array<VkAttachmentReference, kMaxColorAttachments> resolveReferences;
+    for (std::uint32_t i = 0; i < query.GetColorAttachmentCount(); ++i)
+    {
+        if (!query.TestColorAttachment(i) || !query.TestResolvedColorAttachment(i))
+        {
+            continue;
+        }
+        
+        auto &attachmentRef = attachmentRefs[attachmentCount];
+        auto &attachmentDesc = attachmentDescs[attachmentCount];
+        
+        attachmentRef.attachment = attachmentCount;
+        attachmentRef.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+        
+        attachmentDesc.flags = 0;
+        attachmentDesc.format = ToVulkanType(query.colorFormats[i]);
+        attachmentDesc.samples = VK_SAMPLE_COUNT_1_BIT;
+        attachmentDesc.loadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+        attachmentDesc.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+        attachmentDesc.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+        attachmentDesc.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+        
+        resolveReferences[resolveAttachmentCount].attachment = attachmentCount;
+        resolveReferences[resolveAttachmentCount].layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+        
+        resolveAttachmentCount++;
+        attachmentCount++;
+    }
+    
     VkAttachmentReference* depthStencilAttachment = nullptr;
-    if (query.hasDepthStencil)
+    if (query.bHasDepthStencil)
     {
         auto &attachmentRef = attachmentRefs[attachmentCount];
         auto &attachmentDesc = attachmentDescs[attachmentCount];
@@ -61,12 +117,12 @@ VKRenderPass::VKRenderPass(VKDevice* device, const RenderPassCacheQuery &query)
         attachmentRef.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
         
         attachmentDesc.flags = 0;
-        attachmentDesc.format = GetVkFormat(query.depthStencilFormat);
+        attachmentDesc.format = ToVulkanType(query.depthStencilFormat);
         attachmentDesc.samples = VK_SAMPLE_COUNT_1_BIT;
-        attachmentDesc.loadOp = GetLoadOp(query.depthLoadOp);
-        attachmentDesc.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
-        attachmentDesc.stencilLoadOp = GetLoadOp(query.stencilLoadOp);
-        attachmentDesc.stencilStoreOp = VK_ATTACHMENT_STORE_OP_STORE;
+        attachmentDesc.loadOp = ToVulkanType(query.depthLoadOp);
+        attachmentDesc.storeOp = ToVulkanType(query.depthStoreOp);
+        attachmentDesc.stencilLoadOp = ToVulkanType(query.stencilLoadOp);
+        attachmentDesc.stencilStoreOp = ToVulkanType(query.stencilStoreOp);
         attachmentDesc.initialLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
         attachmentDesc.finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
         
@@ -81,10 +137,29 @@ VKRenderPass::VKRenderPass(VKDevice* device, const RenderPassCacheQuery &query)
     subpassDesc.pInputAttachments = nullptr;
     subpassDesc.colorAttachmentCount = colorAttachmentCount;
     subpassDesc.pColorAttachments = attachmentRefs.data();
-    subpassDesc.pResolveAttachments = nullptr;
+    subpassDesc.pResolveAttachments =
+        resolveAttachmentCount > 0 ? resolveReferences.data() : nullptr;
     subpassDesc.pDepthStencilAttachment = depthStencilAttachment;
     subpassDesc.preserveAttachmentCount = 0;
     subpassDesc.pPreserveAttachments = nullptr;
+    
+    // std::array<VkSubpassDependency, 2> dependencies;
+    //
+    // dependencies[0].srcSubpass = VK_SUBPASS_EXTERNAL;
+    // dependencies[0].dstSubpass = 0;
+    // dependencies[0].srcStageMask = VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
+    // dependencies[0].dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+    // dependencies[0].srcAccessMask = VK_ACCESS_MEMORY_READ_BIT;
+    // dependencies[0].dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_READ_BIT | VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+    // dependencies[0].dependencyFlags = VK_DEPENDENCY_BY_REGION_BIT;
+    //
+    // dependencies[1].srcSubpass = 0;
+    // dependencies[1].dstSubpass = VK_SUBPASS_EXTERNAL;
+    // dependencies[1].srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+    // dependencies[1].dstStageMask = VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
+    // dependencies[1].srcAccessMask = VK_ACCESS_COLOR_ATTACHMENT_READ_BIT | VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+    // dependencies[1].dstAccessMask = VK_ACCESS_MEMORY_READ_BIT;
+    // dependencies[1].dependencyFlags = VK_DEPENDENCY_BY_REGION_BIT;
     
     // Chain everything in VkRenderPassCreateInfo
     VkRenderPassCreateInfo createInfo;
@@ -98,109 +173,9 @@ VKRenderPass::VKRenderPass(VKDevice* device, const RenderPassCacheQuery &query)
     createInfo.dependencyCount = 0;
     createInfo.pDependencies = nullptr;
     
-    CALL_VK(vkCreateRenderPass(device->GetDevice(), &createInfo, nullptr, &vkRenderPass_));
+    CALL_VK(vkCreateRenderPass(VKDEVICE()->GetNative(), &createInfo, nullptr, &vkRenderPass_));
     
+    return VK_NULL_HANDLE != vkRenderPass_;
 }
-
-//VKRenderPass::VKRenderPass(VKDevice* device, const RenderPassCreateInfo& createInfo)
-//{
-//    // Setup descriptions for attachments.
-//    std::vector<VkAttachmentDescription> attachmentDescriptions(createInfo.attachments.size());
-//    ParseAttachmentDescriptions(createInfo, attachmentDescriptions);
-//
-//    // Setup descriptions for subpasses.
-//    std::vector<VkSubpassDescription> subpassDescriptions(createInfo.subpasses.size());
-//    std::vector<std::vector<VkAttachmentReference>> attachReferences;
-//    ParseSubpassDescriptions(createInfo, subpassDescriptions, attachReferences);
-//
-//    // TODO realxie configurable
-//    VkAttachmentReference depthAttachmentRef = {};
-//    depthAttachmentRef.attachment = 1;
-//    depthAttachmentRef.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
-//    subpassDescriptions[0].pDepthStencilAttachment = &depthAttachmentRef;
-//
-//    VkSubpassDependency dependency = {};
-//    dependency.srcSubpass = VK_SUBPASS_EXTERNAL;
-//    dependency.dstSubpass = 0;
-//    dependency.srcStageMask = 0;
-//    dependency.dstStageMask = 0;
-//
-//    VkRenderPassCreateInfo renderPassInfo = {
-//            .sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO,
-//            .pNext = nullptr,
-//            .attachmentCount = (std::uint32_t)attachmentDescriptions.size(),
-//            .pAttachments = attachmentDescriptions.data(),
-//            .subpassCount = (std::uint32_t)subpassDescriptions.size(),
-//            .pSubpasses = subpassDescriptions.data(),
-//            .dependencyCount = 1,
-//            .pDependencies = &dependency
-//    };
-//
-//    CALL_VK(vkCreateRenderPass(device->GetDevice(), &renderPassInfo, nullptr, &vkRenderPass_));
-//}
-
-VKRenderPass::~VKRenderPass()
-{
-    vkDestroyRenderPass(device_->GetDevice(), vkRenderPass_, nullptr);
-}
-
-//void VKRenderPass::ParseAttachmentDescriptions(const RenderPassCreateInfo& createInfo, std::vector<VkAttachmentDescription>& descriptions)
-//{
-//    descriptions.resize(createInfo.attachments.size());
-//    for (size_t i = 0; i < createInfo.attachments.size(); ++i)
-//    {
-//        const AttachmentDescription& desc = createInfo.attachments[i];
-//        VkAttachmentDescription& target = descriptions[i];
-//        target.format = ToVkFormat(desc.format);
-//        target.samples = ToVkSampleCountFlagBits(desc.samples);
-//        target.loadOp = ToVkAttachmentLoadOp(desc.loadOp);
-//        target.storeOp = ToVkAttachmentStoreOp(desc.storeOp);
-//        target.stencilLoadOp = ToVkAttachmentLoadOp(desc.stencilLoadOp);
-//        target.stencilStoreOp = ToVkAttachmentStoreOp(desc.stencilStoreOp);
-//        target.initialLayout = ToVkImageLayout(desc.initialLayout);
-//        target.finalLayout = ToVkImageLayout(desc.finalLayout);
-//    }
-//}
-//
-//void VKRenderPass::ParseSubpassDescriptions(const RenderPassCreateInfo& createInfo
-//        , std::vector<VkSubpassDescription>& descriptions
-//        , std::vector<std::vector<VkAttachmentReference>>& references
-//        )
-//{
-//    descriptions.resize(createInfo.subpasses.size());
-//    references.resize(descriptions.size());
-//
-//    for (size_t i = 0; i < createInfo.subpasses.size(); ++i)
-//    {
-//        const SubpassDescription& sp = createInfo.subpasses[i];
-//        RHI_ASSERT(sp.inputAttachments.size() == 0);
-//        RHI_ASSERT(sp.resolveAttachments.size() == 0);
-//        RHI_ASSERT(sp.preserveAttachments.size() == 0);
-//
-//        VkSubpassDescription& description = descriptions[i];
-//        description.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
-//        description.flags = 0;
-//        description.inputAttachmentCount = 0;
-//        description.pInputAttachments = nullptr;
-//
-//        ParseAttachmentReferences(sp.colorAttachments, references[i]);
-//        description.colorAttachmentCount = references[i].size();
-//        description.pColorAttachments = references[i].data();
-//        description.pResolveAttachments = nullptr;
-//        description.pDepthStencilAttachment = nullptr;
-//        description.preserveAttachmentCount = 0;
-//        description.pPreserveAttachments = nullptr;
-//    }
-//}
-//
-//void VKRenderPass::ParseAttachmentReferences(const std::vector<AttachmentReference>& attachments, std::vector<VkAttachmentReference>& attachmentReferences)
-//{
-//    attachmentReferences.resize(attachments.size());
-//    for (size_t i = 0; i < attachments.size(); ++i)
-//    {
-//        attachmentReferences[i].attachment = attachments[i].attachment;
-//        attachmentReferences[i].layout = ToVkImageLayout(attachments[i].layout);
-//    }
-//}
 
 NS_RHI_END

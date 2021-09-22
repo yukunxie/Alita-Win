@@ -8,7 +8,7 @@
 #include "Base/ObjectBase.h"
 #include "Base/FileSystem.h"
 #include "Effect.h"
-#include "RHI.h"
+#include "RHI/RHI.h"
 //#include "Meshes/VertexBuffer.h"
 
 #define RAPIDJSON_ASSERT(x) Assert(x, "")
@@ -111,22 +111,22 @@ public:
 		std::sort(inputAttributes_.begin(), inputAttributes_.end());
 	}
 
-	RHI::VertexInputDescriptor ToRHIDescriptor()
+	RHI::VertexStateDescriptor ToRHIDescriptor()
 	{
-		RHI::VertexInputDescriptor ret;
+		RHI::VertexStateDescriptor ret;
 		ret.indexFormat = indexType_ == IndexType::UINT32? RHI::IndexFormat::UINT32 : RHI::IndexFormat::UINT16;
 		for (const auto& ia : inputAttributes_)
 		{
 			RHI::VertexBufferDescriptor vbDesc;
 			vbDesc.stepMode = RHI::InputStepMode::VERTEX;
-			vbDesc.stride = ia.stride;
+			vbDesc.arrayStride = ia.stride;
 
 			RHI::VertexAttributeDescriptor vaDesc;
 			vaDesc.format = ia.ToRHIFormat();
 			vaDesc.offset = ia.offset;
 			vaDesc.shaderLocation = ia.location;
 
-			vbDesc.attributeSet.push_back(vaDesc);
+			vbDesc.attributes.push_back(vaDesc);
 
 			ret.vertexBuffers.push_back(vbDesc);
 		}
@@ -212,6 +212,8 @@ protected:
 	RHI::Shader* rhiVertShader_ = nullptr;
 	RHI::Shader* rhiFragShader_ = nullptr;
 	RHI::RenderPipeline* rhiPipelineState_ = nullptr;
+
+	RHI::RenderPipeline* rhiPipelineStateObjects_[(uint32)TechniqueType::TMaxCount] = { nullptr };
 
 	bool bBindingDirty_ = true;
 };

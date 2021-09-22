@@ -8,22 +8,68 @@
 #include "Graphics/RenderScene.h"
 #include "Event/EventSystem.h"
 
-#include "Backend/Vulkan/VKCanvasContext.h"
 #include "Backend/Vulkan/ShaderHelper.h"
+#include "Backend/Vulkan/VKDevice.h"
 
 NS_RX_BEGIN
+
+class DeviceHandler : public RHI::IDeviceExternalDeps
+{
+public:
+    DeviceHandler() = delete;
+
+    DeviceHandler(Engine* engine)
+        : engine_(engine)
+    {}
+
+    virtual ~DeviceHandler() {};
+
+    virtual void* GetNativeWindowHandle() const override
+    {
+        return engine_->GetWindowHandler();
+    }
+    virtual void SetDrawCommandCalled(bool hasDrawCommand) const override
+    {
+    }
+    virtual void SetDrawCallCount(std::uint32_t drawcall) const override
+    {
+    }
+    virtual void SetBufferCount(std::uint32_t count) const override
+    {
+    }
+    virtual void SetTextureCount(std::uint32_t count) const override
+    {
+    }
+    virtual void SetBufferMemorySize(std::uint32_t size) const override
+    {
+    }
+    virtual void SetPresentDone() const override
+    {
+    }
+    virtual void ShowDebugMessage(const std::string& message) const override
+    {
+    }
+    virtual void ShowDebugMessage(const char* message) const override
+    {
+    }
+
+protected:
+    Engine* engine_ = nullptr;
+};
 
 Engine* Engine::engine_ = nullptr;
 
 Engine::Engine(void* windowHandler)
 {
-    gpuDevice_ = RHI::CreateDeviceHelper(RHI::DeviceType::VULKAN, windowHandler);
     windowHandler_ = windowHandler;
 }
 
 bool Engine::Init()
 {
+    gpuDevice_ = RHI::VKDevice::Create({}, std::make_unique<DeviceHandler>(this));
+    LOGI("Engine::Init gpuDevice_=%p", gpuDevice_);
     world_ = new World();
+    LOGI("Engine::Init world_=%p", world_);
     renderScene_ = new RenderScene();
     eventSystem_ = new EventSystem(windowHandler_);
     return true;
@@ -52,8 +98,10 @@ Engine::~Engine()
 
 void Engine::Update(float dt)
 {
+    gpuDevice_->OnFrameCallback(dt);
+
     if (!world_)return;
-    
+
     world_->Tick(dt);
 
     renderScene_->Tick(dt);
@@ -71,7 +119,7 @@ void Engine::RunWithWorld(World* world)
 std::uint32_t Engine::StartScheduler(FuncTypeEngineUpdateCallback callback, void* data)
 {
     auto id = ++schedulerIDRecorder_;
-    schedulers_[id] = {callback, data};
+    schedulers_[id] = { callback, data };
     return id;
 }
 

@@ -5,36 +5,73 @@
 #include "VKCommandEncoder.h"
 #include "VKCommandBuffer.h"
 #include "VKRenderPassEncoder.h"
+#include "VKComputePassEncoder.h"
 #include "VKBuffer.h"
 #include "VKTexture.h"
-
 
 NS_RHI_BEGIN
 
 VKCommandEncoder::VKCommandEncoder(VKDevice* device)
+    : CommandEncoder(device)
 {
-    device_ = device;
+    RHI_PTR_ASSIGN(commandBuffer_, VKDEVICE()->CreateCommandBuffer());
+}
+
+void VKCommandEncoder::Dispose()
+{
+    RHI_DISPOSE_BEGIN();
     
-    commandBuffer_ = new VKCommandBuffer(device_);
-    RHI_SAFE_RETAIN(commandBuffer_);
+    RHI_SAFE_RELEASE(commandBuffer_);
+    RHI_SAFE_RELEASE(renderPassEncoder_);
+    RHI_SAFE_RELEASE(computePassEncoder_);
+    
+    RHI_DISPOSE_END();
 }
 
 VKCommandEncoder::~VKCommandEncoder()
 {
+    Dispose();
+}
+
+bool VKCommandEncoder::Init()
+{
+    return true;
+}
+
+void VKCommandEncoder::Reset()
+{
     RHI_SAFE_RELEASE(commandBuffer_);
     RHI_SAFE_RELEASE(renderPassEncoder_);
+    RHI_SAFE_RELEASE(computePassEncoder_);
+    
+    RHI_PTR_ASSIGN(commandBuffer_, VKDEVICE()->CreateCommandBuffer());
 }
 
 RenderPassEncoder* VKCommandEncoder::BeginRenderPass(const RenderPassDescriptor &descriptor)
 {
-    if (renderPassEncoder_ == nullptr)
+    if (renderPassEncoder_)
     {
-        renderPassEncoder_ = new VKRenderPassEncoder(device_);
-        RHI_SAFE_RETAIN(renderPassEncoder_);
+        renderPassEncoder_->EndPass();
     }
-    commandBuffer_->ResetCommandBuffer();
-    renderPassEncoder_->BeginPass(commandBuffer_->GetNative(), descriptor);
+    RHI_SAFE_RELEASE(renderPassEncoder_);
+    
+    auto newRenderPassEncoder = VKDEVICE()->CreateObject<VKRenderPassEncoder>(commandBuffer_, descriptor);
+    RHI_PTR_ASSIGN(renderPassEncoder_, newRenderPassEncoder);
+    
     return renderPassEncoder_;
+}
+
+ComputePassEncoder* VKCommandEncoder::BeginComputePass(const ComputePassDescriptor &descriptor)
+{
+    if (computePassEncoder_)
+    {
+        computePassEncoder_->EndPass();
+    }
+    
+    auto newComputePassEncoder = VKDEVICE()->CreateObject<VKComputePassEncoder>(commandBuffer_, descriptor);
+    RHI_PTR_ASSIGN(computePassEncoder_, newComputePassEncoder);
+    
+    return computePassEncoder_;
 }
 
 CommandBuffer* VKCommandEncoder::Finish(const CommandBufferDescriptor &descriptor)
@@ -43,38 +80,80 @@ CommandBuffer* VKCommandEncoder::Finish(const CommandBufferDescriptor &descripto
 }
 
 void VKCommandEncoder::CopyBufferToBuffer(
-    const Buffer* source,
+    Buffer* source,
     BufferSize sourceOffset,
     Buffer* destination,
     BufferSize destinationOffset,
     BufferSize size)
 {
+    commandBuffer_->RecordCommand<DeferredCmdCopyBufferToBuffer>(source, sourceOffset, destination,
+                                                                 destinationOffset, size);
+    commandBuffer_->AddBindingObject(source);
+    commandBuffer_->AddBindingObject(destination);
 }
 
 void VKCommandEncoder::CopyBufferToTexture(
-    const BufferCopyView &source,
+    BufferCopyView &source,
     TextureCopyView &destination,
-    const Extent3D &copySize)
+    Extent3D &copySize)
 {
-    auto buffer = RHI_CAST(const VKBuffer*, source.buffer);
-    auto texture = RHI_CAST(const VKTexture*, destination.texture);
-    auto dstImageLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
-    
-    VkBufferImageCopy bufferImageCopy;
+    commandBuffer_->RecordCommand<DeferredCmdCopyBufferToTexture>(source, destination, copySize);
+    commandBuffer_->AddBindingObject(source.buffer);
+    commandBuffer_->AddBindingObject(destination.texture);
+}
+
+void VKCommandEncoder::CopyTextureToBuffer(
+    TextureCopyView &source,
+    BufferCopyView &destination,
+    Extent3D &copySize)
+{
+    VKTexture* texture = RHI_CAST(VKTexture*, source.texture);
+    if (false == texture->TestTextureUsage(TextureUsage::COPY_SRC))
     {
-        bufferImageCopy.bufferOffset = source.offset;
-        // bufferRowLength measured by pixel.
-        bufferImageCopy.bufferRowLength =
-            source.rowPitch / GetTextureFormatPixelSize(texture->GetFormat());
-        bufferImageCopy.bufferImageHeight = source.imageHeight;
-        bufferImageCopy.imageSubresource = {VK_IMAGE_ASPECT_COLOR_BIT, destination.mipLevel, 0,
-                                            destination.arrayLayer};
-        bufferImageCopy.imageOffset = {destination.origin.x, destination.origin.y,
-                                       destination.origin.z};
-        bufferImageCopy.imageExtent = {copySize.width, copySize.height, copySize.depth};
+        LOGE("CopyTextureToBuffer: the source texture must has COPY_SRC bit");
+        return;
     }
-    vkCmdCopyBufferToImage(commandBuffer_->GetNative(), buffer->GetNative(), texture->GetNative(),
-                           dstImageLayout, 1, &bufferImageCopy);
+    commandBuffer_->RecordCommand<DeferredCmdCopyTextureToBuffer>(source, destination, copySize);
+    commandBuffer_->AddBindingObject(source.texture);
+    commandBuffer_->AddBindingObject(destination.buffer);
+}
+
+void VKCommandEncoder::CopyTextureToTexture(
+    TextureCopyView &source,
+    TextureCopyView &destination,
+    Extent3D &copySize)
+{
+    commandBuffer_->RecordCommand<DeferredCmdCopyTextureToTexture>(source, destination, copySize);
+    commandBuffer_->AddBindingObject(source.texture);
+    commandBuffer_->AddBindingObject(destination.texture);
+}
+
+void VKCommandEncoder::ResolveQuerySet(
+    QuerySet* querySet,
+    std::uint32_t queryFirstIndex,
+    std::uint32_t queryCount,
+    Buffer* dstBuffer,
+    std::uint32_t dstOffset)
+{
+    commandBuffer_->RecordCommand<DeferredCmdResolveQuerySet>(querySet, queryFirstIndex, queryCount,
+                                                              dstBuffer, dstOffset);
+    commandBuffer_->AddBindingObject(querySet);
+    commandBuffer_->AddBindingObject(dstBuffer);
+}
+
+void VKCommandEncoder::PushDebugGroup(const std::string &groupLabel)
+{
+    commandBuffer_->PushDebugGroup(groupLabel.c_str());
+}
+
+void VKCommandEncoder::PopDebugGroup()
+{
+    commandBuffer_->PopDebugGroup();
+}
+
+void VKCommandEncoder::InsertDebugMarker(const std::string &markerLabel)
+{
+    commandBuffer_->InsertDebugMarker(markerLabel.c_str());
 }
 
 NS_RHI_END

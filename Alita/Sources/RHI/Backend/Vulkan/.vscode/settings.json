@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "*.mtl": "cpp",
+        "algorithm": "cpp"
+    }
+}

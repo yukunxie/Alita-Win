@@ -6,13 +6,36 @@
 
 NS_RHI_BEGIN
 
-bool VKPipelineLayout::Init(VKDevice* device, const PipelineLayoutDescriptor &descriptor)
+VKPipelineLayout::VKPipelineLayout(VKDevice* device)
+    : PipelineLayout(device)
 {
-    vkDevice_ = device->GetDevice();
+
+}
+
+void VKPipelineLayout::Dispose()
+{
+    RHI_DISPOSE_BEGIN();
     
-    std::vector<VkDescriptorSetLayout> setLayouts;
-    for (const BindGroupLayout* bindGroupLayout: descriptor.bindGroupLayouts)
+    if (vkPipelineLayout_)
     {
+        vkDestroyPipelineLayout(VKDEVICE()->GetNative(), vkPipelineLayout_, nullptr);
+        vkPipelineLayout_ = VK_NULL_HANDLE;
+    }
+    
+    RHI_DISPOSE_END();
+}
+
+VKPipelineLayout::~VKPipelineLayout()
+{
+    Dispose();
+}
+
+bool VKPipelineLayout::Init(const PipelineLayoutDescriptor &descriptor)
+{
+    std::vector<VkDescriptorSetLayout> setLayouts;
+    for (size_t i = 0; i < descriptor.bindGroupLayouts.size(); ++i)
+    {
+        const BindGroupLayout* bindGroupLayout = descriptor.bindGroupLayouts[i];
         setLayouts.push_back(((VKBindGroupLayout*) bindGroupLayout)->GetNative());
     }
     
@@ -24,31 +47,9 @@ bool VKPipelineLayout::Init(VKDevice* device, const PipelineLayoutDescriptor &de
         .pPushConstantRanges = nullptr, // Optional
     };
     
-    CALL_VK(vkCreatePipelineLayout(vkDevice_, &pipelineLayoutInfo, nullptr, &vkPipelineLayout_));
-    
-    return true;
-}
-
-VKPipelineLayout*
-VKPipelineLayout::Create(VKDevice* device, const PipelineLayoutDescriptor &descriptor)
-{
-    auto ret = new VKPipelineLayout();
-    if (ret && ret->Init(device, descriptor))
-    {
-        RHI_SAFE_RETAIN(ret);
-        return ret;
-    }
-    
-    if (ret) delete ret;
-    return nullptr;
-}
-
-VKPipelineLayout::~VKPipelineLayout()
-{
-    if (vkPipelineLayout_)
-    {
-        vkDestroyPipelineLayout(vkDevice_, vkPipelineLayout_, nullptr);
-    }
+    CALL_VK(vkCreatePipelineLayout(VKDEVICE()->GetNative(), &pipelineLayoutInfo, nullptr,
+                                     &vkPipelineLayout_));
+    return VK_NULL_HANDLE != vkPipelineLayout_;
 }
 
 NS_RHI_END
