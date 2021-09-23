@@ -32,6 +32,7 @@ private:
 	ShadowMapGenPass shadowGenPass_;
 	IgniterPass igniterPass_;
 	OpaquePass opaquePass_;
+	DeferredPass deferredPass_;
 	ScreenResolvePass screenResolvePass_;
 	TExtent2D  windowSize_;
 

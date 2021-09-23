@@ -89,11 +89,13 @@ struct GBuffers
     RHI::TextureView* GMaterial = nullptr;
 };
 
-class DeferredPass : public Pass
+class GBufferPass : public Pass
 {
 public:
-    DeferredPass();
+    GBufferPass();
     virtual void Execute(RHI::CommandEncoder* cmdEncoder, const std::vector<RenderObject*>& renderObjects) override;
+
+    const GBuffers& GetGBuffers() { return GBuffers_; }
 
 private:
     GBuffers GBuffers_;
@@ -111,10 +113,10 @@ protected:
     RHI::TextureView* rtDepthStencil_ = nullptr;
 };
 
-class PostProcessBasePass : public Pass
+class FullScreenPass : public Pass
 {
 public:
-    PostProcessBasePass(const std::string& shaderName, ETechniqueType technique);
+    FullScreenPass(const std::string& shaderName, ETechniqueType technique);
 
     void Execute(RHI::CommandEncoder* cmdEncoder);
 
@@ -124,11 +126,22 @@ protected:
     MeshComponent* meshComponent_ = nullptr;
 };
 
-class ScreenResolvePass : public PostProcessBasePass
+class DeferredPass : public FullScreenPass
+{
+public:
+    DeferredPass();
+    virtual void Execute(RHI::CommandEncoder* cmdEncoder, const std::vector<RenderObject*>& renderObjects) override;
+
+protected:
+    GBufferPass GBufferPass_;
+    RHI::TextureView* rtColor_ = nullptr;
+};
+
+class ScreenResolvePass : public FullScreenPass
 {
 public:
     ScreenResolvePass()
-        : PostProcessBasePass("", ETechniqueType::TShading)
+        : FullScreenPass("Materials/PostProcess.json", ETechniqueType::TShading)
     {}
 
     void Setup(const Pass* inputPass)

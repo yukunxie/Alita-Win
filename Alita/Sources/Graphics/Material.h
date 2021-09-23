@@ -268,7 +268,6 @@ public:
 protected:
 	RHI::RenderPipeline* CreatePipelineState(const PSOKey& psoKey, const ShaderSet& shaderSet);
 	void ParseBindGroupLayout(const rapidjson::Document& doc);
-	void ParseInputAssembler(const rapidjson::Document& doc);
 
 	void ApplyModifyToBindGroup(RHI::RenderPassEncoder& passEndcoder);
 	void BindPSO(RHI::RenderPassEncoder& passEndcoder);

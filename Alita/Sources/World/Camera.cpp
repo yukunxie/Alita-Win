@@ -119,7 +119,7 @@ PerspectiveCamera::PerspectiveCamera(float fov, float aspect, float nearPlane, f
 	, nearPlane_(nearPlane)
 	, farPlane_(farPlane)
 {
-	projMatrix_ = glm::perspectiveRH(glm::radians(fov), aspect, nearPlane, farPlane);
+	projMatrix_ = glm::perspective(glm::radians(fov), aspect, nearPlane, farPlane);
 	projMatrix_[1][1] *= -1;
 }
 

@@ -190,7 +190,6 @@ Material::Material(const std::string& configFilename)
     fsFilename_ = doc["code"]["fs"].GetString();
 
     ParseBindGroupLayout(doc);
-    ParseInputAssembler(doc);
 }
 
 void Material::Apply(const Pass* pass, ETechniqueType technique, ERenderSet renderSet, RHI::RenderPassEncoder& passEndcoder)
@@ -348,62 +347,12 @@ void Material::ApplyModifyToBindGroup(RHI::RenderPassEncoder& passEndcoder)
     rhiBindGroup_ = Engine::GetGPUDevice()->CreateBindGroup(descriptor);
 }
 
-void Material::ParseInputAssembler(const rapidjson::Document& doc)
-{
-    /*if (!doc.HasMember("attributes"))
-    {
-        return;
-    }
-    Assert(doc["attributes"].IsArray());
-
-    for (auto& cfg : doc["attributes"].GetArray())
-    {
-        InputAttribute attri;
-
-        auto attriName = cfg["name"].GetString();
-        attri.location = cfg["location"].GetUint();
-        attri.offset = cfg.HasMember("offset") ? cfg["offest"].GetUint() : 0;
-        attri.stride = cfg.HasMember("stride") ? cfg["stride"].GetUint() : 0;
-        std::string format = cfg["format"].GetString();
-
-        attri.kind = VertexBuffer::NameToVBAttrKind(attriName);
-
-        switch (_SimpleHash(format.c_str()))
-        {
-        case _SimpleHash("float"):
-            attri.format = InputAttributeFormat::FLOAT;
-            break;
-        case _SimpleHash("float2"):
-            attri.format = InputAttributeFormat::FLOAT2;
-            break;
-        case _SimpleHash("float3"):
-            attri.format = InputAttributeFormat::FLOAT3;
-            break;
-        case _SimpleHash("float4"):
-            attri.format = InputAttributeFormat::FLOAT4;
-            break;
-        default:
-            Assert(false, "invalid format");
-            break;
-        }
-
-        inputAttributes_.push_back(attri);
-    }
-
-    std::sort(inputAttributes_.begin(), inputAttributes_.end(),
-        [](const InputAttribute& a, const InputAttribute& b)
-        {
-            return a.location < b.location;
-        });*/
-}
-
 void Material::ParseBindGroupLayout(const rapidjson::Document& doc)
 {
     if (!doc.HasMember("bindings"))
     {
         return;
     }
-    //Assert(doc["bindings"].IsArray(), "");
 
     for (auto& cfg : doc["bindings"].GetArray())
     {
@@ -614,6 +563,14 @@ void Material::BindPSO(RHI::RenderPassEncoder& passEndcoder)
 ShaderSet Material::CreateShaderSet(ETechniqueType technique)
 {
     std::vector<std::string> userDefines;
+
+    switch (technique)
+    {
+    case ETechniqueType::TGBufferGen:
+        userDefines.push_back("#define GEN_GBUFFER_PASS 1");
+        break;
+    }
+
     uint32 iaLocation = 0;
     userDefines.push_back("#define IA_LOCATION_POSITION " + std::to_string(iaLocation++));
 

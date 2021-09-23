@@ -113,7 +113,7 @@ void ShadowMapGenPass::Execute(RHI::CommandEncoder* cmdEncoder, const std::vecto
 	renderPassEncoder->EndPass();
 }
 
-DeferredPass::DeferredPass()
+GBufferPass::GBufferPass()
 {
 	const RHI::Extent2D extent = { 1280, 800 };
 
@@ -183,9 +183,51 @@ DeferredPass::DeferredPass()
 	};
 }
 
-void DeferredPass::Execute(RHI::CommandEncoder* cmdEncoder, const std::vector<RenderObject*>& renderObjects)
+void GBufferPass::Execute(RHI::CommandEncoder* cmdEncoder, const std::vector<RenderObject*>& renderObjects)
 {
+	SetupOutputAttachment(0, GBuffers_.GDiffuse);
+	SetupOutputAttachment(1, GBuffers_.GNormal);
+	SetupOutputAttachment(2, GBuffers_.GPosition);
+	SetupOutputAttachment(3, GBuffers_.GMaterial);
+	SetupDepthStencilAttachemnt(dsTexture_);
 
+	RHI::RenderPassDescriptor renderPassDescriptor;
+
+	for (const auto& tp : attachments_)
+	{
+		RHI::RenderPassColorAttachmentDescriptor descriptor;
+		{
+			descriptor.attachment = tp.second;
+			descriptor.resolveTarget = nullptr;
+			descriptor.loadValue = { 0.0f, 0.0f, 0.0f, 1.0f };
+			descriptor.loadOp = RHI::LoadOp::CLEAR;
+			descriptor.storeOp = RHI::StoreOp::STORE;
+		}
+		renderPassDescriptor.colorAttachments.push_back(descriptor);
+	}
+
+	renderPassDescriptor.depthStencilAttachment = {
+		.attachment = dsAttachment_,
+		.depthLoadOp = RHI::LoadOp::CLEAR,
+		.depthStoreOp = RHI::StoreOp::STORE,
+		.depthLoadValue = 1,
+		.stencilLoadOp = RHI::LoadOp::CLEAR,
+		.stencilStoreOp = RHI::StoreOp::STORE,
+		.stencilLoadValue = 0,
+	};
+
+	auto renderPassEncoder = cmdEncoder->BeginRenderPass(renderPassDescriptor);
+
+	const auto& extent = GBuffers_.GDiffuse->GetTexture()->GetTextureSize();
+	renderPassEncoder->SetViewport(0, 0, extent.width, extent.height, 0, 1);
+	renderPassEncoder->SetScissorRect(0, 0, extent.width, extent.height);
+
+	for (const auto ro : renderObjects)
+	{
+		ro->Render(this, ETechniqueType::TGBufferGen, ERenderSet::ERenderSet_Opaque, *renderPassEncoder);
+	}
+
+	renderPassEncoder->EndPass();
 }
 
 OpaquePass::OpaquePass()
@@ -232,7 +274,7 @@ void OpaquePass::Execute(RHI::CommandEncoder* cmdEncoder, const std::vector<Rend
 		{
 			descriptor.attachment = rtColor_;
 			descriptor.resolveTarget = nullptr;
-			descriptor.loadValue = { 1.0f, 1.0f, 0.0f, 1.0f };
+			descriptor.loadValue = { 0.0f, 0.0f, 0.0f, 1.0f };
 			descriptor.loadOp = RHI::LoadOp::CLEAR;
 			descriptor.storeOp = RHI::StoreOp::STORE;
 		}
@@ -243,7 +285,7 @@ void OpaquePass::Execute(RHI::CommandEncoder* cmdEncoder, const std::vector<Rend
 		.attachment = dsAttachment_,
 		.depthLoadOp = RHI::LoadOp::CLEAR,
 		.depthStoreOp = RHI::StoreOp::STORE,
-		.depthLoadValue = 1.0f,
+		.depthLoadValue = 1,
 		.stencilLoadOp = RHI::LoadOp::CLEAR,
 		.stencilStoreOp = RHI::StoreOp::STORE,
 		.stencilLoadValue = 0,
@@ -263,11 +305,11 @@ void OpaquePass::Execute(RHI::CommandEncoder* cmdEncoder, const std::vector<Rend
 	renderPassEncoder->EndPass();
 }
 
-PostProcessBasePass::PostProcessBasePass(const std::string& shaderName, ETechniqueType technique)
+FullScreenPass::FullScreenPass(const std::string& materialName, ETechniqueType technique)
 {
 	MeshComponent* meshComp = new MeshComponent();
 	meshComp->geometry_ = new Geometry;
-	meshComp->material_ = new Material("Materials/PostProcess.json");
+	meshComp->material_ = new Material(materialName);
 
 	{
 		std::vector<float> vertices = {-1, -1, 0,	// bottom left corner
@@ -304,7 +346,7 @@ PostProcessBasePass::PostProcessBasePass(const std::string& shaderName, ETechniq
 	meshComponent_ = meshComp;
 }
 
-void PostProcessBasePass::Execute(RHI::CommandEncoder* cmdEncoder)
+void FullScreenPass::Execute(RHI::CommandEncoder* cmdEncoder)
 {
 	RHI::RenderPassDescriptor renderPassDescriptor;
 
@@ -332,12 +374,45 @@ void PostProcessBasePass::Execute(RHI::CommandEncoder* cmdEncoder)
 	renderPassEncoder->EndPass();
 }
 
+DeferredPass::DeferredPass()
+	: FullScreenPass("Materials/DeferredLighting.json", ETechniqueType::TShading)
+{
+	const RHI::Extent2D extent = { 1280, 800 };
+
+	RHI::TextureDescriptor descriptor;
+	descriptor.sampleCount = 1;
+	descriptor.format = RHI::TextureFormat::RGBA16FLOAT;
+	descriptor.usage = RHI::TextureUsage::OUTPUT_ATTACHMENT;
+	descriptor.size = extent;
+	descriptor.arrayLayerCount = 1;
+	descriptor.mipLevelCount = 1;
+	descriptor.dimension = RHI::TextureDimension::TEXTURE_2D;
+	rtColor_ = Engine::GetGPUDevice()->CreateTexture(descriptor)->CreateView({});
+
+}
+
+void DeferredPass::Execute(RHI::CommandEncoder* cmdEncoder, const std::vector<RenderObject*>& renderObjects)
+{
+	GBufferPass_.Reset();
+	GBufferPass_.Execute(cmdEncoder, renderObjects);
+
+	SetupOutputAttachment(0, rtColor_);
+
+	auto material = meshComponent_->GetRenderObject()->materialObject;
+	material->SetTexture("tGDiffuse", GBufferPass_.GetGBuffers().GDiffuse->GetTexture());
+	material->SetTexture("tGNormal", GBufferPass_.GetGBuffers().GNormal->GetTexture());
+	material->SetTexture("tGPosition", GBufferPass_.GetGBuffers().GPosition->GetTexture());
+	material->SetTexture("tGMaterial", GBufferPass_.GetGBuffers().GMaterial->GetTexture());
+
+	FullScreenPass::Execute(cmdEncoder);
+}
+
 void ScreenResolvePass::Execute(RHI::CommandEncoder* cmdEncoder)
 {
 	const auto* texture = inputPass_->GetColorAttachments()[0].second->GetTexture();
 	meshComponent_->GetRenderObject()->materialObject->SetTexture("tAlbedo", texture);
 
-	PostProcessBasePass::Execute(cmdEncoder);
+	FullScreenPass::Execute(cmdEncoder);
 }
 
 NS_RX_END

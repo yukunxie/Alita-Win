@@ -55,7 +55,7 @@ void World::SetupDefaultCamera()
 	{
 		return;
 	}
-	defaultCamera_ = Camera::CreatePerspectiveCamera(45.0, 1280.f / 800.0f, 0.1f, 100.f);
+	defaultCamera_ = Camera::CreatePerspectiveCamera(45.0, 1280.f / 800.0f, 1.0f, 100.f);
 	defaultCamera_->LookAt({ 0, 15, 15 }, { 0, 0, 0 }, { 0, 1, 0 });
 
 	shadowMapCamera_ = new OrthoCamera(-100, 100, -100, 100, 0.1, 100);

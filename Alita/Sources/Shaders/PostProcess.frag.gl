@@ -10,5 +10,5 @@ void TShading() {
     //vec4 diffuse = uShading.baseColorFactor;
     //OutColor = vec4(_UV0.xy, 0, 1);
 
-    OutColor = texture(sampler2D(tAlbedo, sAlbedo), _UV0) * vec4(_UV0.xy, 0, 1);
+    OutColor = texture(sampler2D(tAlbedo, sAlbedo), _UV0);
 }

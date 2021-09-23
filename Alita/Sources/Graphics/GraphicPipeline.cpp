@@ -66,16 +66,21 @@ void GraphicPipeline::Execute(const std::vector<RenderObject*>& renderObjects)
 	//shadowGenPass_.Execute(rhiCommandEncoder_, renderObjects);
 	//
 	// draw opaque objects.
+	//{
+	//	opaquePass_.Reset();
+	//	//opaquePass_.SetupDepthStencilAttachemnt(rhiDSTextureView_);
+	//	//opaquePass_.SetupOutputAttachment(0, colorAttachment);
+	//	opaquePass_.Execute(rhiCommandEncoder_, renderObjects);
+	//}
+
 	{
-		opaquePass_.Reset();
-		//opaquePass_.SetupDepthStencilAttachemnt(rhiDSTextureView_);
-		//opaquePass_.SetupOutputAttachment(0, colorAttachment);
-		opaquePass_.Execute(rhiCommandEncoder_, renderObjects);
+		deferredPass_.Reset();
+		deferredPass_.Execute(rhiCommandEncoder_, renderObjects);
 	}
 
 	{
 		screenResolvePass_.Reset();
-		screenResolvePass_.Setup(&opaquePass_);
+		screenResolvePass_.Setup(&deferredPass_);
 		screenResolvePass_.SetupOutputAttachment(0, colorAttachment);
 		screenResolvePass_.Execute(rhiCommandEncoder_);
 	}

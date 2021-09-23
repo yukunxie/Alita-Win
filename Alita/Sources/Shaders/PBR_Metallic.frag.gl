@@ -28,6 +28,11 @@ layout(binding = 11) uniform texture2D   tAlbedo;
 layout(binding = 12) uniform sampler     sAlbedo;
 
 layout(location = 0) out vec4 OutColor;
+#if GEN_GBUFFER_PASS
+layout(location = 1) out vec4 GNormal;
+layout(location = 2) out vec4 GPosition;
+layout(location = 3) out vec4 GMaterial;
+#endif
 
 void TShading() {
     vec4 diffuse = uShading.baseColorFactor;
@@ -46,9 +51,15 @@ void TShading() {
 }
 
 void TGBufferGen() {
-#if USE_NORMAL
-    OutColor = vec4(normalize(_WorldNormal) * 0.5 + vec3(0.5, 0.5, 0.5), 1.0);
-#else
-    OutColor = vec4(0.5, 0.5, 0.5, 1.0);
+    vec4 diffuse = uShading.baseColorFactor;
+#if USE_UV0
+    diffuse = texture(sampler2D(tAlbedo, sAlbedo), _UV0);
+#endif
+    OutColor = diffuse;
+
+#if GEN_GBUFFER_PASS
+    GNormal = vec4(normalize(_WorldNormal) * 0.5 + vec3(0.5, 0.5, 0.5), 0.0);
+    GPosition.xyz = _WorldPosition.xyz;
+    GMaterial = vec4(uShading.metallicFactor, uShading.roughnessFactor, 0, 0);
 #endif
 }
