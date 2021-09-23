@@ -194,7 +194,7 @@ Material::Material(const std::string& configFilename)
     ParseInputAssembler(doc);
 }
 
-void Material::Apply(RHI::RenderPassEncoder& passEndcoder)
+void Material::Apply(const Pass* pass, ETechniqueType technique, ERenderSet renderSet, RHI::RenderPassEncoder& passEndcoder)
 {
     // update binding buffer.
     {
@@ -205,10 +205,52 @@ void Material::Apply(RHI::RenderPassEncoder& passEndcoder)
         SetFloat("ViewMatrix", 0, 16, (float*)&params.viewMatrix);
         SetFloat("ProjMatrix", 0, 16, (float*)&params.projMatrix);
     }
-    BindPSO(passEndcoder);
+
+    PSOKey psoKey{};
+    SetupPSOKey(psoKey, technique);
+    SetupPSOKey(psoKey, renderSet);
+    SetupPSOKey(psoKey, pass);
+
+    RHI::RenderPipeline* pso = nullptr;
+
+    if (rhiPSOMap_.contains(psoKey))
+    {
+        pso = rhiPSOMap_[psoKey];
+    }
+    else
+    {
+        ShaderSet shaders = CreateShaderSet(technique);
+        pso = CreatePipelineState(psoKey, shaders);
+        rhiPSOMap_[psoKey] = pso;
+        RHI_SAFE_RETAIN(pso);
+    }
+
     ApplyModifyToBindGroup(passEndcoder);
-    passEndcoder.SetPipeline(rhiPipelineState_);
+    passEndcoder.SetPipeline(pso);
     passEndcoder.SetBindGroup(0, rhiBindGroup_, 0, nullptr);
+}
+
+void Material::SetupPSOKey(PSOKey& psoKey, ERenderSet renderSet)
+{
+    // todo
+}
+
+void Material::SetupPSOKey(PSOKey& psoKey, ETechniqueType technique)
+{
+    psoKey.Technique = (int)technique;
+}
+
+void Material::SetupPSOKey(PSOKey& psoKey, const Pass* pass)
+{
+    for (const auto& tp : pass->GetColorAttachments())
+    {
+        RHI_ASSERT(tp.first < kMaxAttachmentCount);
+        psoKey.AttachmentFormats[tp.first] = (uint8)tp.second->GetFormat();
+    }
+    if (auto ds = pass->GetDSAttachment(); ds)
+    {
+        psoKey.DSAttachmentFormat = (uint8)ds->GetFormat();
+    }
 }
 
 bool Material::SetFloat(const std::string& name, std::uint32_t offset, std::uint32_t count, float* data)
@@ -489,11 +531,6 @@ void Material::ParseBindGroupLayout(const rapidjson::Document& doc)
     }
     rhiBindGroupLayout_ = Engine::GetGPUDevice()->CreateBindGroupLayout(descriptor);
 
-}
-
-void Material::CreatePipelineState()
-{
-    // todo;
     {
         RHI::PipelineLayoutDescriptor desc;
         {
@@ -502,15 +539,19 @@ void Material::CreatePipelineState()
         rhiPipelineLayout_ = Engine::GetGPUDevice()->CreatePipelineLayout(desc);
     }
 
+}
+
+RHI::RenderPipeline* Material::CreatePipelineState(const PSOKey& psoKey, const ShaderSet& shaderSet)
+{
     RHI::RenderPipelineDescriptor psoDesc;
     {
         psoDesc.layout = rhiPipelineLayout_;
         psoDesc.primitiveTopology = RHI::PrimitiveTopology::TRIANGLE_LIST;
 
         {
-            psoDesc.vertexStage.shader = rhiVertShader_;
+            psoDesc.vertexStage.shader = shaderSet.VertexShader;
             psoDesc.vertexStage.entryPoint = "main";
-            psoDesc.fragmentStage.shader = rhiFragShader_;
+            psoDesc.fragmentStage.shader = shaderSet.FragmentShader;
             psoDesc.fragmentStage.entryPoint = "main";
         }
 
@@ -518,8 +559,8 @@ void Material::CreatePipelineState()
         {
             psoDesc.depthStencilState = RHI::DepthStencilStateDescriptor();
             psoDesc.depthStencilState.format = RHI::TextureFormat::DEPTH24PLUS_STENCIL8;
-            psoDesc.depthStencilState.depthWriteEnabled = true;
-            psoDesc.depthStencilState.depthCompare = RHI::CompareFunction::LESS;
+            psoDesc.depthStencilState.depthWriteEnabled = psoKey.DepthWrite;
+            psoDesc.depthStencilState.depthCompare = (RHI::CompareFunction)psoKey.DepthCmpFunc;
             psoDesc.depthStencilState.stencilFront = {};
             psoDesc.depthStencilState.stencilBack = {};
         }
@@ -528,30 +569,36 @@ void Material::CreatePipelineState()
         psoDesc.vertexState = inputAssembler_.ToRHIDescriptor();
 
         psoDesc.rasterizationState = {
-            .frontFace = RHI::FrontFace::COUNTER_CLOCKWISE,
-            .cullMode = RHI::CullMode::BACK_BIT,
+            .frontFace = (RHI::FrontFace)psoKey.FrontFace,
+            .cullMode = (RHI::CullMode)psoKey.CullMode,
         };
 
-        RHI::ColorStateDescriptor csd;
+        for (int i = 0; i < kMaxAttachmentCount; ++i)
         {
-            csd.format = RHI::TextureFormat::BGRA8UNORM;
-            csd.alphaBlend = {};
-            csd.colorBlend = {};
-            csd.writeMask = RHI::ColorWrite::ALL;
+            if (psoKey.AttachmentFormats[i] != 0)
+            {
+                RHI::ColorStateDescriptor csd;
+                {
+                    csd.format = (RHI::TextureFormat)psoKey.AttachmentFormats[i];
+                    csd.alphaBlend = {};
+                    csd.colorBlend = {};
+                    csd.writeMask = RHI::ColorWrite::ALL;
+                }
+                psoDesc.colorStates.push_back(csd);
+            }
         }
-        psoDesc.colorStates.push_back(csd);
 
         psoDesc.sampleCount = 1;
         psoDesc.sampleMask = 0xFFFFFFFF;
         psoDesc.alphaToCoverageEnabled = false;
     }
 
-    rhiPipelineState_ = Engine::GetGPUDevice()->CreateRenderPipeline(psoDesc);
+    return Engine::GetGPUDevice()->CreateRenderPipeline(psoDesc);
 }
 
 void Material::BindPSO(RHI::RenderPassEncoder& passEndcoder)
 {
-    if (rhiPipelineState_)
+   /* if (rhiPipelineState_)
     {
         return;
     }
@@ -589,13 +636,59 @@ void Material::BindPSO(RHI::RenderPassEncoder& passEndcoder)
     }
 
     rhiVertShader_ = _CreateShader(vsFilename_, RHI::ShaderType::VERTEX, ETechniqueType::TShading, userDefines);
-    rhiFragShader_ = _CreateShader(fsFilename_, RHI::ShaderType::FRAGMENT, ETechniqueType::TShading, userDefines);
+    rhiFragShader_ = _CreateShader(fsFilename_, RHI::ShaderType::FRAGMENT, ETechniqueType::TShading, userDefines);*/
 
 
-    if (!rhiPipelineState_)
+    //if (!rhiPipelineState_)
+    //{
+    //    CreatePipelineState();
+    //}
+}
+
+ShaderSet Material::CreateShaderSet(ETechniqueType technique)
+{
+    std::vector<std::string> userDefines;
+    for (const InputAttribute& ia : inputAssembler_.inputAttributes_)
     {
-        CreatePipelineState();
+        switch (ia.kind)
+        {
+        case VertexBufferAttriKind::NORMAL:
+            userDefines.push_back("#define USE_NORMAL 1");
+            break;
+        case VertexBufferAttriKind::DIFFUSE:
+            userDefines.push_back("#define USE_DIFFUSE 1");
+            break;
+        case VertexBufferAttriKind::TEXCOORD:
+            userDefines.push_back("#define USE_UV0 1");
+            break;
+        case VertexBufferAttriKind::TANGENT:
+            userDefines.push_back("#define USE_TANGENT 1");
+            break;
+        case VertexBufferAttriKind::BINORMAL:
+            userDefines.push_back("#define USE_BINORMAL 1");
+            break;
+        case VertexBufferAttriKind::BITANGENT:
+            userDefines.push_back("#define USE_BITANGENT 1");
+            break;
+        case VertexBufferAttriKind::TEXCOORD2:
+            userDefines.push_back("#define USE_UV0 1");
+            break;
+        }
     }
+
+    ShaderSet shaderSet;
+
+    if (vsFilename_.size())
+    {
+        shaderSet.VertexShader = _CreateShader(vsFilename_, RHI::ShaderType::VERTEX, technique, userDefines);
+    }
+
+    if (fsFilename_.size())
+    {
+        shaderSet.FragmentShader = _CreateShader(fsFilename_, RHI::ShaderType::FRAGMENT, technique, userDefines);
+    }
+
+    return shaderSet;
 }
 
 NS_RX_END

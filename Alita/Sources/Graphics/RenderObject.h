@@ -5,13 +5,14 @@
 #include "Base/ObjectBase.h"
 #include "Meshes/VertexBuffer.h"
 #include "Material.h"
+#include "Pass.h"
 
 
 NS_RX_BEGIN
 
 struct RenderObject
 {
-	void Render(RHI::RenderPassEncoder& passEndcoder);
+	void Render(const Pass* pass, ETechniqueType technique, ERenderSet renderSet, RHI::RenderPassEncoder& passEndcoder);
 
 	struct VertexBufferInfo
 	{

@@ -46,17 +46,9 @@ void TShading() {
 }
 
 void TGBufferGen() {
-    vec4 diffuse = uShading.baseColorFactor;
-
-#if USE_UV0
-    diffuse = texture(sampler2D(tAlbedo, sAlbedo), _UV0);
-#endif
-
 #if USE_NORMAL
-    vec3 lightDir = normalize(uGlobal.EyePos.xyz - _WorldPosition);
-    float specular = clamp(dot(lightDir, normalize(_WorldNormal)), 0, 1);
-    diffuse.xyz *= specular * uGlobal.SunLightColor.xyz * uGlobal.SunLightColor.a;
+    OutColor = vec4(normalize(_WorldNormal) * 0.5 + vec3(0.5, 0.5, 0.5), 1.0);
+#else
+    OutColor = vec4(0.5, 0.5, 0.5, 1.0);
 #endif
-
-    OutColor = vec4(diffuse.xyz + uShading.emissiveFactor.xyz , 1.0);
 }

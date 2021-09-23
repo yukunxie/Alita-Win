@@ -42,11 +42,18 @@ public:
         dsAttachment_ = nullptr;
     }
 
+    const std::vector<std::pair<std::uint32_t, RHI::TextureView*>>& GetColorAttachments() const { return attachments_; }
+
+    const RHI::TextureView* GetDSAttachment() const { return dsAttachment_; }
+
+    RHI::RenderPassEncoder* GetRenderPassEncoder() const { return rhiPassEncoder_; }
+
     virtual void Execute(RHI::CommandEncoder* cmdEncoder, const std::vector<RenderObject*>& renderObjects) = 0;
 
 protected:
     std::vector<std::pair<std::uint32_t, RHI::TextureView*>> attachments_;
     RHI::TextureView* dsAttachment_ = nullptr;
+    RHI::RenderPassEncoder* rhiPassEncoder_ = nullptr;
 };
 
 class IgniterPass : public Pass

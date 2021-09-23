@@ -2,9 +2,9 @@
 
 NS_RX_BEGIN
 
-void RenderObject::Render(RHI::RenderPassEncoder& passEndcoder)
+void RenderObject::Render(const Pass* pass, ETechniqueType technique, ERenderSet renderSet, RHI::RenderPassEncoder& passEndcoder)
 {
-	materialObject->Apply(passEndcoder);
+	materialObject->Apply(pass, technique, renderSet, passEndcoder);
 
 	for (const auto& vb : vertexBuffers)
 	{

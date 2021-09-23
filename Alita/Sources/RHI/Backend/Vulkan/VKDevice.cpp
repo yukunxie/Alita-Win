@@ -476,12 +476,13 @@ void VKDevice::AttemptEnumerateInstanceLayerAndExtensions()
     }
     
     const char* requestVulkanLayerNames[] = {
-        "VK_LAYER_GOOGLE_threading",
-        "VK_LAYER_LUNARG_parameter_validation",
-        "VK_LAYER_LUNARG_object_tracker",
-        "VK_LAYER_LUNARG_core_validation",
-        "VK_LAYER_GOOGLE_unique_objects",
+        //"VK_LAYER_GOOGLE_threading",
+        //"VK_LAYER_LUNARG_parameter_validation",
+        //"VK_LAYER_LUNARG_object_tracker",
+        //"VK_LAYER_LUNARG_core_validation",
+        //"VK_LAYER_GOOGLE_unique_objects",
         "VK_LAYER_KHRONOS_validation",
+        "VK_LAYER_RENDERDOC_Capture",
     };
     
     for (uint32_t j = 0; j < sizeof(requestVulkanLayerNames) / sizeof(requestVulkanLayerNames[0]); j++)
@@ -1437,6 +1438,8 @@ bool VKDevice::InitDescriptorPool()
     VkDescriptorPoolCreateInfo poolInfo;
     {
         poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
+        poolInfo.pNext = nullptr;
+        poolInfo.flags = 0;
         poolInfo.poolSizeCount = (std::uint32_t)poolSizes.size();
         poolInfo.pPoolSizes = poolSizes.data();
         poolInfo.maxSets = maxSets;

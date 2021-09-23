@@ -309,6 +309,9 @@ void VKSwapChain::Present(std::uint32_t imageIndex, VkSemaphore semaWaiting, boo
         LOGE("QueuePresentKHR fail, code=%s result=%s", GetVkResultString(code),
              GetVkResultString(result));
     }
+
+    // todo;
+    vkQueueWaitIdle(queue->GetNative());
     
     if (code == VK_ERROR_OUT_OF_DATE_KHR || result == VK_ERROR_OUT_OF_DATE_KHR)
     {

@@ -141,6 +141,9 @@
     <Filter Include="Sources\RHI\Include\RHI\Helper">
       <UniqueIdentifier>{6584cb33-fda7-49e8-bf0c-f471815f6fd1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Third-Party\RenderDoc">
+      <UniqueIdentifier>{7046677d-6f5b-4497-b72c-dc631e3c5bfc}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Third-Party\StandAlone\ResourceLimits.cpp">
@@ -1068,6 +1071,9 @@
     </ClInclude>
     <ClInclude Include="Sources\RHI\Include\RHI\Helper\Vector.h">
       <Filter>Sources\RHI\Include\RHI\Helper</Filter>
+    </ClInclude>
+    <ClInclude Include="Third-Party\RenderDoc\renderdoc_app.h">
+      <Filter>Third-Party\RenderDoc</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

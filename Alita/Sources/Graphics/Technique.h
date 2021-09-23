@@ -18,6 +18,12 @@ enum class ETechniqueType
     TMaxCount,
 };
 
+enum ERenderSet
+{
+    ERenderSet_Opaque           = 1 << 0,
+    ERenderSet_Transparent      = 1 << 1,
+};
+
 enum ETechniqueMask : std::uint64_t
 {
     TShading    = 1 << (uint32)ETechniqueType::TShading,
@@ -25,6 +31,8 @@ enum ETechniqueMask : std::uint64_t
 };
 
 using TechniqueFlags = std::uint64_t;
+
+constexpr uint32 kMaxAttachmentCount = 6;
 //
 //class Technique
 //{

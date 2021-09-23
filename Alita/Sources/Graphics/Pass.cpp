@@ -107,7 +107,7 @@ void ShadowMapGenPass::Execute(RHI::CommandEncoder* cmdEncoder, const std::vecto
 
 	for (const auto ro : renderObjects)
 	{
-		ro->Render(*renderPassEncoder);
+		ro->Render(this, ETechniqueType::TShading, ERenderSet::ERenderSet_Opaque, *renderPassEncoder);
 	}
 
 	renderPassEncoder->EndPass();
@@ -148,7 +148,7 @@ void OpaquePass::Execute(RHI::CommandEncoder* cmdEncoder, const std::vector<Rend
 
 	for (const auto ro : renderObjects)
 	{
-		ro->Render(*renderPassEncoder);
+		ro->Render(this, ETechniqueType::TGBufferGen, ERenderSet::ERenderSet_Opaque, *renderPassEncoder);
 	}
 
 	renderPassEncoder->EndPass();

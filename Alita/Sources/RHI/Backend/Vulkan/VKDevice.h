@@ -44,7 +44,7 @@ NS_RHI_BEGIN
 #if defined(RHI_DEBUG) && RHI_DEBUG
 #define VULKAN_VALIDATE_LAYER_ENABLED 1
 #else
-#define VULKAN_VALIDATE_LAYER_ENABLED 0
+#define VULKAN_VALIDATE_LAYER_ENABLED 1
 #endif
 
 // Only enable validate layer in debug model
@@ -316,7 +316,7 @@ public:
     void ScheduleAsyncTask(Args ...args)
     {
         auto task = std::make_shared<AsyncTaskName>(args...);
-#if USE_RENDER_THREAD
+#if USE_RENDER_THREAD || 1
         GetAsyncWorker()->EnqueueInGameThread(task);
 #else
         task->Execute();

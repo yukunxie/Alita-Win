@@ -448,6 +448,7 @@ echo "xxxxx"</Command>
     <ClInclude Include="Third-Party\glslang\OSDependent\osinclude.h" />
     <ClInclude Include="Third-Party\glslang\Public\ShaderLang.h" />
     <ClInclude Include="Third-Party\OGLCompilersDLL\InitializeDll.h" />
+    <ClInclude Include="Third-Party\RenderDoc\renderdoc_app.h" />
     <ClInclude Include="Third-Party\SPIRV\bitutils.h" />
     <ClInclude Include="Third-Party\SPIRV\disassemble.h" />
     <ClInclude Include="Third-Party\SPIRV\doc.h" />

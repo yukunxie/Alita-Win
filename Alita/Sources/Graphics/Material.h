@@ -154,7 +154,6 @@ protected:
 	friend class Material;
 };
 
-constexpr std::uint32_t kMaxAttachmentCount = 6;
 struct ShadingStateHasher
 {
 	RHI::Format attachments[kMaxAttachmentCount];
@@ -167,6 +166,17 @@ struct PSOKey
 	PSOKey() noexcept
 	{
 		memset(this, 0, sizeof(*this));
+		this->Technique = (int)ETechniqueType::TShading;
+		this->DepthWrite = 1;
+		this->DepthCmpFunc = (int)RHI::CompareFunction::LESS;
+		this->StencilWrite = 0;
+		this->StencilCmpFunc = (int)RHI::CompareFunction::ALWAYS;
+		this->StencilFailOp = (int)RHI::StencilOperation::KEEP;
+		this->StencilDepthFailOp = (int)RHI::StencilOperation::KEEP;
+		this->StencilPassOp = (int)RHI::StencilOperation::KEEP;
+		this->StencilMask = 0;
+		this->FrontFace = (int)RHI::FrontFace::COUNTER_CLOCKWISE;
+		this->CullMode = (int)RHI::CullMode::BACK_BIT;
 	}
 
 	PSOKey(const PSOKey& lhr) noexcept
@@ -187,15 +197,11 @@ struct PSOKey
 	uint8 StencilFailOp : 3;
 	uint8 StencilDepthFailOp : 3;
 	uint8 StencilPassOp : 3;
-	uint8 StencilMask : 8;
 	uint8 FrontFace : 1;
 	uint8 CullMode : 2;
-	uint8 AttachmentFormat0 : 8;
-	uint8 AttachmentFormat1 : 8;
-	uint8 AttachmentFormat2 : 8;
-	uint8 AttachmentFormat3 : 8;
-	uint8 AttachmentFormat4 : 8;
-	uint8 AttachmentFormat5 : 8;
+	uint8 StencilMask : 8;
+	uint8 AttachmentFormats[kMaxAttachmentCount];
+	uint8 DSAttachmentFormat: 8;
 };
 
 NS_RX_END
@@ -230,6 +236,13 @@ namespace std
 
 NS_RX_BEGIN
 
+struct ShaderSet
+{
+	RHI::Shader* VertexShader = nullptr;
+	RHI::Shader* FragmentShader = nullptr;
+	RHI::Shader* ComputeShader = nullptr;
+};
+
 class Material : public ObjectBase
 {
 public:
@@ -241,7 +254,7 @@ public:
 
 	bool SetTexture(const std::string& name, RHI::Texture* texture);
 
-	void Apply(RHI::RenderPassEncoder& passEndcoder);
+	void Apply(const Pass* pass, ETechniqueType technique, ERenderSet renderSet, RHI::RenderPassEncoder& passEndcoder);
 
 	const std::vector<InputAttribute>& GetInputAttributes() const
 	{
@@ -255,12 +268,18 @@ public:
 	}
 
 protected:
-	void CreatePipelineState();
+	RHI::RenderPipeline* CreatePipelineState(const PSOKey& psoKey, const ShaderSet& shaderSet);
 	void ParseBindGroupLayout(const rapidjson::Document& doc);
 	void ParseInputAssembler(const rapidjson::Document& doc);
 
 	void ApplyModifyToBindGroup(RHI::RenderPassEncoder& passEndcoder);
 	void BindPSO(RHI::RenderPassEncoder& passEndcoder);
+
+	void SetupPSOKey(PSOKey& psoKey, ERenderSet renderSet);
+	void SetupPSOKey(PSOKey& psoKey, ETechniqueType technique);
+	void SetupPSOKey(PSOKey& psoKey, const Pass* pass);
+
+	ShaderSet CreateShaderSet(ETechniqueType technique);
 
 protected:
 	std::string vsFilename_;
@@ -282,8 +301,6 @@ protected:
 	RHI::RenderPipeline* rhiPipelineState_ = nullptr;
 
 	std::unordered_map< PSOKey, RHI::RenderPipeline*> rhiPSOMap_;
-
-	RHI::RenderPipeline* rhiPipelineStateObjects_[(uint32)ETechniqueType::TMaxCount] = { nullptr };
 
 	bool bBindingDirty_ = true;
 };
