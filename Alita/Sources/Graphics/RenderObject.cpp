@@ -6,9 +6,10 @@ void RenderObject::Render(const Pass* pass, ETechniqueType technique, ERenderSet
 {
 	materialObject->Apply(pass, technique, renderSet, passEndcoder);
 
+	uint32 slot = 0;
 	for (const auto& vb : vertexBuffers)
 	{
-		passEndcoder.SetVertexBuffer(vb.gpuBuffer, vb.offset, vb.slot);
+		passEndcoder.SetVertexBuffer(vb.gpuBuffer, vb.offset, slot++/*vb.slot*/);
 	}
 
 	passEndcoder.SetIndexBuffer(indexBuffer.gpuBuffer, indexBuffer.offset);

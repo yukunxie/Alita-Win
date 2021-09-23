@@ -1,4 +1,4 @@
-
+ï»¿
 #include "Windows.h"
 #include <glfw\glfw3.h>
 
@@ -48,13 +48,13 @@ void _OutputLog(LogLevel level, const char* format, ...)
 #if WIN32
         std::wstring wdir;
         {
-            //»ñÈ¡»º³åÇø´óĞ¡£¬²¢ÉêÇë¿Õ¼ä£¬»º³åÇø´óĞ¡°´×Ö·û¼ÆËã  
+            //è·å–ç¼“å†²åŒºå¤§å°ï¼Œå¹¶ç”³è¯·ç©ºé—´ï¼Œç¼“å†²åŒºå¤§å°æŒ‰å­—ç¬¦è®¡ç®—  
             int len = MultiByteToWideChar(CP_ACP, 0, dir.c_str(), dir.size(), NULL, 0);
             TCHAR* buffer = new TCHAR[len + 1];
-            //¶à×Ö½Ú±àÂë×ª»»³É¿í×Ö½Ú±àÂë  
+            //å¤šå­—èŠ‚ç¼–ç è½¬æ¢æˆå®½å­—èŠ‚ç¼–ç   
             MultiByteToWideChar(CP_ACP, 0, dir.c_str(), dir.size(), buffer, len);
             buffer[len] = '\0';
-            //É¾³ı»º³åÇø²¢·µ»ØÖµ  
+            //åˆ é™¤ç¼“å†²åŒºå¹¶è¿”å›å€¼  
             wdir.append(buffer);
             delete[] buffer;
         }

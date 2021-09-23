@@ -9,6 +9,7 @@
 #include "RHI/RHI.h"
 #include "Types/Types.h"
 #include "World/Camera.h"
+#include "Technique.h"
 
 NS_RX_BEGIN
 
@@ -80,10 +81,65 @@ protected:
     RHI::TextureView* dsTexture_ = nullptr;
 };
 
+struct GBuffers
+{
+    RHI::TextureView* GDiffuse = nullptr;
+    RHI::TextureView* GNormal = nullptr;
+    RHI::TextureView* GPosition = nullptr;
+    RHI::TextureView* GMaterial = nullptr;
+};
+
+class DeferredPass : public Pass
+{
+public:
+    DeferredPass();
+    virtual void Execute(RHI::CommandEncoder* cmdEncoder, const std::vector<RenderObject*>& renderObjects) override;
+
+private:
+    GBuffers GBuffers_;
+    RHI::TextureView* dsTexture_ = nullptr;
+};
+
 class OpaquePass : public Pass
 {
 public:
+    OpaquePass();
     virtual void Execute(RHI::CommandEncoder* cmdEncoder, const std::vector<RenderObject*>& renderObjects) override;
+
+protected:
+    RHI::TextureView* rtColor_ = nullptr;
+    RHI::TextureView* rtDepthStencil_ = nullptr;
+};
+
+class PostProcessBasePass : public Pass
+{
+public:
+    PostProcessBasePass(const std::string& shaderName, ETechniqueType technique);
+
+    void Execute(RHI::CommandEncoder* cmdEncoder);
+
+    virtual void Execute(RHI::CommandEncoder* cmdEncoder, const std::vector<RenderObject*>& renderObjects) override {}
+
+protected:
+    MeshComponent* meshComponent_ = nullptr;
+};
+
+class ScreenResolvePass : public PostProcessBasePass
+{
+public:
+    ScreenResolvePass()
+        : PostProcessBasePass("", ETechniqueType::TShading)
+    {}
+
+    void Setup(const Pass* inputPass)
+    {
+        inputPass_ = inputPass;
+    }
+
+    void Execute(RHI::CommandEncoder* cmdEncoder);
+
+protected:
+    const Pass* inputPass_ = nullptr;
 };
 
 NS_RX_END

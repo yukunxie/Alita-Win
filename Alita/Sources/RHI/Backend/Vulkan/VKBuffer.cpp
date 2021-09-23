@@ -120,7 +120,7 @@ void VKBuffer::UpdateBuffer(const void* data, std::uint32_t offset, std::uint32_
     Unmap();
 }
 
-const void* VKBuffer::MapRead(std::uint32_t offset, std::uint32_t size)
+const void* VKBuffer::MapRead(std::uint32_t offset, std::uint32_t size) const
 {
     RHI_ASSERT(pData_ == nullptr);
     /**
@@ -141,7 +141,7 @@ const void* VKBuffer::MapRead(std::uint32_t offset, std::uint32_t size)
     return pData_;
 }
 
-void* VKBuffer::MapWrite(std::uint32_t offset, std::uint32_t size)
+void* VKBuffer::MapWrite(std::uint32_t offset, std::uint32_t size) const
 {
     RHI_ASSERT(pData_ == nullptr);
 
@@ -246,7 +246,7 @@ void VKBuffer::CallMapWriteCallback(std::uint32_t offset, std::uint32_t size)
     }
 }
 
-void VKBuffer::Unmap()
+void VKBuffer::Unmap() const
 {
     RHI_ASSERT(pData_);
 #if USE_VULKAN_MEMORY_ALLCATOR
@@ -262,7 +262,7 @@ void VKBuffer::Destroy()
     Dispose();
 }
 
-void VKBuffer::SetSubData(std::uint32_t offset, std::uint32_t byteSize, const void* data)
+void VKBuffer::SetSubData(std::uint32_t offset, std::uint32_t byteSize, const void* data) const
 {
     RHI_ASSERT(byteSize > 0);
     auto pAddress = (std::uint8_t*) MapWrite(offset, byteSize);

@@ -46,7 +46,10 @@ public:
         return texture_ ? texture_->GetNative() : VK_NULL_HANDLE;
     }
     
-    VKTexture* GetTexture()
+    //VKTexture* GetTexture()
+    //{ return texture_.Get(); }
+
+    virtual const Texture* GetTexture() const override 
     { return texture_.Get(); }
 
 private:

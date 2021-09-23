@@ -131,7 +131,7 @@ void VKCommandBuffer::BeginRenderPass(RenderPass* pass,
         for (size_t i = 0; i < vkFramebuffer->GetColorAttachmentCount(); ++i)
         {
             auto textureView = vkFramebuffer->GetColorAttachments()[i];
-            auto texture = textureView->GetTexture();
+            auto texture = (VKTexture*)textureView->GetTexture();
             texture->TransToOutputAttachmentImageLayout(this);
         }
         RHI_ASSERT(currentRenderPassIndex_ < bindGroupCatagories_.size());

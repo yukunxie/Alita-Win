@@ -30,13 +30,15 @@ void MeshComponent::SetupRenderObject()
 
 	renderObject_.vertexBuffers.clear();
 
+	uint32 slot = 0;
+
 	for (auto& vbs : geometry_->GetVBStreams())
 	{
 		RenderObject::VertexBufferInfo vb;
 		{
 			vb.gpuBuffer = vbs->gpuBuffer;
 			vb.offset = 0;
-			vb.slot = GetInputAttributeLocation(vbs->kind);
+			vb.slot = slot++;
 		}
 		renderObject_.vertexBuffers.push_back(vb);
 

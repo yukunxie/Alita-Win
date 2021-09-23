@@ -202,7 +202,7 @@ void VKBindGroup::TransImageLayoutToSampled(VKCommandBuffer *commandBuffer)
             VKTextureView* textureView = RHI_CAST(VKTextureView*,
                                                   textureViewBinding->GetTextureView());
             
-            textureView->GetTexture()->TransToSampledImageLayout(commandBuffer);
+            ((VKTexture*)textureView->GetTexture())->TransToSampledImageLayout(commandBuffer);
         }
     }
 }

@@ -1,0 +1,62 @@
+{
+  "name": "CommonMaterial",
+  "indexFormat": "uint32",
+  "code": {
+    "vs": "Shaders/PostProcess.vert.gl",
+    "fs": "Shaders/PostProcess.frag.gl"
+  },
+  "defines": [],
+  "techniques": {
+    "Shading":
+    {
+      "vs_entry": "TShading",
+      "fs_entry": "TShading"
+    }
+  },
+  "bindings": [
+    {
+      "name": "uGlobal",
+      "binding": 0,
+      "type": "Buffer",
+      "stride": 176,
+      "fields": [
+        {
+          "name": "EyePos",
+          "format": "float4",
+          "offset": 0
+        },
+        {
+          "name": "SunLight",
+          "format": "float4",
+          "offset": 16
+        },
+        {
+          "name": "SunLightColor",
+          "format": "float4",
+          "offset": 32
+        },
+        {
+          "name": "ViewMatrix",
+          "format": "mat4",
+          "offset": 48
+        },
+        {
+          "name": "ProjMatrix",
+          "format": "mat4",
+          "offset": 112
+        }
+      ]
+    },
+    {
+      "name": "tAlbedo",
+      "binding": 11,
+      "type": "Texture2D",
+      "uri": "Textures/default-512.png"
+    },
+    {
+      "name": "albedo_sampler",
+      "binding": 12,
+      "type": "Sampler2D"
+    }
+  ]
+}

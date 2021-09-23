@@ -9,6 +9,7 @@
 NS_RX_BEGIN
 
 GraphicPipeline::GraphicPipeline()
+	: screenResolvePass_()
 {
 	LOGI("xxxx 0");
 
@@ -67,9 +68,16 @@ void GraphicPipeline::Execute(const std::vector<RenderObject*>& renderObjects)
 	// draw opaque objects.
 	{
 		opaquePass_.Reset();
-		opaquePass_.SetupDepthStencilAttachemnt(rhiDSTextureView_);
-		opaquePass_.SetupOutputAttachment(0, colorAttachment);
+		//opaquePass_.SetupDepthStencilAttachemnt(rhiDSTextureView_);
+		//opaquePass_.SetupOutputAttachment(0, colorAttachment);
 		opaquePass_.Execute(rhiCommandEncoder_, renderObjects);
+	}
+
+	{
+		screenResolvePass_.Reset();
+		screenResolvePass_.Setup(&opaquePass_);
+		screenResolvePass_.SetupOutputAttachment(0, colorAttachment);
+		screenResolvePass_.Execute(rhiCommandEncoder_);
 	}
 
 	//// submit to gpu and present 

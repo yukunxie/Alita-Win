@@ -138,7 +138,6 @@ static RHI::Shader* _CreateShader(const std::string& filename, RHI::ShaderType s
     }
 
     std::string shaderText = sShaderExtensions
-        + _GenShaderIALocationDefines() + "\n"
         + defines + "\n"
         + sShaderGlobalConstantBuffer + "\n"
         + data;
@@ -232,7 +231,19 @@ void Material::Apply(const Pass* pass, ETechniqueType technique, ERenderSet rend
 
 void Material::SetupPSOKey(PSOKey& psoKey, ERenderSet renderSet)
 {
-    // todo
+    switch (renderSet)
+    {
+    case rx::ERenderSet_Opaque:
+        break;
+    case rx::ERenderSet_Transparent:
+        break;
+    case rx::ERenderSet_PostProcess:
+        psoKey.DepthWrite = 0;
+        psoKey.DepthCmpFunc = (int)RHI::CompareFunction::ALWAYS;
+        break;
+    default:
+        break;
+    }
 }
 
 void Material::SetupPSOKey(PSOKey& psoKey, ETechniqueType technique)
@@ -267,7 +278,7 @@ bool Material::SetFloat(const std::string& name, std::uint32_t offset, std::uint
     return true;
 }
 
-bool Material::SetTexture(const std::string& name, RHI::Texture* texture)
+bool Material::SetTexture(const std::string& name, const RHI::Texture* texture)
 {
     Assert(texture != nullptr, "null is invalid");
     const auto it = parameters_.find(name);
@@ -299,7 +310,7 @@ void Material::ApplyModifyToBindGroup(RHI::RenderPassEncoder& passEndcoder)
     {
         if (it->type == MaterailBindingObjectType::BUFFER)
         {
-            auto resource = Engine::GetGPUDevice()->CreateBufferBinding(it->buffer, 0, it->stride);
+            auto resource = Engine::GetGPUDevice()->CreateBufferBinding((RHI::Buffer*)it->buffer, 0, it->stride);
             RHI_SAFE_RETAIN(resource);
             RHI::BindGroupBinding tmp;
             {
@@ -310,7 +321,7 @@ void Material::ApplyModifyToBindGroup(RHI::RenderPassEncoder& passEndcoder)
         }
         else if (it->type == MaterailBindingObjectType::TEXTURE2D)
         {
-            auto resource = Engine::GetGPUDevice()->CreateTextureViewBinding(it->texture->CreateView({}));
+            auto resource = Engine::GetGPUDevice()->CreateTextureViewBinding(((RHI::Texture*)it->texture)->CreateView({}));
             RHI_SAFE_RETAIN(resource);
             RHI::BindGroupBinding tmp;
             {
@@ -321,7 +332,7 @@ void Material::ApplyModifyToBindGroup(RHI::RenderPassEncoder& passEndcoder)
         }
         else if (it->type == MaterailBindingObjectType::SAMPLER2D)
         {
-            auto resource = Engine::GetGPUDevice()->CreateSamplerBinding(it->sampler);
+            auto resource = Engine::GetGPUDevice()->CreateSamplerBinding((RHI::Sampler*)it->sampler);
             RHI_SAFE_RETAIN(resource);
             RHI::BindGroupBinding tmp;
             {
@@ -598,80 +609,45 @@ RHI::RenderPipeline* Material::CreatePipelineState(const PSOKey& psoKey, const S
 
 void Material::BindPSO(RHI::RenderPassEncoder& passEndcoder)
 {
-   /* if (rhiPipelineState_)
-    {
-        return;
-    }
-
-    RHI_SAFE_RELEASE(rhiVertShader_);
-    RHI_SAFE_RELEASE(rhiFragShader_);
-
-    std::vector<std::string> userDefines;
-    for (const InputAttribute& ia : inputAssembler_.inputAttributes_)
-    {
-        switch (ia.kind)
-        {
-        case VertexBufferAttriKind::NORMAL:
-            userDefines.push_back("#define USE_NORMAL 1");
-            break;
-        case VertexBufferAttriKind::DIFFUSE:
-            userDefines.push_back("#define USE_DIFFUSE 1");
-            break;
-        case VertexBufferAttriKind::TEXCOORD:
-            userDefines.push_back("#define USE_UV0 1");
-            break;
-        case VertexBufferAttriKind::TANGENT:
-            userDefines.push_back("#define USE_TANGENT 1");
-            break;
-        case VertexBufferAttriKind::BINORMAL:
-            userDefines.push_back("#define USE_BINORMAL 1");
-            break;
-        case VertexBufferAttriKind::BITANGENT:
-            userDefines.push_back("#define USE_BITANGENT 1");
-            break;
-        case VertexBufferAttriKind::TEXCOORD2:
-            userDefines.push_back("#define USE_UV0 1");
-            break;
-        }
-    }
-
-    rhiVertShader_ = _CreateShader(vsFilename_, RHI::ShaderType::VERTEX, ETechniqueType::TShading, userDefines);
-    rhiFragShader_ = _CreateShader(fsFilename_, RHI::ShaderType::FRAGMENT, ETechniqueType::TShading, userDefines);*/
-
-
-    //if (!rhiPipelineState_)
-    //{
-    //    CreatePipelineState();
-    //}
 }
 
 ShaderSet Material::CreateShaderSet(ETechniqueType technique)
 {
     std::vector<std::string> userDefines;
+    uint32 iaLocation = 0;
+    userDefines.push_back("#define IA_LOCATION_POSITION " + std::to_string(iaLocation++));
+
     for (const InputAttribute& ia : inputAssembler_.inputAttributes_)
     {
         switch (ia.kind)
         {
         case VertexBufferAttriKind::NORMAL:
             userDefines.push_back("#define USE_NORMAL 1");
+            userDefines.push_back("#define IA_LOCATION_NORMAL " + std::to_string(iaLocation++));
             break;
         case VertexBufferAttriKind::DIFFUSE:
             userDefines.push_back("#define USE_DIFFUSE 1");
+            userDefines.push_back("#define IA_LOCATION_DIFFUSE " + std::to_string(iaLocation++));
             break;
         case VertexBufferAttriKind::TEXCOORD:
             userDefines.push_back("#define USE_UV0 1");
+            userDefines.push_back("#define IA_LOCATION_TEXCOORD " + std::to_string(iaLocation++));
             break;
         case VertexBufferAttriKind::TANGENT:
             userDefines.push_back("#define USE_TANGENT 1");
+            userDefines.push_back("#define IA_LOCATION_TANGENT " + std::to_string(iaLocation++));
             break;
         case VertexBufferAttriKind::BINORMAL:
             userDefines.push_back("#define USE_BINORMAL 1");
+            userDefines.push_back("#define IA_LOCATION_BINORMAL " + std::to_string(iaLocation++));
             break;
         case VertexBufferAttriKind::BITANGENT:
             userDefines.push_back("#define USE_BITANGENT 1");
+            userDefines.push_back("#define IA_LOCATION_BITANGENT " + std::to_string(iaLocation++));
             break;
         case VertexBufferAttriKind::TEXCOORD2:
             userDefines.push_back("#define USE_UV0 1");
+            userDefines.push_back("#define IA_LOCATION_TEXCOORD2 " + std::to_string(iaLocation++));
             break;
         }
     }

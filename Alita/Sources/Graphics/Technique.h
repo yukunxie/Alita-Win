@@ -6,7 +6,6 @@
 #define ALITA_TECHNIQUE_H
 
 #include "../Base/ObjectBase.h"
-#include "Pass.h"
 
 NS_RX_BEGIN
 
@@ -18,10 +17,11 @@ enum class ETechniqueType
     TMaxCount,
 };
 
-enum ERenderSet
+enum ERenderSet : std::uint64_t
 {
     ERenderSet_Opaque           = 1 << 0,
     ERenderSet_Transparent      = 1 << 1,
+    ERenderSet_PostProcess      = 1 << 2,
 };
 
 enum ETechniqueMask : std::uint64_t

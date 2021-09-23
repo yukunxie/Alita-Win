@@ -25,9 +25,9 @@ public:
     
     void UpdateBuffer(const void* data, std::uint32_t offset, std::uint32_t size);
     
-    virtual const void* MapRead(std::uint32_t offset, std::uint32_t size) override;
+    virtual const void* MapRead(std::uint32_t offset, std::uint32_t size) const override;
     
-    virtual void* MapWrite(std::uint32_t offset, std::uint32_t size) override;
+    virtual void* MapWrite(std::uint32_t offset, std::uint32_t size) const override;
     
     virtual void
     MapReadAsync(const std::function<void(bool, Buffer*, const void*)> &onMapReadReady, 
@@ -37,12 +37,12 @@ public:
     MapWriteAsync(const std::function<void(bool, Buffer*, void*)> &onMapWriteReady, 
         std::uint32_t offset = 0, std::uint32_t size = 0) override;
     
-    virtual void Unmap() override;
+    virtual void Unmap() const override;
     
     virtual void Destroy() override;
     
     virtual void
-    SetSubData(std::uint32_t offset, std::uint32_t byteSize, const void* data) override;
+    SetSubData(std::uint32_t offset, std::uint32_t byteSize, const void* data) const override;
     
     virtual void Dispose() override;
     
@@ -52,7 +52,7 @@ public:
 
 private:
     VkBuffer vkBuffer_ = VK_NULL_HANDLE;
-    void* pData_ = nullptr;
+    mutable void* pData_ = nullptr;
 
 #if USE_VULKAN_MEMORY_ALLCATOR
     VmaAllocation vmaAllocation_ = nullptr;

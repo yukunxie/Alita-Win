@@ -39,9 +39,9 @@ public:
     { return bufferUsage_; }
 
 public:
-    virtual const void* MapRead(std::uint32_t offset, std::uint32_t size) = 0;
+    virtual const void* MapRead(std::uint32_t offset, std::uint32_t size) const = 0;
     
-    virtual void* MapWrite(std::uint32_t offset, std::uint32_t size) = 0;
+    virtual void* MapWrite(std::uint32_t offset, std::uint32_t size) const = 0;
     
     virtual void MapReadAsync(
         const std::function<void(bool, Buffer*, const void*)> &onMapReadReady, 
@@ -51,11 +51,11 @@ public:
     MapWriteAsync(const std::function<void(bool, Buffer*, void*)> &onMapWriteReady, 
         std::uint32_t offset = 0, std::uint32_t size = 0) = 0;
     
-    virtual void Unmap() = 0;
+    virtual void Unmap() const = 0;
     
     virtual void Destroy() = 0;
     
-    virtual void SetSubData(std::uint32_t offset, std::uint32_t byteSize, const void* data) = 0;
+    virtual void SetSubData(std::uint32_t offset, std::uint32_t byteSize, const void* data) const = 0;
 
     inline void increaseBindCount() { bindCount_++; }
     inline void reduceBindCount()  { bindCount_--; }

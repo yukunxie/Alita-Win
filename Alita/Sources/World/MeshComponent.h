@@ -30,7 +30,8 @@ public:
 
 	virtual void Tick(float dt) override;
 
-protected:
+	RenderObject* GetRenderObject() { return &renderObject_; }
+
 	void SetupRenderObject();
 
 public:

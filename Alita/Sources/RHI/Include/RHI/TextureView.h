@@ -24,6 +24,8 @@ public:
     void MarkSwapchainImage()
     { isSwapchainImage_ = true; }
 
+    virtual const Texture* GetTexture() const { return nullptr; }
+
 protected:
     virtual ~TextureView() = default;
 

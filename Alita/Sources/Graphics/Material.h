@@ -9,6 +9,7 @@
 #include "Base/FileSystem.h"
 #include "Effect.h"
 #include "RHI/RHI.h"
+#include "Pass.h"
 //#include "Meshes/VertexBuffer.h"
 
 #define RAPIDJSON_ASSERT(x) Assert(x, "")
@@ -44,9 +45,9 @@ struct MaterialBindingObject
 	MaterailBindingObjectType type;
 	union
 	{
-		RHI::Buffer* buffer;
-		RHI::Texture* texture;
-		RHI::Sampler* sampler;
+		const RHI::Buffer* buffer;
+		const RHI::Texture* texture;
+		const RHI::Sampler* sampler;
 	};
 };
 
@@ -81,10 +82,10 @@ struct InputAttribute
 		return RHI::VertexFormat::FLOAT;
 	}
 
-	bool operator < (const InputAttribute& other)
-	{
-		return location < other.location;
-	}
+	//bool operator < (const InputAttribute& other)
+	//{
+	//	return location < other.location;
+	//}
 };
 
 class InputAssembler
@@ -106,9 +107,6 @@ public:
 		hash_ = 1;
 		inputAttributes_ = inputAttributes;
 		indexType_ = indexType;
-		
-		// sort by location
-		std::sort(inputAttributes_.begin(), inputAttributes_.end());
 	}
 
 	RHI::VertexStateDescriptor ToRHIDescriptor()
@@ -252,7 +250,7 @@ public:
 
 	bool SetFloat(const std::string& name, std::uint32_t offset, std::uint32_t count, float* data);
 
-	bool SetTexture(const std::string& name, RHI::Texture* texture);
+	bool SetTexture(const std::string& name, const RHI::Texture* texture);
 
 	void Apply(const Pass* pass, ETechniqueType technique, ERenderSet renderSet, RHI::RenderPassEncoder& passEndcoder);
 
