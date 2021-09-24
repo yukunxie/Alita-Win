@@ -64,8 +64,8 @@ ShadowMapGenPass::ShadowMapGenPass()
 		RHI::TextureDescriptor descriptor;
 		{
 			descriptor.sampleCount = 1;
-			descriptor.format = RHI::TextureFormat::DEPTH24PLUS_STENCIL8;
-			descriptor.usage = RHI::TextureUsage::OUTPUT_ATTACHMENT;
+			descriptor.format = RHI::TextureFormat::DEPTH32FLOAT;
+			descriptor.usage = RHI::TextureUsage::OUTPUT_ATTACHMENT | RHI::TextureUsage::SAMPLED;
 			descriptor.size = { shadowMapSize_.width, shadowMapSize_.height };
 			descriptor.arrayLayerCount = 1;
 			descriptor.mipLevelCount = 1;
@@ -79,16 +79,17 @@ void ShadowMapGenPass::Execute(RHI::CommandEncoder* cmdEncoder, const std::vecto
 {
 	RHI::RenderPassDescriptor renderPassDescriptor;
 
-	RHI::RenderPassColorAttachmentDescriptor descriptor;
-	{
-		descriptor.attachment = shadowMapTexture_;
-		descriptor.resolveTarget = nullptr;
-		descriptor.loadValue = { 1.0f, 1.0f, 1.0f, 1.0f };
-		descriptor.loadOp = RHI::LoadOp::CLEAR;
-		descriptor.storeOp = RHI::StoreOp::STORE;
-	}
-	renderPassDescriptor.colorAttachments.push_back(descriptor);
+	//RHI::RenderPassColorAttachmentDescriptor descriptor;
+	//{
+	//	descriptor.attachment = shadowMapTexture_;
+	//	descriptor.resolveTarget = nullptr;
+	//	descriptor.loadValue = { 1.0f, 1.0f, 1.0f, 1.0f };
+	//	descriptor.loadOp = RHI::LoadOp::CLEAR;
+	//	descriptor.storeOp = RHI::StoreOp::STORE;
+	//}
+	//renderPassDescriptor.colorAttachments.push_back(descriptor);
 
+	SetupDepthStencilAttachemnt(dsTexture_);
 	renderPassDescriptor.depthStencilAttachment = {
 		.attachment = dsTexture_,
 		.depthLoadOp = RHI::LoadOp::CLEAR,
@@ -101,9 +102,10 @@ void ShadowMapGenPass::Execute(RHI::CommandEncoder* cmdEncoder, const std::vecto
 
 	auto renderPassEncoder = cmdEncoder->BeginRenderPass(renderPassDescriptor);
 
-	const auto& extent = shadowMapTexture_->GetTexture()->GetTextureSize();
+	const auto& extent = dsTexture_->GetTexture()->GetTextureSize();
 	renderPassEncoder->SetViewport(0, 0, extent.width, extent.height, 0, 1);
 	renderPassEncoder->SetScissorRect(0, 0, extent.width, extent.height);
+	//renderPassEncoder->
 
 	for (const auto ro : renderObjects)
 	{
@@ -403,6 +405,7 @@ void DeferredPass::Execute(RHI::CommandEncoder* cmdEncoder, const std::vector<Re
 	material->SetTexture("tGNormal", GBufferPass_.GetGBuffers().GNormal->GetTexture());
 	material->SetTexture("tGPosition", GBufferPass_.GetGBuffers().GPosition->GetTexture());
 	material->SetTexture("tGMaterial", GBufferPass_.GetGBuffers().GMaterial->GetTexture());
+	material->SetTexture("tShadowMap", shadowMapPass_->GetDSAttachment()->GetTexture());
 
 	FullScreenPass::Execute(cmdEncoder);
 }

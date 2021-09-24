@@ -58,13 +58,17 @@ void World::SetupDefaultCamera()
 	defaultCamera_ = Camera::CreatePerspectiveCamera(45.0, 1280.f / 800.0f, 1.0f, 100.f);
 	defaultCamera_->LookAt({ 0, 15, 15 }, { 0, 0, 0 }, { 0, 1, 0 });
 
-	shadowMapCamera_ = new OrthoCamera(-100, 100, -100, 100, 0.1, 100);
-	shadowMapCamera_->LookAt({ -20, 20, 20 }, { 0, 0, 0 }, { 0, 1, 0 });
+	shadowMapCamera_ = new OrthoCamera(-10, 10, -10, 10, 0.1f, 100);
+	shadowMapCamera_->LookAt(TVector3( -20.0f, 20.0f, 20.0f), TVector3(0.0f, 0.0f, 0.0f ), TVector3(0.0f, 1.0f, 0.0f));
+
+	//shadowMapCamera_ = Camera::CreatePerspectiveCamera(45.0, 1, 1.0f, 300.f);
+	//shadowMapCamera_->LookAt({ 1, 100, 0 }, { 0, 0, 0 }, { 0, 1, 0 });
 }
 
 void World::Tick(float dt)
 {
 	defaultCamera_->Tick(dt);
+	shadowMapCamera_->Tick(dt);
 
 	for (auto it : entities_)
 	{

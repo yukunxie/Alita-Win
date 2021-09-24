@@ -82,7 +82,8 @@ void GraphicPipeline::Execute(const std::vector<RenderObject*>& renderObjects)
 	//}
 
 	{
-		deferredPass_.Reset();
+		deferredPass_.Reset(); 
+		deferredPass_.Setup(&shadowGenPass_);
 		deferredPass_.Execute(rhiCommandEncoder_, renderObjects);
 	}
 

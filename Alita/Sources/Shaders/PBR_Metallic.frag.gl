@@ -64,3 +64,8 @@ void TGBufferGen() {
 #endif
 }
 
+// don't output anything
+void TShadowMapGen() 
+{
+}
+

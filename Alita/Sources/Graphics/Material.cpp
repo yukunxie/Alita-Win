@@ -107,6 +107,7 @@ static ConstantBufferFieldArray sGlobalUnfiormFields
     {MaterialParameterType::FLOAT4,     "SunLightColor"},
     {MaterialParameterType::MAT4,       "ViewMatrix"},
     {MaterialParameterType::MAT4,       "ProjMatrix"},
+    {MaterialParameterType::MAT4,       "ViewProjMatrix"},
     {MaterialParameterType::MAT4,       "ShadowViewProjMatrix"},
 };
 
@@ -228,7 +229,7 @@ static RHI::Shader* _CreateShader(const std::string& filename, RHI::ShaderType s
         techEntryName = "void TGBufferGen()";
         break;
     case ETechniqueType::TShadowmapGen:
-        techEntryName = "void TShadowmapGen()";
+        techEntryName = "void TShadowMapGen()";
         break;
     default:
         RHI_ASSERT(false);
@@ -285,6 +286,8 @@ void Material::Apply(const Pass* pass, ETechniqueType technique, ERenderSet rend
         SetFloat("SunLightColor", 0, 4, (float*)&params.sunLightColor.x);
         SetFloat("ViewMatrix", 0, 16, (float*)&params.viewMatrix);
         SetFloat("ProjMatrix", 0, 16, (float*)&params.projMatrix);
+        SetFloat("ViewProjMatrix", 0, 16, (float*)&params.viewProjMatrix);
+        SetFloat("ShadowViewProjMatrix", 0, 16, (float*)&params.shadowViewProjMatrix);
     }
 
     PSOKey psoKey{};
@@ -638,6 +641,8 @@ RHI::RenderPipeline* Material::CreatePipelineState(const PSOKey& psoKey, const S
             }
         }
 
+        psoDesc.hasDepthStencilState = psoKey.DSAttachmentFormat != 0;
+
         psoDesc.sampleCount = 1;
         psoDesc.sampleMask = 0xFFFFFFFF;
         psoDesc.alphaToCoverageEnabled = false;
@@ -706,7 +711,7 @@ ShaderSet Material::CreateShaderSet(ETechniqueType technique)
         shaderSet.VertexShader = _CreateShader(vsFilename_, RHI::ShaderType::VERTEX, technique, userDefines);
     }
 
-    if (fsFilename_.size())
+    if (fsFilename_.size() && technique != ETechniqueType::TShadowmapGen)
     {
         shaderSet.FragmentShader = _CreateShader(fsFilename_, RHI::ShaderType::FRAGMENT, technique, userDefines);
     }

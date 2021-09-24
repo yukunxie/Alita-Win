@@ -9,6 +9,8 @@ layout(binding = 15) uniform texture2D   tGPosition;
 layout(binding = 16) uniform sampler     sGPosition;
 layout(binding = 17) uniform texture2D   tGMaterial;
 layout(binding = 18) uniform sampler     sGMaterial;
+layout(binding = 19) uniform texture2D   tShadowMap;
+layout(binding = 20) uniform sampler     sShadowMap;
 
 layout(location = 0) out vec4 OutColor;
 
@@ -24,5 +26,13 @@ void TShading() {
     float specular = clamp(dot(lightDir, normalize(_WorldNormal)), 0, 1);
     diffuse.xyz *= specular * uGlobal.SunLightColor.xyz * uGlobal.SunLightColor.a;
 
-    OutColor = vec4(diffuse, 1.0);
+    vec4 p = uGlobal.ShadowViewProjMatrix * vec4(_WorldPosition, 1.0);
+    
+    float shadowFactor = 1.0;
+    if (p.z / p.w > texture(sampler2D(tShadowMap, sShadowMap), _UV0).r)
+    {
+        shadowFactor = 0.0;
+    }
+
+    OutColor = vec4(diffuse * shadowFactor, 1.0);
 }

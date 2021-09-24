@@ -166,9 +166,9 @@ struct PSOKey
 		memset(this, 0, sizeof(*this));
 		this->Technique = (int)ETechniqueType::TShading;
 		this->DepthWrite = 1;
-		this->DepthCmpFunc = (int)RHI::CompareFunction::LESS;
+		this->DepthCmpFunc = (int)RHI::CompareFunction::LESS_EQUAL;
 		this->StencilWrite = 0;
-		this->StencilCmpFunc = (int)RHI::CompareFunction::ALWAYS;
+		this->StencilCmpFunc = (int)RHI::CompareFunction::NEVER;
 		this->StencilFailOp = (int)RHI::StencilOperation::KEEP;
 		this->StencilDepthFailOp = (int)RHI::StencilOperation::KEEP;
 		this->StencilPassOp = (int)RHI::StencilOperation::KEEP;

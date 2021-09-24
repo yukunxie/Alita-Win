@@ -132,9 +132,15 @@ public:
     DeferredPass();
     virtual void Execute(RHI::CommandEncoder* cmdEncoder, const std::vector<RenderObject*>& renderObjects) override;
 
+    void Setup(const Pass* smPass)
+    {
+        shadowMapPass_ = smPass;
+    }
+
 protected:
     GBufferPass GBufferPass_;
     RHI::TextureView* rtColor_ = nullptr;
+    const Pass* shadowMapPass_ = nullptr;
 };
 
 class ScreenResolvePass : public FullScreenPass

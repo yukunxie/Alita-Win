@@ -47,7 +47,7 @@ void TShading() {
 }
 
 void TGBufferGen() {
-    gl_Position = uGlobal.ProjMatrix * uGlobal.ViewMatrix * uBatch.WorldMatrix * vec4(inPosition, 1.0);
+    gl_Position = uGlobal.ViewProjMatrix * uBatch.WorldMatrix * vec4(inPosition, 1.0);
     _WorldPosition = (uBatch.WorldMatrix * vec4(inPosition, 1.0)).xyz;
 
 #if USE_NORMAL
@@ -57,4 +57,9 @@ void TGBufferGen() {
 #if USE_UV0
     _UV0  = inTexCoord;
 #endif
+}
+
+void TShadowMapGen() 
+{
+    gl_Position = uGlobal.ShadowViewProjMatrix * uBatch.WorldMatrix * vec4(inPosition, 1.0);
 }

@@ -25,6 +25,7 @@ bool VKRenderPipeline::Init(const RenderPipelineDescriptor &descriptor)
     RHI_PTR_ASSIGN(pipelineLayout_, RHI_CAST(VKPipelineLayout * , descriptor.layout));
     
     VkPipelineShaderStageCreateInfo shaderStages[2];
+    int shaderStageCount = 0;
     {
         const auto &vertexStageInfo = descriptor.vertexStage;
         const auto &fragmentStageInfo = descriptor.fragmentStage;
@@ -36,14 +37,20 @@ bool VKRenderPipeline::Init(const RenderPipelineDescriptor &descriptor)
         shaderStages[0].module = RHI_CAST(const VKShader*, vertexStageInfo.shader)->GetNative();
         shaderStages[0].pName = vertexStageInfo.entryPoint.c_str();
         shaderStages[0].pSpecializationInfo = nullptr;
+        shaderStageCount++;
         
-        shaderStages[1].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
-        shaderStages[1].pNext = nullptr;
-        shaderStages[1].flags = 0;
-        shaderStages[1].stage = VK_SHADER_STAGE_FRAGMENT_BIT;
-        shaderStages[1].module = RHI_CAST(const VKShader*, fragmentStageInfo.shader)->GetNative();
-        shaderStages[1].pName = fragmentStageInfo.entryPoint.c_str();
-        shaderStages[1].pSpecializationInfo = nullptr;
+        if (fragmentStageInfo.shader)
+        {
+            shaderStages[1].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+            shaderStages[1].pNext = nullptr;
+            shaderStages[1].flags = 0;
+            shaderStages[1].stage = VK_SHADER_STAGE_FRAGMENT_BIT;
+            shaderStages[1].module = RHI_CAST(const VKShader*, fragmentStageInfo.shader)->GetNative();
+            shaderStages[1].pName = fragmentStageInfo.entryPoint.c_str();
+            shaderStages[1].pSpecializationInfo = nullptr;
+            shaderStageCount++;
+        }
+        
     }
     
     VkPipelineInputAssemblyStateCreateInfo inputAssembly;
@@ -156,10 +163,10 @@ bool VKRenderPipeline::Init(const RenderPipelineDescriptor &descriptor)
         else
         {
             colorBlendAttachment.blendEnable = VK_FALSE;
-            colorBlendAttachment.srcColorBlendFactor = VK_BLEND_FACTOR_ONE;
+            colorBlendAttachment.srcColorBlendFactor = VK_BLEND_FACTOR_ZERO;
             colorBlendAttachment.dstColorBlendFactor = VK_BLEND_FACTOR_ZERO;
             colorBlendAttachment.colorBlendOp = VK_BLEND_OP_ADD;
-            colorBlendAttachment.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE;
+            colorBlendAttachment.srcAlphaBlendFactor = VK_BLEND_FACTOR_ZERO;
             colorBlendAttachment.dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO;
             colorBlendAttachment.alphaBlendOp = VK_BLEND_OP_ADD;
         }
@@ -185,10 +192,10 @@ bool VKRenderPipeline::Init(const RenderPipelineDescriptor &descriptor)
         VK_DYNAMIC_STATE_VIEWPORT,
         VK_DYNAMIC_STATE_SCISSOR,
         VK_DYNAMIC_STATE_LINE_WIDTH,
-        VK_DYNAMIC_STATE_DEPTH_BIAS,
+        //VK_DYNAMIC_STATE_DEPTH_BIAS,
         VK_DYNAMIC_STATE_BLEND_CONSTANTS,
         VK_DYNAMIC_STATE_STENCIL_REFERENCE,
-        // VK_DYNAMIC_STATE_DEPTH_BOUNDS,
+        //// VK_DYNAMIC_STATE_DEPTH_BOUNDS,
     };
     
     VkPipelineDynamicStateCreateInfo dynamic;
@@ -257,7 +264,7 @@ bool VKRenderPipeline::Init(const RenderPipelineDescriptor &descriptor)
         depthStencilStateCreateInfo.minDepthBounds = 0.0f;
         depthStencilStateCreateInfo.maxDepthBounds = 1.0f;
         
-        depthStencilStateCreateInfo.stencilTestEnable =
+        depthStencilStateCreateInfo.stencilTestEnable = 
             dsDescriptor.stencilFront.compare != CompareFunction::ALWAYS ||
             dsDescriptor.stencilBack.compare != CompareFunction::ALWAYS;
         
@@ -269,6 +276,7 @@ bool VKRenderPipeline::Init(const RenderPipelineDescriptor &descriptor)
             dsDescriptor.stencilFront.compare);
         depthStencilStateCreateInfo.front.compareMask = dsDescriptor.stencilReadMask;
         depthStencilStateCreateInfo.front.writeMask = dsDescriptor.stencilWriteMask;
+        depthStencilStateCreateInfo.front.reference = 0;
         
         depthStencilStateCreateInfo.back.failOp = ToVulkanType(dsDescriptor.stencilBack.failOp);
         depthStencilStateCreateInfo.back.passOp = ToVulkanType(dsDescriptor.stencilBack.passOp);
@@ -277,6 +285,7 @@ bool VKRenderPipeline::Init(const RenderPipelineDescriptor &descriptor)
         depthStencilStateCreateInfo.back.compareOp = ToVulkanType(dsDescriptor.stencilBack.compare);
         depthStencilStateCreateInfo.back.compareMask = dsDescriptor.stencilReadMask;
         depthStencilStateCreateInfo.back.writeMask = dsDescriptor.stencilWriteMask;
+        depthStencilStateCreateInfo.back.reference = 0;
     }
     
     {
@@ -314,7 +323,7 @@ bool VKRenderPipeline::Init(const RenderPipelineDescriptor &descriptor)
         createInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
         createInfo.pNext = nullptr;
         createInfo.flags = 0;
-        createInfo.stageCount = 2;
+        createInfo.stageCount = shaderStageCount;
         createInfo.pStages = shaderStages;
         createInfo.pVertexInputState = &vertexInputCreateDescription;
         createInfo.pInputAssemblyState = &inputAssembly;

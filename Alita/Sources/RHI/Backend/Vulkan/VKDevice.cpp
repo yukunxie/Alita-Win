@@ -48,6 +48,10 @@ PFN_vkCmdDebugMarkerBeginEXT vkCmdDebugMarkerBeginEXT = nullptr;
 PFN_vkCmdDebugMarkerEndEXT vkCmdDebugMarkerEndEXT = nullptr;
 PFN_vkCmdDebugMarkerInsertEXT vkCmdDebugMarkerInsertEXT = nullptr;
 
+PFN_vkCreateDebugUtilsMessengerEXT vkCreateDebugUtilsMessengerEXT;
+PFN_vkDestroyDebugUtilsMessengerEXT vkDestroyDebugUtilsMessengerEXT;
+VkDebugUtilsMessengerEXT debugUtilsMessenger;
+
 XXHash64 gXXHash64Generator(0x21378732);
 
 bool gIsDeviceSupportNegativeViewport = false;
@@ -453,7 +457,7 @@ static VkApplicationInfo sVulkanAPPInfo = {
     .applicationVersion = VK_MAKE_VERSION(1, 0, 0),
     .pEngineName = "RX",
     .engineVersion = VK_MAKE_VERSION(1, 0, 0),
-    .apiVersion = VK_MAKE_VERSION(1, 0, 0),
+    .apiVersion = VK_MAKE_VERSION(1, 2, 0),
 };
 
 void VKDevice::AttemptEnumerateInstanceLayerAndExtensions()
@@ -652,6 +656,11 @@ bool VKDevice::InitInstance()
     {
         instanceExt.push_back(VK_EXT_DEBUG_REPORT_EXTENSION_NAME);
     }
+
+    if (HasExtension(instanceExtensions_, VK_EXT_DEBUG_UTILS_EXTENSION_NAME))
+    {
+        instanceExt.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
+    }
     
     // Create the Vulkan instance
     VkInstanceCreateInfo instanceCreateInfo;
@@ -675,6 +684,15 @@ bool VKDevice::InitInstance()
         {
             strExtensions.push_back(glfwExtensions[i]);
         }
+    }
+    if (HasExtension(instanceExtensions_, VK_EXT_DEBUG_REPORT_EXTENSION_NAME))
+    {
+        strExtensions.push_back(VK_EXT_DEBUG_REPORT_EXTENSION_NAME);
+    }
+
+    if (HasExtension(instanceExtensions_, VK_EXT_DEBUG_UTILS_EXTENSION_NAME))
+    {
+        strExtensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
     }
     instanceCreateInfo.enabledExtensionCount = strExtensions.size();
     instanceCreateInfo.ppEnabledExtensionNames = strExtensions.data();
@@ -725,6 +743,8 @@ bool VKDevice::InitInstance()
         vkInstance_, "vkCreateDebugReportCallbackEXT");
     vkDestroyDebugReportCallbackEXT_ = (PFN_vkDestroyDebugReportCallbackEXT) vkGetInstanceProcAddr(
         vkInstance_, "vkDestroyDebugReportCallbackEXT");
+
+    vkCreateDebugUtilsMessengerEXT = reinterpret_cast<PFN_vkCreateDebugUtilsMessengerEXT>(vkGetInstanceProcAddr(vkInstance_, "vkCreateDebugUtilsMessengerEXT"));
     
     // Create the debug callback with desired settings
     if (vkCreateDebugReportCallbackEXT_)

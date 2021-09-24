@@ -16,6 +16,8 @@ struct GobalRenderParams
 	TVector4 sunLightColor;
 	TMat4x4  viewMatrix;
 	TMat4x4  projMatrix;
+	TMat4x4  viewProjMatrix;
+	TMat4x4	 shadowViewProjMatrix;
 };
 
 class RenderScene

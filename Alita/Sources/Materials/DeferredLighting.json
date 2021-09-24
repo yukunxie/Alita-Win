@@ -57,6 +57,17 @@
       "name": "GMaterial_sampler",
       "binding": 18,
       "type": "Sampler2D"
+    },
+    {
+      "name": "tShadowMap",
+      "binding": 19,
+      "type": "Texture2D",
+      "uri": ""
+    },
+    {
+      "name": "ShadowMap_sampler",
+      "binding": 20,
+      "type": "Sampler2D"
     }
   ]
 }

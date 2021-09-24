@@ -35,6 +35,8 @@ void RenderScene::Tick(float dt)
 	gobalRenderParams_.sunLightColor = TVector4(1.0f, 1.0f, 1.0f, 1.0f);
 	gobalRenderParams_.viewMatrix = Engine::GetWorld()->GetCamera()->GetViewMatrix();
 	gobalRenderParams_.projMatrix = Engine::GetWorld()->GetCamera()->GetProjectionMatrix();
+	gobalRenderParams_.viewProjMatrix = Engine::GetWorld()->GetCamera()->GetViewProjectionMatrix();
+	gobalRenderParams_.shadowViewProjMatrix = Engine::GetWorld()->GetShadowMapCamera()->GetViewProjectionMatrix();
 }
 
 void RenderScene::SubmitGPU()

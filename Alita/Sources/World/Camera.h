@@ -35,7 +35,7 @@ public:
 	
 	TMat4x4 GetViewProjectionMatrix()
 	{
-		return viewMatrix_ * projMatrix_;
+		return  projMatrix_ * viewMatrix_;
 	}
 
 	void LookAt(const TVector3& from, const TVector3& center, const TVector3& up = { 0, 1, 0 });
