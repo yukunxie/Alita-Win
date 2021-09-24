@@ -40,7 +40,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 
 #if WIN32
 
-static RENDERDOC_API_1_4_0* rdoc_api = NULL;
+RENDERDOC_API_1_4_0* rdoc_api = NULL;
 
 using WString = std::basic_string<wchar_t, std::char_traits<wchar_t>>;
 
@@ -111,6 +111,7 @@ int main() {
 
     glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
     GLFWwindow* window = glfwCreateWindow(1280, 800, "Vulkan window", nullptr, nullptr);
+    glfwMakeContextCurrent(window);
 
     NS_RX::Engine* pEngine = NS_RX::Engine::CreateEngine(window);
 

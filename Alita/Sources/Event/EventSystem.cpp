@@ -7,11 +7,15 @@
 
 #include <iostream>
 
+#if WIN32
+#include "../Third-Party/RenderDoc/renderdoc_app.h"
+extern RENDERDOC_API_1_4_0* rdoc_api;
+#endif
+
 
 NS_RX_BEGIN
 
 EventSystem* EventSystem::instance_ = nullptr;
-
 
 void EventSystem::_SetupEventRegisterToWindow(void* windowHandler)
 {
@@ -54,7 +58,22 @@ void EventSystem::_EventKeyboardHandler(int key, int scancode, int action, int m
 			Engine::GetWorld()->GetCamera()->MoveForward(1.0f);
 		else if (key == GLFW_KEY_DOWN || key == GLFW_KEY_S)
 			Engine::GetWorld()->GetCamera()->MoveForward(-1.0f);
+		else
+		{
+#if WIN32
+			if (rdoc_api && key == GLFW_KEY_F12 && mods == GLFW_MOD_CONTROL && action == GLFW_PRESS)
+			{
+				rdoc_api->TriggerCapture();
+				if (!rdoc_api->IsRemoteAccessConnected())
+				{
+					rdoc_api->LaunchReplayUI(true, NULL);
+				}
+			}
+#endif
+		}
 	}
+
+
 }
 
 void EventSystem::_EventMouseButtonHandler(int button, int action, int mods, double xpos, double ypos)

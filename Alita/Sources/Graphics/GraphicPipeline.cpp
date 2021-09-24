@@ -6,6 +6,8 @@
 #include "Backend/Vulkan/VKSwapChain.h"
 #include "Backend/Vulkan/VKCommandBuffer.h"
 
+int g_test_released = false;
+
 NS_RX_BEGIN
 
 GraphicPipeline::GraphicPipeline()
@@ -20,6 +22,7 @@ GraphicPipeline::GraphicPipeline()
 
 	rhiCommandEncoder_ = Engine::GetGPUDevice()->CreateCommandEncoder();
 	RHI_SAFE_RETAIN(rhiCommandEncoder_);
+	g_test_released = true;
 
 	LOGI("xxxx 2");
 
@@ -47,6 +50,11 @@ GraphicPipeline::GraphicPipeline()
 		rhiDSTextureView_ = rhiDSTexture_->CreateView({});
 		RHI_SAFE_RETAIN(rhiDSTextureView_);
 	}
+}
+
+GraphicPipeline::~GraphicPipeline()
+{
+	RHI_SAFE_RELEASE(rhiCommandEncoder_);
 }
 
 void GraphicPipeline::Execute(const std::vector<RenderObject*>& renderObjects)

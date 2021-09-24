@@ -16,9 +16,7 @@ class GraphicPipeline
 public:
 	GraphicPipeline();
 
-	virtual ~GraphicPipeline()
-	{
-	}
+	virtual ~GraphicPipeline();
 
 	const TExtent2D& GetWindowSize() const
 	{

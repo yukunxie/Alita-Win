@@ -9,6 +9,8 @@
 #include "VKBuffer.h"
 #include "VKTexture.h"
 
+extern int g_test_released;
+
 NS_RHI_BEGIN
 
 VKCommandEncoder::VKCommandEncoder(VKDevice* device)
@@ -30,7 +32,11 @@ void VKCommandEncoder::Dispose()
 
 VKCommandEncoder::~VKCommandEncoder()
 {
-    LOGW("xxxxxxxxxxxxxxxxxxxxx ~VKCommandEncoder");
+    if (g_test_released)
+    {
+        LOGW("xxxxxxxxxxxxxxxxxxxxx ~VKCommandEncoder");
+    }
+    
     Dispose();
 }
 

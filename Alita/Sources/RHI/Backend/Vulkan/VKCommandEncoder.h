@@ -27,7 +27,7 @@ public:
     bool Init();
     
     virtual void Reset() override;
-    
+
     virtual RenderPassEncoder* BeginRenderPass(const RenderPassDescriptor &descriptor) override;
     
     virtual ComputePassEncoder* BeginComputePass(const ComputePassDescriptor &descriptor) override;
