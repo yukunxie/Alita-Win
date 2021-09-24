@@ -9,6 +9,8 @@
 
 #include "Backend/Vulkan/ShaderHelper.h"
 
+#include <sstream>
+
 NS_RX_BEGIN
 
 std::uint32_t GetInputAttributeLocation(VertexBufferAttriKind kind)
@@ -57,6 +59,57 @@ static const std::string sShaderExtensions =
 "#extension GL_ARB_separate_shader_objects : enable\n"
 "#extension GL_ARB_shading_language_450pack : enable\n";
 
+//enum class EShaderDataType
+//{
+//    Float,
+//    Float2,
+//    Float3,
+//    Float4,
+//    Int,
+//    Int2,
+//    Int3,
+//    Int4,
+//    Matrix2x2,
+//    Matrix3x3,
+//    Matrix4x4,
+//};
+
+struct GLDataTypeConfig
+{
+    std::string Name;
+    uint32      Size;
+    uint32      ComponentSize;
+    // std140 // https://blog.csdn.net/fatcat123/article/details/116144288
+    uint32      Align;
+};
+
+static std::unordered_map<MaterialParameterType, GLDataTypeConfig> sShaderDataTypeToGLType
+{
+    {MaterialParameterType::FLOAT,      {"float",   4,   4,   4   }},
+    {MaterialParameterType::FLOAT2,     {"vec2",    8,   4,   8   }},
+    {MaterialParameterType::FLOAT3,     {"vec3",    12,  4,   16  }},
+    {MaterialParameterType::FLOAT4,     {"vec4",    16,  4,   16  }},
+    {MaterialParameterType::INT,        {"int",     4,   4,   4   }},
+    {MaterialParameterType::INT2,       {"int2",    8,   4,   8   }},
+    {MaterialParameterType::INT3,       {"int3",    12,  4,   16  }},
+    {MaterialParameterType::INT4,       {"int4",    16,  4,   16  }},
+    {MaterialParameterType::MAT2,       {"mat2",    16,  4,   16  }},
+    {MaterialParameterType::MAT3,       {"mat3",    48,  4,   16  }},
+    {MaterialParameterType::MAT4,       {"mat4",    64,  4,   16  }},
+};
+
+typedef std::vector<std::tuple<MaterialParameterType, std::string>> ConstantBufferFieldArray;
+
+static ConstantBufferFieldArray sGlobalUnfiormFields
+{
+    {MaterialParameterType::FLOAT4,     "EyePos"},
+    {MaterialParameterType::FLOAT4,     "SunLight"},
+    {MaterialParameterType::FLOAT4,     "SunLightColor"},
+    {MaterialParameterType::MAT4,       "ViewMatrix"},
+    {MaterialParameterType::MAT4,       "ProjMatrix"},
+    {MaterialParameterType::MAT4,       "ShadowViewProjMatrix"},
+};
+
 static const std::string sShaderGlobalConstantBuffer =
 "layout(binding = 0) uniform Global	                            \n"
 "{	                                                            \n"
@@ -66,6 +119,76 @@ static const std::string sShaderGlobalConstantBuffer =
 "    mat4 ViewMatrix;	                                        \n"
 "    mat4 ProjMatrix;	                                        \n"
 "} uGlobal;                                                     \n";
+
+
+std::string GenerateConstantBufferDeclaration(const ConstantBufferFieldArray& fileds, uint32 binding, const std::string& typeName, const std::string& cBufferName)
+{
+    static const char* format =
+        "layout(binding = %d) uniform %s\n"
+        "{	                            \n"
+        "%s                             \n"
+        "} %s;                          \n";
+    
+    std::ostringstream ostr;
+    for (const auto& field : fileds)
+    {
+        ostr << "\t" << sShaderDataTypeToGLType[std::get<0>(field)].Name << " \t" << std::get<1>(field) << ";" << "\t\n";
+    }
+
+    int size_s = std::snprintf(nullptr, 0, format, binding, typeName.c_str(), ostr.str().c_str(), cBufferName.c_str()) + 1; // Extra space for '\0'
+    if (size_s <= 0) { throw std::runtime_error("Error during formatting."); }
+
+    auto size = static_cast<size_t>(size_s);
+    auto buf = std::make_unique<char[]>(size);
+    std::snprintf(buf.get(), size, format, binding, typeName.c_str(), ostr.str().c_str(), cBufferName.c_str());
+    return std::string(buf.get(), buf.get() + size - 1);
+}
+
+void Material::SetupConstantBufferLayout()
+{
+    uint32 binding = 0;
+    std::vector< MaterialParameter> parameters;
+    std::string cBufferName = "uGlobal";
+
+    uint32 offset = 0;
+
+    for (const auto& field : sGlobalUnfiormFields)
+    {
+        parameters.emplace_back();
+        auto& param = parameters.back();
+        param.binding = binding;
+        param.format  = std::get<0>(field);
+        param.name    = std::get<1>(field);
+
+        const uint32 byteAlign = sShaderDataTypeToGLType[param.format].Align;
+        RHI_ASSERT(byteAlign & (byteAlign - 1) == 0);
+        offset = (offset + byteAlign - 1) & (~(byteAlign - 1));
+        param.offset = offset;
+        offset += sShaderDataTypeToGLType[param.format].Size;
+    }
+
+    MaterialBindingObject* bindingObject = new MaterialBindingObject();
+    bindingObjects_.push_back(bindingObject);
+
+    bindingObject->type     = MaterailBindingObjectType::BUFFER;
+    bindingObject->name     = cBufferName;
+    bindingObject->binding  = binding;
+    bindingObject->stride   = offset;
+
+    RHI::BufferDescriptor bufferDescriptor;
+    {
+        bufferDescriptor.size = bindingObject->stride;
+        bufferDescriptor.usage = RHI::BufferUsage::UNIFORM;
+    };
+    bindingObject->buffer = Engine::GetGPUDevice()->CreateBuffer(bufferDescriptor);
+    RHI_SAFE_RETAIN(bindingObject->buffer);
+
+    for (auto& param : parameters)
+    {
+        param.bindingObject = bindingObject;
+        parameters_[param.name] = param;
+    }
+}
 
 
 static constexpr std::uint32_t _SimpleHash(const char* p)
@@ -88,9 +211,11 @@ static RHI::Shader* _CreateShader(const std::string& filename, RHI::ShaderType s
         defines += d + "\n";
     }
 
+    const auto globalCBuffer = GenerateConstantBufferDeclaration(sGlobalUnfiormFields, 0, "Global", "uGlobal");
+
     std::string shaderText = sShaderExtensions
         + defines + "\n"
-        + sShaderGlobalConstantBuffer + "\n"
+        + globalCBuffer + "\n"
         + data;
 
     std::string techEntryName = "";
@@ -312,8 +437,15 @@ void Material::ParseBindGroupLayout(const rapidjson::Document& doc)
         return;
     }
 
+    // uGlobal;
+    SetupConstantBufferLayout();
+
     for (auto& cfg : doc["bindings"].GetArray())
     {
+        // skip binding == 0, for global.
+        if (cfg["binding"].GetUint() == 0)
+            continue;
+
         std::string type = cfg["type"].GetString();
         MaterialBindingObject* bindingObject = new MaterialBindingObject();
         bindingObject->stride = 0;

@@ -63,3 +63,4 @@ void TGBufferGen() {
     GMaterial = vec4(uShading.metallicFactor, uShading.roughnessFactor, 0, 0);
 #endif
 }
+

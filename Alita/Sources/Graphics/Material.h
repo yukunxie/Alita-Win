@@ -268,6 +268,7 @@ public:
 protected:
 	RHI::RenderPipeline* CreatePipelineState(const PSOKey& psoKey, const ShaderSet& shaderSet);
 	void ParseBindGroupLayout(const rapidjson::Document& doc);
+	void SetupConstantBufferLayout();
 
 	void ApplyModifyToBindGroup(RHI::RenderPassEncoder& passEndcoder);
 	void BindPSO(RHI::RenderPassEncoder& passEndcoder);
@@ -277,6 +278,8 @@ protected:
 	void SetupPSOKey(PSOKey& psoKey, const Pass* pass);
 
 	ShaderSet CreateShaderSet(ETechniqueType technique);
+
+	
 
 protected:
 	std::string vsFilename_;

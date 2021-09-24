@@ -15,39 +15,6 @@
   },
   "bindings": [
     {
-      "name": "uGlobal",
-      "binding": 0,
-      "type": "Buffer",
-      "stride": 176,
-      "fields": [
-        {
-          "name": "EyePos",
-          "format": "float4",
-          "offset": 0
-        },
-        {
-          "name": "SunLight",
-          "format": "float4",
-          "offset": 16
-        },
-        {
-          "name": "SunLightColor",
-          "format": "float4",
-          "offset": 32
-        },
-        {
-          "name": "ViewMatrix",
-          "format": "mat4",
-          "offset": 48
-        },
-        {
-          "name": "ProjMatrix",
-          "format": "mat4",
-          "offset": 112
-        }
-      ]
-    },
-    {
       "name": "tGDiffuse",
       "binding": 11,
       "type": "Texture2D",
