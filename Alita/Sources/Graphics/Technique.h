@@ -11,8 +11,9 @@ NS_RX_BEGIN
 
 enum class ETechniqueType
 {
-    TShading    = 0, 
-    TGBufferGen,
+    TShading    = 0 , 
+    TGBufferGen     ,
+    TShadowmapGen   ,
 
     TMaxCount,
 };

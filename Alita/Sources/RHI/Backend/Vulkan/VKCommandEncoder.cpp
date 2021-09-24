@@ -30,6 +30,7 @@ void VKCommandEncoder::Dispose()
 
 VKCommandEncoder::~VKCommandEncoder()
 {
+    LOGW("xxxxxxxxxxxxxxxxxxxxx ~VKCommandEncoder");
     Dispose();
 }
 

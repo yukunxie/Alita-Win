@@ -11,18 +11,6 @@
 
 NS_RX_BEGIN
 
-//enum InputAttributeLocation
-//{
-//	IA_LOCATION_POSITION = 0,
-//	IA_LOCATION_NORMAL = 1,
-//	IA_LOCATION_TEXCOORD = 2,
-//	IA_LOCATION_DIFFUSE = 3,
-//	IA_LOCATION_TANGENT = 4,
-//	IA_LOCATION_BINORMAL = 5,
-//	IA_LOCATION_BITANGENT = 6,
-//	IA_LOCATION_TEXCOORD2 = 7,
-//};
-
 std::uint32_t GetInputAttributeLocation(VertexBufferAttriKind kind)
 {
     switch (kind)
@@ -79,43 +67,6 @@ static const std::string sShaderGlobalConstantBuffer =
 "    mat4 ProjMatrix;	                                        \n"
 "} uGlobal;                                                     \n";
 
-//static const std::string sShaderIALocationDefine =
-//"#define IA_LOCATION_POSITION 0      \n"
-//"#define IA_LOCATION_NORMAL 1        \n"
-//"#define IA_LOCATION_TEXCOORD 2      \n"
-//"#define IA_LOCATION_DIFFUSE 3       \n"
-//"#define IA_LOCATION_TANGENT 4       \n"
-//"#define IA_LOCATION_BINORMAL 5      \n"
-//"#define IA_LOCATION_BITANGENT 6     \n"
-//"#define IA_LOCATION_TEXCOORD2 7     \n";
-
-static std::string _GenShaderIALocationDefines()
-{
-    static const char* format =
-        "#define IA_LOCATION_POSITION     %d  \n"
-        "#define IA_LOCATION_NORMAL       %d  \n"
-        "#define IA_LOCATION_TEXCOORD     %d  \n"
-        "#define IA_LOCATION_DIFFUSE      %d  \n"
-        "#define IA_LOCATION_TANGENT      %d  \n"
-        "#define IA_LOCATION_BINORMAL     %d  \n"
-        "#define IA_LOCATION_BITANGENT    %d  \n"
-        "#define IA_LOCATION_TEXCOORD2    %d  \n";
-
-    char buffer[1024] = { 0 };
-
-    std::snprintf(buffer, sizeof(buffer), format,
-        (int)InputAttributeLocation::IA_LOCATION_POSITION,
-        (int)InputAttributeLocation::IA_LOCATION_NORMAL,
-        (int)InputAttributeLocation::IA_LOCATION_TEXCOORD,
-        (int)InputAttributeLocation::IA_LOCATION_DIFFUSE,
-        (int)InputAttributeLocation::IA_LOCATION_TANGENT,
-        (int)InputAttributeLocation::IA_LOCATION_BINORMAL,
-        (int)InputAttributeLocation::IA_LOCATION_BITANGENT,
-        (int)InputAttributeLocation::IA_LOCATION_TEXCOORD2
-    );
-    return std::string(buffer);
-}
-
 
 static constexpr std::uint32_t _SimpleHash(const char* p)
 {
@@ -151,13 +102,20 @@ static RHI::Shader* _CreateShader(const std::string& filename, RHI::ShaderType s
     case ETechniqueType::TGBufferGen:
         techEntryName = "void TGBufferGen()";
         break;
+    case ETechniqueType::TShadowmapGen:
+        techEntryName = "void TShadowmapGen()";
+        break;
+    default:
+        RHI_ASSERT(false);
     }
     RHI_ASSERT(techEntryName.size() > 0);
 
     auto npos = shaderText.find(techEntryName.c_str(), 0);
     RHI_ASSERT(npos != std::string::npos);
-
-    shaderText = shaderText.replace(npos, techEntryName.size(), "void main()");
+    if (npos != std::string::npos)
+    {
+        shaderText = shaderText.replace(npos, techEntryName.size(), "void main()");
+    }
 
     //strstr(shaderText.c_str())
 

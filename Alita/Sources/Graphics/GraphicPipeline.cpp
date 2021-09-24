@@ -62,8 +62,8 @@ void GraphicPipeline::Execute(const std::vector<RenderObject*>& renderObjects)
 	//	igniterPass_.Execute(rhiCommandEncoder_, renderObjects);
 	//}
 
-	//shadowGenPass_.Reset();
-	//shadowGenPass_.Execute(rhiCommandEncoder_, renderObjects);
+	shadowGenPass_.Reset();
+	shadowGenPass_.Execute(rhiCommandEncoder_, renderObjects);
 	//
 	// draw opaque objects.
 	//{
