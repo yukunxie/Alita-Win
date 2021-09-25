@@ -23,7 +23,7 @@ layout(binding = 1) uniform Batch {
     mat4 WorldMatrix;
 } uBatch;
 
-layout(location = 0) out vec3 _WorldPosition;
+layout(location = 0) out vec4 _WorldPosition;
 
 #if USE_NORMAL
 layout(location = 1) out vec3 _WorldNormal;
@@ -35,7 +35,7 @@ layout(location = 2) out vec2 _UV0;
 
 void TShading() {
     gl_Position = uGlobal.ProjMatrix * uGlobal.ViewMatrix * uBatch.WorldMatrix * vec4(inPosition, 1.0);
-    _WorldPosition = (uBatch.WorldMatrix * vec4(inPosition, 1.0)).xyz;
+    _WorldPosition = (uBatch.WorldMatrix * vec4(inPosition, 1.0));
 
 #if USE_NORMAL
     _WorldNormal =  (transpose(inverse(uBatch.WorldMatrix)) * vec4(inNormal, 1.0)).xyz;
@@ -48,7 +48,7 @@ void TShading() {
 
 void TGBufferGen() {
     gl_Position = uGlobal.ViewProjMatrix * uBatch.WorldMatrix * vec4(inPosition, 1.0);
-    _WorldPosition = (uBatch.WorldMatrix * vec4(inPosition, 1.0)).xyz;
+    _WorldPosition = (uBatch.WorldMatrix * vec4(inPosition, 1.0));
 
 #if USE_NORMAL
     _WorldNormal =  (transpose(inverse(uBatch.WorldMatrix)) * vec4(inNormal, 1.0)).xyz;

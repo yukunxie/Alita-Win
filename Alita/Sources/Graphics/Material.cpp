@@ -287,7 +287,7 @@ void Material::Apply(const Pass* pass, ETechniqueType technique, ERenderSet rend
         SetFloat("ViewMatrix", 0, 16, (float*)&params.viewMatrix);
         SetFloat("ProjMatrix", 0, 16, (float*)&params.projMatrix);
         SetFloat("ViewProjMatrix", 0, 16, (float*)&params.viewProjMatrix);
-        SetFloat("ShadowViewProjMatrix", 0, 16, (float*)&params.shadowViewProjMatrix);
+        SetFloat("ShadowViewProjMatrix", 0, 16, (float*)&params.shadowViewProjMatrix); 
     }
 
     PSOKey psoKey{};
@@ -334,6 +334,10 @@ void Material::SetupPSOKey(PSOKey& psoKey, ERenderSet renderSet)
 void Material::SetupPSOKey(PSOKey& psoKey, ETechniqueType technique)
 {
     psoKey.Technique = (int)technique;
+    if (technique == ETechniqueType::TShadowmapGen)
+    {
+        psoKey.CullMode = 0;
+    }
 }
 
 void Material::SetupPSOKey(PSOKey& psoKey, const Pass* pass)
@@ -536,12 +540,12 @@ void Material::ParseBindGroupLayout(const rapidjson::Document& doc)
         {
             bindingObject->type = MaterailBindingObjectType::SAMPLER2D;
             bindingObject->name = cfg["name"].GetString();
-            bindingObject->binding = cfg["binding"].GetUint();
+            bindingObject->binding = cfg["binding"].GetUint(); 
 
             RHI::SamplerDescriptor descriptor;
             {
-                descriptor.minFilter = RHI::FilterMode::LINEAR;
-                descriptor.magFilter = RHI::FilterMode::LINEAR;
+                descriptor.minFilter = RHI::FilterMode::NEAREST;
+                descriptor.magFilter = RHI::FilterMode::NEAREST;
                 descriptor.addressModeU = RHI::AddressMode::REPEAT;
                 descriptor.addressModeV = RHI::AddressMode::REPEAT;
                 descriptor.addressModeW = RHI::AddressMode::REPEAT;
@@ -667,12 +671,14 @@ ShaderSet Material::CreateShaderSet(ETechniqueType technique)
     }
 
     uint32 iaLocation = 0;
-    userDefines.push_back("#define IA_LOCATION_POSITION " + std::to_string(iaLocation++));
 
     for (const InputAttribute& ia : inputAssembler_.inputAttributes_)
     {
         switch (ia.kind)
         {
+        case VertexBufferAttriKind::POSITION:
+            userDefines.push_back("#define IA_LOCATION_POSITION " + std::to_string(iaLocation++));
+            break;
         case VertexBufferAttriKind::NORMAL:
             userDefines.push_back("#define USE_NORMAL 1");
             userDefines.push_back("#define IA_LOCATION_NORMAL " + std::to_string(iaLocation++));

@@ -14,7 +14,7 @@ layout(binding = 2) uniform ShadingBuffer {
     float roughnessFactor;
 } uShading;
 
-layout(location = 0) in vec3 _WorldPosition;
+layout(location = 0) in vec4 _WorldPosition;
 
 #if USE_NORMAL
 layout(location = 1) in vec3 _WorldNormal;
@@ -42,7 +42,7 @@ void TShading() {
 #endif
 
 #if USE_NORMAL
-    vec3 lightDir = normalize(uGlobal.EyePos.xyz - _WorldPosition);
+    vec3 lightDir = normalize(uGlobal.EyePos.xyz - _WorldPosition.xyz);
     float specular = clamp(dot(lightDir, normalize(_WorldNormal)), 0, 1);
     diffuse.xyz *= specular * uGlobal.SunLightColor.xyz * uGlobal.SunLightColor.a;
 #endif
@@ -59,7 +59,7 @@ void TGBufferGen() {
 
 #if GEN_GBUFFER_PASS
     GNormal = vec4(normalize(_WorldNormal) * 0.5 + vec3(0.5, 0.5, 0.5), 0.0);
-    GPosition.xyz = _WorldPosition.xyz;
+    GPosition = _WorldPosition;//vec4(_WorldPosition.xyz, 1.0);
     GMaterial = vec4(uShading.metallicFactor, uShading.roughnessFactor, 0, 0);
 #endif
 }

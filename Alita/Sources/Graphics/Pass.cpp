@@ -121,7 +121,7 @@ GBufferPass::GBufferPass()
 
 	// 0
 	{
-		RHI::TextureDescriptor descriptor;
+		RHI::TextureDescriptor descriptor; 
 		descriptor.sampleCount = 1;
 		descriptor.format = RHI::TextureFormat::RGBA16FLOAT;
 		descriptor.usage = RHI::TextureUsage::OUTPUT_ATTACHMENT;
@@ -149,7 +149,7 @@ GBufferPass::GBufferPass()
 	{
 		RHI::TextureDescriptor descriptor;
 		descriptor.sampleCount = 1;
-		descriptor.format = RHI::TextureFormat::RGBA16FLOAT;
+		descriptor.format = RHI::TextureFormat::RGBA32FLOAT;
 		descriptor.usage = RHI::TextureUsage::OUTPUT_ATTACHMENT;
 		descriptor.size = extent;
 		descriptor.arrayLayerCount = 1;
