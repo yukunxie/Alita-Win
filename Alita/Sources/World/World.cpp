@@ -9,6 +9,7 @@
 #include "Loaders/GLTFLoader.h"
 #include "Loaders/ImageLoader.h"
 #include "Terrain.h"
+#include "SkyBox.h"
 #include "MeshComponent.h"
 
 NS_RX_BEGIN
@@ -21,23 +22,27 @@ World::World()
 		AddEntity(new Model());
 	}*/
 
-	{
-		auto terrain = Terrain::CreateFromHeightMap("Textures/heightmap.png", -3.f, .0f, 0.1f, { 5, 5 });
-		AddEntity(terrain);
-		auto tex = ImageLoader::LoadTextureFromUri("Textures/grass.jpg");
-		auto mesh = terrain->GetComponent<MeshComponent>();
-		mesh->GetMaterial()->SetTexture("albedo", tex);
-	}
+	//{
+	//	auto terrain = Terrain::CreateFromHeightMap("Textures/heightmap.png", -3.f, .0f, 0.1f, { 5, 5 });
+	//	AddEntity(terrain);
+	//	auto tex = ImageLoader::LoadTextureFromUri("Textures/grass.jpg");
+	//	auto mesh = terrain->GetComponent<MeshComponent>();
+	//	mesh->GetMaterial()->SetTexture("albedo", tex);
+	//}
+
+	//{
+	//	//const auto& models = GLTFLoader::LoadModelFromGLTF("Models/chinesedragon.gltf");
+	//	const auto& models = GLTFLoader::LoadModelFromGLTF("Models/color_teapot_spheres.gltf");
+	//	//const auto& models = GLTFLoader::LoadModelFromGLTF("Models/deer.gltf");
+	//	//const auto& models = GLTFLoader::LoadModelFromGLTF("Models/armor/armor.gltf");
+	//	for (auto model : models)
+	//	{
+	//		AddEntity(model);
+	//	}
+	//}
 
 	{
-		//const auto& models = GLTFLoader::LoadModelFromGLTF("Models/chinesedragon.gltf");
-		const auto& models = GLTFLoader::LoadModelFromGLTF("Models/color_teapot_spheres.gltf");
-		//const auto& models = GLTFLoader::LoadModelFromGLTF("Models/deer.gltf");
-		//const auto& models = GLTFLoader::LoadModelFromGLTF("Models/armor/armor.gltf");
-		for (auto model : models)
-		{
-			AddEntity(model);
-		}
+		AddEntity(new SkyBox);
 	}
 }
 

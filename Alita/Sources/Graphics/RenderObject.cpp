@@ -4,19 +4,19 @@ NS_RX_BEGIN
 
 void RenderObject::Render(const Pass* pass, ETechniqueType technique, ERenderSet renderSet, RHI::RenderPassEncoder& passEndcoder)
 {
-	materialObject->Apply(pass, technique, renderSet, passEndcoder);
+	MaterialObject->Apply(pass, technique, renderSet, passEndcoder);
 
 	uint32 slot = 0;
-	for (const auto& vb : vertexBuffers)
+	for (const auto& vb : VertexBuffers)
 	{
-		passEndcoder.SetVertexBuffer(vb.gpuBuffer, vb.offset, slot++/*vb.slot*/);
+		passEndcoder.SetVertexBuffer(vb.GpuBuffer, vb.Offset, slot++/*vb.slot*/);
 	}
 
-	passEndcoder.SetIndexBuffer(indexBuffer.gpuBuffer, indexBuffer.offset);
+	passEndcoder.SetIndexBuffer(IndexBuffer.GpuBuffer, IndexBuffer.Offset);
 
-	if (indexBuffer.instanceCount == 0)
+	if (IndexBuffer.InstanceCount == 0)
 	{
-		passEndcoder.DrawIndexed(indexBuffer.indexCount, 1, 0, 0, 0);
+		passEndcoder.DrawIndexed(IndexBuffer.IndexCount, 1, 0, 0, 0);
 	}
 }
 

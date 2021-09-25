@@ -16,24 +16,24 @@ struct RenderObject
 
 	struct VertexBufferInfo
 	{
-		RHI::Buffer* gpuBuffer = nullptr;
-		std::uint32_t	offset = 0;
-		std::uint32_t	slot = 0xFFFFFFFF;
+		RHI::Buffer*	GpuBuffer = nullptr;
+		std::uint32_t	Offset = 0;
+		std::uint32_t	Slot = 0xFFFFFFFF;
 	};
 
 	struct IndexBufferInfo
 	{
-		RHI::Buffer* gpuBuffer = nullptr;
-		std::uint32_t	offset = 0;
-		std::uint32_t	indexCount = 0;
-		std::uint32_t	instanceCount = 0;
-		IndexType		indexType = IndexType::UINT32;
-
+		RHI::Buffer*	GpuBuffer = nullptr;
+		std::uint32_t	Offset = 0;
+		std::uint32_t	IndexCount = 0;
+		std::uint32_t	InstanceCount = 0;
+		IndexType		IndexType = IndexType::UINT32;
 	};
 
-	Material* materialObject;
-	std::vector<VertexBufferInfo> vertexBuffers;
-	IndexBufferInfo indexBuffer;
+	Material* MaterialObject;
+	std::vector<VertexBufferInfo> VertexBuffers;
+	IndexBufferInfo IndexBuffer;
+	std::uint64_t	RenderFlags = 0;
 };
 
 NS_RX_END

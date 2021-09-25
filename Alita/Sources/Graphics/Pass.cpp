@@ -400,7 +400,7 @@ void DeferredPass::Execute(RHI::CommandEncoder* cmdEncoder, const std::vector<Re
 
 	SetupOutputAttachment(0, rtColor_);
 
-	auto material = meshComponent_->GetRenderObject()->materialObject;
+	auto material = meshComponent_->GetRenderObject()->MaterialObject;
 	material->SetTexture("tGDiffuse", GBufferPass_.GetGBuffers().GDiffuse->GetTexture());
 	material->SetTexture("tGNormal", GBufferPass_.GetGBuffers().GNormal->GetTexture());
 	material->SetTexture("tGPosition", GBufferPass_.GetGBuffers().GPosition->GetTexture());
@@ -413,7 +413,7 @@ void DeferredPass::Execute(RHI::CommandEncoder* cmdEncoder, const std::vector<Re
 void ScreenResolvePass::Execute(RHI::CommandEncoder* cmdEncoder)
 {
 	const auto* texture = inputPass_->GetColorAttachments()[0].second->GetTexture();
-	meshComponent_->GetRenderObject()->materialObject->SetTexture("tAlbedo", texture);
+	meshComponent_->GetRenderObject()->MaterialObject->SetTexture("tAlbedo", texture);
 
 	FullScreenPass::Execute(cmdEncoder);
 }

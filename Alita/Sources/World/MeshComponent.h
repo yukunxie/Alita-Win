@@ -41,6 +41,9 @@ public:
 
 	friend class MeshComponentBuilder;
 	friend class Terrain;
+
+private:
+	std::uint64_t renderFlags_ = ERenderSet_Opaque;
 };
 
 class MeshComponentBuilder

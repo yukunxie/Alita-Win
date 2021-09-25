@@ -22,7 +22,8 @@ enum ERenderSet : std::uint64_t
 {
     ERenderSet_Opaque           = 1 << 0,
     ERenderSet_Transparent      = 1 << 1,
-    ERenderSet_PostProcess      = 1 << 2,
+    ERenderSet_SkyBox           = 1 << 2,
+    ERenderSet_PostProcess      = 1 << 3,
 };
 
 enum ETechniqueMask : std::uint64_t

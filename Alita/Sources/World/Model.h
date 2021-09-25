@@ -18,6 +18,9 @@ public:
     virtual ~Model();
 
 public:
+    static Model* CreateBox();
+
+public:
     
     virtual void Tick(float dt) override;
 };

@@ -485,6 +485,9 @@
     <ClCompile Include="Sources\RHI\Backend\Vulkan\VMA\VmaUsage.cpp">
       <Filter>Sources\RHI\Backend\Vulkan\WMA</Filter>
     </ClCompile>
+    <ClCompile Include="Sources\World\SkyBox.cpp">
+      <Filter>Sources\World\Private</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Sources\Platform\Platform.h">
@@ -1074,6 +1077,9 @@
     </ClInclude>
     <ClInclude Include="Third-Party\RenderDoc\renderdoc_app.h">
       <Filter>Third-Party\RenderDoc</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\World\SkyBox.h">
+      <Filter>Sources\World\Public</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
