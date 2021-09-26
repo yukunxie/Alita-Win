@@ -345,7 +345,7 @@ void Material::SetupPSOKey(PSOKey& psoKey, ETechniqueType technique)
         psoKey.CullMode = 2;
         break;
     case ETechniqueType::TShadowmapGen:
-        psoKey.CullMode = 1;
+        psoKey.CullMode = 2;
         psoKey.DepthBias = 1;
         break;
     case ETechniqueType::TSkyBox:

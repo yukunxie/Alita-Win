@@ -14,6 +14,47 @@ layout(binding = 20) uniform sampler     sShadowMap;
 
 layout(location = 0) out vec4 OutColor;
 
+#define ShadowFactor 0.5
+
+float textureProj(vec4 shadowCoord, vec2 off)
+{
+	float shadow = 1.0;
+	if ( shadowCoord.z > -1.0 && shadowCoord.z < 1.0 ) 
+	{
+		float dist = texture(sampler2D(tShadowMap, sShadowMap), shadowCoord.xy + off ).r;
+		if ( shadowCoord.w > 0.0 && dist < shadowCoord.z ) 
+		{
+			shadow = ShadowFactor;
+		}
+	}
+	return shadow;
+}
+
+float filterPCF(vec4 sc)
+{
+	//ivec2 texDim = textureSize(sampler2D(tShadowMap, sShadowMap), 0);
+    // float dx = scale / float(texDim.x);
+	// float dy = scale / float(texDim.y);
+	float scale = 1.0;
+	float dx = scale / 2048.0;
+    float dy = scale / 2048.0;
+
+	float shadowFactor = 0.0;
+	int count = 0;
+	int range = 1;
+	
+	for (int x = -range; x <= range; x++)
+	{
+		for (int y = -range; y <= range; y++)
+		{
+			shadowFactor += textureProj(sc, vec2(dx*x, dy*y));
+			count++;
+		}
+	
+	}
+	return shadowFactor / count;
+}
+
 void TShading() {
     //OutColor = texture(sampler2D(tGPosition, sGDiffuse), _UV0);
 
@@ -31,12 +72,13 @@ void TShading() {
     p /= p.w;
     vec2 projCoords= (p.xy + 1.0) * 0.5;
     
-    float shadowFactor = 1.0;
-    float smDepth = texture(sampler2D(tShadowMap, sShadowMap), projCoords).r;
-    if (p.z > smDepth)
-    {
-        shadowFactor = 0.5;
-    }
+    float shadowFactor = filterPCF(vec4(projCoords, p.z, 1.0));
+    // float shadowFactor = 1.0;
+    // float smDepth = texture(sampler2D(tShadowMap, sShadowMap), projCoords).r;
+    // if (p.z > smDepth)
+    // {
+    //     shadowFactor = 0.5;
+    // }
 
     OutColor = vec4(diffuse * shadowFactor , 1.0);
 }
