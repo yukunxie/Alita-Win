@@ -251,6 +251,11 @@ void DeferredCmdSetBlendColor::Execute(RHI::VKCommandBuffer* commandBuffer)
     commandBuffer->SetBlendColor(color_);
 }
 
+void DeferredCmdSetDepthBias::Execute(RHI::VKCommandBuffer* commandBuffer)
+{
+    commandBuffer->SetDepthBias(depthBiasConstantFactor_, depthBiasClamp_, depthBiasSlopeFactor_);
+}
+
 void DeferredCmdPushDebugGroup::Execute(RHI::VKCommandBuffer* commandBuffer)
 {
     commandBuffer->PushDebugGroup(strings_.data());

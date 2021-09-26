@@ -35,6 +35,7 @@ enum class RenderCommand
     SetScissorRect,
     SetViewport,
     SetBlendColor,
+    SetDepthBias,
     SetBindGroup,
     SetIndexBuffer,
     SetVertexBuffer,

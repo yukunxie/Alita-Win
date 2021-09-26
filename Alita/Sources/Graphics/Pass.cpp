@@ -20,6 +20,8 @@ void Pass::BeginPass()
 
 	RHI::RenderPassDescriptor renderPassDescriptor;
 
+	uint32 rtWidth(0), rtHeight(0);
+
 	for (const auto& tp : attachments_)
 	{
 		RHI::RenderPassColorAttachmentDescriptor descriptor;
@@ -31,6 +33,12 @@ void Pass::BeginPass()
 			descriptor.storeOp = RHI::StoreOp::STORE;
 		}
 		renderPassDescriptor.colorAttachments.push_back(descriptor);
+
+		if (rtWidth == 0)
+		{
+			rtWidth = tp.RenderTarget->GetTexture()->GetTextureSize().width;
+			rtHeight = tp.RenderTarget->GetTexture()->GetTextureSize().height;
+		}
 	}
 
 	if (DepthStencilAttachment_.RenderTarget)
@@ -44,10 +52,20 @@ void Pass::BeginPass()
 		.stencilStoreOp = RHI::StoreOp::STORE,
 		.stencilLoadValue = DepthStencilAttachment_.ClearStencil,
 		};
+
+		if (rtWidth == 0)
+		{
+			rtWidth = DepthStencilAttachment_.RenderTarget->GetTexture()->GetTextureSize().width;
+			rtHeight = DepthStencilAttachment_.RenderTarget->GetTexture()->GetTextureSize().height;
+		}
 	}
 
 	RHI_ASSERT(RenderPassEncoder_ == nullptr);
 	RenderPassEncoder_ = CommandEncoder_->BeginRenderPass(renderPassDescriptor);
+
+	RenderPassEncoder_->SetViewport(0, 0, rtWidth, rtHeight, 0, 1);
+	RenderPassEncoder_->SetScissorRect(0, 0, rtWidth, rtHeight);
+	RenderPassEncoder_->SetDepthBias(0, 0, 0);
 }
 
 void Pass::EndPass()
@@ -81,6 +99,8 @@ void ShadowMapGenPass::Execute(RHI::CommandEncoder* cmdEncoder, const std::vecto
 	SetupDepthStencilAttachemnt(dsTexture_, true, 1.0f, 0);
 
 	BeginPass();
+
+	RenderPassEncoder_->SetDepthBias(1.25f, 0, 1.75f);
 
 	for (const auto ro : renderObjects)
 	{

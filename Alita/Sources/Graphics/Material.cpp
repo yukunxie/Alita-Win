@@ -342,9 +342,11 @@ void Material::SetupPSOKey(PSOKey& psoKey, ETechniqueType technique)
     case ETechniqueType::TShading:
         break;
     case ETechniqueType::TGBufferGen:
+        psoKey.CullMode = 2;
         break;
     case ETechniqueType::TShadowmapGen:
-        psoKey.CullMode = 0;
+        psoKey.CullMode = 1;
+        psoKey.DepthBias = 1;
         break;
     case ETechniqueType::TSkyBox:
         psoKey.CullMode = 0;
@@ -650,6 +652,7 @@ RHI::RenderPipeline* Material::CreatePipelineState(const PSOKey& psoKey, const S
         psoDesc.rasterizationState = {
             .frontFace = (RHI::FrontFace)psoKey.FrontFace,
             .cullMode = (RHI::CullMode)psoKey.CullMode,
+            .depthBias = psoKey.DepthBias
         };
 
         for (int i = 0; i < kMaxAttachmentCount; ++i)

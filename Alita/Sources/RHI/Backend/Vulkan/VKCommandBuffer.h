@@ -143,6 +143,8 @@ public:
     virtual void SetStencilReference(std::uint32_t reference) override;
     
     virtual void SetBlendColor(const Color &color) override;
+
+    virtual void SetDepthBias(float depthBiasConstantFactor, float depthBiasClamp, float depthBiasSlopeFactor) override;
     
     virtual void PushDebugGroup(const char* groupLabel) override;
     

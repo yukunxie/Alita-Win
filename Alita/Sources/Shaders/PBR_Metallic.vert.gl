@@ -62,4 +62,5 @@ void TGBufferGen() {
 void TShadowMapGen() 
 {
     gl_Position = uGlobal.ShadowViewProjMatrix * uBatch.WorldMatrix * vec4(inPosition, 1.0);
+    gl_Position /= gl_Position.w;
 }

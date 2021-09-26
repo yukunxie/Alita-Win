@@ -82,6 +82,8 @@ public:
     virtual void BeginOcclusionQuery(std::uint32_t queryIndex) = 0;
     
     virtual void EndOcclusionQuery(std::uint32_t queryIndex) = 0;
+
+    virtual void SetDepthBias(float depthBiasConstantFactor, float depthBiasClamp, float depthBiasSlopeFactor) = 0;
 };
 
 NS_RHI_END

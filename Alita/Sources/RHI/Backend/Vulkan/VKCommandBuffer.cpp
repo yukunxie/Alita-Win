@@ -569,6 +569,11 @@ void VKCommandBuffer::SetBlendColor(const Color &color)
     vkCmdSetBlendConstants(GetNative(), &color.r);
 }
 
+void VKCommandBuffer::SetDepthBias(float depthBiasConstantFactor, float depthBiasClamp, float depthBiasSlopeFactor)
+{
+    vkCmdSetDepthBias(GetNative(), depthBiasConstantFactor, depthBiasClamp, depthBiasSlopeFactor);
+}
+
 void VKCommandBuffer::BeginOcclusionQuery(std::uint32_t queryIndex)
 {
     RHI_ASSERT(occlusionQuerySetBinding_);
@@ -726,6 +731,10 @@ void VKCommandBuffer::SubmitCommandList()
     
             case RenderCommand::SetBlendColor:
                 static_cast<DeferredCmdSetBlendColor*>(cmd)->Execute(this);
+                break;
+
+            case RenderCommand::SetDepthBias:
+                static_cast<DeferredCmdSetDepthBias*>(cmd)->Execute(this);
                 break;
     
             case RenderCommand::SetBindGroup:

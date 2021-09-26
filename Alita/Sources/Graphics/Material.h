@@ -165,6 +165,7 @@ struct PSOKey
 	{
 		memset(this, 0, sizeof(*this));
 		this->Technique = (int)ETechniqueType::TShading;
+		this->DepthBias = 0;
 		this->DepthWrite = 1;
 		this->DepthCmpFunc = (int)RHI::CompareFunction::LESS_EQUAL;
 		this->StencilWrite = 0;
@@ -188,6 +189,7 @@ struct PSOKey
 	}
 	
 	uint8 Technique : 8;
+	uint8 DepthBias : 1;
 	uint8 DepthWrite : 1;
 	uint8 DepthCmpFunc : 3;
 	uint8 StencilWrite : 1;

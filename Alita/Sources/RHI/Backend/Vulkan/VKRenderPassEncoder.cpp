@@ -363,6 +363,11 @@ void VKRenderPassEncoder::EndOcclusionQuery(std::uint32_t queryIndex)
     commandBuffer_->RecordCommand<DeferredCmdEndOcclusionQuery>(queryIndex);
 }
 
+void VKRenderPassEncoder::SetDepthBias(float depthBiasConstantFactor, float depthBiasClamp, float depthBiasSlopeFactor)
+{
+    commandBuffer_->RecordCommand<DeferredCmdSetDepthBias>(depthBiasConstantFactor, depthBiasClamp, depthBiasSlopeFactor);
+}
+
 void VKRenderPassEncoder::EndPass()
 {
     if (!commandBuffer_)

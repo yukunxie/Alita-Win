@@ -20,23 +20,23 @@ void TShading() {
     vec3 diffuse = texture(sampler2D(tGDiffuse, sGDiffuse), _UV0).xyz;
 
     vec4 wp = texture(sampler2D(tGPosition, sGPosition), _UV0);
-    vec3 _WorldPosition = wp.xyz / wp.w;
+    vec3 _WorldPosition = wp.xyz;// / wp.w;
     vec3 _WorldNormal = (texture(sampler2D(tGNormal, sGNormal), _UV0).xyz - 0.5) * 2.0;
 
     vec3 lightDir = normalize(uGlobal.EyePos.xyz - _WorldPosition);
     float specular = clamp(dot(lightDir, normalize(_WorldNormal)), 0, 1);
     diffuse.xyz *= specular * uGlobal.SunLightColor.xyz * uGlobal.SunLightColor.a;
 
-    vec4 p = uGlobal.ShadowViewProjMatrix * vec4(wp);
+    vec4 p = uGlobal.ShadowViewProjMatrix * vec4(wp / wp.z);
     p /= p.w;
-    vec3 projCoords= (p.xyz + 1.0) * 0.5;
+    vec2 projCoords= (p.xy + 1.0) * 0.5;
     
     float shadowFactor = 1.0;
-    float smDepth = texture(sampler2D(tShadowMap, sShadowMap), vec2(projCoords.x, 1 - projCoords.y)).r;
-    if (p.z - 0.002 > smDepth)
+    float smDepth = texture(sampler2D(tShadowMap, sShadowMap), projCoords).r;
+    if (p.z > smDepth)
     {
         shadowFactor = 0.5;
     }
 
-    OutColor = vec4(diffuse , 1.0);
+    OutColor = vec4(diffuse * shadowFactor , 1.0);
 }

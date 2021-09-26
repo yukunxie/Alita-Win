@@ -520,6 +520,28 @@ private:
     Color color_;
 };
 
+struct DeferredCmdSetDepthBias final : public DeferredCmdBase
+{
+    DeferredCmdSetDepthBias(float depthBiasConstantFactor,
+        float depthBiasClamp,
+        float depthBiasSlopeFactor)
+        : DeferredCmdBase(RenderCommand::SetDepthBias)
+    {
+        depthBiasConstantFactor_ = depthBiasConstantFactor;
+        depthBiasClamp_ = depthBiasClamp;
+        depthBiasSlopeFactor_ = depthBiasSlopeFactor;
+    }
+
+    virtual void Execute(VKCommandBuffer* commandBuffer) override;
+
+    ~DeferredCmdSetDepthBias() = delete;
+
+private:
+    float                                       depthBiasConstantFactor_;
+    float                                       depthBiasClamp_;
+    float                                       depthBiasSlopeFactor_;
+};
+
 struct DeferredCmdExecuteBundle final : public DeferredCmdBase
 {
     DeferredCmdExecuteBundle(RenderBundle* renderBundle)

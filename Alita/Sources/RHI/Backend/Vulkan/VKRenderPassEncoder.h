@@ -78,6 +78,8 @@ public:
     virtual void BeginOcclusionQuery(std::uint32_t queryIndex) override;
     
     virtual void EndOcclusionQuery(std::uint32_t queryIndex) override;
+
+    virtual void SetDepthBias(float depthBiasConstantFactor, float depthBiasClamp, float depthBiasSlopeFactor) override;
     
     virtual void EndPass() override;
     

@@ -100,8 +100,10 @@ public:
                                 std::uint32_t height) = 0;
     
     virtual void SetStencilReference(std::uint32_t reference) = 0;
-    
+   
     virtual void SetBlendColor(const Color &color) = 0;
+
+    virtual void SetDepthBias(float depthBiasConstantFactor, float depthBiasClamp, float depthBiasSlopeFactor) = 0;
     
     virtual void PushDebugGroup(const char* groupLabel) = 0;
     
