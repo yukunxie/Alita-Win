@@ -18,7 +18,7 @@ public:
     {
     }
     
-    bool IsSwapchainImage()
+    bool IsSwapchainImage() const
     { return isSwapchainImage_; }
     
     void MarkSwapchainImage()

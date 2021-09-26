@@ -24,36 +24,65 @@ class MeshComponent;
 
 class RenderObject;
 
+struct AttachmentConfig
+{
+    const RHI::TextureView* RenderTarget= nullptr;
+    uint8               Slot            = 0xFF;
+    bool                Clear           = true;
+    uint8               ClearStencil    = 0;
+    float               ClearDepth      = 1.0f;
+    RHI::Color          ClearColor      = { 0, 0, 0, 1 };
+    
+};
+
 class Pass : public ObjectBase
 {
 public:
-    void SetupDepthStencilAttachemnt(RHI::TextureView* attachment)
+    void SetupDepthStencilAttachemnt(const RHI::TextureView* attachment, bool clear = true, float depth = 1.0f, uint8 stencil = 0)
     {
-        dsAttachment_ = attachment;
+        DepthStencilAttachment_.RenderTarget = attachment;
+        DepthStencilAttachment_.Clear = clear;
+        DepthStencilAttachment_.ClearDepth = depth;
+        DepthStencilAttachment_.ClearStencil = stencil;
     }
 
-    void SetupOutputAttachment(std::uint32_t index, RHI::TextureView* attachment)
+    void SetupOutputAttachment(std::uint32_t index, const RHI::TextureView* attachment, bool clear = true, const RHI::Color& clearColor = { 0, 0, 0, 1})
     {
-        attachments_.push_back({ index, attachment });
+        attachments_.push_back(AttachmentConfig
+            {
+                .RenderTarget = attachment,
+                .Slot = (uint8)index,
+                .Clear = clear,
+                .ClearStencil = 0,
+                .ClearDepth = 1.0f,
+                .ClearColor = clearColor
+            });
     }
 
     void Reset()
     {
+        RenderPassEncoder_ = nullptr;
         attachments_.clear();
-        dsAttachment_ = nullptr;
+        DepthStencilAttachment_.RenderTarget = nullptr;
     }
 
-    const std::vector<std::pair<std::uint32_t, RHI::TextureView*>>& GetColorAttachments() const { return attachments_; }
+    void BeginPass();
 
-    const RHI::TextureView* GetDSAttachment() const { return dsAttachment_; }
+    void EndPass();
+
+    const std::vector<AttachmentConfig>& GetColorAttachments() const { return attachments_; }
+
+    const RHI::TextureView* GetDSAttachment() const { return DepthStencilAttachment_.RenderTarget; }
 
     RHI::RenderPassEncoder* GetRenderPassEncoder() const { return rhiPassEncoder_; }
 
     virtual void Execute(RHI::CommandEncoder* cmdEncoder, const std::vector<RenderObject*>& renderObjects) = 0;
 
 protected:
-    std::vector<std::pair<std::uint32_t, RHI::TextureView*>> attachments_;
-    RHI::TextureView* dsAttachment_ = nullptr;
+    RHI::RenderPassEncoder* RenderPassEncoder_ = nullptr;
+    RHI::CommandEncoder* CommandEncoder_ = nullptr;
+    std::vector<AttachmentConfig> attachments_;
+    AttachmentConfig DepthStencilAttachment_;
     RHI::RenderPassEncoder* rhiPassEncoder_ = nullptr;
 };
 
@@ -77,7 +106,7 @@ public:
 
 protected:
     TExtent2D     shadowMapSize_ = { 2048, 2048 };
-    RHI::TextureView* shadowMapTexture_ = nullptr;
+    //RHI::TextureView* shadowMapTexture_ = nullptr;
     RHI::TextureView* dsTexture_ = nullptr;
 };
 
@@ -117,6 +146,7 @@ class SkyBoxPass : public Pass
 {
 public:
     SkyBoxPass();
+    void Setup(const Pass* mainPass, const Pass* depthPass);
     virtual void Execute(RHI::CommandEncoder* cmdEncoder, const std::vector<RenderObject*>& renderObjects) override;
 
 protected:

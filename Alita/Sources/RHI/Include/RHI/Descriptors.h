@@ -183,8 +183,8 @@ union Color
 
 struct RenderPassColorAttachmentDescriptor
 {
-    TextureView* attachment = nullptr;
-    TextureView* resolveTarget = nullptr;
+    const TextureView* attachment = nullptr;
+    const TextureView* resolveTarget = nullptr;
     Color loadValue;
     LoadOp loadOp = LoadOp::LOAD;
     StoreOp storeOp = StoreOp::STORE;
@@ -202,7 +202,7 @@ struct RenderPassColorAttachmentDescriptor
 
 struct RenderPassDepthStencilAttachmentDescriptor
 {
-    TextureView* attachment = nullptr;
+    const TextureView* attachment = nullptr;
     
     LoadOp depthLoadOp = LoadOp::CLEAR;
     StoreOp depthStoreOp = StoreOp::STORE;

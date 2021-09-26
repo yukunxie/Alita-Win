@@ -152,7 +152,7 @@ struct FramebufferCacheQuery
     }
     
     VKRenderPass* renderPass;
-    VKTextureView* attachments[kMaxColorAttachments];
+    const VKTextureView* attachments[kMaxColorAttachments];
     std::uint32_t width = 0;
     std::uint32_t height = 0;
     std::uint32_t layers = 1;

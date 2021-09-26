@@ -7,112 +7,87 @@
 #include "World/World.h"
 #include "World/Camera.h"
 #include "RenderObject.h"
+#include "Engine/Engine.h"
+#include "Graphics/RenderScene.h"
 
 NS_RX_BEGIN
 
-void IgniterPass::Execute(RHI::CommandEncoder* cmdEncoder, const std::vector<RenderObject*>& renderObjects)
+void Pass::BeginPass()
 {
-	/*RHI::RenderPassDescriptor renderPassDescriptor;
+	CommandEncoder_ = Engine::GetRenderScene()->GetGraphicPipeline()->GetCommandEncoder();
+
+	std::sort(attachments_.begin(), attachments_.end(), [](const AttachmentConfig& a, const AttachmentConfig& b) {return a.Slot < b.Slot; });
+
+	RHI::RenderPassDescriptor renderPassDescriptor;
 
 	for (const auto& tp : attachments_)
 	{
 		RHI::RenderPassColorAttachmentDescriptor descriptor;
 		{
-			descriptor.attachment = tp.second;
+			descriptor.attachment = tp.RenderTarget;
 			descriptor.resolveTarget = nullptr;
-			descriptor.loadValue = { 0.0f, 1.0f, 0.0f, 1.0f };
-			descriptor.loadOp = RHI::LoadOp::CLEAR;
+			descriptor.loadValue = tp.ClearColor;
+			descriptor.loadOp = tp.Clear? RHI::LoadOp::CLEAR : RHI::LoadOp::LOAD;
 			descriptor.storeOp = RHI::StoreOp::STORE;
 		}
 		renderPassDescriptor.colorAttachments.push_back(descriptor);
 	}
 
-	renderPassDescriptor.depthStencilAttachment = {
-		.attachment = dsAttachment_,
-		.depthLoadOp = RHI::LoadOp::CLEAR,
+	if (DepthStencilAttachment_.RenderTarget)
+	{
+		renderPassDescriptor.depthStencilAttachment = {
+		.attachment = DepthStencilAttachment_.RenderTarget,
+		.depthLoadOp = DepthStencilAttachment_.Clear? RHI::LoadOp::CLEAR : RHI::LoadOp::LOAD,
 		.depthStoreOp = RHI::StoreOp::STORE,
-		.depthLoadValue = 1.0f,
-		.stencilLoadOp = RHI::LoadOp::CLEAR,
+		.depthLoadValue = DepthStencilAttachment_.ClearDepth,
+		.stencilLoadOp = DepthStencilAttachment_.Clear ? RHI::LoadOp::CLEAR : RHI::LoadOp::LOAD,
 		.stencilStoreOp = RHI::StoreOp::STORE,
-		.stencilLoadValue = 0,
-	};
+		.stencilLoadValue = DepthStencilAttachment_.ClearStencil,
+		};
+	}
 
-	auto renderPassEncoder = cmdEncoder->BeginRenderPass(renderPassDescriptor);
+	RHI_ASSERT(RenderPassEncoder_ == nullptr);
+	RenderPassEncoder_ = CommandEncoder_->BeginRenderPass(renderPassDescriptor);
+}
 
-	renderPassEncoder->EndPass();
+void Pass::EndPass()
+{
+	RHI_ASSERT(RenderPassEncoder_);
+	RenderPassEncoder_->EndPass();
+	RenderPassEncoder_ = nullptr;
+}
 
-	Reset();*/
+void IgniterPass::Execute(RHI::CommandEncoder* cmdEncoder, const std::vector<RenderObject*>& renderObjects)
+{
 }
 
 ShadowMapGenPass::ShadowMapGenPass()
 {
+	RHI::TextureDescriptor descriptor;
 	{
-		RHI::TextureDescriptor descriptor;
-		{
-			descriptor.sampleCount = 1;
-			descriptor.format = RHI::TextureFormat::R32FLOAT;
-			descriptor.usage = RHI::TextureUsage::OUTPUT_ATTACHMENT;
-			descriptor.size = { shadowMapSize_.width, shadowMapSize_.height };
-			descriptor.arrayLayerCount = 1;
-			descriptor.mipLevelCount = 1;
-			descriptor.dimension = RHI::TextureDimension::TEXTURE_2D;
-		};
-		shadowMapTexture_ = Engine::GetGPUDevice()->CreateTexture(descriptor)->CreateView({});
-	}
-
-	{
-		RHI::TextureDescriptor descriptor;
-		{
-			descriptor.sampleCount = 1;
-			descriptor.format = RHI::TextureFormat::DEPTH32FLOAT;
-			descriptor.usage = RHI::TextureUsage::OUTPUT_ATTACHMENT | RHI::TextureUsage::SAMPLED;
-			descriptor.size = { shadowMapSize_.width, shadowMapSize_.height };
-			descriptor.arrayLayerCount = 1;
-			descriptor.mipLevelCount = 1;
-			descriptor.dimension = RHI::TextureDimension::TEXTURE_2D;
-		};
-		dsTexture_ = Engine::GetGPUDevice()->CreateTexture(descriptor)->CreateView({});
-	}
+		descriptor.sampleCount = 1;
+		descriptor.format = RHI::TextureFormat::DEPTH32FLOAT;
+		descriptor.usage = RHI::TextureUsage::OUTPUT_ATTACHMENT | RHI::TextureUsage::SAMPLED;
+		descriptor.size = { shadowMapSize_.width, shadowMapSize_.height };
+		descriptor.arrayLayerCount = 1;
+		descriptor.mipLevelCount = 1;
+		descriptor.dimension = RHI::TextureDimension::TEXTURE_2D;
+	};
+	dsTexture_ = Engine::GetGPUDevice()->CreateTexture(descriptor)->CreateView({});
 }
 
 void ShadowMapGenPass::Execute(RHI::CommandEncoder* cmdEncoder, const std::vector<RenderObject*>& renderObjects)
 {
-	RHI::RenderPassDescriptor renderPassDescriptor;
+	SetupDepthStencilAttachemnt(dsTexture_, true, 1.0f, 0);
 
-	//RHI::RenderPassColorAttachmentDescriptor descriptor;
-	//{
-	//	descriptor.attachment = shadowMapTexture_;
-	//	descriptor.resolveTarget = nullptr;
-	//	descriptor.loadValue = { 1.0f, 1.0f, 1.0f, 1.0f };
-	//	descriptor.loadOp = RHI::LoadOp::CLEAR;
-	//	descriptor.storeOp = RHI::StoreOp::STORE;
-	//}
-	//renderPassDescriptor.colorAttachments.push_back(descriptor);
-
-	SetupDepthStencilAttachemnt(dsTexture_);
-	renderPassDescriptor.depthStencilAttachment = {
-		.attachment = dsTexture_,
-		.depthLoadOp = RHI::LoadOp::CLEAR,
-		.depthStoreOp = RHI::StoreOp::STORE,
-		.depthLoadValue = 1.0f,
-		.stencilLoadOp = RHI::LoadOp::CLEAR,
-		.stencilStoreOp = RHI::StoreOp::STORE,
-		.stencilLoadValue = 0,
-	};
-
-	auto renderPassEncoder = cmdEncoder->BeginRenderPass(renderPassDescriptor);
-
-	const auto& extent = dsTexture_->GetTexture()->GetTextureSize();
-	renderPassEncoder->SetViewport(0, 0, extent.width, extent.height, 0, 1);
-	renderPassEncoder->SetScissorRect(0, 0, extent.width, extent.height);
-	//renderPassEncoder->
+	BeginPass();
 
 	for (const auto ro : renderObjects)
 	{
-		ro->Render(this, ETechniqueType::TShadowmapGen, ERenderSet::ERenderSet_Opaque, *renderPassEncoder);
+		ro->Render(this, ETechniqueType::TShadowmapGen, ERenderSet::ERenderSet_Opaque, *RenderPassEncoder_);
 	}
 
-	renderPassEncoder->EndPass();
+	EndPass();
 }
 
 GBufferPass::GBufferPass()
@@ -187,49 +162,20 @@ GBufferPass::GBufferPass()
 
 void GBufferPass::Execute(RHI::CommandEncoder* cmdEncoder, const std::vector<RenderObject*>& renderObjects)
 {
-	SetupOutputAttachment(0, GBuffers_.GDiffuse);
-	SetupOutputAttachment(1, GBuffers_.GNormal);
-	SetupOutputAttachment(2, GBuffers_.GPosition);
-	SetupOutputAttachment(3, GBuffers_.GMaterial);
-	SetupDepthStencilAttachemnt(dsTexture_);
+	SetupOutputAttachment(0, GBuffers_.GDiffuse, true, { 0.0f, 0.0f, 0.0f, 1.0f });
+	SetupOutputAttachment(1, GBuffers_.GNormal, true, { 0.0f, 0.0f, 0.0f, 1.0f });
+	SetupOutputAttachment(2, GBuffers_.GPosition, true, { 0.0f, 0.0f, 0.0f, 1.0f });
+	SetupOutputAttachment(3, GBuffers_.GMaterial, true, { 0.0f, 0.0f, 0.0f, 1.0f });
+	SetupDepthStencilAttachemnt(dsTexture_, true, 1.0f, 0);
 
-	RHI::RenderPassDescriptor renderPassDescriptor;
-
-	for (const auto& tp : attachments_)
-	{
-		RHI::RenderPassColorAttachmentDescriptor descriptor;
-		{
-			descriptor.attachment = tp.second;
-			descriptor.resolveTarget = nullptr;
-			descriptor.loadValue = { 0.0f, 0.0f, 0.0f, 1.0f };
-			descriptor.loadOp = RHI::LoadOp::CLEAR;
-			descriptor.storeOp = RHI::StoreOp::STORE;
-		}
-		renderPassDescriptor.colorAttachments.push_back(descriptor);
-	}
-
-	renderPassDescriptor.depthStencilAttachment = {
-		.attachment = dsAttachment_,
-		.depthLoadOp = RHI::LoadOp::CLEAR,
-		.depthStoreOp = RHI::StoreOp::STORE,
-		.depthLoadValue = 1,
-		.stencilLoadOp = RHI::LoadOp::CLEAR,
-		.stencilStoreOp = RHI::StoreOp::STORE,
-		.stencilLoadValue = 0,
-	};
-
-	auto renderPassEncoder = cmdEncoder->BeginRenderPass(renderPassDescriptor);
-
-	const auto& extent = GBuffers_.GDiffuse->GetTexture()->GetTextureSize();
-	renderPassEncoder->SetViewport(0, 0, extent.width, extent.height, 0, 1);
-	renderPassEncoder->SetScissorRect(0, 0, extent.width, extent.height);
+	BeginPass();
 
 	for (const auto ro : renderObjects)
 	{
-		ro->Render(this, ETechniqueType::TGBufferGen, ERenderSet::ERenderSet_Opaque, *renderPassEncoder);
+		ro->Render(this, ETechniqueType::TGBufferGen, ERenderSet::ERenderSet_Opaque, *RenderPassEncoder_);
 	}
 
-	renderPassEncoder->EndPass();
+	EndPass();
 }
 
 OpaquePass::OpaquePass()
@@ -265,46 +211,17 @@ OpaquePass::OpaquePass()
 
 void OpaquePass::Execute(RHI::CommandEncoder* cmdEncoder, const std::vector<RenderObject*>& renderObjects)
 {
-	RHI::RenderPassDescriptor renderPassDescriptor;
-
 	SetupOutputAttachment(0, rtColor_);
 	SetupDepthStencilAttachemnt(rtDepthStencil_);
 
-	for (const auto& tp : attachments_)
-	{
-		RHI::RenderPassColorAttachmentDescriptor descriptor;
-		{
-			descriptor.attachment = rtColor_;
-			descriptor.resolveTarget = nullptr;
-			descriptor.loadValue = { 0.0f, 0.0f, 0.0f, 1.0f };
-			descriptor.loadOp = RHI::LoadOp::CLEAR;
-			descriptor.storeOp = RHI::StoreOp::STORE;
-		}
-		renderPassDescriptor.colorAttachments.push_back(descriptor);
-	}
-
-	renderPassDescriptor.depthStencilAttachment = {
-		.attachment = dsAttachment_,
-		.depthLoadOp = RHI::LoadOp::CLEAR,
-		.depthStoreOp = RHI::StoreOp::STORE,
-		.depthLoadValue = 1,
-		.stencilLoadOp = RHI::LoadOp::CLEAR,
-		.stencilStoreOp = RHI::StoreOp::STORE,
-		.stencilLoadValue = 0,
-	};
-
-	auto renderPassEncoder = cmdEncoder->BeginRenderPass(renderPassDescriptor);
-
-	const RHI::Extent2D extent = { 1280, 800 };
-	renderPassEncoder->SetViewport(0, 0, extent.width, extent.height, 0, 1);
-	renderPassEncoder->SetScissorRect(0, 0, extent.width, extent.height);
+	BeginPass();
 
 	for (const auto ro : renderObjects)
 	{
-		ro->Render(this, ETechniqueType::TShading, ERenderSet::ERenderSet_Opaque, *renderPassEncoder);
+		ro->Render(this, ETechniqueType::TShading, ERenderSet::ERenderSet_Opaque, *RenderPassEncoder_);
 	}
 
-	renderPassEncoder->EndPass();
+	EndPass();
 }
 
 SkyBoxPass::SkyBoxPass()
@@ -338,48 +255,37 @@ SkyBoxPass::SkyBoxPass()
 	};
 }
 
+void SkyBoxPass::Setup(const Pass* mainPass, const Pass* depthPass)
+{
+	if (mainPass)
+	{
+		SetupOutputAttachment(0, mainPass->GetColorAttachments()[0].RenderTarget, false);
+	}
+	if (depthPass && depthPass->GetDSAttachment())
+	{
+		SetupDepthStencilAttachemnt(depthPass->GetDSAttachment(), false);
+	}
+	else if (mainPass->GetDSAttachment())
+	{
+		SetupDepthStencilAttachemnt(mainPass->GetDSAttachment(), false);
+	}
+}
+
 void SkyBoxPass::Execute(RHI::CommandEncoder* cmdEncoder, const std::vector<RenderObject*>& renderObjects)
 {
-	RHI::RenderPassDescriptor renderPassDescriptor;
-
-	SetupOutputAttachment(0, rtColor_);
-	SetupDepthStencilAttachemnt(dsAttachment_);
-
-	for (const auto& tp : attachments_)
+	if (GetColorAttachments().empty())
 	{
-		RHI::RenderPassColorAttachmentDescriptor descriptor;
-		{
-			descriptor.attachment = tp.second;
-			descriptor.resolveTarget = nullptr;
-			descriptor.loadValue = { 0.0f, 0.0f, 0.0f, 1.0f };
-			descriptor.loadOp = RHI::LoadOp::CLEAR;
-			descriptor.storeOp = RHI::StoreOp::STORE;
-		}
-		renderPassDescriptor.colorAttachments.push_back(descriptor);
+		SetupOutputAttachment(0, rtColor_);
 	}
 
-	renderPassDescriptor.depthStencilAttachment = {
-		.attachment = dsAttachment_,
-		.depthLoadOp = RHI::LoadOp::CLEAR,
-		.depthStoreOp = RHI::StoreOp::STORE,
-		.depthLoadValue = 1,
-		.stencilLoadOp = RHI::LoadOp::CLEAR,
-		.stencilStoreOp = RHI::StoreOp::STORE,
-		.stencilLoadValue = 0,
-	};
-
-	auto renderPassEncoder = cmdEncoder->BeginRenderPass(renderPassDescriptor);
-
-	const RHI::Extent2D extent = { 1280, 800 };
-	renderPassEncoder->SetViewport(0, 0, extent.width, extent.height, 0, 1);
-	renderPassEncoder->SetScissorRect(0, 0, extent.width, extent.height);
+	BeginPass();
 
 	for (const auto ro : renderObjects)
 	{
-		ro->Render(this, ETechniqueType::TSkyBox, ERenderSet::ERenderSet_SkyBox, *renderPassEncoder);
+		ro->Render(this, ETechniqueType::TSkyBox, ERenderSet::ERenderSet_SkyBox, *RenderPassEncoder_);
 	}
 
-	renderPassEncoder->EndPass();
+	EndPass();
 }
 
 FullScreenPass::FullScreenPass(const std::string& materialName, ETechniqueType technique)
@@ -425,30 +331,11 @@ FullScreenPass::FullScreenPass(const std::string& materialName, ETechniqueType t
 
 void FullScreenPass::Execute(RHI::CommandEncoder* cmdEncoder)
 {
-	RHI::RenderPassDescriptor renderPassDescriptor;
+	BeginPass();
 
-	for (const auto& tp : attachments_)
-	{
-		RHI::RenderPassColorAttachmentDescriptor descriptor;
-		{
-			descriptor.attachment = tp.second;
-			descriptor.resolveTarget = nullptr;
-			descriptor.loadValue = { 0.0f, 0.0f, 0.0f, 1.0f };
-			descriptor.loadOp = RHI::LoadOp::UNDEFINED;
-			descriptor.storeOp = RHI::StoreOp::STORE;
-		}
-		renderPassDescriptor.colorAttachments.push_back(descriptor);
-	}
+	meshComponent_->GetRenderObject()->Render(this, ETechniqueType::TShading, ERenderSet::ERenderSet_PostProcess, *RenderPassEncoder_);
 
-	auto renderPassEncoder = cmdEncoder->BeginRenderPass(renderPassDescriptor);
-
-	const RHI::Extent2D extent = { 1280, 800 };
-	renderPassEncoder->SetViewport(0, 0, extent.width, extent.height, 0, 1);
-	renderPassEncoder->SetScissorRect(0, 0, extent.width, extent.height);
-
-	meshComponent_->GetRenderObject()->Render(this, ETechniqueType::TShading, ERenderSet::ERenderSet_PostProcess, *renderPassEncoder);
-
-	renderPassEncoder->EndPass();
+	EndPass();
 }
 
 DeferredPass::DeferredPass()
@@ -474,6 +361,7 @@ void DeferredPass::Execute(RHI::CommandEncoder* cmdEncoder, const std::vector<Re
 	GBufferPass_.Execute(cmdEncoder, renderObjects);
 
 	SetupOutputAttachment(0, rtColor_);
+	SetupDepthStencilAttachemnt(GBufferPass_.GetDSAttachment(), false);
 
 	auto material = meshComponent_->GetRenderObject()->MaterialObject;
 	material->SetTexture("tGDiffuse", GBufferPass_.GetGBuffers().GDiffuse->GetTexture());
@@ -487,9 +375,8 @@ void DeferredPass::Execute(RHI::CommandEncoder* cmdEncoder, const std::vector<Re
 
 void ScreenResolvePass::Execute(RHI::CommandEncoder* cmdEncoder)
 {
-	const auto* texture = inputPass_->GetColorAttachments()[0].second->GetTexture();
+	const auto* texture = inputPass_->GetColorAttachments()[0].RenderTarget->GetTexture();
 	meshComponent_->GetRenderObject()->MaterialObject->SetTexture("tAlbedo", texture);
-
 	FullScreenPass::Execute(cmdEncoder);
 }
 

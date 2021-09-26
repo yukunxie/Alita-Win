@@ -86,7 +86,7 @@ bool VKRenderPassEncoder::Init(VKCommandBuffer* commandBuffer,
                            attachment.loadOp,
                            attachment.storeOp,
                            attachment.resolveTarget != nullptr,
-                           RHI_CAST(VKTextureView*, attachment.attachment)->GetSampleCount());
+                           RHI_CAST(const VKTextureView*, attachment.attachment)->GetSampleCount());
             if (attachment.loadOp == LoadOp::CLEAR)
             {
                 VkClearAttachment clearAttachment;
@@ -98,7 +98,7 @@ bool VKRenderPassEncoder::Init(VKCommandBuffer* commandBuffer,
                 clearAttachments.push_back(clearAttachment);
             }
 
-            auto view = RHI_CAST(VKTextureView*, attachment.attachment);
+            auto view = RHI_CAST(const VKTextureView*, attachment.attachment);
             query.bIsSwapchainTextures[i] = view->GetTexture()->IsSwapchainImage();
 
             attachmentCount++;
@@ -137,10 +137,10 @@ bool VKRenderPassEncoder::Init(VKCommandBuffer* commandBuffer,
     }
     
     {
-        VKTextureView* colorAttachment = RHI_CAST(VKTextureView*,
+        auto colorAttachment = RHI_CAST(const VKTextureView*,
                                                   descriptor.colorAttachments[0].attachment);
         
-        VKTextureView* dsAttachment = RHI_CAST(VKTextureView*,
+        auto dsAttachment = RHI_CAST(const VKTextureView*,
                                                descriptor.depthStencilAttachment.attachment);
         
         Extent3D attachmentSize;
@@ -171,7 +171,7 @@ bool VKRenderPassEncoder::Init(VKCommandBuffer* commandBuffer,
             const auto &attachment = descriptor.colorAttachments[i];
             if (attachment.attachment)
             {
-                query.attachments[attachmentCount++] = RHI_CAST(VKTextureView*,
+                query.attachments[attachmentCount++] = RHI_CAST(const VKTextureView*,
                                                                 attachment.attachment);
             }
         }
@@ -181,7 +181,7 @@ bool VKRenderPassEncoder::Init(VKCommandBuffer* commandBuffer,
             const auto &attachment = descriptor.colorAttachments[i];
             if (attachment.resolveTarget)
             {
-                query.attachments[attachmentCount++] = RHI_CAST(VKTextureView*,
+                query.attachments[attachmentCount++] = RHI_CAST(const VKTextureView*,
                                                                 attachment.resolveTarget);
             }
         }

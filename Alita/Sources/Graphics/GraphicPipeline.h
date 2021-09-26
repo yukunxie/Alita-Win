@@ -23,6 +23,8 @@ public:
 		return WindowSize_;
 	}
 
+	RHI::CommandEncoder* GetCommandEncoder() { return CommandEncoder_; }
+
 public:
 	void Execute(const std::vector<RenderObject*>& renderObjects);
 

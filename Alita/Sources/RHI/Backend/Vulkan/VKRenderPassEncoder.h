@@ -87,8 +87,8 @@ private:
     VKCommandBuffer* commandBuffer_ = nullptr;
     VKFramebuffer* vkFramebuffer_ = VK_NULL_HANDLE;
     VKRenderPass* renderPass_ = nullptr;
-    Vector<TextureView*> attachments_;
-    Vector<TextureView*> resolveTargets_;
+    Vector<const TextureView*> attachments_;
+    Vector<const TextureView*> resolveTargets_;
     TextureView* depthStencilAttachemnt_ = nullptr;
     
     bool hasSwapchainImage_ = false;

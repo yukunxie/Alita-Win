@@ -2,6 +2,7 @@
 #include "stb/stb_image.h"
 #include "Base/FileSystem.h"
 #include "World/MeshComponent.h"
+#include "World/World.h"
 #include "Graphics/RenderScene.h"
 
 #include <math.h>
@@ -22,6 +23,7 @@ SkyBox::~SkyBox()
 
 void SkyBox::Tick(float dt)
 {
+    SetPosition(Engine::GetWorld()->GetCameraPosition());
     Model::Tick(dt);
 }
 

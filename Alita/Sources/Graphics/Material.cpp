@@ -348,6 +348,8 @@ void Material::SetupPSOKey(PSOKey& psoKey, ETechniqueType technique)
         break;
     case ETechniqueType::TSkyBox:
         psoKey.CullMode = 0;
+        psoKey.DepthWrite = false;
+        psoKey.StencilWrite = false;
         break;
     default:
         break;
@@ -358,8 +360,8 @@ void Material::SetupPSOKey(PSOKey& psoKey, const Pass* pass)
 {
     for (const auto& tp : pass->GetColorAttachments())
     {
-        RHI_ASSERT(tp.first < kMaxAttachmentCount);
-        psoKey.AttachmentFormats[tp.first] = (uint8)tp.second->GetFormat();
+        RHI_ASSERT(tp.Slot < kMaxAttachmentCount);
+        psoKey.AttachmentFormats[tp.Slot] = (uint8)tp.RenderTarget->GetFormat();
     }
     if (auto ds = pass->GetDSAttachment(); ds)
     {

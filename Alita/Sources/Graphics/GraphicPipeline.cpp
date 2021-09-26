@@ -63,24 +63,8 @@ void GraphicPipeline::Execute(const std::vector<RenderObject*>& renderObjects)
 	RHI::TextureView* colorAttachment = RHISwapChain_->GetCurrentTexture()->CreateView({});
 	CommandEncoder_->Reset();
 
-	//// init pass
-	//{
-	//	IgniterPass_.Reset();
-	//	IgniterPass_.SetupDepthStencilAttachemnt(rhiDSTextureView_);
-	//	IgniterPass_.SetupOutputAttachment(0, colorAttachment);
-	//	IgniterPass_.Execute(CommandEncoder_, renderObjects);
-	//}
-
 	ShadowGenPass_.Reset();
 	ShadowGenPass_.Execute(CommandEncoder_, renderObjects);
-	//
-	// draw opaque objects.
-	//{
-	//	OpaquePass_.Reset();
-	//	//OpaquePass_.SetupDepthStencilAttachemnt(rhiDSTextureView_);
-	//	//OpaquePass_.SetupOutputAttachment(0, colorAttachment);
-	//	OpaquePass_.Execute(CommandEncoder_, renderObjects);
-	//}
 
 	{
 		DeferredPass_.Reset(); 
@@ -90,6 +74,7 @@ void GraphicPipeline::Execute(const std::vector<RenderObject*>& renderObjects)
 
 	{
 		SkyBoxPass_.Reset();
+		SkyBoxPass_.Setup(&DeferredPass_, &DeferredPass_);
 		SkyBoxPass_.Execute(CommandEncoder_, renderObjects);
 	}
 
@@ -101,35 +86,11 @@ void GraphicPipeline::Execute(const std::vector<RenderObject*>& renderObjects)
 		ScreenResolvePass_.Execute(CommandEncoder_);
 	}
 
-	//// submit to gpu and present 
-	//{
-	//	VkImageMemoryBarrier prePresentBarrier = {};
-	//	prePresentBarrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
-	//	prePresentBarrier.pNext = NULL;
-	//	prePresentBarrier.srcAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
-	//	prePresentBarrier.dstAccessMask = VK_ACCESS_MEMORY_READ_BIT;
-	//	prePresentBarrier.oldLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-	//	prePresentBarrier.newLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
-	//	prePresentBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-	//	prePresentBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-	//	prePresentBarrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-	//	prePresentBarrier.subresourceRange.baseMipLevel = 0;
-	//	prePresentBarrier.subresourceRange.levelCount = 1;
-	//	prePresentBarrier.subresourceRange.baseArrayLayer = 0;
-	//	prePresentBarrier.subresourceRange.layerCount = 1;
-	//	prePresentBarrier.image = RHI_CAST(RHI::VKTextureView*, colorAttachment)->GetVkImage();
-
 		RHI::CommandBuffer* cmdBuffer = CommandEncoder_->Finish();
 		RHI_SAFE_RETAIN(cmdBuffer);
 
-	//	vkCmdPipelineBarrier(RHI_CAST(RHI::VKCommandBuffer*, cmdBuffer)->GetNative(), VK_PIPELINE_STAGE_ALL_COMMANDS_BIT,
-	//		VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT, 0, 0, NULL, 0,
-	//		NULL, 1, &prePresentBarrier);
-
 		GraphicQueue_->Submit(1, &cmdBuffer);
 		Engine::GetGPUDevice()->OnFrameEnd();
-		//RHISwapChain_->Present(GraphicQueue_, nullptr);
-	//}
 }
 
 NS_RX_END

@@ -42,7 +42,7 @@ public:
         return colorAttachmentCount_;
     }
     
-    const std::array<VKTextureView*, kMaxColorAttachments>& GetColorAttachments() const
+    const std::array<const VKTextureView*, kMaxColorAttachments>& GetColorAttachments() const
     {
         return colorAttachments_;
     }
@@ -56,7 +56,7 @@ private:
     Extent2D extent2D_;
     
     std::uint32_t colorAttachmentCount_ = 0;
-    std::array<VKTextureView*, kMaxColorAttachments> colorAttachments_;
+    std::array<const VKTextureView*, kMaxColorAttachments> colorAttachments_;
     
     bool hasSwapChainImages_ = false;
     

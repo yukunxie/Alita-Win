@@ -27,16 +27,18 @@ public:
 	virtual ~RenderScene();
 
 public:
+	GraphicPipeline* GetGraphicPipeline() { return GraphicPipeline_; }
+
 	void AddPrimitive(MeshComponent* mesh);
 
 	void AddRenderObject(RenderObject* obj)
 	{
-		renderObjects_.push_back(obj);
+		RenderObjects_.push_back(obj);
 	}
 
 	const GobalRenderParams& GetGobalRenderParams() const
 	{
-		return gobalRenderParams_;
+		return GobalRenderParams_;
 	}
 
 	void Tick(float dt);
@@ -45,11 +47,11 @@ public:
 
 protected:
 
-	GobalRenderParams gobalRenderParams_;
+	GobalRenderParams GobalRenderParams_;
 
-	std::vector<RenderObject*> renderObjects_;
+	std::vector<RenderObject*> RenderObjects_;
 
-    GraphicPipeline* graphicPipeline_ = nullptr;
+    GraphicPipeline* GraphicPipeline_ = nullptr;
 };
 
 NS_RX_END
