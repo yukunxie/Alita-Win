@@ -144,6 +144,9 @@
     <Filter Include="Third-Party\RenderDoc">
       <UniqueIdentifier>{7046677d-6f5b-4497-b72c-dc631e3c5bfc}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Third-Party\ktx">
+      <UniqueIdentifier>{89839bf5-f4a2-4031-9419-286cdebb79ec}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Third-Party\StandAlone\ResourceLimits.cpp">
@@ -487,6 +490,48 @@
     </ClCompile>
     <ClCompile Include="Sources\World\SkyBox.cpp">
       <Filter>Sources\World\Private</Filter>
+    </ClCompile>
+    <ClCompile Include="Third-Party\ktx\lib\checkheader.c">
+      <Filter>Third-Party\ktx</Filter>
+    </ClCompile>
+    <ClCompile Include="Third-Party\ktx\lib\errstr.c">
+      <Filter>Third-Party\ktx</Filter>
+    </ClCompile>
+    <ClCompile Include="Third-Party\ktx\lib\filestream.c">
+      <Filter>Third-Party\ktx</Filter>
+    </ClCompile>
+    <ClCompile Include="Third-Party\ktx\lib\hashlist.c">
+      <Filter>Third-Party\ktx</Filter>
+    </ClCompile>
+    <ClCompile Include="Third-Party\ktx\lib\hashtable.c">
+      <Filter>Third-Party\ktx</Filter>
+    </ClCompile>
+    <ClCompile Include="Third-Party\ktx\lib\memstream.c">
+      <Filter>Third-Party\ktx</Filter>
+    </ClCompile>
+    <ClCompile Include="Third-Party\ktx\lib\swap.c">
+      <Filter>Third-Party\ktx</Filter>
+    </ClCompile>
+    <ClCompile Include="Third-Party\ktx\lib\texture.c">
+      <Filter>Third-Party\ktx</Filter>
+    </ClCompile>
+    <ClCompile Include="Third-Party\ktx\lib\vk_funcs.c">
+      <Filter>Third-Party\ktx</Filter>
+    </ClCompile>
+    <ClCompile Include="Third-Party\ktx\lib\vkloader.c">
+      <Filter>Third-Party\ktx</Filter>
+    </ClCompile>
+    <ClCompile Include="Third-Party\ktx\lib\writer.c">
+      <Filter>Third-Party\ktx</Filter>
+    </ClCompile>
+    <ClCompile Include="Third-Party\ktx\lib\writer_v1.c">
+      <Filter>Third-Party\ktx</Filter>
+    </ClCompile>
+    <ClCompile Include="Third-Party\ktx\lib\etcdec.cxx">
+      <Filter>Third-Party\ktx</Filter>
+    </ClCompile>
+    <ClCompile Include="Third-Party\ktx\lib\etcunpack.cxx">
+      <Filter>Third-Party\ktx</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1085,6 +1130,9 @@
   <ItemGroup>
     <None Include="Third-Party\glslang\Include\revision.template">
       <Filter>Third-Party\glslang\Include</Filter>
+    </None>
+    <None Include="Third-Party\ktx\lib\vk_funclist.inl">
+      <Filter>Third-Party\ktx</Filter>
     </None>
   </ItemGroup>
 </Project>

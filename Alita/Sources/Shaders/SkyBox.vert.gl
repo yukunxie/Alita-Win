@@ -12,6 +12,6 @@ layout(location = 0) out vec3 _UVW;
 void TSkyBox() {
     _UVW = inPosition;
 	// Convert cubemap coordinates into Vulkan coordinate space
-	_UVW.xy *= -1.0;
+	//_UVW.xy *= -1.0;
     gl_Position = uGlobal.ViewProjMatrix * uBatch.WorldMatrix * vec4(inPosition, 1.0);
 }

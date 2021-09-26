@@ -4,15 +4,16 @@
 
 layout (location = 0) in vec3 inUVW;
 
-layout(binding = 11) uniform texture2D   tAlbedo;
-layout(binding = 12) uniform sampler     sAlbedo;
+layout(binding = 11) uniform textureCube    tAlbedo;
+layout(binding = 12) uniform sampler        sAlbedo;
 
 
 layout(location = 0) out vec4 OutColor;
 
-void main() 
+void TSkyBox() 
 {
-	// OutColor = texture(samplerCubeMap, inUVW);
-    OutColor = vec4(inUVW, 1.0);
+    OutColor = texture(samplerCube(tAlbedo, sAlbedo), inUVW);
+	//OutColor = texture(tAlbedo, inUVW);
+    // OutColor = vec4(inUVW, 1.0);
 }
 

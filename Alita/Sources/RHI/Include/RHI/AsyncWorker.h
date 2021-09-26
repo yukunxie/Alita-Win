@@ -116,11 +116,7 @@ protected:
     
     virtual void Run() override
     {
-#if ANDROID
         threadId_ = pthread_self();
-#else
-        threadId_ = 0;
-#endif
         
         while (!IsStopped())
         {
@@ -145,7 +141,11 @@ protected:
 protected:
     SemaphoreCXX semaphore_;
     std::mutex mutex_;
+#if WIN32
+    std::uint32_t threadId_ = 0;
+#else
     std::thread::native_handle_type threadId_ = 0;
+#endif
     std::queue<AsyncTaskPtr> taskQueue_;
     std::atomic<bool> isThreadStopped_;
 };

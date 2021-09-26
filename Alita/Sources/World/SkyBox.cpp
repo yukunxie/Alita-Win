@@ -13,7 +13,7 @@ SkyBox::SkyBox()
     auto modelComp = MeshComponentBuilder::CreateBox("Materials/SkyBox.json");
     modelComp->SetRenderSet(ERenderSet_SkyBox);
     this->AddComponment(modelComp);
-    this->SetScale({ 100, 100, 100 });
+    this->SetScale({ 500, 500, 500 });
 }
 
 SkyBox::~SkyBox()

@@ -61,7 +61,7 @@ void World::SetupDefaultCamera()
 		return;
 	}
 	defaultCamera_ = Camera::CreatePerspectiveCamera(45.0, 1280.f / 800.0f, 1.0f, 1000.f);
-	defaultCamera_->LookAt({ 0, 15, 15 }, { 0, 0, 0 }, { 0, 1, 0 });
+	defaultCamera_->LookAt({ 0, 15, 15 }, { 0, 15, 0 }, { 0, 1, 0 });
 
 	shadowMapCamera_ = new OrthoCamera(-50, 50, 50, -50, 0.0001f, 1000);
 	shadowMapCamera_->LookAt(TVector3( -20.0f, 20.0f, 20.0f), TVector3(0.0f, 0.0f, 0.0f ), TVector3(0.0f, 1.0f, 0.0f));

@@ -80,7 +80,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(ProjectDir)Sources;$(ProjectDir)Sources\RHI\;$(ProjectDir)Sources\RHI\Include;$(ProjectDir)Third-Party\OGLCompilersDLL;$(ProjectDir)Third-Party;$(ProjectDir)Third-Party\vulkan\Include;$(ProjectDir)Third-Party\glfw\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)Sources;$(ProjectDir)Sources\RHI\;$(ProjectDir)Sources\RHI\Include;$(ProjectDir)Third-Party\OGLCompilersDLL;$(ProjectDir)Third-Party;$(ProjectDir)Third-Party\vulkan\Include;$(ProjectDir)Third-Party\ktx\include;$(ProjectDir)Third-Party\glfw\include;$(ProjectDir)Third-Party\ktx\other_include;$(IncludePath)</IncludePath>
     <LibraryPath>$(ProjectDir)Third-Party\vulkan\Lib\Win64;$(ProjectDir)Third-Party\glfw\Lib\Win64;$(LibraryPath)</LibraryPath>
     <CustomBuildBeforeTargets>Run</CustomBuildBeforeTargets>
   </PropertyGroup>
@@ -258,6 +258,20 @@ echo "xxxxx"</Command>
     <ClCompile Include="Third-Party\glslang\MachineIndependent\Versions.cpp" />
     <ClCompile Include="Third-Party\glslang\OSDependent\Windows\main.cpp" />
     <ClCompile Include="Third-Party\glslang\OSDependent\Windows\ossource.cpp" />
+    <ClCompile Include="Third-Party\ktx\lib\checkheader.c" />
+    <ClCompile Include="Third-Party\ktx\lib\errstr.c" />
+    <ClCompile Include="Third-Party\ktx\lib\etcdec.cxx" />
+    <ClCompile Include="Third-Party\ktx\lib\etcunpack.cxx" />
+    <ClCompile Include="Third-Party\ktx\lib\filestream.c" />
+    <ClCompile Include="Third-Party\ktx\lib\hashlist.c" />
+    <ClCompile Include="Third-Party\ktx\lib\hashtable.c" />
+    <ClCompile Include="Third-Party\ktx\lib\memstream.c" />
+    <ClCompile Include="Third-Party\ktx\lib\swap.c" />
+    <ClCompile Include="Third-Party\ktx\lib\texture.c" />
+    <ClCompile Include="Third-Party\ktx\lib\vkloader.c" />
+    <ClCompile Include="Third-Party\ktx\lib\vk_funcs.c" />
+    <ClCompile Include="Third-Party\ktx\lib\writer.c" />
+    <ClCompile Include="Third-Party\ktx\lib\writer_v1.c" />
     <ClCompile Include="Third-Party\OGLCompilersDLL\InitializeDll.cpp" />
     <ClCompile Include="Third-Party\SPIRV\disassemble.cpp" />
     <ClCompile Include="Third-Party\SPIRV\doc.cpp" />
@@ -473,6 +487,7 @@ echo "xxxxx"</Command>
   </ItemGroup>
   <ItemGroup>
     <None Include="Third-Party\glslang\Include\revision.template" />
+    <None Include="Third-Party\ktx\lib\vk_funclist.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

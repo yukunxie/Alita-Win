@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "*.gl": "cpp",
+        "gl_format.h": "c"
+    }
+}

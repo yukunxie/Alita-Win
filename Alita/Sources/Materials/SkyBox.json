@@ -31,7 +31,7 @@
       "name": "albedo",
       "binding": 11,
       "type": "Texture2D",
-      "uri": "Textures/default-512.png"
+      "uri": "Textures/cubemap_vulkan.ktx"
     },
     {
       "name": "albedo_sampler",

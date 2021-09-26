@@ -7,6 +7,7 @@
 
 #include <stdexcept>
 #include <functional>
+#include <assert.h>
 
 #include "Platform/Platform.h"
 
@@ -14,10 +15,14 @@
 #include <android/log.h>
 #endif
 
+#if WIN32
+#define pthread_self() (0)
+#endif 
+
 #if defined(COCOS2D_DEBUG) && COCOS2D_DEBUG
 #define RHI_DEBUG 1
 #else
-#define RHI_DEBUG 0
+#define RHI_DEBUG 1
 #endif
 
 #if RHI_DEBUG

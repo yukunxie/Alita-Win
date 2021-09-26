@@ -161,7 +161,7 @@ void Material::SetupConstantBufferLayout()
         param.name    = std::get<1>(field);
 
         const uint32 byteAlign = sShaderDataTypeToGLType[param.format].Align;
-        RHI_ASSERT(byteAlign & (byteAlign - 1) == 0);
+        RHI_ASSERT((byteAlign & (byteAlign - 1)) == 0);
         offset = (offset + byteAlign - 1) & (~(byteAlign - 1));
         param.offset = offset;
         offset += sShaderDataTypeToGLType[param.format].Size;
@@ -424,7 +424,13 @@ void Material::ApplyModifyToBindGroup(RHI::RenderPassEncoder& passEndcoder)
         }
         else if (it->type == MaterailBindingObjectType::TEXTURE2D)
         {
-            auto resource = Engine::GetGPUDevice()->CreateTextureViewBinding(((RHI::Texture*)it->texture)->CreateView({}));
+            RHI::TextureViewDescriptor tvDescriptor;
+            if (it->texture->GetArrayLayerCount() == 6)
+            {
+                tvDescriptor.dimension = RHI::TextureViewDimension::DIM_CUBE;
+            }
+
+            auto resource = Engine::GetGPUDevice()->CreateTextureViewBinding(((RHI::Texture*)it->texture)->CreateView(tvDescriptor));
             RHI_SAFE_RETAIN(resource);
             RHI::BindGroupBinding tmp;
             {
