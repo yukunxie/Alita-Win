@@ -56,8 +56,7 @@ std::uint32_t GetFormatSize(InputAttributeFormat format)
 
 static const std::string sShaderExtensions =
 "#version 450\n"
-"#extension GL_ARB_separate_shader_objects : enable\n"
-"#extension GL_ARB_shading_language_450pack : enable\n";
+"#extension GL_ARB_separate_shader_objects : enable\n\n";
 
 //enum class EShaderDataType
 //{
@@ -231,6 +230,9 @@ static RHI::Shader* _CreateShader(const std::string& filename, RHI::ShaderType s
     case ETechniqueType::TShadowmapGen:
         techEntryName = "void TShadowMapGen()";
         break;
+    case ETechniqueType::TSkyBox:
+        techEntryName = "void TSkyBox()";
+        break;
     default:
         RHI_ASSERT(false);
     }
@@ -334,9 +336,21 @@ void Material::SetupPSOKey(PSOKey& psoKey, ERenderSet renderSet)
 void Material::SetupPSOKey(PSOKey& psoKey, ETechniqueType technique)
 {
     psoKey.Technique = (int)technique;
-    if (technique == ETechniqueType::TShadowmapGen)
+
+    switch (technique)
     {
+    case ETechniqueType::TShading:
+        break;
+    case ETechniqueType::TGBufferGen:
+        break;
+    case ETechniqueType::TShadowmapGen:
         psoKey.CullMode = 0;
+        break;
+    case ETechniqueType::TSkyBox:
+        psoKey.CullMode = 0;
+        break;
+    default:
+        break;
     }
 }
 

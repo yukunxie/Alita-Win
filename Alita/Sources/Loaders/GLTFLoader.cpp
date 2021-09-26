@@ -49,8 +49,8 @@ namespace GLTFLoader
 		for (const tinygltf::Primitive& primitive : tMesh.primitives)
 		{
 			MeshComponent* mc = new MeshComponent();
-			mc->geometry_ = new Geometry;
-			mc->material_ = new Material("Materials/PBR_Metallic.json");
+			mc->Geometry_ = new Geometry;
+			mc->Material_ = new Material("Materials/PBR_Metallic.json");
 			{
 				const tinygltf::Material& tMaterial = tModel.materials[primitive.material];
 				std::vector<float> tmp;
@@ -61,7 +61,7 @@ namespace GLTFLoader
 						auto v = tMaterial.emissiveFactor[i];
 						tmp[i] = (float)v;
 					}
-					mc->material_->SetFloat("emissiveFactor", 0, std::min(3, (int)tmp.size()), tmp.data());
+					mc->Material_->SetFloat("emissiveFactor", 0, std::min(3, (int)tmp.size()), tmp.data());
 				}
 
 				const tinygltf::PbrMetallicRoughness& pbrMetallicRoughness = tMaterial.pbrMetallicRoughness;
@@ -72,14 +72,14 @@ namespace GLTFLoader
 						auto v = pbrMetallicRoughness.baseColorFactor[i];
 						tmp[i] = (float)v;
 					}
-					mc->material_->SetFloat("baseColorFactor", 0, std::min(4, (int)tmp.size()), tmp.data());
+					mc->Material_->SetFloat("baseColorFactor", 0, std::min(4, (int)tmp.size()), tmp.data());
 				}
 				{
 					float metallicFactor = (float)pbrMetallicRoughness.metallicFactor;
-					mc->material_->SetFloat("metallicFactor", 0, 1, &metallicFactor);
+					mc->Material_->SetFloat("metallicFactor", 0, 1, &metallicFactor);
 
 					float roughnessFactor = (float)pbrMetallicRoughness.roughnessFactor;
-					mc->material_->SetFloat("roughnessFactor", 0, 1, &roughnessFactor);
+					mc->Material_->SetFloat("roughnessFactor", 0, 1, &roughnessFactor);
 				}
 				if (pbrMetallicRoughness.baseColorTexture.index != -1)
 				{
@@ -89,7 +89,7 @@ namespace GLTFLoader
 					auto texture = _LoadTexture(image);
 					if (texture)
 					{
-						mc->material_->SetTexture("albedo", texture);
+						mc->Material_->SetTexture("albedo", texture);
 					}
 					/*if (image.mimeType.empty())
 					{
@@ -138,11 +138,11 @@ namespace GLTFLoader
 				{
 					tmp[i] = pIndices[i];
 				}
-				mc->geometry_->GetIndexBuffer()->InitData(tmp.data(), tmp.size() * sizeof(tmp[0]));
+				mc->Geometry_->GetIndexBuffer()->InitData(tmp.data(), tmp.size() * sizeof(tmp[0]));
 			}
 			else if (accessor.componentType == TINYGLTF_COMPONENT_TYPE_UNSIGNED_INT)
 			{
-				mc->geometry_->GetIndexBuffer()->InitData(tData, accessor.count * sizeof(int));
+				mc->Geometry_->GetIndexBuffer()->InitData(tData, accessor.count * sizeof(int));
 			}
 			else
 			{

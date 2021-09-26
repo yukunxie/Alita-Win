@@ -20,24 +20,25 @@ public:
 
 	const TExtent2D& GetWindowSize() const
 	{
-		return windowSize_;
+		return WindowSize_;
 	}
 
 public:
 	void Execute(const std::vector<RenderObject*>& renderObjects);
 
 private:
-	ShadowMapGenPass shadowGenPass_;
-	IgniterPass igniterPass_;
-	OpaquePass opaquePass_;
-	DeferredPass deferredPass_;
-	ScreenResolvePass screenResolvePass_;
-	TExtent2D  windowSize_;
+	ShadowMapGenPass ShadowGenPass_;
+	IgniterPass IgniterPass_;
+	OpaquePass OpaquePass_;
+	SkyBoxPass SkyBoxPass_;
+	DeferredPass DeferredPass_;
+	ScreenResolvePass ScreenResolvePass_;
+	TExtent2D  WindowSize_;
 
 	// RHI
-	RHI::SwapChain* rhiSwapChain_ = nullptr;
-	RHI::Queue* graphicQueue_ = nullptr;
-	RHI::CommandEncoder* rhiCommandEncoder_ = nullptr;
+	RHI::SwapChain* RHISwapChain_ = nullptr;
+	RHI::Queue* GraphicQueue_ = nullptr;
+	RHI::CommandEncoder* CommandEncoder_ = nullptr;
 	
 	RHI::Texture* rhiDSTexture_ = nullptr;
 	RHI::TextureView* rhiDSTextureView_ = nullptr;

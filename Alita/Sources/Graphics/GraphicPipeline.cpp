@@ -11,18 +11,18 @@ int g_test_released = false;
 NS_RX_BEGIN
 
 GraphicPipeline::GraphicPipeline()
-	: screenResolvePass_()
+	: ScreenResolvePass_()
 {
 	LOGI("xxxx 0");
 
-	graphicQueue_ = Engine::GetGPUDevice()->GetQueue();
-	RHI_SAFE_RETAIN(graphicQueue_);
+	GraphicQueue_ = Engine::GetGPUDevice()->GetQueue();
+	RHI_SAFE_RETAIN(GraphicQueue_);
 
 	LOGI("xxxx 1");
 
-	rhiCommandEncoder_ = Engine::GetGPUDevice()->CreateCommandEncoder();
-	RHI_SAFE_RETAIN(rhiCommandEncoder_);
-	RHI_SAFE_RETAIN(rhiCommandEncoder_);
+	CommandEncoder_ = Engine::GetGPUDevice()->CreateCommandEncoder();
+	RHI_SAFE_RETAIN(CommandEncoder_);
+	RHI_SAFE_RETAIN(CommandEncoder_);
 	g_test_released = true;
 
 	LOGI("xxxx 2");
@@ -31,17 +31,17 @@ GraphicPipeline::GraphicPipeline()
 	swapChainDescriptor.device = Engine::GetGPUDevice();
 	swapChainDescriptor.format = RHI::TextureFormat::RGBA8UNORM;
 
-	rhiSwapChain_ = Engine::GetGPUDevice()->CreateSwapchain(swapChainDescriptor);
-	RHI_SAFE_RETAIN(rhiSwapChain_);
+	RHISwapChain_ = Engine::GetGPUDevice()->CreateSwapchain(swapChainDescriptor);
+	RHI_SAFE_RETAIN(RHISwapChain_);
 
-	windowSize_ = { rhiSwapChain_->GetExtent().width, rhiSwapChain_->GetExtent().height };
+	WindowSize_ = { RHISwapChain_->GetExtent().width, RHISwapChain_->GetExtent().height };
 	{
 		RHI::TextureDescriptor descriptor;
 		{
 			descriptor.sampleCount = 1;
 			descriptor.format = RHI::TextureFormat::DEPTH24PLUS_STENCIL8;
 			descriptor.usage = RHI::TextureUsage::OUTPUT_ATTACHMENT;
-			descriptor.size = { windowSize_.width, windowSize_.height };
+			descriptor.size = { WindowSize_.width, WindowSize_.height };
 			descriptor.arrayLayerCount = 1;
 			descriptor.mipLevelCount = 1;
 			descriptor.dimension = RHI::TextureDimension::TEXTURE_2D;
@@ -55,44 +55,50 @@ GraphicPipeline::GraphicPipeline()
 
 GraphicPipeline::~GraphicPipeline()
 {
-	RHI_SAFE_RELEASE(rhiCommandEncoder_);
+	RHI_SAFE_RELEASE(CommandEncoder_);
 }
 
 void GraphicPipeline::Execute(const std::vector<RenderObject*>& renderObjects)
 {
-	RHI::TextureView* colorAttachment = rhiSwapChain_->GetCurrentTexture()->CreateView({});
-	rhiCommandEncoder_->Reset();
+	RHI::TextureView* colorAttachment = RHISwapChain_->GetCurrentTexture()->CreateView({});
+	CommandEncoder_->Reset();
 
 	//// init pass
 	//{
-	//	igniterPass_.Reset();
-	//	igniterPass_.SetupDepthStencilAttachemnt(rhiDSTextureView_);
-	//	igniterPass_.SetupOutputAttachment(0, colorAttachment);
-	//	igniterPass_.Execute(rhiCommandEncoder_, renderObjects);
+	//	IgniterPass_.Reset();
+	//	IgniterPass_.SetupDepthStencilAttachemnt(rhiDSTextureView_);
+	//	IgniterPass_.SetupOutputAttachment(0, colorAttachment);
+	//	IgniterPass_.Execute(CommandEncoder_, renderObjects);
 	//}
 
-	shadowGenPass_.Reset();
-	shadowGenPass_.Execute(rhiCommandEncoder_, renderObjects);
+	ShadowGenPass_.Reset();
+	ShadowGenPass_.Execute(CommandEncoder_, renderObjects);
 	//
 	// draw opaque objects.
 	//{
-	//	opaquePass_.Reset();
-	//	//opaquePass_.SetupDepthStencilAttachemnt(rhiDSTextureView_);
-	//	//opaquePass_.SetupOutputAttachment(0, colorAttachment);
-	//	opaquePass_.Execute(rhiCommandEncoder_, renderObjects);
+	//	OpaquePass_.Reset();
+	//	//OpaquePass_.SetupDepthStencilAttachemnt(rhiDSTextureView_);
+	//	//OpaquePass_.SetupOutputAttachment(0, colorAttachment);
+	//	OpaquePass_.Execute(CommandEncoder_, renderObjects);
 	//}
 
 	{
-		deferredPass_.Reset(); 
-		deferredPass_.Setup(&shadowGenPass_);
-		deferredPass_.Execute(rhiCommandEncoder_, renderObjects);
+		DeferredPass_.Reset(); 
+		DeferredPass_.Setup(&ShadowGenPass_);
+		DeferredPass_.Execute(CommandEncoder_, renderObjects);
 	}
 
 	{
-		screenResolvePass_.Reset();
-		screenResolvePass_.Setup(&deferredPass_);
-		screenResolvePass_.SetupOutputAttachment(0, colorAttachment);
-		screenResolvePass_.Execute(rhiCommandEncoder_);
+		SkyBoxPass_.Reset();
+		SkyBoxPass_.Execute(CommandEncoder_, renderObjects);
+	}
+
+	{
+		ScreenResolvePass_.Reset();
+		//ScreenResolvePass_.Setup(&DeferredPass_);
+		ScreenResolvePass_.Setup(&SkyBoxPass_);
+		ScreenResolvePass_.SetupOutputAttachment(0, colorAttachment);
+		ScreenResolvePass_.Execute(CommandEncoder_);
 	}
 
 	//// submit to gpu and present 
@@ -113,16 +119,16 @@ void GraphicPipeline::Execute(const std::vector<RenderObject*>& renderObjects)
 	//	prePresentBarrier.subresourceRange.layerCount = 1;
 	//	prePresentBarrier.image = RHI_CAST(RHI::VKTextureView*, colorAttachment)->GetVkImage();
 
-		RHI::CommandBuffer* cmdBuffer = rhiCommandEncoder_->Finish();
+		RHI::CommandBuffer* cmdBuffer = CommandEncoder_->Finish();
 		RHI_SAFE_RETAIN(cmdBuffer);
 
 	//	vkCmdPipelineBarrier(RHI_CAST(RHI::VKCommandBuffer*, cmdBuffer)->GetNative(), VK_PIPELINE_STAGE_ALL_COMMANDS_BIT,
 	//		VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT, 0, 0, NULL, 0,
 	//		NULL, 1, &prePresentBarrier);
 
-		graphicQueue_->Submit(1, &cmdBuffer);
+		GraphicQueue_->Submit(1, &cmdBuffer);
 		Engine::GetGPUDevice()->OnFrameEnd();
-		//rhiSwapChain_->Present(graphicQueue_, nullptr);
+		//RHISwapChain_->Present(GraphicQueue_, nullptr);
 	//}
 }
 

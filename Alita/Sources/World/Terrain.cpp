@@ -77,15 +77,15 @@ Terrain* Terrain::CreateFromHeightMap(const std::string& imgFilename, float minH
     }
 
     MeshComponent* meshComp = new MeshComponent();
-    meshComp->geometry_ = new Geometry;
-    meshComp->material_ = new Material("Materials/PBR_Metallic.json");
+    meshComp->Geometry_ = new Geometry;
+    meshComp->Material_ = new Material("Materials/PBR_Metallic.json");
 
     {
         auto vbBuffer = new VertexBuffer();
         vbBuffer->kind = VertexBufferAttriKind::POSITION;
         vbBuffer->format = InputAttributeFormat::FLOAT3;
         vbBuffer->InitData(vertices.data(), vertices.size() * sizeof(vertices[0]));
-        meshComp->geometry_->AppendVertexBuffer(vbBuffer);
+        meshComp->Geometry_->AppendVertexBuffer(vbBuffer);
     }
 
     {
@@ -93,7 +93,7 @@ Terrain* Terrain::CreateFromHeightMap(const std::string& imgFilename, float minH
         vbBuffer->kind = VertexBufferAttriKind::NORMAL;
         vbBuffer->format = InputAttributeFormat::FLOAT3;
         vbBuffer->InitData(diffuse.data(), diffuse.size() * sizeof(diffuse[0]));
-        meshComp->geometry_->AppendVertexBuffer(vbBuffer);
+        meshComp->Geometry_->AppendVertexBuffer(vbBuffer);
     }
 
     {
@@ -101,11 +101,11 @@ Terrain* Terrain::CreateFromHeightMap(const std::string& imgFilename, float minH
         vbBuffer->kind = VertexBufferAttriKind::TEXCOORD;
         vbBuffer->format = InputAttributeFormat::FLOAT2;
         vbBuffer->InitData(texCoords.data(), texCoords.size() * sizeof(texCoords[0]));
-        meshComp->geometry_->AppendVertexBuffer(vbBuffer);
+        meshComp->Geometry_->AppendVertexBuffer(vbBuffer);
     }
 
-    meshComp->geometry_->indexBuffer_.indexType = IndexType::UINT32;
-    meshComp->geometry_->indexBuffer_.InitData(indices.data(), indices.size() * sizeof(indices[0]));
+    meshComp->Geometry_->indexBuffer_.indexType = IndexType::UINT32;
+    meshComp->Geometry_->indexBuffer_.InitData(indices.data(), indices.size() * sizeof(indices[0]));
 
     auto terrain = new Terrain();
     terrain->AddComponment(meshComp);

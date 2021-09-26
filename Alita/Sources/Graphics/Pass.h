@@ -113,6 +113,17 @@ protected:
     RHI::TextureView* rtDepthStencil_ = nullptr;
 };
 
+class SkyBoxPass : public Pass
+{
+public:
+    SkyBoxPass();
+    virtual void Execute(RHI::CommandEncoder* cmdEncoder, const std::vector<RenderObject*>& renderObjects) override;
+
+protected:
+    RHI::TextureView* rtColor_ = nullptr;
+    RHI::TextureView* rtDepthStencil_ = nullptr;
+};
+
 class FullScreenPass : public Pass
 {
 public:

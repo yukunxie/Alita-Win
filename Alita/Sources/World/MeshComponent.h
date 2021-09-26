@@ -20,36 +20,56 @@ class MeshComponent : public Component
 public:
 	Material* GetMaterial() const
 	{
-		return material_;
+		return Material_;
 	}
 
 	Geometry* GetGeometry() const
 	{
-		return geometry_;
+		return Geometry_;
 	}
 
 	virtual void Tick(float dt) override;
 
-	RenderObject* GetRenderObject() { return &renderObject_; }
+	RenderObject* GetRenderObject() { return &RenderObject_; }
 
 	void SetupRenderObject();
 
+	std::uint64_t GetRenderSet()
+	{
+		return RenderSetBits_;
+	}
+
+	void SetRenderSet(std::uint64_t renderSet)
+	{
+		RenderSetBits_ = renderSet;
+	}
+
+	void UnionRenderSet(std::uint64_t renderSet)
+	{
+		RenderSetBits_ |= renderSet;
+	}
+
+	void RemoveRenderSet(std::uint64_t renderSet)
+	{
+		RenderSetBits_ &= ~renderSet;
+	}
+
 public:
-	RenderObject renderObject_;
-	Material* material_ = nullptr;
-	Geometry* geometry_ = nullptr;
+	RenderObject RenderObject_;
+	Material* Material_ = nullptr;
+	Geometry* Geometry_ = nullptr;
 
 	friend class MeshComponentBuilder;
 	friend class Terrain;
 
 private:
-	std::uint64_t renderFlags_ = ERenderSet_Opaque;
+	std::uint64_t RenderSetBits_ = ERenderSet_Opaque;
 };
 
 class MeshComponentBuilder
 {
 public:
-	static MeshComponent* CreateBox();
+	static MeshComponent* CreateBox(const std::string& material = "");
 };
 
 NS_RX_END

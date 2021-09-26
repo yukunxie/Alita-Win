@@ -10,15 +10,16 @@ NS_RX_BEGIN
 
 void MeshComponent::SetupRenderObject()
 {
-	if (renderObject_.MaterialObject)
+	if (RenderObject_.MaterialObject)
 	{
 		return;
 	}
-	renderObject_.MaterialObject = material_;
-	auto& ib = renderObject_.IndexBuffer;
+	RenderObject_.RenderSetBits = RenderSetBits_;
+	RenderObject_.MaterialObject = Material_;
+	auto& ib = RenderObject_.IndexBuffer;
 	{
-		ib.GpuBuffer = geometry_->GetIndexBuffer()->gpuBuffer;
-		ib.IndexCount = geometry_->GetIndexBuffer()->GetIndexCount();
+		ib.GpuBuffer = Geometry_->GetIndexBuffer()->gpuBuffer;
+		ib.IndexCount = Geometry_->GetIndexBuffer()->GetIndexCount();
 		ib.InstanceCount = 0;
 		ib.IndexType = IndexType::UINT32;
 		ib.Offset = 0;
@@ -28,11 +29,11 @@ void MeshComponent::SetupRenderObject()
 
 	std::vector<InputAttribute> attributes;
 
-	renderObject_.VertexBuffers.clear();
+	RenderObject_.VertexBuffers.clear();
 
 	uint32 slot = 0;
 
-	for (auto& vbs : geometry_->GetVBStreams())
+	for (auto& vbs : Geometry_->GetVBStreams())
 	{
 		RenderObject::VertexBufferInfo vb;
 		{
@@ -40,7 +41,7 @@ void MeshComponent::SetupRenderObject()
 			vb.Offset = 0;
 			vb.Slot = slot++;
 		}
-		renderObject_.VertexBuffers.push_back(vb);
+		RenderObject_.VertexBuffers.push_back(vb);
 
 		InputAttribute iAttri;
 		{
@@ -52,7 +53,7 @@ void MeshComponent::SetupRenderObject()
 		attributes.push_back(iAttri);
 	}
 
-	material_->SetInputAssembler({ attributes , IndexType::UINT32 });
+	Material_->SetInputAssembler({ attributes , IndexType::UINT32 });
 }
 
 void MeshComponent::Tick(float dt)
@@ -62,16 +63,16 @@ void MeshComponent::Tick(float dt)
 	const auto* etOwner = GetOwner();
 
 	const TMat4x4 worldMatrix = etOwner->GetWorldMatrix();
-	material_->SetFloat("WorldMatrix", 0, 16, (float*)&worldMatrix);
+	Material_->SetFloat("WorldMatrix", 0, 16, (float*)&worldMatrix);
 
-	Engine::GetRenderScene()->AddRenderObject(&renderObject_);
+	Engine::GetRenderScene()->AddRenderObject(&RenderObject_);
 }
 
-MeshComponent* MeshComponentBuilder::CreateBox()
+MeshComponent* MeshComponentBuilder::CreateBox(const std::string& material)
 {
 	MeshComponent* meshComp = new MeshComponent();
-	meshComp->geometry_ = new Geometry;
-	meshComp->material_ = new Material("Materials/PBR_Metallic.json");
+	meshComp->Geometry_ = new Geometry;
+	meshComp->Material_ = new Material(material.empty() ? "Materials/PBR_Metallic.json" : material);
 
 	std::vector<TVector3> positions = {
 		// Front face
@@ -172,7 +173,7 @@ MeshComponent* MeshComponentBuilder::CreateBox()
 		vbBuffer->kind = kind;
 		vbBuffer->format = format;
 		vbBuffer->InitData(data, size);
-		meshComp->geometry_->AppendVertexBuffer(vbBuffer);
+		meshComp->Geometry_->AppendVertexBuffer(vbBuffer);
 	};
 
 	BindVertexBufferHandle(VertexBufferAttriKind::POSITION, InputAttributeFormat::FLOAT3, positions.data(), sizeof(positions[0]) * positions.size());
@@ -215,8 +216,8 @@ MeshComponent* MeshComponentBuilder::CreateBox()
 	}
 	BindVertexBufferHandle(VertexBufferAttriKind::NORMAL, InputAttributeFormat::FLOAT3, normals.data(), sizeof(normals[0])* normals.size());
 
-	meshComp->geometry_->indexBuffer_.indexType = IndexType::UINT32;
-	meshComp->geometry_->indexBuffer_.InitData(indices.data(), indices.size() * sizeof(indices[0]));
+	meshComp->Geometry_->indexBuffer_.indexType = IndexType::UINT32;
+	meshComp->Geometry_->indexBuffer_.InitData(indices.data(), indices.size() * sizeof(indices[0]));
 	
 
 	return meshComp;

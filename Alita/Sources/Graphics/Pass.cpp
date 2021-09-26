@@ -307,11 +307,86 @@ void OpaquePass::Execute(RHI::CommandEncoder* cmdEncoder, const std::vector<Rend
 	renderPassEncoder->EndPass();
 }
 
+SkyBoxPass::SkyBoxPass()
+{
+	const RHI::Extent2D extent = { 1280, 800 };
+	// 0
+	{
+		RHI::TextureDescriptor descriptor;
+		descriptor.sampleCount = 1;
+		descriptor.format = RHI::TextureFormat::RGBA16FLOAT;
+		descriptor.usage = RHI::TextureUsage::OUTPUT_ATTACHMENT;
+		descriptor.size = extent;
+		descriptor.arrayLayerCount = 1;
+		descriptor.mipLevelCount = 1;
+		descriptor.dimension = RHI::TextureDimension::TEXTURE_2D;
+		rtColor_ = Engine::GetGPUDevice()->CreateTexture(descriptor)->CreateView({});
+		SetupOutputAttachment(0, rtColor_);
+	};
+
+	// ds
+	{
+		RHI::TextureDescriptor descriptor;
+		descriptor.sampleCount = 1;
+		descriptor.format = RHI::TextureFormat::DEPTH24PLUS_STENCIL8;
+		descriptor.usage = RHI::TextureUsage::OUTPUT_ATTACHMENT;
+		descriptor.size = extent;
+		descriptor.arrayLayerCount = 1;
+		descriptor.mipLevelCount = 1;
+		descriptor.dimension = RHI::TextureDimension::TEXTURE_2D;
+		rtDepthStencil_ = Engine::GetGPUDevice()->CreateTexture(descriptor)->CreateView({});
+	};
+}
+
+void SkyBoxPass::Execute(RHI::CommandEncoder* cmdEncoder, const std::vector<RenderObject*>& renderObjects)
+{
+	RHI::RenderPassDescriptor renderPassDescriptor;
+
+	SetupOutputAttachment(0, rtColor_);
+	SetupDepthStencilAttachemnt(dsAttachment_);
+
+	for (const auto& tp : attachments_)
+	{
+		RHI::RenderPassColorAttachmentDescriptor descriptor;
+		{
+			descriptor.attachment = tp.second;
+			descriptor.resolveTarget = nullptr;
+			descriptor.loadValue = { 0.0f, 0.0f, 0.0f, 1.0f };
+			descriptor.loadOp = RHI::LoadOp::CLEAR;
+			descriptor.storeOp = RHI::StoreOp::STORE;
+		}
+		renderPassDescriptor.colorAttachments.push_back(descriptor);
+	}
+
+	renderPassDescriptor.depthStencilAttachment = {
+		.attachment = dsAttachment_,
+		.depthLoadOp = RHI::LoadOp::CLEAR,
+		.depthStoreOp = RHI::StoreOp::STORE,
+		.depthLoadValue = 1,
+		.stencilLoadOp = RHI::LoadOp::CLEAR,
+		.stencilStoreOp = RHI::StoreOp::STORE,
+		.stencilLoadValue = 0,
+	};
+
+	auto renderPassEncoder = cmdEncoder->BeginRenderPass(renderPassDescriptor);
+
+	const RHI::Extent2D extent = { 1280, 800 };
+	renderPassEncoder->SetViewport(0, 0, extent.width, extent.height, 0, 1);
+	renderPassEncoder->SetScissorRect(0, 0, extent.width, extent.height);
+
+	for (const auto ro : renderObjects)
+	{
+		ro->Render(this, ETechniqueType::TSkyBox, ERenderSet::ERenderSet_SkyBox, *renderPassEncoder);
+	}
+
+	renderPassEncoder->EndPass();
+}
+
 FullScreenPass::FullScreenPass(const std::string& materialName, ETechniqueType technique)
 {
 	MeshComponent* meshComp = new MeshComponent();
-	meshComp->geometry_ = new Geometry;
-	meshComp->material_ = new Material(materialName);
+	meshComp->Geometry_ = new Geometry;
+	meshComp->Material_ = new Material(materialName);
 
 	{
 		std::vector<float> vertices = {-1, -1, 0,	// bottom left corner
@@ -323,7 +398,7 @@ FullScreenPass::FullScreenPass(const std::string& materialName, ETechniqueType t
 		vbBuffer->kind = VertexBufferAttriKind::POSITION;
 		vbBuffer->format = InputAttributeFormat::FLOAT3;
 		vbBuffer->InitData(vertices.data(), vertices.size() * sizeof(vertices[0]));
-		meshComp->geometry_->AppendVertexBuffer(vbBuffer);
+		meshComp->Geometry_->AppendVertexBuffer(vbBuffer);
 	}
 
 	{
@@ -336,12 +411,12 @@ FullScreenPass::FullScreenPass(const std::string& materialName, ETechniqueType t
 		vbBuffer->kind = VertexBufferAttriKind::TEXCOORD;
 		vbBuffer->format = InputAttributeFormat::FLOAT2;
 		vbBuffer->InitData(texCoords.data(), texCoords.size() * sizeof(texCoords[0]));
-		meshComp->geometry_->AppendVertexBuffer(vbBuffer);
+		meshComp->Geometry_->AppendVertexBuffer(vbBuffer);
 	}
 
 	std::vector<uint32> indices { 0, 1, 2, 0, 2, 3 };
-	meshComp->geometry_->GetIndexBuffer()->indexType = IndexType::UINT32;
-	meshComp->geometry_->GetIndexBuffer()->InitData(indices.data(), indices.size() * sizeof(indices[0]));
+	meshComp->Geometry_->GetIndexBuffer()->indexType = IndexType::UINT32;
+	meshComp->Geometry_->GetIndexBuffer()->InitData(indices.data(), indices.size() * sizeof(indices[0]));
 
 	meshComp->SetupRenderObject();
 

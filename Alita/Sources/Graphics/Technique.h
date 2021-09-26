@@ -14,6 +14,7 @@ enum class ETechniqueType
     TShading    = 0 , 
     TGBufferGen     ,
     TShadowmapGen   ,
+    TSkyBox   ,
 
     TMaxCount,
 };

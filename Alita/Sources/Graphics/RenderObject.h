@@ -33,7 +33,7 @@ struct RenderObject
 	Material* MaterialObject;
 	std::vector<VertexBufferInfo> VertexBuffers;
 	IndexBufferInfo IndexBuffer;
-	std::uint64_t	RenderFlags = 0;
+	std::uint64_t	RenderSetBits = 0;
 };
 
 NS_RX_END

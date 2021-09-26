@@ -10,7 +10,8 @@ NS_RX_BEGIN
 
 SkyBox::SkyBox()
 {
-    auto modelComp = MeshComponentBuilder::CreateBox();
+    auto modelComp = MeshComponentBuilder::CreateBox("Materials/SkyBox.json");
+    modelComp->SetRenderSet(ERenderSet_SkyBox);
     this->AddComponment(modelComp);
     this->SetScale({ 100, 100, 100 });
 }
