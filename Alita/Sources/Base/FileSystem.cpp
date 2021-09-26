@@ -3,14 +3,36 @@
 
 #include <string> 
 #include <fstream>
+#include <filesystem>
 
 #include <stdio.h>
 #include <direct.h>
+
+#if WIN32
+#include <windows.h>
+#include <locale>
+#include <codecvt>
+#endif
 
 
 NS_RX_BEGIN
 
 FileSystem* FileSystem::instance_ = nullptr;
+
+#if WIN32
+std::string GetExePath() {
+	TCHAR buffer[MAX_PATH] = { 0 };
+	GetModuleFileName(NULL, buffer, MAX_PATH);
+	std::wstring::size_type pos = std::wstring(buffer).find_last_of(L"\\/");
+	std::wstring path = std::wstring(buffer).substr(0, pos);
+
+	using convert_type = std::codecvt_utf8<wchar_t>;
+	std::wstring_convert<convert_type, wchar_t> converter;
+
+	//use converter (.to_bytes: wstr->str, .from_bytes: str->wstr)
+	return converter.to_bytes(path);
+}
+#endif
 
 FileSystem::FileSystem()
 {
@@ -21,8 +43,19 @@ FileSystem::FileSystem()
 		searchPaths_.push_back(workingDir);
 	}
 
+	std::string sWorkingDir = std::string(workingDir);
 	searchPaths_.push_back(std::string(workingDir) + "/Assets/");
 	searchPaths_.push_back(std::string(workingDir) + "/Sources/");
+
+	{
+		std::string::size_type pos = sWorkingDir.rfind("\\Alita");
+		if (pos != std::string::npos)
+		{
+			std::string basePath = sWorkingDir.substr(0, pos);
+			searchPaths_.push_back(std::string(basePath) + "/Alita/Assets/");
+			searchPaths_.push_back(std::string(basePath) + "/Alita/Sources/");
+		}
+	}
 
 	// todo realxie
 #if defined(WIN32) && defined(_DEBUG)

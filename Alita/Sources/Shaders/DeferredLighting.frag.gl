@@ -39,6 +39,4 @@ void TShading() {
     }
 
     OutColor = vec4(diffuse , 1.0);
-    // OutColor = vec4(p.z, smDepth,0, 1.0);
-    // OutColor = vec4(projCoords.xy,);
 }

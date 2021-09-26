@@ -131,9 +131,9 @@
       <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
-      <Command>xcopy /Y /E $(ProjectDir)Sources\Shaders  $(OutDir)Shaders\
-xcopy /Y /E $(ProjectDir)Assets  $(OutDir)Assets\
-xcopy /Y /E $(ProjectDir)Sources\Materials  $(OutDir)Materials\</Command>
+      <Command>rem xcopy /Y /E $(ProjectDir)Sources\Shaders  $(OutDir)Shaders\
+rem xcopy /Y /E $(ProjectDir)Assets  $(OutDir)Assets\
+rem xcopy /Y /E $(ProjectDir)Sources\Materials  $(OutDir)Materials\</Command>
     </PreBuildEvent>
     <CustomBuildStep>
       <Command>echo $(ProjectDir)
