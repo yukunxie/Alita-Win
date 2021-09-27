@@ -67,7 +67,15 @@
     {
       "name": "ShadowMap_sampler",
       "binding": 20,
-      "type": "Sampler2D"
+      "type": "Sampler2D",
+      "filter":{
+        "magFilter":    "point",
+        "minFilter":    "point",
+        "mipmapFilter": "point",
+        "addressModeU": "clamp",
+        "addressModeV": "clamp",
+        "addressModeW": "clamp"
+      }
     }
   ]
 }

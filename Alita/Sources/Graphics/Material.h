@@ -277,8 +277,8 @@ public:
 
 protected:
 	RHI::Shader* _CreateShader(const std::string& filename, RHI::ShaderType shaderType, ETechniqueType techType, const std::vector<std::string>& userDefines);
-
 	RHI::RenderPipeline* CreatePipelineState(const PSOKey& psoKey, const ShaderSet& shaderSet);
+	RHI::SamplerDescriptor ParseSamplerDescriptor(const rapidjson::Value& doc);
 	void ParseBindGroupLayout(const rapidjson::Document& doc);
 	void SetupConstantBufferLayout();
 

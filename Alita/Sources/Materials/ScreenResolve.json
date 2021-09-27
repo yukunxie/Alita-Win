@@ -21,9 +21,17 @@
       "uri": "Textures/default-512.png"
     },
     {
-      "name": "albedo_sampler",
+      "name": "sAlbedo",
       "binding": 12,
-      "type": "Sampler2D"
+      "type": "Sampler2D",
+      "filter":{
+        "magFilter":    "linear",
+        "minFilter":    "linear",
+        "mipmapFilter": "linear",
+        "addressModeU": "clamp",
+        "addressModeV": "clamp",
+        "addressModeW": "clamp"
+      }
     }
   ]
 }

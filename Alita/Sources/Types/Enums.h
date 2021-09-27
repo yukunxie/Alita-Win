@@ -44,6 +44,8 @@ enum class MaterialParameterType
 	TEXTURE2D,
 };
 
+MaterialParameterType ToMaterialParameterType(const char* text);
+
 enum class InputAttributeFormat
 {
 	FLOAT,

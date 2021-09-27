@@ -11,6 +11,48 @@
 
 NS_RX_BEGIN
 
+static constexpr std::uint32_t _SimpleHash(const char* p, uint32 key = 31)
+{
+    std::uint32_t hash = 0;
+    for (; *p; p++)
+    {
+        hash = hash * key + *p;
+    }
+    return hash;
+}
+
+MaterialParameterType ToMaterialParameterType(const char* format)
+{
+    switch (_SimpleHash(format))
+    {
+    case _SimpleHash("float"): return MaterialParameterType::FLOAT;
+    case _SimpleHash("float2"): return MaterialParameterType::FLOAT2;
+    case _SimpleHash("float3"): return MaterialParameterType::FLOAT3;
+    case _SimpleHash("float4"): return MaterialParameterType::FLOAT4;
+    case _SimpleHash("int"): return MaterialParameterType::INT;
+    case _SimpleHash("int2"): return MaterialParameterType::INT2;
+    case _SimpleHash("int3"): return MaterialParameterType::INT3;
+    case _SimpleHash("int4"): return MaterialParameterType::INT4;
+    case _SimpleHash("bool"): return MaterialParameterType::BOOL;
+    case _SimpleHash("bool1"): return MaterialParameterType::BOOL1;
+    case _SimpleHash("bool2"): return MaterialParameterType::BOOL2;
+    case _SimpleHash("bool3"): return MaterialParameterType::BOOL3;
+    case _SimpleHash("mat4"): return MaterialParameterType::MAT4;
+    case _SimpleHash("mat3"): return MaterialParameterType::MAT3;
+    case _SimpleHash("mat2"): return MaterialParameterType::MAT2;
+    case _SimpleHash("mat4x3"): return MaterialParameterType::MAT4x3;
+    case _SimpleHash("mat4x2"): return MaterialParameterType::MAT4x2;
+    case _SimpleHash("mat3x4"): return MaterialParameterType::MAT3x4;
+    case _SimpleHash("mat2x4"): return MaterialParameterType::MAT2x4;
+    case _SimpleHash("mat3x2"): return MaterialParameterType::MAT3x2;
+    case _SimpleHash("Buffer"): return MaterialParameterType::BUFFER;
+    case _SimpleHash("Sampler2D"): return MaterialParameterType::SAMPLER2D;
+    case _SimpleHash("Texture2D"): return MaterialParameterType::TEXTURE2D;
+    default:
+        RHI_ASSERT(false, "invalid format");
+    }
+}
+
 std::uint32_t GetInputAttributeLocation(VertexBufferAttriKind kind)
 {
     switch (kind)
@@ -188,16 +230,6 @@ void Material::SetupConstantBufferLayout()
     }
 }
 
-
-static constexpr std::uint32_t _SimpleHash(const char* p)
-{
-    std::uint32_t hash = 0;
-    for (; *p; p++)
-    {
-        hash = hash * 31 + *p;
-    }
-    return hash;
-}
 RHI::Shader* Material::_CreateShader(const std::string& filename, RHI::ShaderType shaderType, ETechniqueType techType, const std::vector<std::string>& userDefines)
 {
     std::string data = FileSystem::GetInstance()->GetStringData(filename.c_str());
@@ -483,6 +515,78 @@ void Material::ApplyModifyToBindGroup(RHI::RenderPassEncoder& passEndcoder)
     rhiBindGroup_ = Engine::GetGPUDevice()->CreateBindGroup(descriptor);
 }
 
+RHI::SamplerDescriptor Material::ParseSamplerDescriptor(const rapidjson::Value& doc)
+{
+    RHI::SamplerDescriptor descriptor;
+    {
+        descriptor.minFilter = RHI::FilterMode::LINEAR;
+        descriptor.magFilter = RHI::FilterMode::LINEAR;
+        descriptor.mipmapFilter = RHI::FilterMode::LINEAR;
+        descriptor.addressModeU = RHI::AddressMode::REPEAT;
+        descriptor.addressModeV = RHI::AddressMode::REPEAT;
+        descriptor.addressModeW = RHI::AddressMode::REPEAT;
+    }
+    if (!doc.HasMember("filter"))
+    {
+        return descriptor;
+    }
+
+    auto ParseFilterMode = [](const char* text) {
+        switch (_SimpleHash(text))
+        {
+        case _SimpleHash("linear"):
+            return RHI::FilterMode::LINEAR;
+        case _SimpleHash("nearest"):
+        case _SimpleHash("point"):
+            return RHI::FilterMode::NEAREST;
+        default:
+            return RHI::FilterMode::LINEAR;
+        }
+    };
+
+    auto ParseAddressMode = [](const char* text) {
+        switch (_SimpleHash(text))
+        {
+        case _SimpleHash("repeat"):
+            return RHI::AddressMode::REPEAT;
+        case _SimpleHash("clamp"):
+            return RHI::AddressMode::CLAMP_TO_EDGE;
+        case _SimpleHash("mirror"):
+            return RHI::AddressMode::MIRROR_REPEAT;
+        default:
+            return RHI::AddressMode::REPEAT;
+        }
+    };
+
+    const auto& cfg = doc["filter"];
+
+    if (cfg.HasMember("minFilter"))
+    {
+        descriptor.minFilter = ParseFilterMode(cfg["minFilter"].GetString());
+    }
+    if (cfg.HasMember("magFilter"))
+    {
+        descriptor.minFilter = ParseFilterMode(cfg["magFilter"].GetString());
+    }
+    if (cfg.HasMember("mipmapFilter"))
+    {
+        descriptor.minFilter = ParseFilterMode(cfg["mipmapFilter"].GetString());
+    }
+    if (cfg.HasMember("addressModeU"))
+    {
+        descriptor.addressModeU = ParseAddressMode(cfg["addressModeU"].GetString());
+    }
+    if (cfg.HasMember("addressModeV"))
+    {
+        descriptor.addressModeV = ParseAddressMode(cfg["addressModeV"].GetString());
+    }
+    if (cfg.HasMember("addressModeW"))
+    {
+        descriptor.addressModeW = ParseAddressMode(cfg["addressModeW"].GetString());
+    }
+    return descriptor;
+}
+
 void Material::ParseBindGroupLayout(const rapidjson::Document& doc)
 {
     if (!doc.HasMember("bindings"))
@@ -520,31 +624,9 @@ void Material::ParseBindGroupLayout(const rapidjson::Document& doc)
                     param.name = f["name"].GetString();
                     param.offset = f["offset"].GetUint();
                     std::string format = f["format"].GetString();
-                    switch (_SimpleHash(format.c_str()))
-                    {
-                    case _SimpleHash("mat4"):
-                        param.format = MaterialParameterType::MAT4;
-                        break;
-                    case _SimpleHash("float"):
-                        param.format = MaterialParameterType::FLOAT;
-                        break;
-                    case _SimpleHash("float2"):
-                        param.format = MaterialParameterType::FLOAT2;
-                        break;
-                    case _SimpleHash("float3"):
-                        param.format = MaterialParameterType::FLOAT3;
-                        break;
-                    case _SimpleHash("float4"):
-                        param.format = MaterialParameterType::FLOAT4;
-                        break;
-                    default:
-                        Assert(false, "invalid format");
-                    }
-
+                    param.format = ToMaterialParameterType(f["format"].GetString());
                     fields.push_back(param);
                 }
-
-                //Assert(bindingObject->stride > 0, "Binding buffer's size must be great than zero");
 
                 RHI::BufferDescriptor bufferDescriptor;
                 {
@@ -587,15 +669,7 @@ void Material::ParseBindGroupLayout(const rapidjson::Document& doc)
             bindingObject->type = MaterailBindingObjectType::SAMPLER2D;
             bindingObject->name = cfg["name"].GetString();
             bindingObject->binding = cfg["binding"].GetUint(); 
-
-            RHI::SamplerDescriptor descriptor;
-            {
-                descriptor.minFilter = RHI::FilterMode::NEAREST;
-                descriptor.magFilter = RHI::FilterMode::NEAREST;
-                descriptor.addressModeU = RHI::AddressMode::REPEAT;
-                descriptor.addressModeV = RHI::AddressMode::REPEAT;
-                descriptor.addressModeW = RHI::AddressMode::REPEAT;
-            }
+            RHI::SamplerDescriptor descriptor = ParseSamplerDescriptor(cfg);
             bindingObject->sampler = Engine::GetGPUDevice()->CreateSampler(descriptor);
             RHI_SAFE_RETAIN(bindingObject->sampler);
         }
