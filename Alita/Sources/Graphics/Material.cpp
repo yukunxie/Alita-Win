@@ -344,6 +344,7 @@ void Material::Apply(const Pass* pass, ETechniqueType technique, ERenderSet rend
     }
     else
     {
+        PrepareBindingLayout();
         ShaderSet shaders = CreateShaderSet(technique);
         pso = CreatePipelineState(psoKey, shaders);
         rhiPSOMap_[psoKey] = pso;
@@ -435,6 +436,11 @@ bool Material::SetTexture(const std::string& name, const RHI::Texture* texture)
 
     if (param.bindingObject->Texture.texture == texture)
         return true;
+    // binding layout changed.
+    if (!param.bindingObject->Texture.texture)
+    {
+        rhiPSOMap_.clear();
+    }
     RHI_SAFE_RELEASE(param.bindingObject->Texture.texture);
     param.bindingObject->Texture.texture = texture;
     RHI_SAFE_RETAIN(param.bindingObject->Texture.texture);
@@ -468,7 +474,7 @@ void Material::ApplyModifyToBindGroup(RHI::RenderPassEncoder& passEndcoder)
         }
         else if (it->type == MaterailBindingObjectType::TEXTURE2D)
         {
-            //if (it->Texture.texture != nullptr)
+            if (it->Texture.texture != nullptr)
             {
                 RHI::TextureViewDescriptor tvDescriptor;
                 if (it->Texture.texture->GetArrayLayerCount() == 6)
@@ -680,9 +686,11 @@ void Material::ParseBindGroupLayout(const rapidjson::Document& doc)
             return a->binding < b->binding;
         }
     );
+}
 
-    // TODO
-
+void Material::PrepareBindingLayout()
+{
+    SystemDefines_.clear();
     RHI::BindGroupLayoutDescriptor descriptor;
     for (const auto& bo : bindingObjects_)
     {
@@ -695,37 +703,44 @@ void Material::ParseBindGroupLayout(const rapidjson::Document& doc)
             target.visibility = RHI::ShaderStage::VERTEX | RHI::ShaderStage::FRAGMENT;
             target.type = RHI::BindingType::UNIFORM_BUFFER;
             descriptor.entries.push_back(target);
-            
+
             break;
         }
 
         case MaterailBindingObjectType::TEXTURE2D:
         {
-            // texture
+            if (bo->Texture.texture)
             {
-                RHI::BindGroupLayoutBinding target;
-                target.binding = bo->binding;
-                target.visibility = RHI::ShaderStage::VERTEX | RHI::ShaderStage::FRAGMENT;
-                target.type = RHI::BindingType::SAMPLED_TEXTURE;
-                descriptor.entries.push_back(target);
-            }
+                // texture
+                {
+                    RHI::BindGroupLayoutBinding target;
+                    target.binding = bo->binding;
+                    target.visibility = RHI::ShaderStage::VERTEX | RHI::ShaderStage::FRAGMENT;
+                    target.type = RHI::BindingType::SAMPLED_TEXTURE;
+                    descriptor.entries.push_back(target);
+                }
 
-            // sampler
-            {
-                RHI::BindGroupLayoutBinding target;
-                target.binding = bo->binding + 1;
-                target.visibility = RHI::ShaderStage::VERTEX | RHI::ShaderStage::FRAGMENT;
-                target.type = RHI::BindingType::SAMPLER;
-                descriptor.entries.push_back(target);
-            }
+                // sampler
+                {
+                    RHI::BindGroupLayoutBinding target;
+                    target.binding = bo->binding + 1;
+                    target.visibility = RHI::ShaderStage::VERTEX | RHI::ShaderStage::FRAGMENT;
+                    target.type = RHI::BindingType::SAMPLER;
+                    descriptor.entries.push_back(target);
+                }
 
+                if (!bo->Texture.preprocessor.empty())
+                {
+                    SystemDefines_.push_back("#define " + bo->Texture.preprocessor + " 1 ");
+                }
+            }
             break;
         }
 
         default:
             RHI_ASSERT(false);
         }
-        
+
     }
     rhiBindGroupLayout_ = Engine::GetGPUDevice()->CreateBindGroupLayout(descriptor);
 
@@ -802,7 +817,7 @@ void Material::BindPSO(RHI::RenderPassEncoder& passEndcoder)
 
 ShaderSet Material::CreateShaderSet(ETechniqueType technique)
 {
-    std::vector<std::string> userDefines;
+    std::vector<std::string> userDefines = SystemDefines_;
 
     switch (technique)
     {

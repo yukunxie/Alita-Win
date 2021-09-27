@@ -27,7 +27,7 @@ layout(location = 2) in vec2 _UV0;
 layout(binding = 11) uniform texture2D   tAlbedo;
 layout(binding = 12) uniform sampler     sAlbedo;
 
-#if USE_NORMAP_MAP  || 1
+#if USE_NORMAL_MAP
 layout(binding = 13) uniform texture2D   tNormalMap;
 layout(binding = 14) uniform sampler     sNormalMap;
 #endif
@@ -46,10 +46,6 @@ void TShading() {
     diffuse *= texture(sampler2D(tAlbedo, sAlbedo), _UV0);
 #endif
 
-// #if USE_NORMAP_MAP || 1
-//     diffuse *= texture(sampler2D(tNormalMap, sNormalMap), vec2(0, 0));
-// #endif
-
 #if USE_NORMAL
     vec3 lightDir = normalize(uGlobal.EyePos.xyz - _WorldPosition.xyz);
     float specular = clamp(dot(lightDir, normalize(_WorldNormal)), 0, 1);
@@ -64,6 +60,11 @@ void TGBufferGen() {
 #if USE_UV0
     diffuse = texture(sampler2D(tAlbedo, sAlbedo), _UV0);
 #endif
+
+#if USE_NORMAL_MAP
+    diffuse = texture(sampler2D(tNormalMap, sNormalMap), _UV0);
+#endif
+
     OutColor = diffuse;
 
 #if GEN_GBUFFER_PASS

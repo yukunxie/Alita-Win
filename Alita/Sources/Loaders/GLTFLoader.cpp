@@ -102,6 +102,17 @@ namespace GLTFLoader
 					/*auto texture = ImageLoader::LoadTextureFromData(image.image.data(), image.image.size());
 					if (texture);*/
 				}
+				if (tMaterial.normalTexture.index != -1)
+				{
+					auto tIdx = tMaterial.normalTexture.index;
+					const tinygltf::Image& image = tModel.images[tModel.textures[tIdx].source];
+
+					auto texture = _LoadTexture(image);
+					if (texture)
+					{
+						mc->Material_->SetTexture("tNormalMap", texture);
+					}
+				}
 			}
 
 			for (const auto& [attriName, aIdx] : primitive.attributes)

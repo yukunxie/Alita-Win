@@ -75,7 +75,7 @@
       "name": "tNormalMap",
       "binding": 13,
       "type": "Texture2D",
-      "uri": "Textures/default-512.png",
+      "uri": "",
       "filter":{
         "magFilter":    "point",
         "minFilter":    "point",

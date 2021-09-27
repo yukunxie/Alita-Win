@@ -287,6 +287,7 @@ protected:
 	void ParseBindGroupLayout(const rapidjson::Document& doc);
 	void SetupConstantBufferLayout();
 
+	void PrepareBindingLayout();
 	void ApplyModifyToBindGroup(RHI::RenderPassEncoder& passEndcoder);
 	void BindPSO(RHI::RenderPassEncoder& passEndcoder);
 
@@ -307,6 +308,7 @@ protected:
 	std::map<std::string, MaterialParameter> parameters_;
 	std::vector<MaterialBindingObject*> bindingObjects_;
 	std::vector<InputAttribute> inputAttributes_;
+	std::vector<std::string> SystemDefines_;
 
 	// RHI
 	RHI::BindGroupLayout* rhiBindGroupLayout_ = nullptr;
