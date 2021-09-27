@@ -75,7 +75,7 @@ struct AsyncTaskSumbitCommandBufferAndPresent : public AsyncTask
 protected:
     VKDevice* device_ = nullptr;
     VKQueue* queue_ = nullptr;
-    TurboVector<VKCommandBuffer*> commandBuffers_;
+    std::vector<VKCommandBuffer*> commandBuffers_;
     FrameResource* frameResource_;
 };
 

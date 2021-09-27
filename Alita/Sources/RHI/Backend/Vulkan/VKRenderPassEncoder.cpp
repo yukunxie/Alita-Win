@@ -73,7 +73,7 @@ bool VKRenderPassEncoder::Init(VKCommandBuffer* commandBuffer,
     RHI_PTR_ASSIGN(depthStencilAttachemnt_, descriptor.depthStencilAttachment.attachment);
     RHI_PTR_ASSIGN(commandBuffer_, commandBuffer);
     
-    TurboVector<VkClearAttachment> clearAttachments;
+    std::vector<VkClearAttachment> clearAttachments;
     
     RenderPassCacheQuery query;
     {
@@ -137,11 +137,12 @@ bool VKRenderPassEncoder::Init(VKCommandBuffer* commandBuffer,
     }
     
     {
-        auto colorAttachment = RHI_CAST(const VKTextureView*,
-                                                  descriptor.colorAttachments[0].attachment);
-        
-        auto dsAttachment = RHI_CAST(const VKTextureView*,
-                                               descriptor.depthStencilAttachment.attachment);
+        const VKTextureView* colorAttachment = nullptr;
+        if (!descriptor.colorAttachments.empty())
+        {
+            colorAttachment = RHI_CAST(const VKTextureView*, descriptor.colorAttachments[0].attachment);
+        }
+        auto dsAttachment = RHI_CAST(const VKTextureView*, descriptor.depthStencilAttachment.attachment);
         
         Extent3D attachmentSize;
         if (colorAttachment)

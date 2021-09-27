@@ -41,7 +41,6 @@
 #include "Texture.h"
 #include "TextureView.h"
 #include "SampledTextureView.h"
-#include "TurboVector.h"
 #include "TimeProfiler.h"
 
 #include "AsyncWorker.h"

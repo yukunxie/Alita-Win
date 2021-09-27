@@ -198,7 +198,7 @@ void SetBindGroupToGraphicPipelineImpl(VKCommandBuffer* thiz,
     }
     else
     {
-        TurboVector<std::uint32_t, kMaxBindingsPerGroup> offsets(expectedOffsetCount, 0);
+        std::vector<std::uint32_t> offsets(expectedOffsetCount, 0);
         for (std::uint32_t i = 0; i < dynamicOffsetCount; ++i)
         {
             offsets[i] = pDynamicOffsets[i];

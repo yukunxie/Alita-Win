@@ -98,21 +98,6 @@ static const std::string sShaderExtensions =
 "#version 450\n"
 "#extension GL_ARB_separate_shader_objects : enable\n\n";
 
-//enum class EShaderDataType
-//{
-//    Float,
-//    Float2,
-//    Float3,
-//    Float4,
-//    Int,
-//    Int2,
-//    Int3,
-//    Int4,
-//    Matrix2x2,
-//    Matrix3x3,
-//    Matrix4x4,
-//};
-
 struct GLDataTypeConfig
 {
     std::string Name;
@@ -213,15 +198,15 @@ void Material::SetupConstantBufferLayout()
     bindingObject->type     = MaterailBindingObjectType::BUFFER;
     bindingObject->name     = cBufferName;
     bindingObject->binding  = binding;
-    bindingObject->stride   = offset;
+    bindingObject->Buffer.stride   = offset;
 
     RHI::BufferDescriptor bufferDescriptor;
     {
-        bufferDescriptor.size = bindingObject->stride;
+        bufferDescriptor.size = bindingObject->Buffer.stride;
         bufferDescriptor.usage = RHI::BufferUsage::UNIFORM;
     };
-    bindingObject->buffer = Engine::GetGPUDevice()->CreateBuffer(bufferDescriptor);
-    RHI_SAFE_RETAIN(bindingObject->buffer);
+    bindingObject->Buffer.buffer = Engine::GetGPUDevice()->CreateBuffer(bufferDescriptor);
+    RHI_SAFE_RETAIN(bindingObject->Buffer.buffer);
 
     for (auto& param : parameters)
     {
@@ -434,7 +419,7 @@ bool Material::SetFloat(const std::string& name, std::uint32_t offset, std::uint
     const MaterialParameter& param = it->second;
     Assert(param.bindingObject->type == MaterailBindingObjectType::BUFFER, "");
     Assert(param.offset + offset + size < param.bindingObject->stride, "");
-    param.bindingObject->buffer->SetSubData(param.offset + offset, count * sizeof(float), data);
+    param.bindingObject->Buffer.buffer->SetSubData(param.offset + offset, count * sizeof(float), data);
 
     return true;
 }
@@ -448,10 +433,11 @@ bool Material::SetTexture(const std::string& name, const RHI::Texture* texture)
     const MaterialParameter& param = it->second;
     Assert(param.format == MaterialParameterType::TEXTURE2D, "invalid");
 
-    if (param.bindingObject->texture == texture)
+    if (param.bindingObject->Texture.texture == texture)
         return true;
-    param.bindingObject->texture = texture;
-    RHI_SAFE_RETAIN(param.bindingObject->texture);
+    RHI_SAFE_RELEASE(param.bindingObject->Texture.texture);
+    param.bindingObject->Texture.texture = texture;
+    RHI_SAFE_RETAIN(param.bindingObject->Texture.texture);
     bBindingDirty_ = true;
     return true;
 }
@@ -471,7 +457,7 @@ void Material::ApplyModifyToBindGroup(RHI::RenderPassEncoder& passEndcoder)
     {
         if (it->type == MaterailBindingObjectType::BUFFER)
         {
-            auto resource = Engine::GetGPUDevice()->CreateBufferBinding((RHI::Buffer*)it->buffer, 0, it->stride);
+            auto resource = Engine::GetGPUDevice()->CreateBufferBinding((RHI::Buffer*)it->Buffer.buffer, 0, it->Buffer.stride);
             RHI_SAFE_RETAIN(resource);
             RHI::BindGroupBinding tmp;
             {
@@ -482,36 +468,34 @@ void Material::ApplyModifyToBindGroup(RHI::RenderPassEncoder& passEndcoder)
         }
         else if (it->type == MaterailBindingObjectType::TEXTURE2D)
         {
-            RHI::TextureViewDescriptor tvDescriptor;
-            if (it->texture->GetArrayLayerCount() == 6)
+            //if (it->Texture.texture != nullptr)
             {
-                tvDescriptor.dimension = RHI::TextureViewDimension::DIM_CUBE;
-            }
+                RHI::TextureViewDescriptor tvDescriptor;
+                if (it->Texture.texture->GetArrayLayerCount() == 6)
+                {
+                    tvDescriptor.dimension = RHI::TextureViewDimension::DIM_CUBE;
+                }
 
-            auto resource = Engine::GetGPUDevice()->CreateTextureViewBinding(((RHI::Texture*)it->texture)->CreateView(tvDescriptor));
-            RHI_SAFE_RETAIN(resource);
-            RHI::BindGroupBinding tmp;
-            {
-                tmp.binding = it->binding;
-                tmp.resource = resource;
+                auto tv = Engine::GetGPUDevice()->CreateTextureViewBinding(((RHI::Texture*)it->Texture.texture)->CreateView(tvDescriptor));
+                RHI_SAFE_RETAIN(tv);
+                RHI::BindGroupBinding tmp;
+                {
+                    tmp.binding = it->binding;
+                    tmp.resource = tv;
+                }
+                descriptor.entries.push_back(tmp);
+
+                // create sampler for this texture
+                auto sampler = Engine::GetGPUDevice()->CreateSamplerBinding((RHI::Sampler*)it->Texture.sampler);
+                RHI_SAFE_RETAIN(sampler);
+                descriptor.entries.push_back(RHI::BindGroupBinding{ it->binding + 1 , sampler });
             }
-            descriptor.entries.push_back(tmp);
-        }
-        else if (it->type == MaterailBindingObjectType::SAMPLER2D)
-        {
-            auto resource = Engine::GetGPUDevice()->CreateSamplerBinding((RHI::Sampler*)it->sampler);
-            RHI_SAFE_RETAIN(resource);
-            RHI::BindGroupBinding tmp;
-            {
-                tmp.binding = it->binding;
-                tmp.resource = resource;
-            }
-            descriptor.entries.push_back(tmp);
         }
         else
-            Assert(false, "");
+        {
+            RHI_ASSERT(false);
+        }
     }
-
     rhiBindGroup_ = Engine::GetGPUDevice()->CreateBindGroup(descriptor);
 }
 
@@ -604,15 +588,16 @@ void Material::ParseBindGroupLayout(const rapidjson::Document& doc)
             continue;
 
         std::string type = cfg["type"].GetString();
-        MaterialBindingObject* bindingObject = new MaterialBindingObject();
-        bindingObject->stride = 0;
-        bindingObjects_.push_back(bindingObject);
+        
         if (type == "Buffer")
         {
+            MaterialBindingObject* bindingObject = new MaterialBindingObject();
+            bindingObjects_.push_back(bindingObject);
+
             bindingObject->type = MaterailBindingObjectType::BUFFER;
             bindingObject->name = cfg["name"].GetString();
             bindingObject->binding = cfg["binding"].GetUint();
-            bindingObject->stride = cfg["stride"].GetUint();
+            bindingObject->Buffer.stride = cfg["stride"].GetUint();
 
             std::vector<MaterialParameter> fields;
 
@@ -630,11 +615,11 @@ void Material::ParseBindGroupLayout(const rapidjson::Document& doc)
 
                 RHI::BufferDescriptor bufferDescriptor;
                 {
-                    bufferDescriptor.size = bindingObject->stride;
+                    bufferDescriptor.size = bindingObject->Buffer.stride;
                     bufferDescriptor.usage = RHI::BufferUsage::UNIFORM;
                 };
-                bindingObject->buffer = Engine::GetGPUDevice()->CreateBuffer(bufferDescriptor);
-                RHI_SAFE_RETAIN(bindingObject->buffer);
+                bindingObject->Buffer.buffer = Engine::GetGPUDevice()->CreateBuffer(bufferDescriptor);
+                RHI_SAFE_RETAIN(bindingObject->Buffer.buffer);
 
                 for (auto& field : fields)
                 {
@@ -645,16 +630,29 @@ void Material::ParseBindGroupLayout(const rapidjson::Document& doc)
         }
         else if (type == "Texture2D")
         {
+            // texture
+            uint32 binding = cfg["binding"].GetUint();
+            const char* name = cfg["name"].GetString();
+            
+            MaterialBindingObject* bindingObject = new MaterialBindingObject();
+            bindingObjects_.push_back(bindingObject);
+
+            if (cfg.HasMember("preprocessor"))
+            {
+                bindingObject->Texture.preprocessor = cfg["preprocessor"].GetString();
+            }
+
+            // texture
             bindingObject->type = MaterailBindingObjectType::TEXTURE2D;
-            bindingObject->name = cfg["name"].GetString();
-            bindingObject->binding = cfg["binding"].GetUint();
-            std::string uri = "Textures/default-512.png";
+            bindingObject->name = name;
+            bindingObject->binding = binding;
+            std::string uri = "";
             if (cfg.HasMember("uri") && cfg["uri"].IsString() && cfg["uri"].GetStringLength())
             {
                 uri = cfg["uri"].GetString();
             }
-            bindingObject->texture = ImageLoader::LoadTextureFromUri(uri);
-            RHI_SAFE_RETAIN(bindingObject->texture);
+            bindingObject->Texture.texture = uri.empty()? nullptr: ImageLoader::LoadTextureFromUri(uri);
+            RHI_SAFE_RETAIN(bindingObject->Texture.texture);
 
             MaterialParameter param;
             param.name = bindingObject->name;
@@ -663,17 +661,16 @@ void Material::ParseBindGroupLayout(const rapidjson::Document& doc)
             param.bindingObject = bindingObject;
             param.binding = bindingObject->binding;
             parameters_[param.name] = param;
-        }
-        else if (type == "Sampler2D")
-        {
-            bindingObject->type = MaterailBindingObjectType::SAMPLER2D;
-            bindingObject->name = cfg["name"].GetString();
-            bindingObject->binding = cfg["binding"].GetUint(); 
+            
+            // sampler
             RHI::SamplerDescriptor descriptor = ParseSamplerDescriptor(cfg);
-            bindingObject->sampler = Engine::GetGPUDevice()->CreateSampler(descriptor);
-            RHI_SAFE_RETAIN(bindingObject->sampler);
+            bindingObject->Texture.sampler = Engine::GetGPUDevice()->CreateSampler(descriptor);
+            RHI_SAFE_RETAIN(bindingObject->Texture.sampler);
         }
-        else Assert(false, "");
+        else
+        {
+            RHI_ASSERT(false, "");
+        }
 
     }
 
@@ -689,22 +686,46 @@ void Material::ParseBindGroupLayout(const rapidjson::Document& doc)
     RHI::BindGroupLayoutDescriptor descriptor;
     for (const auto& bo : bindingObjects_)
     {
-        RHI::BindGroupLayoutBinding target;
-        target.binding = bo->binding;
-        target.visibility = RHI::ShaderStage::VERTEX | RHI::ShaderStage::FRAGMENT;
         switch (bo->type)
         {
         case MaterailBindingObjectType::BUFFER:
+        {
+            RHI::BindGroupLayoutBinding target;
+            target.binding = bo->binding;
+            target.visibility = RHI::ShaderStage::VERTEX | RHI::ShaderStage::FRAGMENT;
             target.type = RHI::BindingType::UNIFORM_BUFFER;
-            break;
-        case MaterailBindingObjectType::TEXTURE2D:
-            target.type = RHI::BindingType::SAMPLED_TEXTURE;
-            break;
-        case MaterailBindingObjectType::SAMPLER2D:
-            target.type = RHI::BindingType::SAMPLER;
+            descriptor.entries.push_back(target);
+            
             break;
         }
-        descriptor.entries.push_back(target);
+
+        case MaterailBindingObjectType::TEXTURE2D:
+        {
+            // texture
+            {
+                RHI::BindGroupLayoutBinding target;
+                target.binding = bo->binding;
+                target.visibility = RHI::ShaderStage::VERTEX | RHI::ShaderStage::FRAGMENT;
+                target.type = RHI::BindingType::SAMPLED_TEXTURE;
+                descriptor.entries.push_back(target);
+            }
+
+            // sampler
+            {
+                RHI::BindGroupLayoutBinding target;
+                target.binding = bo->binding + 1;
+                target.visibility = RHI::ShaderStage::VERTEX | RHI::ShaderStage::FRAGMENT;
+                target.type = RHI::BindingType::SAMPLER;
+                descriptor.entries.push_back(target);
+            }
+
+            break;
+        }
+
+        default:
+            RHI_ASSERT(false);
+        }
+        
     }
     rhiBindGroupLayout_ = Engine::GetGPUDevice()->CreateBindGroupLayout(descriptor);
 
@@ -715,7 +736,6 @@ void Material::ParseBindGroupLayout(const rapidjson::Document& doc)
         }
         rhiPipelineLayout_ = Engine::GetGPUDevice()->CreatePipelineLayout(desc);
     }
-
 }
 
 RHI::RenderPipeline* Material::CreatePipelineState(const PSOKey& psoKey, const ShaderSet& shaderSet)

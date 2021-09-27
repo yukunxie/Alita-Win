@@ -19,6 +19,7 @@
 
 #include <list>
 #include <map>
+#include <array>
 
 NS_RX_BEGIN
 
@@ -38,18 +39,27 @@ struct MaterialParameter
 	MaterialBindingObject* bindingObject = nullptr;
 };
 
+struct TextureSamplerBindingObject
+{
+	const RHI::Texture* texture = nullptr;
+	const RHI::Sampler* sampler = nullptr;
+	std::string			preprocessor  = "";
+};
+
+struct BufferBindingObject
+{
+	std::uint32_t stride = 0;
+	const RHI::Buffer* buffer = nullptr;
+};
+
 struct MaterialBindingObject
 {
-	std::string name;
-	std::uint32_t binding;
-	std::uint32_t stride = 0;
-	MaterailBindingObjectType type;
-	union
-	{
-		const RHI::Buffer* buffer;
-		const RHI::Texture* texture;
-		const RHI::Sampler* sampler;
-	};
+	MaterailBindingObjectType	type;
+	std::uint32_t				binding;
+	std::string					name;
+	BufferBindingObject			Buffer;
+	TextureSamplerBindingObject Texture;
+	
 };
 
 std::uint32_t GetInputAttributeLocation(VertexBufferAttriKind kind);
@@ -82,11 +92,6 @@ struct InputAttribute
 		Assert(false, "invalid format");
 		return RHI::VertexFormat::FLOAT;
 	}
-
-	//bool operator < (const InputAttribute& other)
-	//{
-	//	return location < other.location;
-	//}
 };
 
 class InputAssembler

@@ -43,7 +43,7 @@ private:
     RHIObjectWrapper<VKBindGroupLayout> bindGroupLayout_;
     
     VkDescriptorSet vkDescriptorSet_ = VK_NULL_HANDLE;
-    TurboVector<BindGroupBinding> bindingResources_;
+    std::vector<BindGroupBinding> bindingResources_;
     
     bool hasUpdateDescriptorSet_ = false;
     

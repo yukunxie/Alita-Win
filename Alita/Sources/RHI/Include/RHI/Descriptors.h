@@ -7,7 +7,6 @@
 
 #include "Macros.h"
 #include "Flags.h"
-#include "TurboVector.h"
 #include "Constants.h"
 
 #include <cmath>
@@ -220,14 +219,14 @@ struct ObjectDescriptorBase
 
 struct RenderPassDescriptor : ObjectDescriptorBase
 {
-    TurboVector<RenderPassColorAttachmentDescriptor, kMaxColorAttachments + 1> colorAttachments;
+    std::vector<RenderPassColorAttachmentDescriptor> colorAttachments;
     RenderPassDepthStencilAttachmentDescriptor depthStencilAttachment;
     QuerySet* occlusionQuerySet = nullptr;
 };
 
 struct RenderBundleEncoderDescriptor : ObjectDescriptorBase
 {
-    TurboVector<TextureFormat, kMaxColorAttachments> colorFormats;
+    std::vector<TextureFormat> colorFormats;
     TextureFormat depthStencilFormat = TextureFormat::INVALID;
     std::uint32_t sampleCount = 1;
 };
@@ -405,7 +404,7 @@ struct VertexBufferDescriptor
 {
     BufferSize arrayStride;
     InputStepMode stepMode = InputStepMode::VERTEX;
-    TurboVector<VertexAttributeDescriptor, kMaxVertexAttributes> attributes;
+    std::vector<VertexAttributeDescriptor> attributes;
     
     bool operator==(const VertexBufferDescriptor &other) const
     {
@@ -426,7 +425,7 @@ struct VertexBufferDescriptor
 struct VertexStateDescriptor
 {
     IndexFormat indexFormat = IndexFormat::UINT32;
-    TurboVector<VertexBufferDescriptor, kMaxVertexInputs> vertexBuffers;
+    std::vector<VertexBufferDescriptor> vertexBuffers;
     
     bool operator==(const VertexStateDescriptor &other) const
     {
@@ -459,7 +458,7 @@ struct RenderPipelineDescriptor : public PipelineDescriptorBase
     
     PrimitiveTopology primitiveTopology;
     RasterizationStateDescriptor rasterizationState;
-    TurboVector<ColorStateDescriptor, kMaxColorAttachments + 1> colorStates;
+    std::vector<ColorStateDescriptor> colorStates;
     DepthStencilStateDescriptor depthStencilState;
     bool hasDepthStencilState = false;
     VertexStateDescriptor vertexState;
@@ -714,7 +713,7 @@ struct BindGroupLayoutBinding
 
 struct BindGroupLayoutDescriptor
 {
-    TurboVector<BindGroupLayoutBinding, kMaxBindingsPerGroup> entries;
+    std::vector<BindGroupLayoutBinding> entries;
     
     bool operator == (const BindGroupLayoutDescriptor& other) const
     {
@@ -738,12 +737,12 @@ struct BindGroupBinding
 struct BindGroupDescriptor : ObjectDescriptorBase
 {
     BindGroupLayout* layout = nullptr;
-    TurboVector<BindGroupBinding, kMaxBindingsPerGroup> entries;
+    std::vector<BindGroupBinding> entries;
 };
 
 struct PipelineLayoutDescriptor
 {
-    TurboVector<BindGroupLayout*, kMaxBindingsPerGroup> bindGroupLayouts;
+    std::vector<BindGroupLayout*> bindGroupLayouts;
     
     bool operator == (const PipelineLayoutDescriptor& other) const
     {

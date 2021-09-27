@@ -140,7 +140,7 @@ public:
 protected:
     std::uint32_t index_ = 0;
     BindGroup* bindGroup_ = nullptr;
-    TurboVector<std::uint32_t, kMaxBindingsPerGroup> dynamicOffsets_;
+    std::vector<std::uint32_t> dynamicOffsets_;
 };
 
 class CmdSetVertexBuffer  final : public RenderCommandBase

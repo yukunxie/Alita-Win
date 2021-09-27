@@ -21,20 +21,10 @@
       "uri": ""
     },
     {
-      "name": "tGDiffuse_sampler",
-      "binding": 12,
-      "type": "Sampler2D"
-    },
-    {
       "name": "tGNormal",
       "binding": 13,
       "type": "Texture2D",
       "uri": ""
-    },
-    {
-      "name": "GNormal_sampler",
-      "binding": 14,
-      "type": "Sampler2D"
     },
     {
       "name": "tGPosition",
@@ -43,31 +33,16 @@
       "uri": ""
     },
     {
-      "name": "GPosition_sampler",
-      "binding": 16,
-      "type": "Sampler2D"
-    },
-    {
       "name": "tGMaterial",
       "binding": 17,
       "type": "Texture2D",
       "uri": ""
     },
     {
-      "name": "GMaterial_sampler",
-      "binding": 18,
-      "type": "Sampler2D"
-    },
-    {
       "name": "tShadowMap",
       "binding": 19,
       "type": "Texture2D",
-      "uri": ""
-    },
-    {
-      "name": "ShadowMap_sampler",
-      "binding": 20,
-      "type": "Sampler2D",
+      "uri": "",
       "filter":{
         "magFilter":    "point",
         "minFilter":    "point",

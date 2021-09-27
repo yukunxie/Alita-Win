@@ -394,7 +394,6 @@ echo "xxxxx"</Command>
     <ClInclude Include="Sources\RHI\Include\RHI\Texture.h" />
     <ClInclude Include="Sources\RHI\Include\RHI\TextureView.h" />
     <ClInclude Include="Sources\RHI\Include\RHI\TimeProfiler.h" />
-    <ClInclude Include="Sources\RHI\Include\RHI\TurboVector.h" />
     <ClInclude Include="Sources\RHI\Include\RHI\xxhash64.h" />
     <ClInclude Include="Sources\RHI\Macros.h" />
     <ClInclude Include="Sources\Types\Enums.h" />

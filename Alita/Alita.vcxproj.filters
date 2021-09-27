@@ -1030,9 +1030,6 @@
     <ClInclude Include="Sources\RHI\Include\RHI\TimeProfiler.h">
       <Filter>Sources\RHI\Include\RHI</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\RHI\Include\RHI\TurboVector.h">
-      <Filter>Sources\RHI\Include\RHI</Filter>
-    </ClInclude>
     <ClInclude Include="Sources\RHI\Include\RHI\xxhash64.h">
       <Filter>Sources\RHI\Include\RHI</Filter>
     </ClInclude>

@@ -19,11 +19,6 @@
       "binding": 11,
       "type": "Texture2D",
       "uri": "Textures/default-512.png"
-    },
-    {
-      "name": "albedo_sampler",
-      "binding": 12,
-      "type": "Sampler2D"
     }
   ]
 }
