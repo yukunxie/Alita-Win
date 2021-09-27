@@ -7,8 +7,6 @@
 #include "Loaders/ImageLoader.h"
 #include "RenderScene.h"
 
-#include "Backend/Vulkan/ShaderHelper.h"
-
 #include <sstream>
 
 NS_RX_BEGIN
@@ -200,8 +198,7 @@ static constexpr std::uint32_t _SimpleHash(const char* p)
     }
     return hash;
 }
-
-static RHI::Shader* _CreateShader(const std::string& filename, RHI::ShaderType shaderType, ETechniqueType techType, const std::vector<std::string>& userDefines = {})
+RHI::Shader* Material::_CreateShader(const std::string& filename, RHI::ShaderType shaderType, ETechniqueType techType, const std::vector<std::string>& userDefines)
 {
     std::string data = FileSystem::GetInstance()->GetStringData(filename.c_str());
 
@@ -218,25 +215,21 @@ static RHI::Shader* _CreateShader(const std::string& filename, RHI::ShaderType s
         + globalCBuffer + "\n"
         + data;
 
+    RHI_ASSERT(TechniqueShaderEntries_[(int)techType].Declared);
     std::string techEntryName = "";
-    switch (techType)
+    switch (shaderType)
     {
-    case ETechniqueType::TShading:
-        techEntryName = "void TShading()";
+    case  RHI::ShaderType::VERTEX:
+        techEntryName = TechniqueShaderEntries_[(int)techType].VertexShaderEntry;
         break;
-    case ETechniqueType::TGBufferGen:
-        techEntryName = "void TGBufferGen()";
-        break;
-    case ETechniqueType::TShadowmapGen:
-        techEntryName = "void TShadowMapGen()";
-        break;
-    case ETechniqueType::TSkyBox:
-        techEntryName = "void TSkyBox()";
+    case  RHI::ShaderType::FRAGMENT:
+        techEntryName = TechniqueShaderEntries_[(int)techType].FragmentShaderEntry;
         break;
     default:
         RHI_ASSERT(false);
     }
-    RHI_ASSERT(techEntryName.size() > 0);
+
+    techEntryName = "void " + techEntryName + "()";  
 
     auto npos = shaderText.find(techEntryName.c_str(), 0);
     RHI_ASSERT(npos != std::string::npos);
@@ -274,6 +267,35 @@ Material::Material(const std::string& configFilename)
 
     vsFilename_ = doc["code"]["vs"].GetString();
     fsFilename_ = doc["code"]["fs"].GetString();
+
+    for (auto it = doc["techniques"].MemberBegin(); it != doc["techniques"].MemberEnd(); it++)
+    {
+       auto techName =  it->name.GetString();
+
+       ETechniqueType technique = ETechniqueType::TShading;
+
+       switch (_SimpleHash(techName))
+       {
+       case _SimpleHash("TShading"):
+           technique = ETechniqueType::TShading;
+           break;
+       case _SimpleHash("TGBufferGen"):
+           technique = ETechniqueType::TGBufferGen;
+           break;
+       case _SimpleHash("TShadowMapGen"):
+           technique = ETechniqueType::TShadowMapGen;
+           break;
+       case _SimpleHash("TSkyBox"):
+           technique = ETechniqueType::TSkyBox;
+           break;
+       default:
+           RHI_ASSERT(false);
+       }
+
+       TechniqueShaderEntries_[(int)technique].Declared = true;
+       TechniqueShaderEntries_[(int)technique].VertexShaderEntry = it->value["vs_entry"].GetString();
+       TechniqueShaderEntries_[(int)technique].FragmentShaderEntry = it->value["fs_entry"].GetString();
+    }
 
     ParseBindGroupLayout(doc);
 }
@@ -344,7 +366,7 @@ void Material::SetupPSOKey(PSOKey& psoKey, ETechniqueType technique)
     case ETechniqueType::TGBufferGen:
         psoKey.CullMode = 2;
         break;
-    case ETechniqueType::TShadowmapGen:
+    case ETechniqueType::TShadowMapGen:
         psoKey.CullMode = 2;
         psoKey.DepthBias = 1;
         break;
@@ -742,7 +764,7 @@ ShaderSet Material::CreateShaderSet(ETechniqueType technique)
         shaderSet.VertexShader = _CreateShader(vsFilename_, RHI::ShaderType::VERTEX, technique, userDefines);
     }
 
-    if (fsFilename_.size() && technique != ETechniqueType::TShadowmapGen)
+    if (fsFilename_.size() && technique != ETechniqueType::TShadowMapGen)
     {
         shaderSet.FragmentShader = _CreateShader(fsFilename_, RHI::ShaderType::FRAGMENT, technique, userDefines);
     }

@@ -7,7 +7,7 @@
   },
   "defines": [],
   "techniques": {
-    "SkyBox":
+    "TSkyBox":
     {
       "vs_entry": "TSkyBox",
       "fs_entry": "TSkyBox"

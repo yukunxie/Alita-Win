@@ -10,6 +10,7 @@
 #include "Effect.h"
 #include "RHI/RHI.h"
 #include "Pass.h"
+#include "Backend/Vulkan/ShaderHelper.h"
 //#include "Meshes/VertexBuffer.h"
 
 #define RAPIDJSON_ASSERT(x) Assert(x, "")
@@ -243,6 +244,13 @@ struct ShaderSet
 	RHI::Shader* ComputeShader = nullptr;
 };
 
+struct TechniqueShaderEntry
+{
+	bool Declared = false;
+	std::string VertexShaderEntry;
+	std::string FragmentShaderEntry;
+};
+
 class Material : public ObjectBase
 {
 public:
@@ -268,6 +276,8 @@ public:
 	}
 
 protected:
+	RHI::Shader* _CreateShader(const std::string& filename, RHI::ShaderType shaderType, ETechniqueType techType, const std::vector<std::string>& userDefines);
+
 	RHI::RenderPipeline* CreatePipelineState(const PSOKey& psoKey, const ShaderSet& shaderSet);
 	void ParseBindGroupLayout(const rapidjson::Document& doc);
 	void SetupConstantBufferLayout();
@@ -280,7 +290,6 @@ protected:
 	void SetupPSOKey(PSOKey& psoKey, const Pass* pass);
 
 	ShaderSet CreateShaderSet(ETechniqueType technique);
-
 	
 
 protected:
@@ -302,6 +311,7 @@ protected:
 	RHI::Shader* rhiFragShader_ = nullptr;
 	RHI::RenderPipeline* rhiPipelineState_ = nullptr;
 
+	std::array<TechniqueShaderEntry, (int)ETechniqueType::TMaxCount> TechniqueShaderEntries_;
 	std::unordered_map< PSOKey, RHI::RenderPipeline*> rhiPSOMap_;
 
 	bool bBindingDirty_ = true;

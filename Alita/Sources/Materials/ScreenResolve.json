@@ -1,9 +1,9 @@
 {
-  "name": "PostProcess",
+  "name": "ScreenResolve",
   "indexFormat": "uint32",
   "code": {
-    "vs": "Shaders/PostProcess.vert.gl",
-    "fs": "Shaders/PostProcess.frag.gl"
+    "vs": "Shaders/ScreenQuad.vert.gl",
+    "fs": "Shaders/ScreenResolve.frag.gl"
   },
   "defines": [],
   "techniques": {

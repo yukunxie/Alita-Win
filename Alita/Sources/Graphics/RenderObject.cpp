@@ -9,7 +9,7 @@ bool CheckSkipRenderObjects(ETechniqueType technique, std::uint64_t renderSetBit
 	case ETechniqueType::TShading:
 		return false;
 	case ETechniqueType::TGBufferGen:
-	case ETechniqueType::TShadowmapGen:
+	case ETechniqueType::TShadowMapGen:
 		return !(ERenderSet_Opaque & renderSetBits);
 	case ETechniqueType::TSkyBox:
 		return !(ERenderSet_SkyBox & renderSetBits);

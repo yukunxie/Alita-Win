@@ -188,7 +188,7 @@ class ScreenResolvePass : public FullScreenPass
 {
 public:
     ScreenResolvePass()
-        : FullScreenPass("Materials/PostProcess.json", ETechniqueType::TShading)
+        : FullScreenPass("Materials/ScreenResolve.json", ETechniqueType::TShading)
     {}
 
     void Setup(const Pass* inputPass)

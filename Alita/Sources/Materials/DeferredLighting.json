@@ -1,5 +1,5 @@
 {
-  "name": "CommonMaterial",
+  "name": "DeferredLighting",
   "indexFormat": "uint32",
   "code": {
     "vs": "Shaders/PostProcess.vert.gl",
@@ -7,7 +7,7 @@
   },
   "defines": [],
   "techniques": {
-    "Shading":
+    "TShading":
     {
       "vs_entry": "TShading",
       "fs_entry": "TShading"

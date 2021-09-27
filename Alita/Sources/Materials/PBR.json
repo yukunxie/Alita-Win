@@ -7,15 +7,20 @@
   },
   "defines": [],
   "techniques": {
-    "Shading":
+    "TShading":
     {
       "vs_entry": "TShading",
       "fs_entry": "TShading"
     },
-    "GBufferGen":
+    "TGBufferGen":
     {
       "vs_entry": "TGBufferGen",
       "fs_entry": "TGBufferGen"
+    },
+    "TShadowMapGen":
+    {
+      "vs_entry": "TShadowMapGen",
+      "fs_entry": "TShadowMapGen"
     }
   },
   "bindings": [
