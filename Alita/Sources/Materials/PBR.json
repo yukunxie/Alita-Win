@@ -1,9 +1,9 @@
 {
-  "name": "CommonMaterial",
+  "name": "PBR",
   "indexFormat": "uint32",
   "code": {
-    "vs": "Shaders/PBR_Metallic.vert.gl",
-    "fs": "Shaders/PBR_Metallic.frag.gl"
+    "vs": "Shaders/PBR.vert.gl",
+    "fs": "Shaders/PBR.frag.gl"
   },
   "defines": [],
   "techniques": {

@@ -78,7 +78,7 @@ Terrain* Terrain::CreateFromHeightMap(const std::string& imgFilename, float minH
 
     MeshComponent* meshComp = new MeshComponent();
     meshComp->Geometry_ = new Geometry;
-    meshComp->Material_ = new Material("Materials/PBR_Metallic.json");
+    meshComp->Material_ = new Material("Materials/PBR.json");
 
     {
         auto vbBuffer = new VertexBuffer();

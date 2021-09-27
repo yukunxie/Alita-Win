@@ -72,7 +72,7 @@ MeshComponent* MeshComponentBuilder::CreateBox(const std::string& material)
 {
 	MeshComponent* meshComp = new MeshComponent();
 	meshComp->Geometry_ = new Geometry;
-	meshComp->Material_ = new Material(material.empty() ? "Materials/PBR_Metallic.json" : material);
+	meshComp->Material_ = new Material(material.empty() ? "Materials/PBR.json" : material);
 
 	std::vector<TVector3> positions = {
 		// Front face

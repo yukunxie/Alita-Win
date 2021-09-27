@@ -50,7 +50,7 @@ namespace GLTFLoader
 		{
 			MeshComponent* mc = new MeshComponent();
 			mc->Geometry_ = new Geometry;
-			mc->Material_ = new Material("Materials/PBR_Metallic.json");
+			mc->Material_ = new Material("Materials/PBR.json");
 			{
 				const tinygltf::Material& tMaterial = tModel.materials[primitive.material];
 				std::vector<float> tmp;
