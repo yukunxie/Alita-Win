@@ -89,7 +89,7 @@ namespace GLTFLoader
 					auto texture = _LoadTexture(image);
 					if (texture)
 					{
-						mc->Material_->SetTexture("albedo", texture);
+						mc->Material_->SetTexture("tAlbedo", texture);
 					}
 					/*if (image.mimeType.empty())
 					{

@@ -27,7 +27,7 @@ World::World()
 		AddEntity(terrain);
 		auto tex = ImageLoader::LoadTextureFromUri("Textures/grass.jpg");
 		auto mesh = terrain->GetComponent<MeshComponent>();
-		mesh->GetMaterial()->SetTexture("albedo", tex);
+		mesh->GetMaterial()->SetTexture("tAlbedo", tex);
 	}
 
 	{
