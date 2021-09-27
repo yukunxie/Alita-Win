@@ -17,6 +17,7 @@ NS_RX_BEGIN
 
 EventSystem* EventSystem::instance_ = nullptr;
 
+
 void EventSystem::_SetupEventRegisterToWindow(void* windowHandler)
 {
 	GLFWwindow* window = (GLFWwindow*)windowHandler;
@@ -27,6 +28,7 @@ void EventSystem::_SetupEventRegisterToWindow(void* windowHandler)
 	glfwSetScrollCallback(window, EventSystem::_EventScrollCallback);
 	glfwSetKeyCallback(window, EventSystem::_EventKeyboardCallback);
 	glfwSetMouseButtonCallback(window, EventSystem::_EventMouseButtonCallbak);
+	glfwSetWindowSizeCallback(window, EventSystem::_EventOnWindowResized);
 }
 
 void EventSystem::_EventMouseHandler(float xpos, float ypos)
@@ -36,6 +38,13 @@ void EventSystem::_EventMouseHandler(float xpos, float ypos)
 		TVector2 diff = (TVector2{ xpos, ypos } - lastMousePosition_) * 0.1f;
 		Engine::GetWorld()->GetCamera()->MoveRight(-diff.x);
 		Engine::GetWorld()->GetCamera()->MoveUp(diff.y);
+	}
+	else if (bRightMouseBtnPressing_)
+	{
+		TVector2 diff = (TVector2{ xpos, ypos } - lastMousePosition_) * 0.1f;
+
+		Engine::GetWorld()->GetCamera()->Yaw(-diff.x);
+		Engine::GetWorld()->GetCamera()->Pitch(diff.y);
 	}
 
 	lastMousePosition_ = { xpos, ypos };
@@ -48,7 +57,7 @@ void EventSystem::_EventScrollHandler(float xoffset, float yoffset)
 
 void EventSystem::_EventKeyboardHandler(int key, int scancode, int action, int mods)
 {
-	if (!bLeftMouseBtnPressing_)
+	if (!bLeftMouseBtnPressing_ && !bRightMouseBtnPressing_)
 	{
 		if (key == GLFW_KEY_RIGHT || key == GLFW_KEY_D)
 			Engine::GetWorld()->GetCamera()->MoveRight(1.0f);
@@ -84,11 +93,15 @@ void EventSystem::_EventMouseButtonHandler(int button, int action, int mods, dou
 		{
 		case GLFW_MOUSE_BUTTON_LEFT:
 			bLeftMouseBtnPressing_ = true;
+			bRightMouseBtnPressing_ = false;
 			lastMousePosition_ = { xpos, ypos };
 			break;
 		case GLFW_MOUSE_BUTTON_MIDDLE:
 			break;
 		case GLFW_MOUSE_BUTTON_RIGHT:
+			bLeftMouseBtnPressing_ = false;
+			bRightMouseBtnPressing_ = true;
+			lastMousePosition_ = { xpos, ypos };
 			break;
 		default:
 			return;
@@ -104,6 +117,7 @@ void EventSystem::_EventMouseButtonHandler(int button, int action, int mods, dou
 		case GLFW_MOUSE_BUTTON_MIDDLE:
 			break;
 		case GLFW_MOUSE_BUTTON_RIGHT:
+			bRightMouseBtnPressing_ = false;
 			break;
 		default:
 			return;
@@ -123,6 +137,19 @@ void EventSystem::_EventMouseButtonHandler(int button, int action, int mods, dou
 			return;
 		}
 	}
+}
+
+void EventSystem::_EventWindowResizedHandler(int width, int height)
+{
+	Engine::GetEngine()->SetWindowResized(width, height);
+	/*if (width == 0 || height == 0)
+	{
+		Engine::GetGPUDevice()->OnEnterBackgroud();
+	}
+	else
+	{
+		Engine::GetGPUDevice()->OnEnterForeground();
+	}*/
 }
 
 void EventSystem::_EventMouseButtonCallbak(GLFWwindow* window, int button, int action, int mods)
@@ -146,6 +173,11 @@ void EventSystem::_EventScrollCallback(GLFWwindow* window, double xoffset, doubl
 void EventSystem::_EventKeyboardCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
 	instance_->_EventKeyboardHandler(key, scancode, action, mods);
+}
+
+void EventSystem::_EventOnWindowResized(GLFWwindow* window, int width, int height)
+{
+	instance_->_EventWindowResizedHandler(width, height);
 }
 
 NS_RX_END

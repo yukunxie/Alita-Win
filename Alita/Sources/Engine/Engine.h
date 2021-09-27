@@ -68,6 +68,8 @@ public:
 		return Engine::GetEngine()->world_;
 	}
 
+	void SetWindowResized(int width, int height);
+
 public:
 	void Update(float dt);
 
@@ -91,6 +93,9 @@ protected:
 
 	RHI::CommandEncoder* rhiCommandEncoder_ = nullptr;
 	RHI::SwapChain* rhiSwapChain_ = nullptr;
+
+	int  WindowWidth_ = 0;
+	int  WindowHeight_ = 0;
 };
 
 NS_RX_END

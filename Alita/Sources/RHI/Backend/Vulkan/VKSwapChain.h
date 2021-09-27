@@ -63,6 +63,8 @@ public:
     { return format_; }
     
     virtual void Dispose() override;
+
+    virtual void RecreateSwapChain() override;
     
     void AcquireNextImage();
     
@@ -70,8 +72,6 @@ public:
     { return vkSwapChain_; }
     
     void NotifyPresentDone(bool hasDrawCommands);
-    
-    void RecreateSwapChain();
     
     std::uint32_t GetImageIndex()
     {

@@ -31,10 +31,11 @@ World::World()
 	}
 
 	{
-		//const auto& models = GLTFLoader::LoadModelFromGLTF("Models/chinesedragon.gltf");
-		const auto& models = GLTFLoader::LoadModelFromGLTF("Models/color_teapot_spheres.gltf");
+		const auto& models = GLTFLoader::LoadModelFromGLTF("Models/chinesedragon.gltf");
+		//const auto& models = GLTFLoader::LoadModelFromGLTF("Models/color_teapot_spheres.gltf");
 		//const auto& models = GLTFLoader::LoadModelFromGLTF("Models/deer.gltf");
 		//const auto& models = GLTFLoader::LoadModelFromGLTF("Models/armor/armor.gltf");
+		//const auto& models = GLTFLoader::LoadModelFromGLTF("Scenes/Sponza/Sponza.gltf");
 		for (auto model : models)
 		{
 			AddEntity(model);
@@ -61,7 +62,11 @@ void World::SetupDefaultCamera()
 		return;
 	}
 	defaultCamera_ = Camera::CreatePerspectiveCamera(45.0, 1280.f / 800.0f, 1.0f, 1000.f);
-	defaultCamera_->LookAt({ 0, 15, 15 }, { 0, 0, 0 }, { 0, 1, 0 });
+	defaultCamera_->Setup({ 0, 15, 15 }, 0.0f, -45.0f);
+	//defaultCamera_->LookAt({ 0, 15, 15 }, { 0, 0, 0 }, { 0, 1, 0 });
+	/*defaultCamera_->SetPosition({ 0, 15, 15 });
+	defaultCamera_->SetRotation({ -45, 0, 0 });*/
+
 
 	shadowMapCamera_ = new OrthoCamera(-50, 50, 50, -50, 0.01f, 100);
 	shadowMapCamera_->LookAt(TVector3( 0, 20.0f, 1), TVector3(0.0f, 0.0f, 0.0f ), TVector3(0.0f, 1.0f, 0.0f));

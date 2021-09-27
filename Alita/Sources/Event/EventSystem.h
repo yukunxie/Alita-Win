@@ -30,6 +30,8 @@ protected:
 
     void _EventMouseButtonHandler(int button, int action, int mods, double xpos, double ypos);
 
+    void _EventWindowResizedHandler(int width, int height);
+
     static void _EventMouseButtonCallbak(GLFWwindow* window, int button, int action, int mods);
 
     static void _EventMouseCallback(GLFWwindow* window, double xpos, double ypos);
@@ -38,10 +40,13 @@ protected:
 
     static void _EventKeyboardCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
 
+    static void _EventOnWindowResized(GLFWwindow* window, int width, int height);
+
 private:
     static EventSystem* instance_;
 
     bool bLeftMouseBtnPressing_ = false;
+    bool bRightMouseBtnPressing_ = false;
     TVector2 lastMousePosition_ = TVector2(0);
 };
 NS_RX_END

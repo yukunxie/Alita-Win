@@ -38,6 +38,8 @@ public:
 		return  projMatrix_ * viewMatrix_;
 	}
 
+	void Setup(const TVector3& position, float yaw, float pitch, const TVector3& up = { 0, 1, 0 });
+
 	void LookAt(const TVector3& from, const TVector3& center, const TVector3& up = { 0, 1, 0 });
 
 	void MoveForward(float speedScale = 1.0f);
@@ -45,6 +47,10 @@ public:
 	void MoveUp(float speedScale = 1.0f);
 
 	void MoveRight(float speedScale = 1.0f);
+
+	void Yaw(float raw = 0.0f);
+
+	void Pitch(float pitch = 0.0f);
 
 public:
 	TColor4 GetBackgroundColor() const
@@ -64,6 +70,11 @@ protected:
 	TMat4x4 viewMatrix_;
 	TMat4x4 projMatrix_;
 	TColor4 backgroudColor_ = { 0.0f, 0.0f, 0.0f, 1.0f };
+
+	float Yaw_ = 0.0f;
+	float Pitch_ = 0.0f;
+	TVector3 WorldUp_ = { 0, 1, 0 };
+	TVector3 Up_;
 };
 
 class OrthoCamera final : public Camera

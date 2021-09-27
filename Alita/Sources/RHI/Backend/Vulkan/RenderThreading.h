@@ -60,7 +60,7 @@ struct AsyncTaskSumbitCommandBufferAndPresent : public AsyncTask
     
     void PostprocessLastSubmission();
     
-    bool SumbitCommandBuffer(VkCommandBuffer vkCommandBuffer, VkSemaphore semaWaiting,
+    std::uint32_t SumbitCommandBuffer(VkCommandBuffer vkCommandBuffer, VkSemaphore semaWaiting,
                              VkSemaphore semaNotify, VkFence fenceNotify);
     
     virtual bool Execute() override;

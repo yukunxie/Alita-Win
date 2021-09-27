@@ -247,6 +247,8 @@ public:
     virtual void OnFrameCallback(float dt) override;
     
     virtual void OnFrameEnd() override;
+
+    virtual void OnWindowResized() override;
     
     void CheckOnBackgroud()
     {

@@ -54,7 +54,7 @@ bool VKTextureView::Init(VKTexture* vkTexture, const TextureViewDescriptor &desc
     texture_ = vkTexture;
     textureViewDescriptor_ = descriptor;
     
-    textureSize_ = texture_->GetTextureSize();
+    //textureSize_ = texture_->GetTextureSize();
     textureFormat_ = texture_->GetFormat();
     
     VkImageViewCreateInfo viewInfo = {};

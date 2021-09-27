@@ -308,6 +308,11 @@ void VKDevice::OnFrameEnd()
     RHI_CAST(VKQueue*, renderQueue_)->SubmitInternal();
 }
 
+void VKDevice::OnWindowResized()
+{
+    GetSwapChain()->RecreateSwapChain();
+}
+
 void VKDevice::Dispose()
 {
     RHI_DISPOSE_BEGIN();
@@ -480,13 +485,12 @@ void VKDevice::AttemptEnumerateInstanceLayerAndExtensions()
     }
     
     const char* requestVulkanLayerNames[] = {
-        //"VK_LAYER_GOOGLE_threading",
-        //"VK_LAYER_LUNARG_parameter_validation",
-        //"VK_LAYER_LUNARG_object_tracker",
-        //"VK_LAYER_LUNARG_core_validation",
-        //"VK_LAYER_GOOGLE_unique_objects",
-        "VK_LAYER_KHRONOS_validation",
-        "VK_LAYER_RENDERDOC_Capture",
+        "VK_LAYER_GOOGLE_threading",
+        "VK_LAYER_LUNARG_parameter_validation",
+        "VK_LAYER_LUNARG_object_tracker",
+        "VK_LAYER_LUNARG_core_validation",
+        "VK_LAYER_GOOGLE_unique_objects",
+        "VK_LAYER_KHRONOS_validation"
     };
     
     for (uint32_t j = 0; j < sizeof(requestVulkanLayerNames) / sizeof(requestVulkanLayerNames[0]); j++)
@@ -503,7 +507,8 @@ void VKDevice::AttemptEnumerateInstanceLayerAndExtensions()
         instanceLayerNames_.push_back(layerName);
     }
 #endif
-    
+  
+#if ANDROID
     // 如果加载的snapdragon profiler 或 RenderDoc的提供的layer, 则禁用所有的layer，否则会crash
     bool hasLoadProfilingLayer = false;
     for (const auto &layer: instanceLayers)
@@ -511,12 +516,13 @@ void VKDevice::AttemptEnumerateInstanceLayerAndExtensions()
         hasLoadProfilingLayer = hasLoadProfilingLayer || strcmp(layer.layerName, "sdp") == 0;
         hasLoadProfilingLayer = hasLoadProfilingLayer || strcmp(layer.layerName, "VK_LAYER_RENDERDOC_Capture") == 0;
     }
-    
+
     if (hasLoadProfilingLayer)
     {
         instanceLayerNames_.clear();
         LOGI("vulkan has load SDP or RenderDoc layer, all instance layers disabled.");
     }
+#endif
     
     for (const auto &layer : instanceLayerNames_)
     {

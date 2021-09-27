@@ -32,6 +32,8 @@ public:
     virtual Extent2D GetExtent() = 0;
     
     virtual TextureFormat GetFormat() = 0;
+
+    virtual void RecreateSwapChain() = 0;
 };
 
 NS_RHI_END

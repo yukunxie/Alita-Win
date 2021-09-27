@@ -164,6 +164,8 @@ public:
     
     virtual void OnFrameEnd() = 0;
 
+    virtual void OnWindowResized() = 0;
+
 private:
     RHIObjectManager rhiObjectManager_;
 #if RHI_DEBUG

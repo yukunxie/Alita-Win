@@ -143,6 +143,7 @@ void VKSwapChain::Init()
         {
             // Here. this branch is adapted for recreate swapchain.
             swapchainTextures_[i]->SetVkImageHandleDirectly(swapChainImages[i]);
+            swapchainTextures_[i]->textureSize_ = { extent_.width, extent_.height, 1 };
         }
         else
         {

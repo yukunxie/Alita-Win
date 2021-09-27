@@ -62,6 +62,11 @@ Engine* Engine::engine_ = nullptr;
 Engine::Engine(void* windowHandler)
 {
     windowHandler_ = windowHandler;
+
+#if WIN32 
+    GLFWwindow* glfwWindow = (GLFWwindow*)windowHandler_;
+    glfwGetWindowSize(glfwWindow, &WindowWidth_, &WindowHeight_);
+#endif
 }
 
 bool Engine::Init()
@@ -98,6 +103,9 @@ Engine::~Engine()
 
 void Engine::Update(float dt)
 {
+    if (WindowWidth_ == 0 || WindowHeight_ == 0)
+        return;
+
     gpuDevice_->OnFrameCallback(dt);
 
     if (!world_)return;
@@ -129,6 +137,28 @@ void Engine::CancelScheduler(std::uint32_t schedulerId)
     {
         schedulers_.erase(it);
     }
+}
+
+void Engine::SetWindowResized(int width, int height)
+{
+    if (width == 0 || height == 0)
+    {
+        Engine::GetGPUDevice()->OnEnterBackgroud();
+    }
+    else
+    {
+        if (WindowWidth_ == 0 || WindowHeight_ == 0)
+        {
+            Engine::GetGPUDevice()->OnEnterForeground();
+        }
+        else
+        {
+            GetGPUDevice()->OnWindowResized();
+        }
+    }
+
+    WindowWidth_ = width;
+    WindowHeight_ = height;
 }
 
 NS_RX_END

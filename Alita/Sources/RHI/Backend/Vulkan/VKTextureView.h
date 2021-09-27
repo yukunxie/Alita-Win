@@ -29,7 +29,7 @@ public:
     { return vkImageView_; }
     
     Extent3D GetTextureSize() const
-    { return textureSize_; }
+    { return texture_->GetTextureSize(); }
     
     std::uint32_t GetSampleCount() const
     {
@@ -57,7 +57,7 @@ private:
     
     VkImageView vkImageView_ = VK_NULL_HANDLE;
     
-    Extent3D textureSize_;
+    //Extent3D textureSize_;
     TextureFormat textureFormat_;
     
     TextureViewDescriptor textureViewDescriptor_;

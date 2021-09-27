@@ -121,7 +121,7 @@ void AsyncTaskSumbitCommandBufferAndPresent::PostprocessLastSubmission()
     }
 }
 
-bool AsyncTaskSumbitCommandBufferAndPresent::SumbitCommandBuffer(VkCommandBuffer vkCommandBuffer,
+std::uint32_t AsyncTaskSumbitCommandBufferAndPresent::SumbitCommandBuffer(VkCommandBuffer vkCommandBuffer,
                                                                  VkSemaphore semaWaiting,
                                                                  VkSemaphore semaNotify,
                                                                  VkFence fenceNotify)
@@ -151,7 +151,7 @@ bool AsyncTaskSumbitCommandBufferAndPresent::SumbitCommandBuffer(VkCommandBuffer
         LOGE("vkQueueSubmit fail code=%s", GetVkResultString(result));
     }
     
-    return VK_SUCCESS == result;
+    return result;
 }
 
 
@@ -178,9 +178,17 @@ bool AsyncTaskSumbitCommandBufferAndPresent::Execute()
         vkResetCommandBuffer(vkCommandBuffer, VK_COMMAND_BUFFER_RESET_RELEASE_RESOURCES_BIT);
         RecordCommandBuffer(vkCommandBuffer);
     }
-    
-    if (false == SumbitCommandBuffer(vkCommandBuffer, imageAvailableSemaphore, renderFinishedSemaphore,
-                        frameResource_->fenceToSyncSubmission))
+
+    VkResult result = (VkResult)SumbitCommandBuffer(vkCommandBuffer, imageAvailableSemaphore, renderFinishedSemaphore,
+        frameResource_->fenceToSyncSubmission);
+
+    if (result == VK_ERROR_DEVICE_LOST)
+    {
+        LOGE("SumbitCommandBuffer fail, RecreateSwapChain.");
+        device_->GetSwapChain()->RecreateSwapChain();
+    }
+
+    if (result != VK_SUCCESS)
     {
         LOGE("SumbitCommandBuffer fail, retry Execute.");
         asyncWorker->GetLocalAllocator()->ReleaseVkCommandBuffer(vkCommandBuffer);

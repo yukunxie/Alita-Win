@@ -39,6 +39,38 @@ void Camera::_UpdateViewMatrix()
 	viewMatrix_ = _ComposeViewMatrix(transform_.Position(), transform_.Rotation());
 }
 
+TVector3 CalcFrontDirectionWithYawPitch(float yaw, float pitch)
+{
+	glm::vec3 front;
+	front.z = -cos(glm::radians(yaw)) * cos(glm::radians(pitch));
+	front.y = sin(glm::radians(pitch));
+	front.x = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+	front = glm::normalize(front);
+
+	return front;
+}
+
+
+void Camera::Setup(const TVector3& position, float yaw, float pitch, const TVector3& up)
+{
+	TVector3 WorldUp_ = up;
+
+	Yaw_ = yaw;
+	Pitch_ = pitch;
+
+	if (Pitch_ > 89.0f)
+		Pitch_ = 89.0f;
+	if (Pitch_ < -89.0f)
+		Pitch_ = -89.0f;
+
+	glm::vec3 front = CalcFrontDirectionWithYawPitch(Yaw_, Pitch_);
+	glm::vec3 right = glm::normalize(glm::cross(front, WorldUp_));
+
+	Up_ = glm::normalize(glm::cross(right, front));
+
+	LookAt(position, position + front, Up_);
+}
+
 void Camera::LookAt(const TVector3& from, const TVector3& center, const TVector3& up)
 {
 	auto rMaxtrix = glm::lookAtRH(from, center, up);
@@ -94,6 +126,33 @@ void Camera::MoveRight(float speedScale)
 	transform_.Position() = glm::inverse(viewMatrix_) * posInViewSpace;
 
 	_UpdateViewMatrix();
+}
+
+void Camera::Yaw(float yaw)
+{
+	Yaw_ += yaw;
+
+	glm::vec3 front = CalcFrontDirectionWithYawPitch(Yaw_, Pitch_);
+	glm::vec3 right = glm::normalize(glm::cross(front, WorldUp_));
+
+	Up_ = glm::normalize(glm::cross(right, front));
+	LookAt(GetPosition(), GetPosition() + front, Up_);
+}
+
+void Camera::Pitch(float pitch)
+{
+	Pitch_ += pitch;
+
+	if (Pitch_ > 89.0f)
+		Pitch_ = 89.0f;
+	if (Pitch_ < -89.0f)
+		Pitch_ = -89.0f;
+
+	glm::vec3 front = CalcFrontDirectionWithYawPitch(Yaw_, Pitch_);
+	glm::vec3 right = glm::normalize(glm::cross(front, WorldUp_));
+
+	Up_ = glm::normalize(glm::cross(right, front));
+	LookAt(GetPosition(), GetPosition() + front, Up_);
 }
 
 OrthoCamera::OrthoCamera(float left, float right, float bottom, float top, float zNear, float zFar)
