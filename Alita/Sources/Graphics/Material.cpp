@@ -90,7 +90,7 @@ std::uint32_t GetFormatSize(InputAttributeFormat format)
     case InputAttributeFormat::FLOAT4:
         return 16;
     }
-    Assert(false, "");
+    RHI_ASSERT(false, "");
     return 0;
 }
 

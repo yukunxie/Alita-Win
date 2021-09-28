@@ -14,6 +14,9 @@ layout(location = IA_LOCATION_NORMAL) in vec3 inNormal;
 #if USE_TANGENT
 layout(location = IA_LOCATION_TANGENT) in vec3 inTangent;
 #endif 
+#if USE_BITANGENT
+layout(location = IA_LOCATION_BITANGENT) in vec3 inBiTangent;
+#endif 
 #if USE_UV0
 layout(location = IA_LOCATION_TEXCOORD) in vec2 inTexCoord;
 #endif
@@ -33,12 +36,23 @@ layout(location = 1) out vec3 _WorldNormal;
 layout(location = 2) out vec2 _UV0;
 #endif
 
+#if USE_NORMAL_MAP && USE_TANGENT && USE_BITANGENT
+layout(location = 3) out mat3 _TBN;
+#endif
+
 void TShading() {
     gl_Position = uGlobal.ProjMatrix * uGlobal.ViewMatrix * uBatch.WorldMatrix * vec4(inPosition, 1.0);
     _WorldPosition = (uBatch.WorldMatrix * vec4(inPosition, 1.0));
 
 #if USE_NORMAL
-    _WorldNormal =  (transpose(inverse(uBatch.WorldMatrix)) * vec4(inNormal, 1.0)).xyz;
+    _WorldNormal =  normalize((transpose(inverse(uBatch.WorldMatrix)) * vec4(inNormal, 1.0)).xyz);
+#endif
+
+#if USE_NORMAL_MAP && USE_TANGENT && USE_BITANGENT
+    vec3 T = normalize(vec3(uBatch.WorldMatrix * vec4(inTangent,   0.0)));
+    vec3 B = normalize(vec3(uBatch.WorldMatrix * vec4(inBiTangent, 0.0)));
+    vec3 N = normalize(vec3(uBatch.WorldMatrix * vec4(inNormal,    0.0)));
+    _TBN = mat3(T, B, N);
 #endif
 
 #if USE_UV0
@@ -51,7 +65,14 @@ void TGBufferGen() {
     _WorldPosition = (uBatch.WorldMatrix * vec4(inPosition, 1.0));
 
 #if USE_NORMAL
-    _WorldNormal =  (transpose(inverse(uBatch.WorldMatrix)) * vec4(inNormal, 1.0)).xyz;
+    _WorldNormal =  normalize((transpose(inverse(uBatch.WorldMatrix)) * vec4(inNormal, 1.0)).xyz);
+#endif
+
+#if USE_NORMAL_MAP && USE_TANGENT && USE_BITANGENT
+    vec3 T = normalize(vec3(uBatch.WorldMatrix * vec4(inTangent,   0.0)));
+    vec3 B = normalize(vec3(uBatch.WorldMatrix * vec4(inBiTangent, 0.0)));
+    vec3 N = normalize(vec3(uBatch.WorldMatrix * vec4(inNormal,    0.0)));
+    _TBN = mat3(T, B, N);
 #endif
 
 #if USE_UV0

@@ -62,7 +62,7 @@ void TShading() {
 
     vec4 wp = texture(sampler2D(tGPosition, sGPosition), _UV0);
     vec3 _WorldPosition = wp.xyz;// / wp.w;
-    vec3 _WorldNormal = (texture(sampler2D(tGNormal, sGNormal), _UV0).xyz - 0.5) * 2.0;
+    vec3 _WorldNormal = texture(sampler2D(tGNormal, sGNormal), _UV0).xyz;
 
     vec3 lightDir = normalize(uGlobal.EyePos.xyz - _WorldPosition);
     float specular = clamp(dot(lightDir, normalize(_WorldNormal)), 0, 1);

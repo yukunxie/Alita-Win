@@ -24,6 +24,10 @@ layout(location = 1) in vec3 _WorldNormal;
 layout(location = 2) in vec2 _UV0;
 #endif
 
+#if USE_NORMAL_MAP && USE_TANGENT && USE_BITANGENT
+layout(location = 3) in mat3 _TBN;
+#endif
+
 layout(binding = 11) uniform texture2D   tAlbedo;
 layout(binding = 12) uniform sampler     sAlbedo;
 
@@ -61,14 +65,20 @@ void TGBufferGen() {
     diffuse = texture(sampler2D(tAlbedo, sAlbedo), _UV0);
 #endif
 
-#if USE_NORMAL_MAP
-    diffuse = texture(sampler2D(tNormalMap, sNormalMap), _UV0);
+    vec3 normal = vec3(0);
+
+#if USE_NORMAL_MAP && USE_TANGENT && USE_BITANGENT
+    vec3 _normal = normalize(texture(sampler2D(tNormalMap, sNormalMap), _UV0).xyz);
+    _normal = _normal * 2.0 - 1.0;
+    normal = normalize(_TBN * _normal); 
+#elif USE_NORMAL
+    normal = _WorldNormal;
 #endif
 
     OutColor = diffuse;
 
 #if GEN_GBUFFER_PASS
-    GNormal = vec4(normalize(_WorldNormal) * 0.5 + vec3(0.5, 0.5, 0.5), 0.0);
+    GNormal = vec4(normal / 2.0 + 0.5, 1.0);
     GPosition = _WorldPosition;//vec4(_WorldPosition.xyz, 1.0);
     GMaterial = vec4(uShading.metallicFactor, uShading.roughnessFactor, 0, 0);
 #endif

@@ -48,6 +48,7 @@ namespace GLTFLoader
 	{
 		for (const tinygltf::Primitive& primitive : tMesh.primitives)
 		{
+			bool useNormapMap = false;
 			MeshComponent* mc = new MeshComponent();
 			mc->Geometry_ = new Geometry;
 			mc->Material_ = new Material("Materials/PBR.json");
@@ -111,6 +112,7 @@ namespace GLTFLoader
 					if (texture)
 					{
 						mc->Material_->SetTexture("tNormalMap", texture);
+						useNormapMap = true;
 					}
 				}
 			}
@@ -137,6 +139,8 @@ namespace GLTFLoader
 			}
 
 			// index buffer
+			std::vector<std::uint32_t> tmpIndexData;
+			const std::uint32_t* tmpPIndex = nullptr;
 			const tinygltf::Accessor& accessor = tModel.accessors[primitive.indices];
 			const tinygltf::BufferView& bufferView = tModel.bufferViews[accessor.bufferView];
 			const tinygltf::Buffer& tBuffer = tModel.buffers[bufferView.buffer];
@@ -144,20 +148,138 @@ namespace GLTFLoader
 			if (accessor.componentType == TINYGLTF_COMPONENT_TYPE_UNSIGNED_SHORT)
 			{
 				std::uint16_t* pIndices = (std::uint16_t*)tData;
-				std::vector<std::uint32_t> tmp(accessor.count);
+				tmpIndexData.resize(accessor.count);
 				for (int i = 0; i < accessor.count; ++i)
 				{
-					tmp[i] = pIndices[i];
+					tmpIndexData[i] = pIndices[i];
 				}
-				mc->Geometry_->GetIndexBuffer()->InitData(tmp.data(), tmp.size() * sizeof(tmp[0]));
+				tmpPIndex = tmpIndexData.data();
+				mc->Geometry_->GetIndexBuffer()->InitData(tmpIndexData.data(), tmpIndexData.size() * sizeof(tmpIndexData[0]));
 			}
 			else if (accessor.componentType == TINYGLTF_COMPONENT_TYPE_UNSIGNED_INT)
 			{
+				tmpPIndex = (std::uint32_t*)tData;
 				mc->Geometry_->GetIndexBuffer()->InitData(tData, accessor.count * sizeof(int));
 			}
 			else
 			{
 				Assert(false, "invalid index type");
+			}
+
+			// generate tangent and bitangent
+			if (useNormapMap)
+			{
+				const uint8* pVertData = nullptr;
+				const uint8* pUVData = nullptr;
+				uint32 vertByteStride = 0;
+				uint32 uvByteStride = 0;
+				uint32 verticesCount = 0;
+
+				// position
+				{
+					int aIdx = primitive.attributes.find("POSITION")->second;
+
+					const tinygltf::Accessor& accessor = tModel.accessors[aIdx];
+					const tinygltf::BufferView& bufferView = tModel.bufferViews[accessor.bufferView];
+					const tinygltf::Buffer& tBuffer = tModel.buffers[bufferView.buffer];
+					pVertData = (tBuffer.data.data() + bufferView.byteOffset);
+
+					vertByteStride = bufferView.byteStride;
+					if (vertByteStride == 0)
+					{
+						vertByteStride = GetFormatSize(_GLTFTypeToIAFormat(accessor.type));
+					}
+					verticesCount = bufferView.byteLength / vertByteStride;
+				}
+
+				// uv
+				{
+					int aIdx = primitive.attributes.find("TEXCOORD_0")->second;
+
+					const tinygltf::Accessor& accessor = tModel.accessors[aIdx];
+					const tinygltf::BufferView& bufferView = tModel.bufferViews[accessor.bufferView];
+					const tinygltf::Buffer& tBuffer = tModel.buffers[bufferView.buffer];
+					pUVData = (tBuffer.data.data() + bufferView.byteOffset);
+
+					uvByteStride = bufferView.byteStride;
+					if (uvByteStride == 0)
+					{
+						uvByteStride = GetFormatSize(_GLTFTypeToIAFormat(accessor.type));
+					}
+				}
+
+				std::vector<TVector3> vertices(verticesCount);
+				std::vector<TVector2> textureCoords(verticesCount);
+				std::vector<TVector3> tangents(verticesCount);
+				std::vector<TVector3> bitangents(verticesCount);
+
+				for (uint32 i = 0; i < verticesCount; ++i)
+				{
+					const float* pVertices = (float*)pVertData;
+					vertices[i] = TVector3{ pVertices[0], pVertices[1], pVertices[2] };
+					pVertData += vertByteStride;
+
+					const float* pUVs = (float*)pUVData;
+					textureCoords[i] = TVector2{ pUVs [0], pUVs [1]};
+					pUVData += uvByteStride;
+				}
+
+				const uint32 triangeCount = tModel.accessors[primitive.indices].count / 3;
+
+				// https://learnopengl.com/Advanced-Lighting/Normal-Mapping
+				for (uint32 triIdx = 0; triIdx < triangeCount; ++triIdx)
+				{
+					uint32 a = tmpPIndex[triIdx * 3 + 0];
+					uint32 b = tmpPIndex[triIdx * 3 + 1];
+					uint32 c = tmpPIndex[triIdx * 3 + 2];
+
+					TVector3 edge1 = vertices[b] - vertices[a];
+					TVector3 edge2 = vertices[c] - vertices[a];
+
+					TVector2 deltaUV1 = textureCoords[b] - textureCoords[a];
+					TVector2 deltaUV2 = textureCoords[c] - textureCoords[a];
+
+					float f = 1.0f / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
+
+					TVector3 tangent, bitangent;
+					tangent.x = f * (deltaUV2.y * edge1.x - deltaUV1.y * edge2.x);
+					tangent.y = f * (deltaUV2.y * edge1.y - deltaUV1.y * edge2.y);
+					tangent.z = f * (deltaUV2.y * edge1.z - deltaUV1.y * edge2.z);
+
+					tangents[a] = tangent;
+					tangents[b] = tangent;
+					tangents[c] = tangent;
+
+					bitangent.x = f * (-deltaUV2.x * edge1.x + deltaUV1.x * edge2.x);
+					bitangent.y = f * (-deltaUV2.x * edge1.y + deltaUV1.x * edge2.y);
+					bitangent.z = f * (-deltaUV2.x * edge1.z + deltaUV1.x * edge2.z);
+
+					bitangents[a] = bitangent;
+					bitangents[b] = bitangent;
+					bitangents[c] = bitangent;
+				}
+
+				{
+					VertexBuffer* vBuffer = new VertexBuffer();
+					{
+						vBuffer->kind = VertexBufferAttriKind::TANGENT;
+						vBuffer->format = InputAttributeFormat::FLOAT3;
+						vBuffer->byteStride = 0;
+						vBuffer->InitData(tangents.data(), sizeof(tangents[0]) * tangents.size());
+					}
+					mc->GetGeometry()->AppendVertexBuffer(vBuffer);
+				}
+
+				{
+					VertexBuffer* vBuffer = new VertexBuffer();
+					{
+						vBuffer->kind = VertexBufferAttriKind::BITANGENT;
+						vBuffer->format = InputAttributeFormat::FLOAT3;
+						vBuffer->byteStride = 0;
+						vBuffer->InitData(bitangents.data(), sizeof(bitangents[0]) * bitangents.size());
+					}
+					mc->GetGeometry()->AppendVertexBuffer(vBuffer);
+				}
 			}
 
 			model->AddComponment(mc);
