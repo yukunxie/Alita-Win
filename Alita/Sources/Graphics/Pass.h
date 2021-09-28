@@ -113,6 +113,7 @@ protected:
 struct GBuffers
 {
     RHI::TextureView* GDiffuse = nullptr;
+    RHI::TextureView* GEmissive = nullptr;
     RHI::TextureView* GNormal = nullptr;
     RHI::TextureView* GPosition = nullptr;
     RHI::TextureView* GMaterial = nullptr;

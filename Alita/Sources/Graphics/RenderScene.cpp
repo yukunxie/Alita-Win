@@ -31,7 +31,7 @@ void RenderScene::AddPrimitive(MeshComponent* mesh)
 void RenderScene::Tick(float dt)
 {
 	GobalRenderParams_.cameraWorldPosition = Engine::GetWorld()->GetCameraPosition();
-	GobalRenderParams_.sunLightDirection = TVector3(0, -20, 3);
+	GobalRenderParams_.sunLightDirection = TVector3(-10, -20, -20);
 	GobalRenderParams_.sunLightColor = TVector4(1.0f, 1.0f, 1.0f, 1.0f);
 	GobalRenderParams_.viewMatrix = Engine::GetWorld()->GetCamera()->GetViewMatrix();
 	GobalRenderParams_.projMatrix = Engine::GetWorld()->GetCamera()->GetProjectionMatrix();

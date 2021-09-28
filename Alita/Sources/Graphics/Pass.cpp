@@ -137,10 +137,23 @@ GBufferPass::GBufferPass()
 		descriptor.arrayLayerCount = 1;
 		descriptor.mipLevelCount = 1;
 		descriptor.dimension = RHI::TextureDimension::TEXTURE_2D;
-		GBuffers_.GNormal = Engine::GetGPUDevice()->CreateTexture(descriptor)->CreateView({});
+		GBuffers_.GEmissive = Engine::GetGPUDevice()->CreateTexture(descriptor)->CreateView({});
 	};
 
 	// 2
+	{
+		RHI::TextureDescriptor descriptor;
+		descriptor.sampleCount = 1;
+		descriptor.format = RHI::TextureFormat::RGBA16FLOAT;
+		descriptor.usage = RHI::TextureUsage::OUTPUT_ATTACHMENT;
+		descriptor.size = extent;
+		descriptor.arrayLayerCount = 1;
+		descriptor.mipLevelCount = 1;
+		descriptor.dimension = RHI::TextureDimension::TEXTURE_2D;
+		GBuffers_.GNormal = Engine::GetGPUDevice()->CreateTexture(descriptor)->CreateView({});
+	};
+
+	// 3
 	{
 		RHI::TextureDescriptor descriptor;
 		descriptor.sampleCount = 1;
@@ -153,7 +166,7 @@ GBufferPass::GBufferPass()
 		GBuffers_.GPosition = Engine::GetGPUDevice()->CreateTexture(descriptor)->CreateView({});
 	};
 
-	// 3
+	// 4
 	{
 		RHI::TextureDescriptor descriptor;
 		descriptor.sampleCount = 1;
@@ -183,9 +196,10 @@ GBufferPass::GBufferPass()
 void GBufferPass::Execute(RHI::CommandEncoder* cmdEncoder, const std::vector<RenderObject*>& renderObjects)
 {
 	SetupOutputAttachment(0, GBuffers_.GDiffuse, true, { 0.0f, 0.0f, 0.0f, 1.0f });
-	SetupOutputAttachment(1, GBuffers_.GNormal, true, { 0.0f, 0.0f, 0.0f, 1.0f });
-	SetupOutputAttachment(2, GBuffers_.GPosition, true, { 0.0f, 0.0f, 0.0f, 1.0f });
-	SetupOutputAttachment(3, GBuffers_.GMaterial, true, { 0.0f, 0.0f, 0.0f, 1.0f });
+	SetupOutputAttachment(1, GBuffers_.GEmissive, true, { 0.0f, 0.0f, 0.0f, 1.0f });
+	SetupOutputAttachment(2, GBuffers_.GNormal, true, { 0.0f, 0.0f, 0.0f, 1.0f });
+	SetupOutputAttachment(3, GBuffers_.GPosition, true, { 0.0f, 0.0f, 0.0f, 1.0f });
+	SetupOutputAttachment(4, GBuffers_.GMaterial, true, { 0.0f, 0.0f, 0.0f, 1.0f });
 	SetupDepthStencilAttachemnt(dsTexture_, true, 1.0f, 0);
 
 	BeginPass();
@@ -385,6 +399,7 @@ void DeferredPass::Execute(RHI::CommandEncoder* cmdEncoder, const std::vector<Re
 
 	auto material = meshComponent_->GetRenderObject()->MaterialObject;
 	material->SetTexture("tGDiffuse", GBufferPass_.GetGBuffers().GDiffuse->GetTexture());
+	material->SetTexture("tGEmissive", GBufferPass_.GetGBuffers().GEmissive->GetTexture());
 	material->SetTexture("tGNormal", GBufferPass_.GetGBuffers().GNormal->GetTexture());
 	material->SetTexture("tGPosition", GBufferPass_.GetGBuffers().GPosition->GetTexture());
 	material->SetTexture("tGMaterial", GBufferPass_.GetGBuffers().GMaterial->GetTexture());

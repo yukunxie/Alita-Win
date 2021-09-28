@@ -55,9 +55,11 @@ layout(binding = 20) uniform sampler     sEmissiveMap;
 
 layout(location = 0) out vec4 OutColor;
 #if GEN_GBUFFER_PASS
-layout(location = 1) out vec4 GNormal;
-layout(location = 2) out vec4 GPosition;
-layout(location = 3) out vec4 GMaterial;
+layout(location = 1) out vec4 GEmissive;
+layout(location = 2) out vec4 GNormal;
+layout(location = 3) out vec4 GPosition;
+// x - metallic, y - roughness, w - "rim" lighting
+layout(location = 4) out vec4 GMaterial;
 #endif
 
 void TShading() {
@@ -89,27 +91,32 @@ void TGBufferGen() {
     _normal = _normal * 2.0 - 1.0;
     normal = normalize(_TBN * _normal); 
 #elif USE_NORMAL
-    normal = _WorldNormal;
+    normal = normalize(_WorldNormal);
 #endif
 
-#if USE_EMISSIVE_MAP
-    diffuse.xyz += texture(sampler2D(tEmissiveMap, sEmissiveMap), _UV0).xyz * 0.01;
-#endif 
+// #if USE_OCCLUSION_MAP
+//     diffuse.xyz += texture(sampler2D(tOcclusionMap, sOcclusionMap), _UV0).xyz * 0.0;
+// #endif 
 
-#if USE_OCCLUSION_MAP
-    diffuse.xyz += texture(sampler2D(tOcclusionMap, sOcclusionMap), _UV0).xyz * 0.0;
-#endif 
-
-#if USE_METALLIC_ROUGHNESS_MAP
-    diffuse.xyz += texture(sampler2D(tMetallicRoughnessMap, sMetallicRoughnessMap), _UV0).xyz * 0.0;
-#endif 
+// #if USE_METALLIC_ROUGHNESS_MAP
+//     diffuse.xyz += texture(sampler2D(tMetallicRoughnessMap, sMetallicRoughnessMap), _UV0).xyz * 0.0;
+// #endif 
 
     OutColor = diffuse;
 
 #if GEN_GBUFFER_PASS
-    GNormal = vec4(normal / 2.0 + 0.5, 1.0);
-    GPosition = _WorldPosition;//vec4(_WorldPosition.xyz, 1.0);
+    GNormal = vec4(normal, 1.0);
+    GPosition = _WorldPosition;
+#if USE_EMISSIVE_MAP
+    GEmissive = texture(sampler2D(tEmissiveMap, sEmissiveMap), _UV0);
+#endif 
+
+#if USE_METALLIC_ROUGHNESS_MAP
+    GMaterial = texture(sampler2D(tMetallicRoughnessMap, sMetallicRoughnessMap), _UV0);
+#else
     GMaterial = vec4(uShading.metallicFactor, uShading.roughnessFactor, 0, 0);
+#endif 
+
 #endif
 }
 

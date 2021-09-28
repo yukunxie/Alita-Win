@@ -21,26 +21,32 @@
       "uri": ""
     },
     {
-      "name": "tGNormal",
+      "name": "tGEmissive",
       "binding": 13,
       "type": "Texture2D",
       "uri": ""
     },
     {
-      "name": "tGPosition",
+      "name": "tGNormal",
       "binding": 15,
       "type": "Texture2D",
       "uri": ""
     },
     {
-      "name": "tGMaterial",
+      "name": "tGPosition",
       "binding": 17,
       "type": "Texture2D",
       "uri": ""
     },
     {
-      "name": "tShadowMap",
+      "name": "tGMaterial",
       "binding": 19,
+      "type": "Texture2D",
+      "uri": ""
+    },
+    {
+      "name": "tShadowMap",
+      "binding": 21,
       "type": "Texture2D",
       "uri": "",
       "filter":{
@@ -51,6 +57,18 @@
         "addressModeV": "clamp",
         "addressModeW": "clamp"
       }
+    },
+    {
+      "name": "tIBLBrdfMap",
+      "binding":23,
+      "type": "Texture2D",
+      "uri": "Engine/IBL_BRDF.png"
+    },
+    {
+      "name": "tCubeMap",
+      "binding": 25,
+      "type": "Texture2D",
+      "uri": "Textures/cubemap_yokohama_rgba.ktx"
     }
   ]
 }

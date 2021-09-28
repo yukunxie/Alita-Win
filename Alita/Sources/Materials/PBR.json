@@ -106,14 +106,6 @@
       "binding": 17,
       "type": "Texture2D",
       "uri": "",
-      "filter":{
-        "magFilter":    "point",
-        "minFilter":    "point",
-        "mipmapFilter": "point",
-        "addressModeU": "clamp",
-        "addressModeV": "clamp",
-        "addressModeW": "clamp"
-      },
       "preprocessor": "USE_METALLIC_ROUGHNESS_MAP"
     },
     {
@@ -121,14 +113,6 @@
       "binding": 19,
       "type": "Texture2D",
       "uri": "",
-      "filter":{
-        "magFilter":    "point",
-        "minFilter":    "point",
-        "mipmapFilter": "point",
-        "addressModeU": "clamp",
-        "addressModeV": "clamp",
-        "addressModeW": "clamp"
-      },
       "preprocessor": "USE_EMISSIVE_MAP"
     }
 
