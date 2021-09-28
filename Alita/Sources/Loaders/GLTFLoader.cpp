@@ -43,6 +43,30 @@ namespace GLTFLoader
 		return ImageLoader::LoadTextureFromData(width, height, component, tImage.image.data(), tImage.image.size());
 	}
 
+	template<typename _TextureInfo>
+	RHI::Texture* _LoadTexture(const tinygltf::Model& tModel, const _TextureInfo& info)
+	{
+		if (info.index == -1)
+			return nullptr;
+		const tinygltf::Image& image = tModel.images[tModel.textures[info.index].source];
+		auto texture = _LoadTexture(image);
+		/*if (texture)
+		{
+			mc->Material_->SetTexture("tAlbedo", texture);
+		}*/
+		/*if (image.mimeType.empty())
+		{
+			if (!image.uri.empty())
+			{
+				auto texture = ImageLoader::LoadTextureFromUri(image.uri);
+			}
+		}*/
+
+		/*auto texture = ImageLoader::LoadTextureFromData(image.image.data(), image.image.size());
+		if (texture);*/
+
+		return texture;
+	}
 
 	void _LoadPrimitives(Entity* model, tinygltf::Model& tModel, const tinygltf::Mesh& tMesh)
 	{
@@ -82,38 +106,30 @@ namespace GLTFLoader
 					float roughnessFactor = (float)pbrMetallicRoughness.roughnessFactor;
 					mc->Material_->SetFloat("roughnessFactor", 0, 1, &roughnessFactor);
 				}
-				if (pbrMetallicRoughness.baseColorTexture.index != -1)
+
+				if (auto texture = _LoadTexture(tModel, pbrMetallicRoughness.baseColorTexture); texture)
 				{
-					auto tIdx = pbrMetallicRoughness.baseColorTexture.index;
-					const tinygltf::Image& image = tModel.images[tModel.textures[tIdx].source];
-
-					auto texture = _LoadTexture(image);
-					if (texture)
-					{
-						mc->Material_->SetTexture("tAlbedo", texture);
-					}
-					/*if (image.mimeType.empty())
-					{
-						if (!image.uri.empty())
-						{
-							auto texture = ImageLoader::LoadTextureFromUri(image.uri);
-						}
-					}*/
-
-					/*auto texture = ImageLoader::LoadTextureFromData(image.image.data(), image.image.size());
-					if (texture);*/
+					mc->Material_->SetTexture("tAlbedo", texture);
 				}
-				if (tMaterial.normalTexture.index != -1)
+				if (auto texture = _LoadTexture(tModel, tMaterial.normalTexture); texture)
 				{
-					auto tIdx = tMaterial.normalTexture.index;
-					const tinygltf::Image& image = tModel.images[tModel.textures[tIdx].source];
-
-					auto texture = _LoadTexture(image);
-					if (texture)
-					{
-						mc->Material_->SetTexture("tNormalMap", texture);
-						useNormapMap = true;
-					}
+					mc->Material_->SetTexture("tNormalMap", texture);
+					useNormapMap = true;
+				}
+				if (auto texture = _LoadTexture(tModel, tMaterial.occlusionTexture); texture)
+				{
+					mc->Material_->SetTexture("tOcclusionMap", texture);
+					useNormapMap = true;
+				}
+				if (auto texture = _LoadTexture(tModel, tMaterial.emissiveTexture); texture)
+				{
+					mc->Material_->SetTexture("tEmissiveMap", texture);
+					useNormapMap = true;
+				}
+				if (auto texture = _LoadTexture(tModel, tMaterial.pbrMetallicRoughness.metallicRoughnessTexture); texture)
+				{
+					mc->Material_->SetTexture("tMetallicRoughnessMap", texture);
+					useNormapMap = true;
 				}
 			}
 

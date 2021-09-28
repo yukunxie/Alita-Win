@@ -85,6 +85,52 @@
         "addressModeW": "clamp"
       },
       "preprocessor": "USE_NORMAL_MAP"
+    },
+    {
+      "name": "tOcclusionMap",
+      "binding": 15,
+      "type": "Texture2D",
+      "uri": "",
+      "filter":{
+        "magFilter":    "point",
+        "minFilter":    "point",
+        "mipmapFilter": "point",
+        "addressModeU": "clamp",
+        "addressModeV": "clamp",
+        "addressModeW": "clamp"
+      },
+      "preprocessor": "USE_OCCLUSION_MAP"
+    },
+    {
+      "name": "tMetallicRoughnessMap",
+      "binding": 17,
+      "type": "Texture2D",
+      "uri": "",
+      "filter":{
+        "magFilter":    "point",
+        "minFilter":    "point",
+        "mipmapFilter": "point",
+        "addressModeU": "clamp",
+        "addressModeV": "clamp",
+        "addressModeW": "clamp"
+      },
+      "preprocessor": "USE_METALLIC_ROUGHNESS_MAP"
+    },
+    {
+      "name": "tEmissiveMap",
+      "binding": 19,
+      "type": "Texture2D",
+      "uri": "",
+      "filter":{
+        "magFilter":    "point",
+        "minFilter":    "point",
+        "mipmapFilter": "point",
+        "addressModeU": "clamp",
+        "addressModeV": "clamp",
+        "addressModeW": "clamp"
+      },
+      "preprocessor": "USE_EMISSIVE_MAP"
     }
+
   ]
 }

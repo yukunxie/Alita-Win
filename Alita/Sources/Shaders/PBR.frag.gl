@@ -36,6 +36,23 @@ layout(binding = 13) uniform texture2D   tNormalMap;
 layout(binding = 14) uniform sampler     sNormalMap;
 #endif
 
+#if USE_OCCLUSION_MAP
+layout(binding = 15) uniform texture2D   tOcclusionMap;
+layout(binding = 16) uniform sampler     sOcclusionMap;
+#endif
+
+#if USE_METALLIC_ROUGHNESS_MAP
+layout(binding = 17) uniform texture2D   tMetallicRoughnessMap;
+layout(binding = 18) uniform sampler     sMetallicRoughnessMap;
+#endif
+
+#if USE_EMISSIVE_MAP
+layout(binding = 19) uniform texture2D   tEmissiveMap;
+layout(binding = 20) uniform sampler     sEmissiveMap;
+#endif
+
+// output
+
 layout(location = 0) out vec4 OutColor;
 #if GEN_GBUFFER_PASS
 layout(location = 1) out vec4 GNormal;
@@ -74,6 +91,18 @@ void TGBufferGen() {
 #elif USE_NORMAL
     normal = _WorldNormal;
 #endif
+
+#if USE_EMISSIVE_MAP
+    diffuse.xyz += texture(sampler2D(tEmissiveMap, sEmissiveMap), _UV0).xyz * 0.01;
+#endif 
+
+#if USE_OCCLUSION_MAP
+    diffuse.xyz += texture(sampler2D(tOcclusionMap, sOcclusionMap), _UV0).xyz * 0.0;
+#endif 
+
+#if USE_METALLIC_ROUGHNESS_MAP
+    diffuse.xyz += texture(sampler2D(tMetallicRoughnessMap, sMetallicRoughnessMap), _UV0).xyz * 0.0;
+#endif 
 
     OutColor = diffuse;
 
