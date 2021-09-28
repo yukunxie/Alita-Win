@@ -312,7 +312,8 @@ namespace GLTFLoader
 			model->GetScale() = { (float)tNode.scale[0], (float)tNode.scale[1], (float)tNode.scale[2] };
 		if (tNode.rotation.size() >= 4)
 		{
-			glm::quat rotation = { (float)tNode.rotation[0], (float)tNode.rotation[1], (float)tNode.rotation[2], (float)tNode.rotation[2] };
+			// !! caution: wxyz!!
+			glm::quat rotation = { (float)tNode.rotation[3], (float)tNode.rotation[0], (float)tNode.rotation[1], (float)tNode.rotation[2] };
 			model->GetRotation() = glm::degrees(glm::eulerAngles(rotation));
 		}
 
