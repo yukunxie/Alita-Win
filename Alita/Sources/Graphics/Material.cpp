@@ -652,12 +652,17 @@ void Material::ParseBindGroupLayout(const rapidjson::Document& doc)
             bindingObject->type = MaterailBindingObjectType::TEXTURE2D;
             bindingObject->name = name;
             bindingObject->binding = binding;
-            std::string uri = "";
-            if (cfg.HasMember("uri") && cfg["uri"].IsString() && cfg["uri"].GetStringLength())
+            if (cfg.HasMember("cubeName"))
             {
-                uri = cfg["uri"].GetString();
+                std::string cubeName = cfg["cubeName"].GetString();
+                bindingObject->Texture.texture = cubeName.empty() ? nullptr : ImageLoader::LoadCubeTexture(cubeName);
             }
-            bindingObject->Texture.texture = uri.empty()? nullptr: ImageLoader::LoadTextureFromUri(uri);
+            else if (cfg.HasMember("uri") && cfg["uri"].IsString() && cfg["uri"].GetStringLength())
+            {
+                std::string uri = cfg["uri"].GetString();
+                bindingObject->Texture.texture = uri.empty() ? nullptr : ImageLoader::LoadTextureFromUri(uri);
+            }
+            
             RHI_SAFE_RETAIN(bindingObject->Texture.texture);
 
             MaterialParameter param;

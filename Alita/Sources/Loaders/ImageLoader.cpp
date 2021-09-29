@@ -13,165 +13,73 @@ NS_RX_BEGIN
 
 namespace ImageLoader
 {
+    static const std::vector<std::string> sImageExts = { ".jpg", ".png", ".tag", ".bmp", };
 
-    RHI::Texture* LoadTextureFromData(uint32 width, uint32 height, uint32 component, const std::uint8_t* data, std::uint32_t byteLength)
+    struct ImageData
     {
-        RHI::Format format = RHI::Format::UNDEFINED;
-        switch (component)
+        RHI::TextureFormat format;
+        uint32 baseWidth;
+        uint32 baseHeight;
+        uint32 numLevels;
+        uint32 numFaces;
+        uint32 byteLength;
+        const uint8* bytes;
+        // layer * 1000 * 1000 + face * 1000 + mipmaps
+        std::unordered_map<uint32, uint32> offsets;
+
+        uint32 GetOffset(uint32 layer, uint32 face, uint32 level) const
         {
-        case 1:
-            format = RHI::Format::R8_UNORM;
-            break;
-        case 2:
-            format = RHI::Format::R8G8_UNORM;
-            break;
-        case 3:
-            format = RHI::Format::R8G8B8_UNORM;
-            break;
-        case 4:
-            format = RHI::Format::R8G8B8A8_UNORM;
-            break;
+            uint32 key = layer * 1000 * 1000 + face * 1000 + level;
+            return offsets.find(key)->second;
         }
-        Assert(format != RHI::Format::UNDEFINED, "invalid component");
 
-        //RHI::ImageCreateInfo imageCreateInfo{
-        //    .imageType = RHI::ImageType::IMAGE_TYPE_2D,
-        //    .format = format,
-        //    .extent = {width, height, 1},
-        //    .mipLevels = 1,
-        //    .arrayLayers = 1,
-        //    .samples = RHI::SampleCountFlagBits::SAMPLE_COUNT_1_BIT,
-        //    .tiling = RHI::ImageTiling::LINEAR,
-        //    .sharingMode = RHI::SharingMode::EXCLUSIVE,
-        //    .imageData = nullptr,
-        //};
+        void SetOffset(uint32 layer, uint32 face, uint32 level, uint32 offset)
+        {
+            uint32 key = layer * 1000 * 1000 + face * 1000 + level;
+            offsets[key] = offset;
+        }
+    };
 
+    RHI::Texture* CreateCubeTexture(const ImageData& imageData)
+    {
+        RHI_ASSERT(imageData.format == RHI::TextureFormat::RGBA8UNORM);
 
         RHI::TextureDescriptor descriptor;
         {
             descriptor.sampleCount = 1;
             descriptor.format = RHI::TextureFormat::RGBA8UNORM;
             descriptor.usage = RHI::TextureUsage::SAMPLED | RHI::TextureUsage::COPY_DST;
-            descriptor.size = { width, height, 1 };
+            descriptor.size = { imageData.baseWidth, imageData.baseHeight, imageData.numFaces };
             descriptor.arrayLayerCount = 1;
-            descriptor.mipLevelCount = 1;
+            descriptor.mipLevelCount = imageData.numLevels;
             descriptor.dimension = RHI::TextureDimension::TEXTURE_2D;
         };
         auto texture = Engine::GetGPUDevice()->CreateTexture(descriptor);
 
         RHI::BufferDescriptor bufferDescriptor;
         {
-            bufferDescriptor.size = (std::uint32_t)width * height * component;
+            bufferDescriptor.size = imageData.byteLength;
             bufferDescriptor.usage = RHI::BufferUsage::COPY_DST | RHI::BufferUsage::COPY_SRC;
         }
 
         auto buffer = Engine::GetGPUDevice()->CreateBuffer(bufferDescriptor);
-        buffer->SetSubData(0, width * height * component, data);
-
-        RHI::BufferCopyView bufferCopyView;
-        {
-            bufferCopyView.buffer = buffer;
-            bufferCopyView.offset = 0;
-            bufferCopyView.rowsPerImage = height;
-            bufferCopyView.bytesPerRow = width * component;
-        }
-
-        RHI::TextureCopyView textureCopyView;
-        {
-            textureCopyView.texture = texture;
-            textureCopyView.origin = { 0, 0, 0 };
-            textureCopyView.mipLevel = 0;
-        }
-
-        auto commandEncoder = Engine::GetGPUDevice()->CreateCommandEncoder();
-        auto size = RHI::Extent3D{ width, height, 1 };
-        commandEncoder->CopyBufferToTexture(bufferCopyView, textureCopyView, size);
-
-        auto cmdBuffer = commandEncoder->Finish();
-        RHI_SAFE_RETAIN(cmdBuffer);
-        Engine::GetGPUDevice()->GetQueue()->Submit(1, &cmdBuffer);
-        RHI_SAFE_RELEASE(cmdBuffer);
-
-        return texture;
-    }
-
-    RHI::Texture* LoadTextureFromData(const std::uint8_t* data, std::uint32_t byteLength)
-    {
-        int texWidth, texHeight, texChannels;
-
-        stbi_uc* pixels = stbi_load_from_memory(data, byteLength, &texWidth,
-            &texHeight, &texChannels, STBI_rgb_alpha);
-
-        return LoadTextureFromData(texWidth, texHeight, 4, pixels, texWidth * texHeight * 4);
-    }
-
-    RHI::Texture* CreateCubeTexture(ktxTexture* ktxTexture)
-    {
-        RHI_ASSERT(ktxTexture->glFormat == 6408);
-
-        //RHI::ImageCreateInfo imageCreateInfo{
-        //    .imageType = RHI::ImageType::IMAGE_TYPE_2D,
-        //    .format = RHI::Format::R8G8B8A8_UNORM,
-        //    .extent = {ktxTexture->baseWidth, ktxTexture->baseHeight, 1},
-        //    .mipLevels = 1,
-        //    .arrayLayers = 1,
-        //    .samples = RHI::SampleCountFlagBits::SAMPLE_COUNT_1_BIT,
-        //    .tiling = RHI::ImageTiling::LINEAR,
-        //    .sharingMode = RHI::SharingMode::EXCLUSIVE,
-        //    .imageData = nullptr,
-        //};
-
-        RHI::TextureDescriptor descriptor;
-        {
-            descriptor.sampleCount = 1;
-            descriptor.format = RHI::TextureFormat::RGBA8UNORM;
-            descriptor.usage = RHI::TextureUsage::SAMPLED | RHI::TextureUsage::COPY_DST;
-            descriptor.size = { ktxTexture->baseWidth, ktxTexture->baseHeight, ktxTexture->numFaces };
-            descriptor.arrayLayerCount = 1;
-            descriptor.mipLevelCount = ktxTexture->numLevels;
-            descriptor.dimension = RHI::TextureDimension::TEXTURE_2D;
-        };
-        auto texture = Engine::GetGPUDevice()->CreateTexture(descriptor);
-
-        ktx_uint8_t* ktxTextureData = ktxTexture_GetData(ktxTexture);
-        ktx_size_t ktxTextureSize = ktxTexture_GetSize(ktxTexture);
-
-        RHI::BufferDescriptor bufferDescriptor;
-        {
-            bufferDescriptor.size = ktxTextureSize;
-            bufferDescriptor.usage = RHI::BufferUsage::COPY_DST | RHI::BufferUsage::COPY_SRC;
-        }
-
-        auto buffer = Engine::GetGPUDevice()->CreateBuffer(bufferDescriptor);
-        buffer->SetSubData(0, ktxTextureSize, ktxTextureData);
+        buffer->SetSubData(0, imageData.byteLength, imageData.bytes);
 
         auto commandEncoder = Engine::GetGPUDevice()->CreateCommandEncoder();
 
-        for (uint32 face = 0; face < 6; ++face)
+        for (uint32 face = 0; face < imageData.numFaces; ++face)
         {
             for (uint32_t level = 0; level < descriptor.mipLevelCount; level++)
             {
                 // Calculate offset into staging buffer for the current mip level and face
-                ktx_size_t offset;
-                KTX_error_code ret = ktxTexture_GetImageOffset(ktxTexture, level, 0, face, &offset);
-                //assert(ret == KTX_SUCCESS);
-                //VkBufferImageCopy bufferCopyRegion = {};
-                //bufferCopyRegion.imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-                //bufferCopyRegion.imageSubresource.mipLevel = level;
-                //bufferCopyRegion.imageSubresource.baseArrayLayer = face;
-                //bufferCopyRegion.imageSubresource.layerCount = 1;
-                //bufferCopyRegion.imageExtent.width = ktxTexture->baseWidth >> level;
-                //bufferCopyRegion.imageExtent.height = ktxTexture->baseHeight >> level;
-                //bufferCopyRegion.imageExtent.depth = 1;
-                //bufferCopyRegion.bufferOffset = offset;
-                ////bufferCopyRegions.push_back(bufferCopyRegion);
+                uint32 offset = imageData.GetOffset(0, face, level);
 
                 RHI::BufferCopyView bufferCopyView;
                 {
                     bufferCopyView.buffer = buffer;
                     bufferCopyView.offset = offset;
-                    bufferCopyView.rowsPerImage = ktxTexture->baseHeight >> level;
-                    bufferCopyView.bytesPerRow = (ktxTexture->baseWidth >> level) * 4;
+                    bufferCopyView.rowsPerImage = imageData.baseHeight >> level;
+                    bufferCopyView.bytesPerRow = (imageData.baseWidth >> level) * 4;
                 }
 
                 RHI::TextureCopyView textureCopyView;
@@ -181,7 +89,7 @@ namespace ImageLoader
                     textureCopyView.mipLevel = level;
                 }
 
-                auto size = RHI::Extent3D{ ktxTexture->baseHeight >> level, ktxTexture->baseWidth >> level, 1 };
+                auto size = RHI::Extent3D{ imageData.baseHeight >> level, imageData.baseWidth >> level, 1 };
                 commandEncoder->CopyBufferToTexture(bufferCopyView, textureCopyView, size);
             }
         }
@@ -194,22 +102,100 @@ namespace ImageLoader
         return texture;
     }
 
+    RHI::Texture* LoadTextureFromData(uint32 texWidth, uint32 texHeight, uint32 texChannels, const std::uint8_t* pixels, std::uint32_t byteLength)
+    {
+        ImageData imageData;
+        {
+            imageData.baseWidth = texWidth;
+            imageData.baseHeight = texHeight;
+            imageData.byteLength = texWidth * texHeight * 4;
+            imageData.format = RHI::TextureFormat::RGBA8UNORM;
+            imageData.numFaces = 1;
+            imageData.numLevels = 1;
+        }
+        imageData.SetOffset(0, 0, 0, 0);
+        std::vector<uint8> bytes;
+
+        std::vector<uint8> tmpData;
+        const uint8* pData = nullptr;
+
+        if (texChannels != 4)
+        {
+            tmpData.resize(texWidth * texHeight * 4, 255);
+            uint8* pCurrent = tmpData.data();
+            for (int i = 0; i < texWidth * texHeight * texChannels; i += texChannels)
+            {
+                for (int j = 0; j < texChannels; ++j)
+                {
+                    pCurrent[j] = pixels[i + j];
+                }
+                pCurrent += 4;
+            }
+            pData = tmpData.data();
+        }
+        else
+        {
+            pData = pixels;
+        }
+
+        imageData.bytes = pData;
+        imageData.byteLength = imageData.byteLength;
+
+        auto texture = CreateCubeTexture(imageData);
+
+        return texture;
+    }
+
+    RHI::Texture* LoadTextureFromData(const std::uint8_t* data, std::uint32_t byteLength)
+    {
+        int texWidth, texHeight, texChannels;
+        stbi_uc* pixels = stbi_load_from_memory(data, byteLength, &texWidth, &texHeight, &texChannels, STBI_default);
+        RHI_ASSERT(pixels != nullptr);
+
+        auto texture = LoadTextureFromData(texWidth, texHeight, texChannels, pixels, texWidth * texHeight * texChannels);
+        STBI_FREE(pixels);
+
+        return texture;
+    }
+
     RHI::Texture* LoadTextureFromKtxFormat(const void* bytes, uint32 size)
     {
         ktxTexture* ktxTexture;
         KTX_error_code result = ktxTexture_CreateFromMemory((ktx_uint8_t*)bytes, size, KTX_TEXTURE_CREATE_LOAD_IMAGE_DATA_BIT, &ktxTexture);
         RHI_ASSERT(result == KTX_SUCCESS);
 
-        if (ktxTexture->numFaces == 6)
+        RHI::Texture* texture;
+
+        RHI_ASSERT(ktxTexture->glFormat == 6408);
+        ImageData imageData;
         {
-            return CreateCubeTexture(ktxTexture);
-        }
-        else
-        {
-            return nullptr;
+            imageData.format = RHI::TextureFormat::RGBA8UNORM;
+            imageData.baseWidth = ktxTexture->baseWidth;
+            imageData.baseHeight = ktxTexture->baseHeight;
+            imageData.numLevels = ktxTexture->numLevels;
+            imageData.numFaces = ktxTexture->numFaces;
+            imageData.bytes = ktxTexture_GetData(ktxTexture);
+            imageData.byteLength = ktxTexture_GetSize(ktxTexture);
         }
 
-        return nullptr;
+        for (uint32 face = 0; face < imageData.numFaces; ++face)
+        {
+            for (uint32_t level = 0; level < ktxTexture->numLevels; level++)
+            {
+                // Calculate offset into staging buffer for the current mip level and face
+                ktx_size_t offset;
+                KTX_error_code ret = ktxTexture_GetImageOffset(ktxTexture, level, 0, face, &offset);
+                imageData.SetOffset(0, face, level, offset);
+            }
+        }
+        texture = CreateCubeTexture(imageData);
+
+        if (ktxTexture)
+        {
+            ktxTexture_Destroy(ktxTexture);
+        }
+
+        return texture;
     }
 
     RHI::Texture* LoadTextureFromUri(const std::string& filename)
@@ -222,6 +208,80 @@ namespace ImageLoader
         else {
             return LoadTextureFromData(imageData.data(), imageData.size());
         }
+    }
+
+    RHI::Texture* LoadCubeTexture(const std::string& cubeTextureName)
+    {
+        constexpr uint32 kFaceNum = 6;
+        const char* kFaceNames[kFaceNum] = {"px", "nx", "py", "ny", "pz", "nz"};
+        std::string fileExt = "";
+        for (const auto& ext : sImageExts)
+        {
+            std::string filename = "Textures\\CubeTextures\\" + cubeTextureName + "\\" + "nx" + ext;
+            if (!FileSystem::GetInstance()->GetAbsFilePath(filename.c_str()).empty())
+            {
+                fileExt = ext;
+                break;
+            }
+        }
+
+        RHI_ASSERT(!fileExt.empty());
+
+        ImageData imageData;
+        {
+            imageData.format = RHI::TextureFormat::RGBA8UNORM;
+            imageData.numFaces = kFaceNum;
+            imageData.numLevels = 1;
+        }
+        std::vector<uint8> bytes;
+
+        for (int face = 0; face < kFaceNum; ++face)
+        {
+            std::string filename = "Textures\\CubeTextures\\" + cubeTextureName + "\\" + kFaceNames[face] + fileExt;
+            const TData& data = FileSystem::GetInstance()->GetBinaryData(filename.c_str());
+
+            int texWidth, texHeight, texChannels;
+            std::vector<uint8> tmpData;
+            const uint8* pData = nullptr;
+            stbi_uc* pixels = stbi_load_from_memory(data.data(), data.size(), &texWidth, &texHeight, &texChannels, STBI_default);
+            pData = pixels;
+            if (texChannels != 4)
+            {
+                tmpData.resize(texWidth * texHeight * 4, 255);
+                pData = tmpData.data();
+                uint8* pCurrent = tmpData.data();
+                for (int i = 0; i < texWidth * texHeight * texChannels; i += texChannels)
+                {
+                    for (int j = 0; j < texChannels; ++j)
+                    {
+                        pCurrent[j] = pixels[i + j];
+                    }
+                    pCurrent += 4;
+                }
+            }
+            uint32 offset = bytes.size();
+            imageData.SetOffset(0, face, 0, offset);
+            uint32 length = texWidth * texHeight * 4;
+            if (face == 0)
+            {
+                imageData.baseWidth = texWidth;
+                imageData.baseHeight = texHeight;
+                imageData.byteLength = texWidth * texHeight * 4 * kFaceNum;
+                bytes.reserve(imageData.byteLength);
+            }
+            RHI_ASSERT(imageData.baseWidth == texWidth);
+            RHI_ASSERT(imageData.baseHeight == texHeight);
+
+            bytes.resize(offset + length);
+            memcpy(bytes.data() + offset, pData, length);
+
+            STBI_FREE(pixels);
+        }
+        imageData.bytes = bytes.data();
+        imageData.byteLength = bytes.size();
+
+        auto texture = CreateCubeTexture(imageData);
+        return texture;
     }
 }
 

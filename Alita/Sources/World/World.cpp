@@ -22,13 +22,13 @@ World::World()
 		AddEntity(new Model());
 	}*/
 
-	{
-		auto terrain = Terrain::CreateFromHeightMap("Textures/heightmap.png", -3.f, .0f, 0.1f, { 5, 5 });
-		AddEntity(terrain);
-		auto tex = ImageLoader::LoadTextureFromUri("Textures/grass.jpg");
-		auto mesh = terrain->GetComponent<MeshComponent>();
-		mesh->GetMaterial()->SetTexture("tAlbedo", tex);
-	}
+	//{
+	//	auto terrain = Terrain::CreateFromHeightMap("Textures/heightmap.png", -3.f, .0f, 0.1f, { 5, 5 });
+	//	AddEntity(terrain);
+	//	auto tex = ImageLoader::LoadTextureFromUri("Textures/grass.jpg");
+	//	auto mesh = terrain->GetComponent<MeshComponent>();
+	//	mesh->GetMaterial()->SetTexture("tAlbedo", tex);
+	//}
 
 	{
 		//const auto& models = GLTFLoader::LoadModelFromGLTF("Models/chinesedragon.gltf");
