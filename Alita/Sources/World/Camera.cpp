@@ -15,6 +15,7 @@ NS_RX_BEGIN
 #define PI 3.1415926f
 #define ANGLE_TO_RAD(angle) ( (angle) * PI / 180.0f)
 
+// https://www.3dgep.com/understanding-the-view-matrix/#The_View_Matrix
 static TMat4x4 _ComposeViewMatrix(const TVector3& position, const TVector3& rotation)
 {
 	//auto viewMatrix = glm::eulerAngleXYZ(rotation.x, rotation.y, rotation.z);
