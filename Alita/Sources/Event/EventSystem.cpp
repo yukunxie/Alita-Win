@@ -36,15 +36,13 @@ void EventSystem::_EventMouseHandler(float xpos, float ypos)
 	if (bLeftMouseBtnPressing_)
 	{
 		TVector2 diff = (TVector2{ xpos, ypos } - lastMousePosition_) * 0.1f;
-		Engine::GetWorld()->GetCamera()->MoveRight(-diff.x);
-		Engine::GetWorld()->GetCamera()->MoveUp(diff.y);
+		Engine::GetWorld()->GetCamera()->RotateAroundPoint(diff.y, -diff.x);
 	}
 	else if (bRightMouseBtnPressing_)
 	{
 		TVector2 diff = (TVector2{ xpos, ypos } - lastMousePosition_) * 0.1f;
 
-		Engine::GetWorld()->GetCamera()->Yaw(-diff.x);
-		Engine::GetWorld()->GetCamera()->Pitch(diff.y);
+		Engine::GetWorld()->GetCamera()->YawPitch(-diff.x, diff.y);
 	}
 
 	lastMousePosition_ = { xpos, ypos };

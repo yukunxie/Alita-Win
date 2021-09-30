@@ -69,7 +69,7 @@
       "name": "tAlbedo",
       "binding": 11,
       "type": "Texture2D",
-      "uri": "Textures/default-512.png"
+      "uri-": "Models/cerberus/Albedo.png"
     },
     {
       "name": "tNormalMap",
@@ -90,7 +90,7 @@
       "name": "tOcclusionMap",
       "binding": 15,
       "type": "Texture2D",
-      "uri": "",
+      "uri-": "Models/cerberus/AO.png",
       "filter":{
         "magFilter":    "point",
         "minFilter":    "point",
@@ -114,6 +114,20 @@
       "type": "Texture2D",
       "uri": "",
       "preprocessor": "USE_EMISSIVE_MAP"
+    },
+    {
+      "name": "tMetallicMap",
+      "binding": 21,
+      "type": "Texture2D",
+      "uri-": "Models/cerberus/Metallic.png",
+      "preprocessor": "USE_METALLIC_MAP"
+    },
+    {
+      "name": "tRoughnessMap",
+      "binding": 23,
+      "type": "Texture2D",
+      "uri-": "Models/cerberus/Roughness.png",
+      "preprocessor": "USE_ROUGHNESS_MAP"
     }
 
   ]

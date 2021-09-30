@@ -62,14 +62,21 @@
       "name": "tIBLBrdfMap",
       "binding":23,
       "type": "Texture2D",
-      "uri": "Engine/IBL_BRDF.png"
+      "uri": "Engine/lutBRDF.png"
     },
     {
       "name": "tCubeMap",
       "binding": 25,
       "type": "Texture2D",
       "uri_": "Textures/cubemap_yokohama_rgba.ktx",
-      "cubeName": "skybox4"
+      "cubeName": "SkyBox0"
+    },
+    {
+      "name": "tIrradiance",
+      "binding": 27,
+      "type": "Texture2D",
+      "uri_": "Textures/cubemap_yokohama_rgba.ktx",
+      "cubeName": "PreIrradiance0"
     }
   ]
 }

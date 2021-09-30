@@ -673,6 +673,7 @@ bool VKDevice::InitInstance()
     {
         instanceCreateInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
         instanceCreateInfo.pNext = nullptr;
+        instanceCreateInfo.flags = 0;
         instanceCreateInfo.pApplicationInfo = &sVulkanAPPInfo;
         instanceCreateInfo.enabledExtensionCount = static_cast<uint32_t>(instanceExt.size());
         instanceCreateInfo.ppEnabledExtensionNames = instanceExt.data();

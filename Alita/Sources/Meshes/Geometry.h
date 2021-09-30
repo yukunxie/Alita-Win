@@ -30,6 +30,10 @@ public:
     {
         return &indexBuffer_;
     }
+
+    bool HasTangent();
+
+    bool HasBiTangent();
     
 protected:
     std::vector<VertexBuffer*> vbStreams_;

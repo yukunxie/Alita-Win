@@ -48,9 +48,9 @@ public:
 
 	void MoveRight(float speedScale = 1.0f);
 
-	void Yaw(float raw = 0.0f);
-
-	void Pitch(float pitch = 0.0f);
+	void RotateAroundPoint(float x, float y);
+	
+	void YawPitch(float raw = 0.0f, float pitch = 0.0);
 
 public:
 	TColor4 GetBackgroundColor() const
@@ -75,6 +75,7 @@ protected:
 	float Pitch_ = 0.0f;
 	TVector3 WorldUp_ = { 0, 1, 0 };
 	TVector3 Up_;
+	TVector3 Front_;
 };
 
 class OrthoCamera final : public Camera

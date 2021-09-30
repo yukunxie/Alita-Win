@@ -6,6 +6,7 @@
 
 #include <glm/gtx/matrix_decompose.hpp>
 #include <glm/gtx/vector_angle.hpp>
+#include < glm/gtx/euler_angles.hpp>
 #include <chrono>
 #include <math.h>
 
@@ -16,13 +17,16 @@ NS_RX_BEGIN
 
 static TMat4x4 _ComposeViewMatrix(const TVector3& position, const TVector3& rotation)
 {
+	//auto viewMatrix = glm::eulerAngleXYZ(rotation.x, rotation.y, rotation.z);
 	auto viewMatrix = TMat4x4(1.0f);
 	viewMatrix = glm::rotate(viewMatrix, glm::radians(rotation.x), TVector3(1.0f, 0.0f, 0.0f));
 	viewMatrix = glm::rotate(viewMatrix, glm::radians(rotation.y), TVector3(0.0f, 1.0f, 0.0f));
 	viewMatrix = glm::rotate(viewMatrix, glm::radians(rotation.z), TVector3(0.0f, 0.0f, 1.0f));
 
 	//translate to init position
-	viewMatrix = glm::transpose(viewMatrix) * glm::translate(TMat4x4(1.0f), position * -1.f);
+	viewMatrix = glm::transpose(viewMatrix) * glm::translate(TMat4x4(1.0f), position);
+
+	auto a = viewMatrix * TVector4(0, 0, 0, 1);
 	return viewMatrix;
 }
 
@@ -63,17 +67,30 @@ void Camera::Setup(const TVector3& position, float yaw, float pitch, const TVect
 	if (Pitch_ < -89.0f)
 		Pitch_ = -89.0f;
 
-	glm::vec3 front = CalcFrontDirectionWithYawPitch(Yaw_, Pitch_);
-	glm::vec3 right = glm::normalize(glm::cross(front, WorldUp_));
+	Front_ = CalcFrontDirectionWithYawPitch(Yaw_, Pitch_);
+	glm::vec3 right = glm::normalize(glm::cross(Front_, WorldUp_));
 
-	Up_ = glm::normalize(glm::cross(right, front));
+	Up_ = glm::normalize(glm::cross(right, Front_));
 
-	LookAt(position, position + front, Up_);
+	LookAt(position, position + Front_, Up_);
 }
 
-void Camera::LookAt(const TVector3& from, const TVector3& center, const TVector3& up)
+#define IS_ZERO(f) (fabs(f) < 1e-5)
+
+template <typename T> T sgn(T val) {
+	return float((T(0) < val) - (val < T(0)));
+}
+
+void Camera::LookAt(const TVector3& from, const TVector3& center, const TVector3& up_)
 {
-	auto rMaxtrix = glm::lookAtRH(from, center, up);
+	TVector3 front = glm::normalize(center - from);
+	TVector3 up = up_;
+	if (IS_ZERO(fabs(front.y) - 1))
+	{
+		up =  TVector3(0, 0.0f, -1);
+	}
+
+	viewMatrix_ = glm::lookAtRH(from, center, up);
 
 	glm::vec3 scale;
 	glm::quat rotation;
@@ -81,14 +98,19 @@ void Camera::LookAt(const TVector3& from, const TVector3& center, const TVector3
 	glm::vec3 skew;
 	glm::vec4 perspective;
 
-	bool ret = glm::decompose(rMaxtrix, scale, rotation, translation, skew, perspective);
+	bool ret = glm::decompose(viewMatrix_, scale, rotation, translation, skew, perspective);
 	Assert(ret, "invalid");
 
 	rotation = glm::conjugate(rotation);
 	auto degrees = glm::degrees(glm::eulerAngles(rotation));
 
+	auto a = viewMatrix_ * TVector4(0, 0, 0, 1);
+
+
 	SetPosition(from);
 	SetRotation(degrees);
+
+
 
 	_UpdateViewMatrix();
 }
@@ -128,32 +150,70 @@ void Camera::MoveRight(float speedScale)
 	_UpdateViewMatrix();
 }
 
-void Camera::Yaw(float yaw)
+void Camera::RotateAroundPoint(float x, float y)
 {
-	Yaw_ += yaw;
+	auto rotation = GetRotation();
+	rotation.y += y/10;
+	rotation.x += x/10;
+	SetRotation(rotation);
+	//float distance = glm::length(GetPosition());
+	//TVector3 center = distance * glm::normalize(Front_) + GetPosition();
+	//TVector3 relPos = GetPosition() - center;
 
-	glm::vec3 front = CalcFrontDirectionWithYawPitch(Yaw_, Pitch_);
-	glm::vec3 right = glm::normalize(glm::cross(front, WorldUp_));
+	////1、初始化一个单位矩阵
+	//glm::mat4 trans = glm::mat4(1.0f);
+	////2、用glm::radians将角度转化为弧度，glm::vec3(0.0, 0.0, 1.0)表示沿Z轴旋转
+	//trans = glm::rotate(trans, glm::radians(x), glm::vec3(1.0, 0.0, 0.0));
+	//trans = glm::rotate(trans, glm::radians(y), glm::vec3(0.0, 1.0, 0.0));
 
-	Up_ = glm::normalize(glm::cross(right, front));
-	LookAt(GetPosition(), GetPosition() + front, Up_);
+	//auto newPosition = glm::vec3(glm::vec4((GetPosition() - center), 1.0) * trans) + center;
+	//LookAt(newPosition, center, { 0, 1, 0 });
+
+
+	//TVector3 right = glm::cross(Front_, WorldUp_);
+
+	//point = glm::rotate(point, x / 10, right);
+	////point = glm::rotate(point, y / 10, WorldUp_);
+
+	///*Front_ = glm::normalize(point);
+	//WorldUp_ = glm::cross(Front_, right);*/
+
+	//SetPosition(point + center);
+
+	//LookAt(GetPosition(), center);
 }
 
-void Camera::Pitch(float pitch)
+void Camera::YawPitch(float yaw, float pitch)
 {
-	Pitch_ += pitch;
+	auto rotation = GetRotation();
+	rotation.y += yaw;
+	rotation.x += pitch;
+	SetRotation(rotation);
 
-	if (Pitch_ > 89.0f)
-		Pitch_ = 89.0f;
-	if (Pitch_ < -89.0f)
-		Pitch_ = -89.0f;
+	/*Yaw_ += yaw;
 
-	glm::vec3 front = CalcFrontDirectionWithYawPitch(Yaw_, Pitch_);
-	glm::vec3 right = glm::normalize(glm::cross(front, WorldUp_));
+	Front_ = CalcFrontDirectionWithYawPitch(Yaw_, Pitch_);
+	glm::vec3 right = glm::normalize(glm::cross(Front_, WorldUp_));
 
-	Up_ = glm::normalize(glm::cross(right, front));
-	LookAt(GetPosition(), GetPosition() + front, Up_);
+	Up_ = glm::normalize(glm::cross(right, Front_));
+	LookAt(GetPosition(), GetPosition() + Front_, Up_);*/
 }
+
+//void Camera::Pitch(float pitch)
+//{
+//	Pitch_ += pitch;
+//
+//	if (Pitch_ > 89.0f)
+//		Pitch_ = 89.0f;
+//	if (Pitch_ < -89.0f)
+//		Pitch_ = -89.0f;
+//
+//	Front_ = CalcFrontDirectionWithYawPitch(Yaw_, Pitch_);
+//	glm::vec3 right = glm::normalize(glm::cross(Front_, WorldUp_));
+//
+//	Up_ = glm::normalize(glm::cross(right, Front_));
+//	LookAt(GetPosition(), GetPosition() + Front_, Up_);
+//}
 
 OrthoCamera::OrthoCamera(float left, float right, float bottom, float top, float zNear, float zFar)
 {
@@ -164,7 +224,7 @@ OrthoCamera::OrthoCamera(float left, float right, float bottom, float top, float
 
 void OrthoCamera::Tick(float dt)
 {
-	_UpdateViewMatrix();
+	//_UpdateViewMatrix();
 }
 
 Camera* Camera::CreatePerspectiveCamera(float fov, float aspect, float nearPlane, float farPlane)
@@ -184,7 +244,7 @@ PerspectiveCamera::PerspectiveCamera(float fov, float aspect, float nearPlane, f
 
 void PerspectiveCamera::Tick(float dt)
 {
-	_UpdateViewMatrix();
+	//_UpdateViewMatrix();
 }
 
 NS_RX_END

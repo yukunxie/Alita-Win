@@ -31,8 +31,8 @@
       "name": "albedo",
       "binding": 11,
       "type": "Texture2D",
-      "uri": "Textures/cubemap_vulkan.ktx",
-      "cubeName-": "skybox4"
+      "uri-": "Textures/cubemap_vulkan.ktx",
+      "cubeName": "SkyBox0"
     }
   ]
 }

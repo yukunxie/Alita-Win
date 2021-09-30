@@ -17,4 +17,24 @@ void Geometry::AppendVertexBuffer(VertexBuffer* buffer)
     vbStreams_.push_back(buffer);
 }
 
+bool Geometry::HasTangent()
+{
+    for (const auto& vb : vbStreams_)
+    {
+        if (vb->kind == VertexBufferAttriKind::TANGENT)
+            return true;
+    }
+    return false;
+}
+
+bool Geometry::HasBiTangent()
+{
+    for (const auto& vb : vbStreams_)
+    {
+        if (vb->kind == VertexBufferAttriKind::BITANGENT)
+            return true;
+    }
+    return false;
+}
+
 NS_RX_END

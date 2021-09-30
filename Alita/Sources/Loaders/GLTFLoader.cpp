@@ -183,7 +183,7 @@ namespace GLTFLoader
 			}
 
 			// generate tangent and bitangent
-			if (useNormapMap)
+			if (useNormapMap && !(mc->GetGeometry()->HasBiTangent() && mc->GetGeometry()->HasTangent()))
 			{
 				const uint8* pVertData = nullptr;
 				const uint8* pUVData = nullptr;
@@ -275,6 +275,7 @@ namespace GLTFLoader
 					bitangents[c] = bitangent;
 				}
 
+				if (!mc->GetGeometry()->HasTangent())
 				{
 					VertexBuffer* vBuffer = new VertexBuffer();
 					{
@@ -286,6 +287,7 @@ namespace GLTFLoader
 					mc->GetGeometry()->AppendVertexBuffer(vBuffer);
 				}
 
+				if (!mc->GetGeometry()->HasBiTangent())
 				{
 					VertexBuffer* vBuffer = new VertexBuffer();
 					{

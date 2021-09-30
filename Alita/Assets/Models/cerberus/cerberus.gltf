@@ -23,10 +23,10 @@
             ],
             "name" : "Node_1",
             "rotation" : [
-                -0.7071067690849304,
+                0.7071068,
                 0,
-                0,
-                0.7071067690849304
+                0.7071068,
+                0
             ],
             "translation" : [
                 0,
@@ -46,6 +46,48 @@
             ]
         }
     ],
+    "samplers" : [
+        {}
+    ],
+    "images" : [
+        {
+            "uri" : "Albedo.png"
+        },
+        {
+            "uri" : "AO.png"
+        },
+        {
+            "uri" : "Metallic.png"
+        },
+        {
+            "uri" : "Normal.png"
+        },
+        {
+            "uri" : "Roughness.png"
+        }
+    ],
+    "textures" : [
+        {
+            "sampler" : 0,
+            "source" : 0
+        },
+        {
+            "sampler" : 0,
+            "source" : 1
+        },
+        {
+            "sampler" : 0,
+            "source" : 2
+        },
+        {
+            "sampler" : 0,
+            "source" : 3
+        },
+        {
+            "sampler" : 0,
+            "source" : 4
+        }
+    ],
     "materials" : [
         {
             "doubleSided" : true,
@@ -56,14 +98,18 @@
             ],
             "name" : "Material_0",
             "pbrMetallicRoughness" : {
-                "baseColorFactor" : [
-                    0.5882353186607361,
-                    0.5882353186607361,
-                    0.5882353186607361,
-                    1
-                ],
-                "metallicFactor" : 0,
-                "roughnessFactor" : 1
+                "baseColorTexture" : {
+                    "index" : 0
+                },
+                "metallicRoughnessTexture" : {
+                    "index" : 2
+                }
+            },
+            "normalTexture" : {
+                "index" : 3
+            },
+            "occlusionTexture" : {
+                "index" : 1
             }
         }
     ],
