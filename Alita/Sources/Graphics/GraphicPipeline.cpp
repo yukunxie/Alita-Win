@@ -60,30 +60,28 @@ GraphicPipeline::~GraphicPipeline()
 
 void GraphicPipeline::Execute(const std::vector<RenderObject*>& renderObjects)
 {
-	RHI::TextureView* colorAttachment = RHISwapChain_->GetCurrentTexture()->CreateView({});
 	CommandEncoder_->Reset();
 
 	ShadowGenPass_.Reset();
-	ShadowGenPass_.Execute(CommandEncoder_, renderObjects);
+	ShadowGenPass_.Execute(renderObjects);
 
 	{
 		DeferredPass_.Reset(); 
 		DeferredPass_.Setup(&ShadowGenPass_);
-		DeferredPass_.Execute(CommandEncoder_, renderObjects);
+		DeferredPass_.Execute(renderObjects);
 	}
 
 	{
 		SkyBoxPass_.Reset();
 		SkyBoxPass_.Setup(&DeferredPass_, &DeferredPass_);
-		SkyBoxPass_.Execute(CommandEncoder_, renderObjects);
+		SkyBoxPass_.Execute(renderObjects);
 	}
 
 	{
 		ScreenResolvePass_.Reset();
 		//ScreenResolvePass_.Setup(&DeferredPass_);
 		ScreenResolvePass_.Setup(&SkyBoxPass_);
-		ScreenResolvePass_.SetupOutputAttachment(0, colorAttachment);
-		ScreenResolvePass_.Execute(CommandEncoder_);
+		ScreenResolvePass_.Execute();
 	}
 
 		RHI::CommandBuffer* cmdBuffer = CommandEncoder_->Finish();

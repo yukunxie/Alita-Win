@@ -170,6 +170,7 @@ echo "xxxxx"</Command>
     <ClCompile Include="Sources\Graphics\Pass.cpp" />
     <ClCompile Include="Sources\Graphics\RenderObject.cpp" />
     <ClCompile Include="Sources\Graphics\RenderScene.cpp" />
+    <ClCompile Include="Sources\Graphics\RenderTarget.cpp" />
     <ClCompile Include="Sources\Graphics\Technique.cpp" />
     <ClCompile Include="Sources\Loaders\EntityLoader.cpp" />
     <ClCompile Include="Sources\Loaders\GLTFLoader.cpp" />
@@ -300,6 +301,7 @@ echo "xxxxx"</Command>
     <ClInclude Include="Sources\Graphics\Pass.h" />
     <ClInclude Include="Sources\Graphics\RenderObject.h" />
     <ClInclude Include="Sources\Graphics\RenderScene.h" />
+    <ClInclude Include="Sources\Graphics\RenderTarget.h" />
     <ClInclude Include="Sources\Graphics\Technique.h" />
     <ClInclude Include="Sources\Loaders\EntityLoader.h" />
     <ClInclude Include="Sources\Loaders\GLTFLoader.h" />

@@ -33,11 +33,6 @@ public:
 	template <typename Tp_>
 	Tp_* GetComponent()
 	{
-		if (dynamic_cast<Tp_*>(&transform_))
-		{
-			return dynamic_cast<Tp_*>(&transform_);
-		}
-
 		for (auto comp : components_)
 		{
 			if (dynamic_cast<Tp_*>(comp))
@@ -46,6 +41,12 @@ public:
 			}
 		}
 		return nullptr;
+	}
+
+	template<>
+	Transform* GetComponent<Transform>()
+	{
+		return &transform_;
 	}
 
 	virtual void Tick(float dt);

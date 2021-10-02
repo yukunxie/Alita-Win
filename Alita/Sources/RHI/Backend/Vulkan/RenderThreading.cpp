@@ -144,14 +144,19 @@ std::uint32_t AsyncTaskSumbitCommandBufferAndPresent::SumbitCommandBuffer(VkComm
         submitInfo.pSignalSemaphores = &semaNotify;
     }
     
-    vkResetFences(device_->GetNative(), 1, &fenceNotify);
-    VkResult result = vkQueueSubmit(queue_->GetNative(), 1, &submitInfo, fenceNotify);
-    if (VK_SUCCESS != result)
+    if (VkResult result = vkResetFences(device_->GetNative(), 1, &fenceNotify); VK_SUCCESS != result)
     {
-        LOGE("vkQueueSubmit fail code=%s", GetVkResultString(result));
+        LOGE("vkQueueSubmit-vkResetFences fail code=%s", GetVkResultString(result));
+        return result;
+    }
+
+    if (VkResult result = vkQueueSubmit(queue_->GetNative(), 1, &submitInfo, fenceNotify); VK_SUCCESS != result)
+    {
+        LOGE("vkQueueSubmit-vkQueueSubmit fail code=%s", GetVkResultString(result));
+        return result;
     }
     
-    return result;
+    return VkResult::VK_SUCCESS;
 }
 
 

@@ -533,6 +533,9 @@
     <ClCompile Include="Third-Party\ktx\lib\etcunpack.cxx">
       <Filter>Third-Party\ktx</Filter>
     </ClCompile>
+    <ClCompile Include="Sources\Graphics\RenderTarget.cpp">
+      <Filter>Sources\Graphics\Private</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Sources\Platform\Platform.h">
@@ -1122,6 +1125,9 @@
     </ClInclude>
     <ClInclude Include="Sources\World\SkyBox.h">
       <Filter>Sources\World\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Graphics\RenderTarget.h">
+      <Filter>Sources\Graphics\Public</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

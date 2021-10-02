@@ -20,52 +20,43 @@ void Pass::BeginPass()
 
 	RHI::RenderPassDescriptor renderPassDescriptor;
 
-	uint32 rtWidth(0), rtHeight(0);
+	RHI::Extent3D extent;
 
 	for (const auto& tp : attachments_)
 	{
 		RHI::RenderPassColorAttachmentDescriptor descriptor;
 		{
-			descriptor.attachment = tp.RenderTarget;
+			descriptor.attachment = tp.RenderTarget->GetTextureView();
 			descriptor.resolveTarget = nullptr;
-			descriptor.loadValue = tp.ClearColor;
+			descriptor.loadValue = tp.RenderTarget->GetClearColor();
 			descriptor.loadOp = tp.Clear? RHI::LoadOp::CLEAR : RHI::LoadOp::LOAD;
 			descriptor.storeOp = RHI::StoreOp::STORE;
 		}
 		renderPassDescriptor.colorAttachments.push_back(descriptor);
-
-		if (rtWidth == 0)
-		{
-			rtWidth = tp.RenderTarget->GetTexture()->GetTextureSize().width;
-			rtHeight = tp.RenderTarget->GetTexture()->GetTextureSize().height;
-		}
+		extent = tp.RenderTarget->GetExtent();
 	}
 
 	if (DepthStencilAttachment_.RenderTarget)
 	{
 		renderPassDescriptor.depthStencilAttachment = {
-		.attachment = DepthStencilAttachment_.RenderTarget,
+		.attachment = DepthStencilAttachment_.RenderTarget->GetTextureView(),
 		.depthLoadOp = DepthStencilAttachment_.Clear? RHI::LoadOp::CLEAR : RHI::LoadOp::LOAD,
 		.depthStoreOp = RHI::StoreOp::STORE,
-		.depthLoadValue = DepthStencilAttachment_.ClearDepth,
+		.depthLoadValue = DepthStencilAttachment_.RenderTarget->GetClearDepth(),
 		.stencilLoadOp = DepthStencilAttachment_.Clear ? RHI::LoadOp::CLEAR : RHI::LoadOp::LOAD,
 		.stencilStoreOp = RHI::StoreOp::STORE,
-		.stencilLoadValue = DepthStencilAttachment_.ClearStencil,
+		.stencilLoadValue = DepthStencilAttachment_.RenderTarget->GetClearStencil(),
 		};
-
-		if (rtWidth == 0)
-		{
-			rtWidth = DepthStencilAttachment_.RenderTarget->GetTexture()->GetTextureSize().width;
-			rtHeight = DepthStencilAttachment_.RenderTarget->GetTexture()->GetTextureSize().height;
-		}
+		extent = DepthStencilAttachment_.RenderTarget->GetExtent();
 	}
 
 	RHI_ASSERT(RenderPassEncoder_ == nullptr);
 	RenderPassEncoder_ = CommandEncoder_->BeginRenderPass(renderPassDescriptor);
-
-	RenderPassEncoder_->SetViewport(0, 0, rtWidth, rtHeight, 0, 1);
-	RenderPassEncoder_->SetScissorRect(0, 0, rtWidth, rtHeight);
-	RenderPassEncoder_->SetDepthBias(0, 0, 0);
+	{
+		RenderPassEncoder_->SetViewport(0, 0, extent.width, extent.height, 0, 1);
+		RenderPassEncoder_->SetScissorRect(0, 0, extent.width, extent.height);
+		RenderPassEncoder_->SetDepthBias(0, 0, 0);
+	}
 }
 
 void Pass::EndPass()
@@ -75,28 +66,18 @@ void Pass::EndPass()
 	RenderPassEncoder_ = nullptr;
 }
 
-void IgniterPass::Execute(RHI::CommandEncoder* cmdEncoder, const std::vector<RenderObject*>& renderObjects)
+void IgniterPass::Execute(const std::vector<RenderObject*>& renderObjects)
 {
 }
 
 ShadowMapGenPass::ShadowMapGenPass()
 {
-	RHI::TextureDescriptor descriptor;
-	{
-		descriptor.sampleCount = 1;
-		descriptor.format = RHI::TextureFormat::DEPTH32FLOAT;
-		descriptor.usage = RHI::TextureUsage::OUTPUT_ATTACHMENT | RHI::TextureUsage::SAMPLED;
-		descriptor.size = { shadowMapSize_.width, shadowMapSize_.height };
-		descriptor.arrayLayerCount = 1;
-		descriptor.mipLevelCount = 1;
-		descriptor.dimension = RHI::TextureDimension::TEXTURE_2D;
-	};
-	dsTexture_ = Engine::GetGPUDevice()->CreateTexture(descriptor)->CreateView({});
+	dsTexture_ = std::make_shared<RenderTarget>(shadowMapSize_.width, shadowMapSize_.height, RHI::TextureFormat::DEPTH32FLOAT);
 }
 
-void ShadowMapGenPass::Execute(RHI::CommandEncoder* cmdEncoder, const std::vector<RenderObject*>& renderObjects)
+void ShadowMapGenPass::Execute(const std::vector<RenderObject*>& renderObjects)
 {
-	SetupDepthStencilAttachemnt(dsTexture_, true, 1.0f, 0);
+	SetupDepthStencilAttachemnt(dsTexture_, true);
 
 	BeginPass();
 
@@ -113,94 +94,30 @@ void ShadowMapGenPass::Execute(RHI::CommandEncoder* cmdEncoder, const std::vecto
 GBufferPass::GBufferPass()
 {
 	const RHI::Extent2D extent = { 1280, 800 };
-
-	// 0
-	{
-		RHI::TextureDescriptor descriptor; 
-		descriptor.sampleCount = 1;
-		descriptor.format = RHI::TextureFormat::RGBA16FLOAT;
-		descriptor.usage = RHI::TextureUsage::OUTPUT_ATTACHMENT;
-		descriptor.size = extent;
-		descriptor.arrayLayerCount = 1;
-		descriptor.mipLevelCount = 1;
-		descriptor.dimension = RHI::TextureDimension::TEXTURE_2D;
-		GBuffers_.GDiffuse = Engine::GetGPUDevice()->CreateTexture(descriptor)->CreateView({});
-	};
-
-	// 1
-	{
-		RHI::TextureDescriptor descriptor;
-		descriptor.sampleCount = 1;
-		descriptor.format = RHI::TextureFormat::RGBA16FLOAT;
-		descriptor.usage = RHI::TextureUsage::OUTPUT_ATTACHMENT;
-		descriptor.size = extent;
-		descriptor.arrayLayerCount = 1;
-		descriptor.mipLevelCount = 1;
-		descriptor.dimension = RHI::TextureDimension::TEXTURE_2D;
-		GBuffers_.GEmissive = Engine::GetGPUDevice()->CreateTexture(descriptor)->CreateView({});
-	};
-
-	// 2
-	{
-		RHI::TextureDescriptor descriptor;
-		descriptor.sampleCount = 1;
-		descriptor.format = RHI::TextureFormat::RGBA16FLOAT;
-		descriptor.usage = RHI::TextureUsage::OUTPUT_ATTACHMENT;
-		descriptor.size = extent;
-		descriptor.arrayLayerCount = 1;
-		descriptor.mipLevelCount = 1;
-		descriptor.dimension = RHI::TextureDimension::TEXTURE_2D;
-		GBuffers_.GNormal = Engine::GetGPUDevice()->CreateTexture(descriptor)->CreateView({});
-	};
-
-	// 3
-	{
-		RHI::TextureDescriptor descriptor;
-		descriptor.sampleCount = 1;
-		descriptor.format = RHI::TextureFormat::RGBA32FLOAT;
-		descriptor.usage = RHI::TextureUsage::OUTPUT_ATTACHMENT;
-		descriptor.size = extent;
-		descriptor.arrayLayerCount = 1;
-		descriptor.mipLevelCount = 1;
-		descriptor.dimension = RHI::TextureDimension::TEXTURE_2D;
-		GBuffers_.GPosition = Engine::GetGPUDevice()->CreateTexture(descriptor)->CreateView({});
-	};
-
-	// 4
-	{
-		RHI::TextureDescriptor descriptor;
-		descriptor.sampleCount = 1;
-		descriptor.format = RHI::TextureFormat::RGBA16FLOAT;
-		descriptor.usage = RHI::TextureUsage::OUTPUT_ATTACHMENT;
-		descriptor.size = extent;
-		descriptor.arrayLayerCount = 1;
-		descriptor.mipLevelCount = 1;
-		descriptor.dimension = RHI::TextureDimension::TEXTURE_2D;
-		GBuffers_.GMaterial = Engine::GetGPUDevice()->CreateTexture(descriptor)->CreateView({});
-	};
-
-	// ds
-	{
-		RHI::TextureDescriptor descriptor;
-		descriptor.sampleCount = 1;
-		descriptor.format = RHI::TextureFormat::DEPTH24PLUS_STENCIL8;
-		descriptor.usage = RHI::TextureUsage::OUTPUT_ATTACHMENT;
-		descriptor.size = extent;
-		descriptor.arrayLayerCount = 1;
-		descriptor.mipLevelCount = 1;
-		descriptor.dimension = RHI::TextureDimension::TEXTURE_2D;
-		dsTexture_ = Engine::GetGPUDevice()->CreateTexture(descriptor)->CreateView({});
-	};
+	GBuffers_.GDiffuse = std::make_shared<RenderTarget>(extent.width, extent.height, RHI::TextureFormat::RGBA16FLOAT);
+	GBuffers_.GEmissive = std::make_shared<RenderTarget>(extent.width, extent.height, RHI::TextureFormat::RGBA16FLOAT);
+	GBuffers_.GNormal = std::make_shared<RenderTarget>(extent.width, extent.height, RHI::TextureFormat::RGBA16FLOAT);
+	GBuffers_.GPosition = std::make_shared<RenderTarget>(extent.width, extent.height, RHI::TextureFormat::RGBA32FLOAT);
+	GBuffers_.GMaterial = std::make_shared<RenderTarget>(extent.width, extent.height, RHI::TextureFormat::RGBA16FLOAT);
+	dsTexture_ = std::make_shared<RenderTarget>(extent.width, extent.height, RHI::TextureFormat::DEPTH24PLUS_STENCIL8);
 }
 
-void GBufferPass::Execute(RHI::CommandEncoder* cmdEncoder, const std::vector<RenderObject*>& renderObjects)
+void GBufferPass::Execute(const std::vector<RenderObject*>& renderObjects)
 {
-	SetupOutputAttachment(0, GBuffers_.GDiffuse, true, { 0.0f, 0.0f, 0.0f, 1.0f });
-	SetupOutputAttachment(1, GBuffers_.GEmissive, true, { 0.0f, 0.0f, 0.0f, 1.0f });
-	SetupOutputAttachment(2, GBuffers_.GNormal, true, { 0.0f, 0.0f, 0.0f, 1.0f });
-	SetupOutputAttachment(3, GBuffers_.GPosition, true, { 0.0f, 0.0f, 0.0f, 1.0f });
-	SetupOutputAttachment(4, GBuffers_.GMaterial, true, { 0.0f, 0.0f, 0.0f, 1.0f });
-	SetupDepthStencilAttachemnt(dsTexture_, true, 1.0f, 0);
+	auto wsize = Engine::GetRenderScene()->GetGraphicPipeline()->GetWindowSize();
+	GBuffers_.GDiffuse->ResizeTarget(wsize.width, wsize.height);
+	GBuffers_.GEmissive->ResizeTarget(wsize.width, wsize.height);
+	GBuffers_.GNormal->ResizeTarget(wsize.width, wsize.height);
+	GBuffers_.GPosition->ResizeTarget(wsize.width, wsize.height);
+	GBuffers_.GMaterial->ResizeTarget(wsize.width, wsize.height);
+	dsTexture_->ResizeTarget(wsize.width, wsize.height);
+
+	SetupOutputAttachment(0, GBuffers_.GDiffuse, true);
+	SetupOutputAttachment(1, GBuffers_.GEmissive, true);
+	SetupOutputAttachment(2, GBuffers_.GNormal, true);
+	SetupOutputAttachment(3, GBuffers_.GPosition, true);
+	SetupOutputAttachment(4, GBuffers_.GMaterial, true);
+	SetupDepthStencilAttachemnt(dsTexture_, true);
 
 	BeginPass();
 
@@ -214,37 +131,16 @@ void GBufferPass::Execute(RHI::CommandEncoder* cmdEncoder, const std::vector<Ren
 
 OpaquePass::OpaquePass()
 {
-	const RHI::Extent2D extent = { 1280, 800 };
-	// 0
-	{
-		RHI::TextureDescriptor descriptor;
-		descriptor.sampleCount = 1;
-		descriptor.format = RHI::TextureFormat::RGBA16FLOAT;
-		descriptor.usage = RHI::TextureUsage::OUTPUT_ATTACHMENT;
-		descriptor.size = extent;
-		descriptor.arrayLayerCount = 1;
-		descriptor.mipLevelCount = 1;
-		descriptor.dimension = RHI::TextureDimension::TEXTURE_2D;
-		rtColor_ = Engine::GetGPUDevice()->CreateTexture(descriptor)->CreateView({});
-		SetupOutputAttachment(0, rtColor_);
-	};
-
-	// ds
-	{
-		RHI::TextureDescriptor descriptor;
-		descriptor.sampleCount = 1;
-		descriptor.format = RHI::TextureFormat::DEPTH24PLUS_STENCIL8;
-		descriptor.usage = RHI::TextureUsage::OUTPUT_ATTACHMENT;
-		descriptor.size = extent;
-		descriptor.arrayLayerCount = 1;
-		descriptor.mipLevelCount = 1;
-		descriptor.dimension = RHI::TextureDimension::TEXTURE_2D;
-		rtDepthStencil_ = Engine::GetGPUDevice()->CreateTexture(descriptor)->CreateView({});
-	};
+	rtColor_ = std::make_shared<RenderTarget>(RHI::TextureFormat::RGBA16FLOAT);
+	rtDepthStencil_ = std::make_shared<RenderTarget>(RHI::TextureFormat::DEPTH24PLUS_STENCIL8);
 }
 
-void OpaquePass::Execute(RHI::CommandEncoder* cmdEncoder, const std::vector<RenderObject*>& renderObjects)
+void OpaquePass::Execute(const std::vector<RenderObject*>& renderObjects)
 {
+	auto wsize = Engine::GetRenderScene()->GetGraphicPipeline()->GetWindowSize();
+	rtColor_->ResizeTarget(wsize.width, wsize.height);
+	rtDepthStencil_->ResizeTarget(wsize.width, wsize.height);
+
 	SetupOutputAttachment(0, rtColor_);
 	SetupDepthStencilAttachemnt(rtDepthStencil_);
 
@@ -260,33 +156,8 @@ void OpaquePass::Execute(RHI::CommandEncoder* cmdEncoder, const std::vector<Rend
 
 SkyBoxPass::SkyBoxPass()
 {
-	const RHI::Extent2D extent = { 1280, 800 };
-	// 0
-	{
-		RHI::TextureDescriptor descriptor;
-		descriptor.sampleCount = 1;
-		descriptor.format = RHI::TextureFormat::RGBA16FLOAT;
-		descriptor.usage = RHI::TextureUsage::OUTPUT_ATTACHMENT;
-		descriptor.size = extent;
-		descriptor.arrayLayerCount = 1;
-		descriptor.mipLevelCount = 1;
-		descriptor.dimension = RHI::TextureDimension::TEXTURE_2D;
-		rtColor_ = Engine::GetGPUDevice()->CreateTexture(descriptor)->CreateView({});
-		SetupOutputAttachment(0, rtColor_);
-	};
-
-	// ds
-	{
-		RHI::TextureDescriptor descriptor;
-		descriptor.sampleCount = 1;
-		descriptor.format = RHI::TextureFormat::DEPTH24PLUS_STENCIL8;
-		descriptor.usage = RHI::TextureUsage::OUTPUT_ATTACHMENT;
-		descriptor.size = extent;
-		descriptor.arrayLayerCount = 1;
-		descriptor.mipLevelCount = 1;
-		descriptor.dimension = RHI::TextureDimension::TEXTURE_2D;
-		rtDepthStencil_ = Engine::GetGPUDevice()->CreateTexture(descriptor)->CreateView({});
-	};
+	rtColor_ = std::make_shared<RenderTarget>(RHI::TextureFormat::RGBA16FLOAT);
+	rtDepthStencil_ = std::make_shared<RenderTarget>(RHI::TextureFormat::DEPTH24PLUS_STENCIL8);
 }
 
 void SkyBoxPass::Setup(const Pass* mainPass, const Pass* depthPass)
@@ -305,10 +176,12 @@ void SkyBoxPass::Setup(const Pass* mainPass, const Pass* depthPass)
 	}
 }
 
-void SkyBoxPass::Execute(RHI::CommandEncoder* cmdEncoder, const std::vector<RenderObject*>& renderObjects)
+void SkyBoxPass::Execute(const std::vector<RenderObject*>& renderObjects)
 {
 	if (GetColorAttachments().empty())
 	{
+		auto wsize = Engine::GetRenderScene()->GetGraphicPipeline()->GetWindowSize();
+		rtColor_->ResizeTarget(wsize.width, wsize.height);
 		SetupOutputAttachment(0, rtColor_);
 	}
 
@@ -363,7 +236,7 @@ FullScreenPass::FullScreenPass(const std::string& materialName, ETechniqueType t
 	meshComponent_ = meshComp;
 }
 
-void FullScreenPass::Execute(RHI::CommandEncoder* cmdEncoder)
+void FullScreenPass::Execute()
 {
 	BeginPass();
 
@@ -375,24 +248,16 @@ void FullScreenPass::Execute(RHI::CommandEncoder* cmdEncoder)
 DeferredPass::DeferredPass()
 	: FullScreenPass("Materials/DeferredLighting.json", ETechniqueType::TShading)
 {
-	const RHI::Extent2D extent = { 1280, 800 };
-
-	RHI::TextureDescriptor descriptor;
-	descriptor.sampleCount = 1;
-	descriptor.format = RHI::TextureFormat::RGBA16FLOAT;
-	descriptor.usage = RHI::TextureUsage::OUTPUT_ATTACHMENT;
-	descriptor.size = extent;
-	descriptor.arrayLayerCount = 1;
-	descriptor.mipLevelCount = 1;
-	descriptor.dimension = RHI::TextureDimension::TEXTURE_2D;
-	rtColor_ = Engine::GetGPUDevice()->CreateTexture(descriptor)->CreateView({});
-
+	rtColor_ = std::make_shared<RenderTarget>(RHI::TextureFormat::RGBA16FLOAT);
 }
 
-void DeferredPass::Execute(RHI::CommandEncoder* cmdEncoder, const std::vector<RenderObject*>& renderObjects)
+void DeferredPass::Execute(const std::vector<RenderObject*>& renderObjects)
 {
 	GBufferPass_.Reset();
-	GBufferPass_.Execute(cmdEncoder, renderObjects);
+	GBufferPass_.Execute(renderObjects);
+
+	auto wsize = Engine::GetRenderScene()->GetGraphicPipeline()->GetWindowSize();
+	rtColor_->ResizeTarget(wsize.width, wsize.height);
 
 	SetupOutputAttachment(0, rtColor_);
 	SetupDepthStencilAttachemnt(GBufferPass_.GetDSAttachment(), false);
@@ -405,14 +270,47 @@ void DeferredPass::Execute(RHI::CommandEncoder* cmdEncoder, const std::vector<Re
 	material->SetTexture("tGMaterial", GBufferPass_.GetGBuffers().GMaterial->GetTexture());
 	material->SetTexture("tShadowMap", shadowMapPass_->GetDSAttachment()->GetTexture());
 
-	FullScreenPass::Execute(cmdEncoder);
+	FullScreenPass::Execute();
 }
 
-void ScreenResolvePass::Execute(RHI::CommandEncoder* cmdEncoder)
+void ScreenResolvePass::Execute()
 {
+	RTSwapChain_->Reset();
+	SetupOutputAttachment(0, RTSwapChain_);
+
 	const auto* texture = inputPass_->GetColorAttachments()[0].RenderTarget->GetTexture();
 	meshComponent_->GetRenderObject()->MaterialObject->SetTexture("tAlbedo", texture);
-	FullScreenPass::Execute(cmdEncoder);
+	FullScreenPass::Execute();
+	/*CommandEncoder_ = Engine::GetRenderScene()->GetGraphicPipeline()->GetCommandEncoder();
+
+	auto swapchain = Engine::GetRenderScene()->GetGraphicPipeline()->GetSwapChain();
+	RHI::TextureView* colorAttachment = swapchain->GetCurrentTexture()->CreateView({});
+
+	RHI::RenderPassDescriptor renderPassDescriptor;
+
+	RHI::RenderPassColorAttachmentDescriptor descriptor;
+	{
+		descriptor.attachment = colorAttachment;
+		descriptor.resolveTarget = nullptr;
+		descriptor.loadValue = { 0, 0, 0, 1 };
+		descriptor.loadOp =  RHI::LoadOp::UNDEFINED;
+		descriptor.storeOp = RHI::StoreOp::STORE;
+	}
+	renderPassDescriptor.colorAttachments.push_back(descriptor);
+	auto extent = colorAttachment->GetTexture()->GetTextureSize();
+
+	RenderPassEncoder_ = CommandEncoder_->BeginRenderPass(renderPassDescriptor);
+	{
+		RenderPassEncoder_->SetViewport(0, 0, extent.width, extent.height, 0, 1);
+		RenderPassEncoder_->SetScissorRect(0, 0, extent.width, extent.height);
+		RenderPassEncoder_->SetDepthBias(0, 0, 0);
+	}
+
+	const auto* texture = inputPass_->GetColorAttachments()[0].RenderTarget->GetTexture();
+	meshComponent_->GetRenderObject()->MaterialObject->SetTexture("tAlbedo", texture);
+	meshComponent_->GetRenderObject()->Render(this, ETechniqueType::TShading, ERenderSet::ERenderSet_PostProcess, *RenderPassEncoder_);
+
+	RenderPassEncoder_->EndPass();*/
 }
 
 NS_RX_END

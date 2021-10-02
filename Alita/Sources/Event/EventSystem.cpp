@@ -36,7 +36,7 @@ void EventSystem::_EventMouseHandler(float xpos, float ypos)
 	if (bLeftMouseBtnPressing_)
 	{
 		TVector2 diff = (TVector2{ xpos, ypos } - lastMousePosition_) * 0.1f;
-		Engine::GetWorld()->GetCamera()->RotateAroundPoint(diff.y, -diff.x);
+		Engine::GetWorld()->GetCamera()->RotateAroundPoint(diff.x, -diff.y);
 	}
 	else if (bRightMouseBtnPressing_)
 	{

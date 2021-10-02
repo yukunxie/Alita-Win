@@ -49,6 +49,8 @@ public:
 	void MoveRight(float speedScale = 1.0f);
 
 	void RotateAroundPoint(float x, float y);
+
+	void RotateAroundAxis(float angle, const TVector3& axis);
 	
 	void YawPitch(float raw = 0.0f, float pitch = 0.0);
 
@@ -62,6 +64,8 @@ public:
 	{
 		backgroudColor_ = color4;
 	}
+
+	virtual void OnWindowResized(uint32 width, uint32 height) {}
 
 public:
 	static Camera* CreatePerspectiveCamera(float fov, float aspect, float nearPlane, float farPlane);
@@ -90,6 +94,8 @@ class PerspectiveCamera final: public Camera
 {
 public:
 	PerspectiveCamera(float fov, float aspect, float nearPlane, float farPlane);
+
+	virtual void OnWindowResized(uint32 width, uint32 height) override;
 
 public:
 	virtual void Tick(float dt) override;

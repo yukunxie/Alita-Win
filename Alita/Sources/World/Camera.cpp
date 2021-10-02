@@ -16,19 +16,44 @@ NS_RX_BEGIN
 #define ANGLE_TO_RAD(angle) ( (angle) * PI / 180.0f)
 
 // https://www.3dgep.com/understanding-the-view-matrix/#The_View_Matrix
-static TMat4x4 _ComposeViewMatrix(const TVector3& position, const TVector3& rotation)
+static TMat4x4 _ComposeViewMatrix(const TVector3& eye, const TVector3& rotation)
 {
-	//auto viewMatrix = glm::eulerAngleXYZ(rotation.x, rotation.y, rotation.z);
-	auto viewMatrix = TMat4x4(1.0f);
-	viewMatrix = glm::rotate(viewMatrix, glm::radians(rotation.x), TVector3(1.0f, 0.0f, 0.0f));
-	viewMatrix = glm::rotate(viewMatrix, glm::radians(rotation.y), TVector3(0.0f, 1.0f, 0.0f));
-	viewMatrix = glm::rotate(viewMatrix, glm::radians(rotation.z), TVector3(0.0f, 0.0f, 1.0f));
+	float yaw = glm::radians(rotation.y);
+	float pitch = glm::radians(rotation.x);
+	
+	// I assume the values are already converted to radians.
+	float cosPitch = cos(pitch);
+	float sinPitch = sin(pitch);
+	float cosYaw = cos(yaw);
+	float sinYaw = sin(yaw);
 
-	//translate to init position
-	viewMatrix = glm::transpose(viewMatrix) * glm::translate(TMat4x4(1.0f), position);
+	TVector3 xaxis = { cosYaw, 0, -sinYaw };
+	TVector3 yaxis = { sinYaw * sinPitch, cosPitch, cosYaw * sinPitch };
+	TVector3 zaxis = { sinYaw * cosPitch, -sinPitch, cosPitch * cosYaw };
 
-	auto a = viewMatrix * TVector4(0, 0, 0, 1);
+	// Create a 4x4 view matrix from the right, up, forward and eye position vectors
+	glm::mat4 viewMatrix = {
+		TVector4(xaxis.x,            yaxis.x,            zaxis.x,      0),
+		TVector4(xaxis.y,            yaxis.y,            zaxis.y,      0),
+		TVector4(xaxis.z,            yaxis.z,            zaxis.z,      0),
+		TVector4(-dot(xaxis, eye), -dot(yaxis, eye), -dot(zaxis, eye), 1)
+	};
+
+	auto a = viewMatrix * TVector4(1, 1, 0, 1);
+
 	return viewMatrix;
+
+	////auto viewMatrix = glm::eulerAngleXYZ(rotation.x, rotation.y, rotation.z);
+	//auto viewMatrix = TMat4x4(1.0f);
+	//viewMatrix = glm::rotate(viewMatrix, glm::radians(rotation.x), TVector3(1.0f, 0.0f, 0.0f));
+	//viewMatrix = glm::rotate(viewMatrix, glm::radians(rotation.y), TVector3(0.0f, 1.0f, 0.0f));
+	//viewMatrix = glm::rotate(viewMatrix, glm::radians(rotation.z), TVector3(0.0f, 0.0f, 1.0f));
+
+	////translate to init position
+	//viewMatrix = glm::transpose(viewMatrix) * glm::translate(TMat4x4(1.0f), position);
+
+	//auto a = viewMatrix * TVector4(1, 1, 0, 1);
+	//return viewMatrix;
 }
 
 Camera::Camera()
@@ -86,7 +111,7 @@ void Camera::LookAt(const TVector3& from, const TVector3& center, const TVector3
 {
 	TVector3 front = glm::normalize(center - from);
 	TVector3 up = up_;
-	if (IS_ZERO(fabs(front.y) - 1))
+	if (fabs(front.y) - 1 < 0.01)
 	{
 		up =  TVector3(0, 0.0f, -1);
 	}
@@ -105,7 +130,7 @@ void Camera::LookAt(const TVector3& from, const TVector3& center, const TVector3
 	rotation = glm::conjugate(rotation);
 	auto degrees = glm::degrees(glm::eulerAngles(rotation));
 
-	auto a = viewMatrix_ * TVector4(0, 0, 0, 1);
+	auto a = viewMatrix_ * TVector4(1, 1, 0, 1);
 
 
 	SetPosition(from);
@@ -113,7 +138,7 @@ void Camera::LookAt(const TVector3& from, const TVector3& center, const TVector3
 
 
 
-	_UpdateViewMatrix();
+	//_UpdateViewMatrix();
 }
 
 const float CAMERA_MOVE_SPEED = 15.0f;
@@ -153,35 +178,31 @@ void Camera::MoveRight(float speedScale)
 
 void Camera::RotateAroundPoint(float x, float y)
 {
-	auto rotation = GetRotation();
-	rotation.y += y/10;
-	rotation.x += x/10;
-	SetRotation(rotation);
-	//float distance = glm::length(GetPosition());
-	//TVector3 center = distance * glm::normalize(Front_) + GetPosition();
-	//TVector3 relPos = GetPosition() - center;
+	TVector3 center = { 0, 0, 0 };
+	TVector3 right = TVector3(glm::transpose(viewMatrix_)[0]);
+	TVector3 up = TVector3(glm::transpose(viewMatrix_)[1]);
+	TVector3 front = TVector3(glm::transpose(viewMatrix_)[2]);
 
-	////1、初始化一个单位矩阵
-	//glm::mat4 trans = glm::mat4(1.0f);
-	////2、用glm::radians将角度转化为弧度，glm::vec3(0.0, 0.0, 1.0)表示沿Z轴旋转
-	//trans = glm::rotate(trans, glm::radians(x), glm::vec3(1.0, 0.0, 0.0));
-	//trans = glm::rotate(trans, glm::radians(y), glm::vec3(0.0, 1.0, 0.0));
+	glm::mat3 basis(right, up, -front);
+	glm::mat3 rotX = glm::mat3(glm::rotate(x, up));
+	glm::mat3 rotY = glm::mat3(glm::rotate(y, right));
+	basis = basis * rotY * rotX;
 
-	//auto newPosition = glm::vec3(glm::vec4((GetPosition() - center), 1.0) * trans) + center;
-	//LookAt(newPosition, center, { 0, 1, 0 });
+	front = -basis[2];
+	up = basis[1];
 
+	float distance = glm::length((GetPosition() - center));
 
-	//TVector3 right = glm::cross(Front_, WorldUp_);
+	TVector3 newPos = glm::normalize(front) * distance + center;
 
-	//point = glm::rotate(point, x / 10, right);
-	////point = glm::rotate(point, y / 10, WorldUp_);
+	//LOGI("%f, orginRotation = {%.03f, %.03f, %.03f}, newPos = {%.03f, %.03f, %.03f}", angle, GetRotation().x, GetRotation().y, GetRotation().z, newPos.x, newPos.y, newPos.z);
 
-	///*Front_ = glm::normalize(point);
-	//WorldUp_ = glm::cross(Front_, right);*/
+	LookAt(newPos, center);
+}
 
-	//SetPosition(point + center);
-
-	//LookAt(GetPosition(), center);
+void Camera::RotateAroundAxis(float angle, const TVector3& axis)
+{
+	
 }
 
 void Camera::YawPitch(float yaw, float pitch)
@@ -243,9 +264,15 @@ PerspectiveCamera::PerspectiveCamera(float fov, float aspect, float nearPlane, f
 	projMatrix_[1][1] *= -1;
 }
 
+void PerspectiveCamera::OnWindowResized(uint32 width, uint32 height)
+{
+	projMatrix_ = glm::perspective(glm::radians(fov_), float(width)/float(height), nearPlane_, farPlane_);
+	projMatrix_[1][1] *= -1;
+}
+
 void PerspectiveCamera::Tick(float dt)
 {
-	//_UpdateViewMatrix();
+	_UpdateViewMatrix();
 }
 
 NS_RX_END

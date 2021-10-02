@@ -18,12 +18,23 @@ public:
 
 	virtual ~GraphicPipeline();
 
-	const TExtent2D& GetWindowSize() const
+	const TExtent2D GetWindowSize() const
 	{
-		return WindowSize_;
+		auto extent = RHISwapChain_->GetCurrentTexture()->GetTextureSize();
+		return { extent.width, extent.height };
+	}
+
+	float GetRenderTargetScaleFactor() const
+	{
+		return 1.0;
 	}
 
 	RHI::CommandEncoder* GetCommandEncoder() { return CommandEncoder_; }
+
+	RHI::SwapChain* GetSwapChain() 
+	{ 
+		return RHISwapChain_;
+	}
 
 public:
 	void Execute(const std::vector<RenderObject*>& renderObjects);

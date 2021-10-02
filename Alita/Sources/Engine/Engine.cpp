@@ -101,6 +101,11 @@ Engine::~Engine()
     RX_SAFE_RELEASE(world_);
 }
 
+TExtent2D Engine::GetWindowSize() const
+{
+    return TExtent2D{ (uint32)WindowWidth_, (uint32)WindowHeight_ };
+}
+
 void Engine::Update(float dt)
 {
     if (WindowWidth_ == 0 || WindowHeight_ == 0)
@@ -159,6 +164,8 @@ void Engine::SetWindowResized(int width, int height)
 
     WindowWidth_ = width;
     WindowHeight_ = height;
+
+    world_->GetCamera()->OnWindowResized(width, height);
 }
 
 NS_RX_END

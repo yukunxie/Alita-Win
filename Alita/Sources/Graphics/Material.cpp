@@ -503,6 +503,7 @@ void Material::ApplyModifyToBindGroup(RHI::RenderPassEncoder& passEndcoder)
         }
     }
     rhiBindGroup_ = Engine::GetGPUDevice()->CreateBindGroup(descriptor);
+    RHI_SAFE_RETAIN(rhiBindGroup_);
 }
 
 RHI::SamplerDescriptor Material::ParseSamplerDescriptor(const rapidjson::Value& doc)

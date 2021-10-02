@@ -7,6 +7,7 @@
 
 #include "RHI/RHI.h"
 #include "Base/Macros.h"
+#include "Types/Types.h"
 
 #include <functional>
 #include <map>
@@ -67,6 +68,8 @@ public:
 	{
 		return Engine::GetEngine()->world_;
 	}
+
+	TExtent2D GetWindowSize() const;
 
 	void SetWindowResized(int width, int height);
 

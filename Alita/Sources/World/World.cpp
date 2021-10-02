@@ -64,12 +64,13 @@ void World::SetupDefaultCamera()
 	{
 		return;
 	}
-	defaultCamera_ = Camera::CreatePerspectiveCamera(45.0, 1280.f / 800.0f, 1.0f, 1000.f);
+	auto wsize = Engine::GetEngine()->GetWindowSize();
+	defaultCamera_ = Camera::CreatePerspectiveCamera(45.0, float(wsize.width) / float(wsize.height), 1.0f, 1000.f);
 	//defaultCamera_->SetPosition({ 0, 5, 5 });
 	//defaultCamera_->SetRotation({ -45, 0, 0 });
 
 	//defaultCamera_->Setup({ 0, 5, 5 }, 0.0f, -45.0f);
-	defaultCamera_->LookAt({ 0, 10, 0 }, { 0, 0, 0 }, { 0, 1, 0 });
+	defaultCamera_->LookAt({ 0, 5, 5 }, { 0, 0, 0 }, { 0, 1, 0 });
 	/*defaultCamera_->SetPosition({ 0, 15, 15 });
 	defaultCamera_->SetRotation({ -45, 0, 0 });*/
 
