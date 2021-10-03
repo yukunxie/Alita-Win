@@ -9,7 +9,7 @@
 
 #if WIN32
 #include "../Third-Party/RenderDoc/renderdoc_app.h"
-extern RENDERDOC_API_1_4_0* rdoc_api;
+extern RENDERDOC_API_1_4_0* gRenderDocAPI;
 #endif
 
 
@@ -68,12 +68,12 @@ void EventSystem::_EventKeyboardHandler(int key, int scancode, int action, int m
 		else
 		{
 #if WIN32
-			if (rdoc_api && key == GLFW_KEY_F12 && mods == GLFW_MOD_CONTROL && action == GLFW_PRESS)
+			if (gRenderDocAPI && key == GLFW_KEY_F12 && mods == GLFW_MOD_CONTROL && action == GLFW_PRESS)
 			{
-				rdoc_api->TriggerCapture();
-				if (!rdoc_api->IsRemoteAccessConnected())
+				gRenderDocAPI->TriggerCapture();
+				if (!gRenderDocAPI->IsRemoteAccessConnected())
 				{
-					rdoc_api->LaunchReplayUI(true, NULL);
+					gRenderDocAPI->LaunchReplayUI(true, NULL);
 				}
 			}
 #endif

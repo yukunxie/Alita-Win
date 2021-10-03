@@ -40,7 +40,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 
 #if WIN32
 
-RENDERDOC_API_1_4_0* rdoc_api = NULL;
+RENDERDOC_API_1_4_0* gRenderDocAPI = NULL;
 
 using WString = std::basic_string<wchar_t, std::char_traits<wchar_t>>;
 
@@ -85,17 +85,17 @@ int main() {
     {
         pRENDERDOC_GetAPI RENDERDOC_GetAPI =
             (pRENDERDOC_GetAPI)GetProcAddress(mod, "RENDERDOC_GetAPI");
-        int ret = RENDERDOC_GetAPI(eRENDERDOC_API_Version_1_4_0, (void**)&rdoc_api);
+        int ret = RENDERDOC_GetAPI(eRENDERDOC_API_Version_1_4_0, (void**)&gRenderDocAPI);
         if (ret == 1)
         {
-            //LOG(RenderDoc, Info) << "RenderDoc Loaded Success";
-            rdoc_api->MaskOverlayBits(eRENDERDOC_Overlay_None, eRENDERDOC_Overlay_None);
-            rdoc_api->UnloadCrashHandler();
+            LOGI("Load RenderDoc Success.")
+            gRenderDocAPI->MaskOverlayBits(eRENDERDOC_Overlay_FrameRate, eRENDERDOC_Overlay_FrameRate);
+            gRenderDocAPI->UnloadCrashHandler();
         }
         else
         {
-           // LOG(RenderDoc, Error) << "RenderDoc GetAPI Failed";
-            rdoc_api = NULL;
+            gRenderDocAPI = NULL;
+            LOGE("Load RenderDoc Fail.")
         }
     }
 #endif
@@ -117,13 +117,32 @@ int main() {
 
     bool firstFrame = true;
 
+    auto nowTime = std::chrono::high_resolution_clock::now();
+    /*long duration = static_cast<long>(std::chrono::duration_cast<std::chrono::microseconds>(
+        nowTime - startTime_).count());
+    LOGI("@@@@TimeProfiler: %s : %.03fms", tag_.c_str(), duration / 1000.0f);*/
+
+    const float frameInterval = 1 / 60.0f;
+
     while (!glfwWindowShouldClose(window)) {
         if (!firstFrame)
         {
             glfwPollEvents();
         }
         firstFrame = false;
-        pEngine->Update(0.016f);
+        auto startTime = std::chrono::high_resolution_clock::now();
+        pEngine->Update(frameInterval);
+        while (true)
+        {
+            auto nowTime = std::chrono::high_resolution_clock::now();
+            long duration = static_cast<long>(std::chrono::duration_cast<std::chrono::microseconds>(nowTime - startTime).count());
+            if (duration / (1000.0f * 1000.0f) >= frameInterval)
+            {
+                break;
+            }
+            using namespace std::literals;
+            std::this_thread::sleep_for(0ms);
+        }
     }
 
     glfwDestroyWindow(window);
