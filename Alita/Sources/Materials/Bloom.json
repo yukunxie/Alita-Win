@@ -1,0 +1,43 @@
+{
+  "name": "Bloom-BrightPass",
+  "indexFormat": "uint32",
+  "code": {
+    "vs": "Shaders/ScreenQuad.vert.gl",
+    "fs": "Shaders/Bloom.frag.gl"
+  },
+  "defines": [],
+  "techniques": {
+    "TShading":
+    {
+      "vs_entry": "TShading",
+      "fs_entry": "TShading"
+    }
+  },
+  "bindings": [
+    {
+      "name": "uBatch",
+      "binding": 1,
+      "type": "Buffer",
+      "stride": 16,
+      "fields": [
+        {
+          "name": "Param",
+          "format": "float4",
+          "offset": 0
+        }
+      ]
+    },
+    {
+      "name": "tAlbedo",
+      "binding": 11,
+      "type": "Texture2D",
+      "uri": ""
+    },
+    {
+      "name": "tBloomMap",
+      "binding": 13,
+      "type": "Texture2D",
+      "uri": ""
+    }
+  ]
+}

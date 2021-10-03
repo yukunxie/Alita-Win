@@ -536,6 +536,9 @@
     <ClCompile Include="Sources\Graphics\RenderTarget.cpp">
       <Filter>Sources\Graphics\Private</Filter>
     </ClCompile>
+    <ClCompile Include="Sources\Graphics\PostProcess\Bloom.cpp">
+      <Filter>Sources\Graphics\Private</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Sources\Platform\Platform.h">
@@ -1127,6 +1130,9 @@
       <Filter>Sources\World\Public</Filter>
     </ClInclude>
     <ClInclude Include="Sources\Graphics\RenderTarget.h">
+      <Filter>Sources\Graphics\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Graphics\PostProcess\Bloom.h">
       <Filter>Sources\Graphics\Public</Filter>
     </ClInclude>
   </ItemGroup>

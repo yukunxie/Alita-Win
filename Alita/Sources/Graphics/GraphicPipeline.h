@@ -3,6 +3,7 @@
 #include "Base/Macros.h"
 #include "Graphics/Pass.h"
 #include "Types/Types.h"
+#include "PostProcess/Bloom.h"
 
 #include "RHI/RHI.h"
 
@@ -46,6 +47,7 @@ private:
 	SkyBoxPass SkyBoxPass_;
 	DeferredPass DeferredPass_;
 	ScreenResolvePass ScreenResolvePass_;
+	BloomPass DownSamplePass_;
 	TExtent2D  WindowSize_;
 
 	// RHI

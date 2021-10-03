@@ -1,0 +1,20 @@
+
+layout(location = 0) in vec2 _UV0;
+
+layout(binding = 1) uniform Batch {
+    vec4 Param;
+} uBatch;
+
+layout(binding = 11) uniform texture2D   tAlbedo;
+layout(binding = 12) uniform sampler     sAlbedo;
+
+layout(binding = 13) uniform texture2D   tBloomMap;
+layout(binding = 14) uniform sampler     sBloomMap;
+
+layout(location = 0) out vec4 OutColor;
+
+void TShading() {
+    vec4 color0 = texture(sampler2D(tAlbedo, sAlbedo), _UV0);
+    vec4 color1 = texture(sampler2D(tBloomMap, sBloomMap), _UV0);
+    OutColor = color0 + color1;
+}

@@ -60,7 +60,7 @@ bool VKRenderPipeline::Init(const RenderPipelineDescriptor &descriptor)
         inputAssembly.flags = 0;
         inputAssembly.topology = ToVulkanType(descriptor.primitiveTopology);
         // Primitive restart is always enabled in Dawn (because of Metal)
-        inputAssembly.primitiveRestartEnable = VK_TRUE;
+        inputAssembly.primitiveRestartEnable = VK_FALSE;
     }
     
     // A dummy viewport/scissor info. The validation layers force use to provide at least one
@@ -162,7 +162,7 @@ bool VKRenderPipeline::Init(const RenderPipelineDescriptor &descriptor)
         }
         else
         {
-            colorBlendAttachment.blendEnable = VK_TRUE;
+            colorBlendAttachment.blendEnable = VK_FALSE;
             colorBlendAttachment.srcColorBlendFactor = VK_BLEND_FACTOR_ONE;
             colorBlendAttachment.dstColorBlendFactor = VK_BLEND_FACTOR_ZERO;
             colorBlendAttachment.colorBlendOp = VK_BLEND_OP_ADD;

@@ -64,7 +64,10 @@ bool VKRenderPass::Init(const RenderPassCacheQuery &query)
         attachmentDesc.samples = (VkSampleCountFlagBits) query.sampleCounts[i];
         attachmentDesc.loadOp = ToVulkanType(query.colorLoadOps[i]);
         attachmentDesc.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
-        attachmentDesc.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+        attachmentDesc.initialLayout = query.TestResolvedColorAttachment(i)
+            || !query.bIsSwapchainTextures[i] ?
+            VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL :
+            VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
         attachmentDesc.finalLayout = query.TestResolvedColorAttachment(i)
                                      || !query.bIsSwapchainTextures[i] ?
                                      VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL :

@@ -411,7 +411,7 @@ void Material::SetupPSOKey(PSOKey& psoKey, const Pass* pass)
     }
 }
 
-bool Material::SetFloat(const std::string& name, std::uint32_t offset, std::uint32_t count, float* data)
+bool Material::SetFloat(const std::string& name, std::uint32_t offset, std::uint32_t count, const float* data)
 {
     const auto it = parameters_.find(name);
     if (it == parameters_.end())

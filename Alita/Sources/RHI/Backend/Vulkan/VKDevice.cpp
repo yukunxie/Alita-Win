@@ -431,7 +431,7 @@ SwapChain* VKDevice::CreateSwapchain(const SwapChainDescriptor &descriptor)
 
 TextureFormat VKDevice::GetSwapchainPreferredFormat()
 {
-    return TextureFormat::RGBA8UNORM;
+    return TextureFormat::BGRA8UNORM;
 }
 
 Buffer* VKDevice::CreateBuffer(const BufferDescriptor &descriptor)
@@ -661,6 +661,11 @@ bool VKDevice::InitInstance()
     if (HasExtension(instanceExtensions_, VK_EXT_DEBUG_REPORT_EXTENSION_NAME))
     {
         instanceExt.push_back(VK_EXT_DEBUG_REPORT_EXTENSION_NAME);
+    }
+
+    if (HasExtension(instanceExtensions_, VK_KHR_SEPARATE_DEPTH_STENCIL_LAYOUTS_EXTENSION_NAME))
+    {
+        instanceExt.push_back(VK_KHR_SEPARATE_DEPTH_STENCIL_LAYOUTS_EXTENSION_NAME);
     }
 
     if (HasExtension(instanceExtensions_, VK_EXT_DEBUG_UTILS_EXTENSION_NAME))

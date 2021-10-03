@@ -98,7 +98,7 @@ void VKSwapChain::CreateVulkanSwapChain()
         createInfo.imageArrayLayers = 1;
         createInfo.imageUsage = vkUsages_;
         createInfo.preTransform = config.capabilities.currentTransform;
-        createInfo.compositeAlpha = VK_COMPOSITE_ALPHA_INHERIT_BIT_KHR;
+        createInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
         createInfo.presentMode = VK_PRESENT_MODE_FIFO_KHR;
         createInfo.clipped = VK_TRUE;
         createInfo.oldSwapchain = VK_NULL_HANDLE;

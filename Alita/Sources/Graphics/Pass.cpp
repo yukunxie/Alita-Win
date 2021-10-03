@@ -8,7 +8,8 @@
 #include "World/Camera.h"
 #include "RenderObject.h"
 #include "Engine/Engine.h"
-#include "Graphics/RenderScene.h"
+#include "RenderScene.h"
+#include "Material.h"
 
 NS_RX_BEGIN
 
@@ -72,7 +73,7 @@ void IgniterPass::Execute(const std::vector<RenderObject*>& renderObjects)
 
 ShadowMapGenPass::ShadowMapGenPass()
 {
-	dsTexture_ = std::make_shared<RenderTarget>(shadowMapSize_.width, shadowMapSize_.height, RHI::TextureFormat::DEPTH32FLOAT);
+	dsTexture_ = std::make_shared<RenderTarget>(shadowMapSize_.width, shadowMapSize_.height, RHI::TextureFormat::DEPTH24PLUS_STENCIL8);
 }
 
 void ShadowMapGenPass::Execute(const std::vector<RenderObject*>& renderObjects)
@@ -236,6 +237,21 @@ FullScreenPass::FullScreenPass(const std::string& materialName, ETechniqueType t
 	meshComponent_ = meshComp;
 }
 
+void FullScreenPass::SetTexture(const std::string& name, const RHI::Texture* texture)
+{
+	meshComponent_->GetRenderObject()->MaterialObject->SetTexture(name, texture);
+}
+
+void FullScreenPass::SetFloat(const std::string& name, std::uint32_t offset, std::uint32_t count, const float* data)
+{
+	meshComponent_->GetRenderObject()->MaterialObject->SetFloat(name, offset, count, data);
+}
+
+Material* FullScreenPass::GetMaterial()
+{
+	return meshComponent_->GetRenderObject()->MaterialObject;
+}
+
 void FullScreenPass::Execute()
 {
 	BeginPass();
@@ -281,36 +297,113 @@ void ScreenResolvePass::Execute()
 	const auto* texture = inputPass_->GetColorAttachments()[0].RenderTarget->GetTexture();
 	meshComponent_->GetRenderObject()->MaterialObject->SetTexture("tAlbedo", texture);
 	FullScreenPass::Execute();
-	/*CommandEncoder_ = Engine::GetRenderScene()->GetGraphicPipeline()->GetCommandEncoder();
-
-	auto swapchain = Engine::GetRenderScene()->GetGraphicPipeline()->GetSwapChain();
-	RHI::TextureView* colorAttachment = swapchain->GetCurrentTexture()->CreateView({});
-
-	RHI::RenderPassDescriptor renderPassDescriptor;
-
-	RHI::RenderPassColorAttachmentDescriptor descriptor;
-	{
-		descriptor.attachment = colorAttachment;
-		descriptor.resolveTarget = nullptr;
-		descriptor.loadValue = { 0, 0, 0, 1 };
-		descriptor.loadOp =  RHI::LoadOp::UNDEFINED;
-		descriptor.storeOp = RHI::StoreOp::STORE;
-	}
-	renderPassDescriptor.colorAttachments.push_back(descriptor);
-	auto extent = colorAttachment->GetTexture()->GetTextureSize();
-
-	RenderPassEncoder_ = CommandEncoder_->BeginRenderPass(renderPassDescriptor);
-	{
-		RenderPassEncoder_->SetViewport(0, 0, extent.width, extent.height, 0, 1);
-		RenderPassEncoder_->SetScissorRect(0, 0, extent.width, extent.height);
-		RenderPassEncoder_->SetDepthBias(0, 0, 0);
-	}
-
-	const auto* texture = inputPass_->GetColorAttachments()[0].RenderTarget->GetTexture();
-	meshComponent_->GetRenderObject()->MaterialObject->SetTexture("tAlbedo", texture);
-	meshComponent_->GetRenderObject()->Render(this, ETechniqueType::TShading, ERenderSet::ERenderSet_PostProcess, *RenderPassEncoder_);
-
-	RenderPassEncoder_->EndPass();*/
 }
+
+DownSamplePass::DownSamplePass()
+	:FullScreenPass("Materials/DownSample.json", ETechniqueType::TShading)
+{
+	RTColor_ = std::make_shared<RenderTarget>();
+}
+
+void DownSamplePass::Execute()
+{
+	auto extent = InputPass_->GetColorAttachments()[0].RenderTarget->GetExtent();
+	auto format = InputPass_->GetColorAttachments()[0].RenderTarget->GetFormat();
+	RTColor_->ResizeTarget(extent.width / 2, extent.height / 2, format);
+
+	SetupOutputAttachment(0, RTColor_);
+
+	const auto* texture = InputPass_->GetColorAttachments()[0].RenderTarget->GetTexture();
+	SetTexture("tAlbedo", texture);
+	float imageSizeInfo[4] = { extent.width, extent.height, 1.0f / extent.width , 1.0f / extent.height };
+	SetFloat("ImageSize", 0, 4, imageSizeInfo);
+
+	float params[4] = { FilterType_, 0, 0 , 0 };
+	SetFloat("Param", 0, 4, params);
+
+	FullScreenPass::Execute();
+}
+
+BloomBrightPass::BloomBrightPass()
+	: FullScreenPass("Materials/Bloom-Bright.json", ETechniqueType::TShading)
+{
+	RTColor_ = std::make_shared<RenderTarget>();
+}
+
+void BloomBrightPass::Execute()
+{
+	auto extent = InputPass_->GetColorAttachments()[0].RenderTarget->GetExtent();
+	auto format = InputPass_->GetColorAttachments()[0].RenderTarget->GetFormat();
+	RTColor_->ResizeTarget(extent.width, extent.height, format);
+
+	SetupOutputAttachment(0, RTColor_);
+
+	const auto* texture = InputPass_->GetColorAttachments()[0].RenderTarget->GetTexture();
+	SetTexture("tAlbedo", texture);
+
+	float params[4] = { 0.5f, 0, 0 , 0 };
+	SetFloat("Param", 0, 4, params);
+
+	FullScreenPass::Execute();
+}
+
+GaussianBlur::GaussianBlur()
+	: FullScreenPass("Materials/GaussianBlur.json", ETechniqueType::TShading)
+	, VerticalGuassianBlurPass_(new GaussianBlur(true))
+{
+	RTColor_ = std::make_shared<RenderTarget>();
+	Param = TVector4(1.0f, 0, 1.0f, 0);
+
+	//VerticalGuassianBlurPass_ = std::make_shared< GaussianBlur>(true);
+}
+
+GaussianBlur::GaussianBlur(bool isVertical)
+	: FullScreenPass("Materials/GaussianBlur.json", ETechniqueType::TShading)
+{
+	RTColor_ = std::make_shared<RenderTarget>();
+	Param = TVector4(0, 1.0f, 1.0f, 0);
+}
+
+void GaussianBlur::Setup(const Pass* inputPass)
+{
+	if (VerticalGuassianBlurPass_)
+	{
+		VerticalGuassianBlurPass_->Setup(inputPass);
+	}
+	else
+	{
+		InputPass_ = inputPass;
+	}
+}
+
+void GaussianBlur::Execute()
+{
+	Reset();
+
+	if (VerticalGuassianBlurPass_)
+	{
+		VerticalGuassianBlurPass_->Execute();
+
+		InputPass_ = VerticalGuassianBlurPass_.get();
+	}
+
+	auto extent = InputPass_->GetColorAttachments()[0].RenderTarget->GetExtent();
+	auto format = InputPass_->GetColorAttachments()[0].RenderTarget->GetFormat();
+	RTColor_->ResizeTarget(extent.width, extent.height, format);
+
+	SetupOutputAttachment(0, RTColor_);
+
+	const auto* texture = InputPass_->GetColorAttachments()[0].RenderTarget->GetTexture();
+	SetTexture("tAlbedo", texture);
+
+	float imageSizeInfo[4] = { extent.width, extent.height, 1.0f / extent.width , 1.0f / extent.height };
+	SetFloat("ImageSize", 0, 4, imageSizeInfo);
+
+	SetFloat("BlurDirection", 0, 4, &Param.x);
+
+	FullScreenPass::Execute();
+}
+
+
 
 NS_RX_END

@@ -168,6 +168,7 @@ echo "xxxxx"</Command>
     <ClCompile Include="Sources\Graphics\GraphicPipeline.cpp" />
     <ClCompile Include="Sources\Graphics\Material.cpp" />
     <ClCompile Include="Sources\Graphics\Pass.cpp" />
+    <ClCompile Include="Sources\Graphics\PostProcess\Bloom.cpp" />
     <ClCompile Include="Sources\Graphics\RenderObject.cpp" />
     <ClCompile Include="Sources\Graphics\RenderScene.cpp" />
     <ClCompile Include="Sources\Graphics\RenderTarget.cpp" />
@@ -299,6 +300,7 @@ echo "xxxxx"</Command>
     <ClInclude Include="Sources\Graphics\GraphicPipeline.h" />
     <ClInclude Include="Sources\Graphics\Material.h" />
     <ClInclude Include="Sources\Graphics\Pass.h" />
+    <ClInclude Include="Sources\Graphics\PostProcess\Bloom.h" />
     <ClInclude Include="Sources\Graphics\RenderObject.h" />
     <ClInclude Include="Sources\Graphics\RenderScene.h" />
     <ClInclude Include="Sources\Graphics\RenderTarget.h" />

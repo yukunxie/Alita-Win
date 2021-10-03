@@ -1027,6 +1027,9 @@ VkImageLayout GetVulkanImageLayout(TextureUsageFlags usage, TextureFormat format
         case TextureUsage::COPY_DST:
             return VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
         case TextureUsage::SAMPLED:
+            if (TextureFormat::DEPTH24PLUS_STENCIL8 == format)
+                return VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
+            else
             return VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
             // Vulkan texture copy functions require the image to be in _one_  known layout.
             // Depending on whether parts of the texture have been transitioned to only
@@ -1040,8 +1043,10 @@ VkImageLayout GetVulkanImageLayout(TextureUsageFlags usage, TextureFormat format
         case TextureUsage::STORAGE:
             return VK_IMAGE_LAYOUT_GENERAL;
         case TextureUsage::OUTPUT_ATTACHMENT:
-            if (TextureFormatHasDepthOrStencil(format))
+            if (TextureFormat::DEPTH24PLUS_STENCIL8 == format)
                 return VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+            else if (TextureFormat::DEPTH32FLOAT == format)
+                return VK_IMAGE_LAYOUT_DEPTH_ATTACHMENT_OPTIMAL;
             else
                 return VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
         case TextureUsage::PRESENT:

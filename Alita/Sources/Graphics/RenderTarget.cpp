@@ -33,6 +33,9 @@ RenderTarget::~RenderTarget()
 
 void RenderTarget::ResizeTarget(uint32 width, uint32 height, RHI::TextureFormat format)
 {
+    width = std::max(width, 1u);
+    height = std::max(height, 1u);
+
     if (TargetWidth_ != width)
     {
         Dirty_ = true;
@@ -73,7 +76,7 @@ void RenderTarget::TryCreateTextureView() const
     RHI::TextureDescriptor descriptor;
     descriptor.sampleCount = 1;
     descriptor.format = Format_;
-    descriptor.usage = RHI::TextureUsage::OUTPUT_ATTACHMENT;
+    descriptor.usage = RHI::TextureUsage::OUTPUT_ATTACHMENT | RHI::TextureUsage::SAMPLED;
     descriptor.size = {TargetWidth_,TargetHeight_, 1};
     descriptor.arrayLayerCount = 1;
     descriptor.mipLevelCount = 1;

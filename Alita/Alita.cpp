@@ -77,7 +77,7 @@ WString QueryRenderdocFromRegister()
 int main() {
 
     
-#if WIN32
+#if WIN32 && 1
     WString RenderdocPath = QueryRenderdocFromRegister();
     RenderdocPath += TEXT("renderdoc.dll");
     HMODULE mod = LoadLibrary(RenderdocPath.c_str());

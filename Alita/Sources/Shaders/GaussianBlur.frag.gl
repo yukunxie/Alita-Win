@@ -1,0 +1,26 @@
+
+layout(location = 0) in vec2 _UV0;
+
+layout(binding = 1) uniform Batch {
+    vec4 ImageSize;
+    vec4 BlurDirection;
+} uBatch;
+
+layout(binding = 11) uniform texture2D   tAlbedo;
+layout(binding = 12) uniform sampler     sAlbedo;
+
+layout(location = 0) out vec4 OutColor;
+
+void TShading() {
+    vec4 color = vec4(0);
+
+    for (int i = -3; i <= 3; ++i)
+    {
+        color += texture(sampler2D(tAlbedo, sAlbedo), _UV0 + i * uBatch.ImageSize.zw * uBatch.BlurDirection.xy * uBatch.BlurDirection.z);
+    }
+
+    color /= 7.0;
+
+
+    OutColor = color;
+}

@@ -1,0 +1,38 @@
+
+layout(location = 0) in vec2 _UV0;
+
+layout(binding = 1) uniform Batch {
+    vec4 ImageSize;
+    vec4 Param;
+} uBatch;
+
+layout(binding = 11) uniform texture2D   tAlbedo;
+layout(binding = 12) uniform sampler     sAlbedo;
+
+layout(location = 0) out vec4 OutColor;
+
+void TShading() {
+    vec4 color0 = texture(sampler2D(tAlbedo, sAlbedo), _UV0);
+    vec4 color1 = texture(sampler2D(tAlbedo, sAlbedo), _UV0 + vec2(0, uBatch.ImageSize.w));
+    vec4 color2 = texture(sampler2D(tAlbedo, sAlbedo), _UV0 + vec2(uBatch.ImageSize.z, 0));
+    vec4 color3 = texture(sampler2D(tAlbedo, sAlbedo), _UV0 + uBatch.ImageSize.zw);
+
+    int filterType = int(uBatch.Param.x + 0.5);
+
+    vec4 color = vec4(0.0);
+    if (filterType == 1)
+    {
+        color += color0;
+        color += color1;
+        color += color2;
+        color += color3;
+        
+        color /= 4.0;
+    }
+    else 
+    {
+        color = color0;
+    }
+
+    OutColor = color;
+}

@@ -25,6 +25,8 @@ class MeshComponent;
 
 class RenderObject;
 
+class Material;
+
 struct AttachmentConfig
 {
     std::shared_ptr<RenderTarget> RenderTarget= nullptr;
@@ -157,6 +159,13 @@ public:
     virtual void Execute(const std::vector<RenderObject*>& renderObjects) override {}
 
 protected:
+    void SetTexture(const std::string& name, const RHI::Texture* texture);
+
+    void SetFloat(const std::string& name, std::uint32_t offset, std::uint32_t count, const float* data);
+
+    Material* GetMaterial();
+
+protected:
     MeshComponent* meshComponent_ = nullptr;
 };
 
@@ -197,6 +206,78 @@ protected:
     const Pass* inputPass_ = nullptr;
 
     std::shared_ptr<RenderTargetSwapChain> RTSwapChain_ = nullptr;
+};
+
+class DownSamplePass : public FullScreenPass
+{
+public:
+    enum DownSampleFilterType
+    {
+        Average = 1,
+        Min     = 2,
+        Max     = 3
+    };
+public:
+    DownSamplePass();
+
+    void Execute();
+
+    virtual void Execute(const std::vector<RenderObject*>& renderObjects) override {};
+
+    void Setup(const Pass* inputPass)
+    {
+        InputPass_ = inputPass;
+    }
+
+    void SetDownSampleFilterType(DownSampleFilterType type)
+    {
+        FilterType_ = type;
+    }
+
+protected:
+    DownSampleFilterType    FilterType_     = DownSampleFilterType::Average;
+    std::shared_ptr<RenderTarget> RTColor_  = nullptr;
+    const Pass* InputPass_                  = nullptr;
+};
+
+class BloomBrightPass : public FullScreenPass
+{
+public:
+    BloomBrightPass();
+
+    void Execute();
+
+    virtual void Execute(const std::vector<RenderObject*>& renderObjects) override {};
+
+    void Setup(const Pass* inputPass)
+    {
+        InputPass_ = inputPass;
+    }
+
+protected:
+    std::shared_ptr<RenderTarget> RTColor_ = nullptr;
+    const Pass* InputPass_ = nullptr;
+};
+
+class GaussianBlur : public FullScreenPass
+{
+public:
+    GaussianBlur();
+
+    void Execute();
+
+    virtual void Execute(const std::vector<RenderObject*>& renderObjects) override {};
+
+    void Setup(const Pass* inputPass);
+
+protected:
+    GaussianBlur(bool isVertical);
+
+protected:
+    TVector4  Param;
+    std::shared_ptr<GaussianBlur> VerticalGuassianBlurPass_;
+    std::shared_ptr<RenderTarget> RTColor_ = nullptr;
+    const Pass* InputPass_ = nullptr;
 };
 
 NS_RX_END

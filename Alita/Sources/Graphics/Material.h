@@ -263,7 +263,7 @@ public:
 
 	virtual void Build() {}
 
-	bool SetFloat(const std::string& name, std::uint32_t offset, std::uint32_t count, float* data);
+	bool SetFloat(const std::string& name, std::uint32_t offset, std::uint32_t count, const float* data);
 
 	bool SetTexture(const std::string& name, const RHI::Texture* texture);
 
