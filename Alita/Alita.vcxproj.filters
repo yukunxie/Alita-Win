@@ -563,6 +563,9 @@
     <ClCompile Include="..\..\imgui\backends\imgui_impl_vulkan.cpp">
       <Filter>Third-Party\imgui\backends</Filter>
     </ClCompile>
+    <ClCompile Include="Sources\Graphics\PostProcess\ToneMapping.cpp">
+      <Filter>Sources\Graphics\Private</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Sources\Platform\Platform.h">
@@ -1182,6 +1185,9 @@
     </ClInclude>
     <ClInclude Include="..\..\imgui\backends\imgui_impl_vulkan.h">
       <Filter>Third-Party\imgui\backends</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Graphics\PostProcess\ToneMapping.h">
+      <Filter>Sources\Graphics\Public</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

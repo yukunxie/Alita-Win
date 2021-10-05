@@ -12,6 +12,8 @@
 
 NS_RHI_BEGIN
 
+extern PFN_vkDebugMarkerSetObjectNameEXT vkDebugMarkerSetObjectName;
+
 VKTexture::VKTexture(VKDevice* device)
     : Texture(device)
 {
@@ -74,6 +76,20 @@ bool VKTexture::Init(const TextureDescriptor &descriptor)
                    &vmaAllocation_, &vmaAllocationInfo_);
 #else
     CALL_VK(vkCreateImage(vkDevice_, &imageInfo, nullptr, &vkImage_));
+
+    if (!descriptor.debugName.empty() && vkDebugMarkerSetObjectName && VKDEVICE()->SupportDebugGroup())
+    {
+        VkDebugMarkerObjectNameInfoEXT nameInfo = {};
+        {
+            nameInfo.sType = VK_STRUCTURE_TYPE_DEBUG_MARKER_OBJECT_NAME_INFO_EXT;
+            nameInfo.pNext = nullptr;
+            nameInfo.objectType = VK_DEBUG_REPORT_OBJECT_TYPE_IMAGE_EXT;
+            nameInfo.object = (uint64_t)vkImage_;
+            nameInfo.pObjectName = descriptor.debugName.c_str();
+        }
+
+        vkDebugMarkerSetObjectName(vkDevice_, &nameInfo);
+    }
     
     VkMemoryRequirements memRequirements;
     vkGetImageMemoryRequirements(vkDevice_, vkImage_, &memRequirements);

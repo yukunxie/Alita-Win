@@ -42,11 +42,11 @@
 
 NS_RHI_BEGIN
 
-PFN_vkDebugMarkerSetObjectTagEXT vkDebugMarkerSetObjectTagEXT = nullptr;
-PFN_vkDebugMarkerSetObjectNameEXT vkDebugMarkerSetObjectNameEXT = nullptr;
-PFN_vkCmdDebugMarkerBeginEXT vkCmdDebugMarkerBeginEXT = nullptr;
-PFN_vkCmdDebugMarkerEndEXT vkCmdDebugMarkerEndEXT = nullptr;
-PFN_vkCmdDebugMarkerInsertEXT vkCmdDebugMarkerInsertEXT = nullptr;
+PFN_vkDebugMarkerSetObjectTagEXT vkDebugMarkerSetObjectTag = VK_NULL_HANDLE;
+PFN_vkDebugMarkerSetObjectNameEXT vkDebugMarkerSetObjectName = VK_NULL_HANDLE;
+PFN_vkCmdDebugMarkerBeginEXT vkCmdDebugMarkerBegin = VK_NULL_HANDLE;
+PFN_vkCmdDebugMarkerEndEXT vkCmdDebugMarkerEnd = VK_NULL_HANDLE;
+PFN_vkCmdDebugMarkerInsertEXT vkCmdDebugMarkerInsert = VK_NULL_HANDLE;
 
 PFN_vkCreateDebugUtilsMessengerEXT vkCreateDebugUtilsMessengerEXT;
 PFN_vkDestroyDebugUtilsMessengerEXT vkDestroyDebugUtilsMessengerEXT;
@@ -737,18 +737,6 @@ bool VKDevice::InitInstance()
     {
         return false;
     }
-    
-    vkDebugMarkerSetObjectTagEXT = PFN_vkDebugMarkerSetObjectTagEXT(vkGetInstanceProcAddr(vkInstance_, "vkDebugMarkerSetObjectTagEXT"));
-    vkDebugMarkerSetObjectNameEXT = PFN_vkDebugMarkerSetObjectNameEXT(vkGetInstanceProcAddr(vkInstance_, "vkDebugMarkerSetObjectNameEXT"));
-    vkCmdDebugMarkerBeginEXT = PFN_vkCmdDebugMarkerBeginEXT(vkGetInstanceProcAddr(vkInstance_, "vkCmdDebugMarkerBeginEXT"));
-    vkCmdDebugMarkerEndEXT = PFN_vkCmdDebugMarkerEndEXT(vkGetInstanceProcAddr(vkInstance_, "vkCmdDebugMarkerEndEXT"));
-    vkCmdDebugMarkerInsertEXT = PFN_vkCmdDebugMarkerInsertEXT(vkGetInstanceProcAddr(vkInstance_, "vkCmdDebugMarkerInsertEXT"));
-    
-    LOGI("vkDebugMarkerSetObjectTagEXT -  %p", vkDebugMarkerSetObjectTagEXT);
-    LOGI("vkDebugMarkerSetObjectNameEXT -  %p", vkDebugMarkerSetObjectNameEXT);
-    LOGI("vkCmdDebugMarkerBeginEXT -  %p", vkCmdDebugMarkerBeginEXT);
-    LOGI("vkCmdDebugMarkerEndEXT -  %p", vkCmdDebugMarkerEndEXT);
-    LOGI("vkCmdDebugMarkerInsertEXT -  %p", vkCmdDebugMarkerInsertEXT);
 
 #if VULKAN_VALIDATE_LAYER_ENABLED
     vkCreateDebugReportCallbackEXT_ = (PFN_vkCreateDebugReportCallbackEXT) vkGetInstanceProcAddr(
@@ -1267,6 +1255,22 @@ bool VKDevice::InitDevice()
         LOGE("CreateDevice fail.");
         return false;
     }
+
+    if (supportDebugGroup_)
+    {
+        // The debug marker extension is not part of the core, so function pointers need to be loaded manually
+        vkDebugMarkerSetObjectTag = (PFN_vkDebugMarkerSetObjectTagEXT)vkGetDeviceProcAddr(vkDevice_, "vkDebugMarkerSetObjectTagEXT");
+        vkDebugMarkerSetObjectName = (PFN_vkDebugMarkerSetObjectNameEXT)vkGetDeviceProcAddr(vkDevice_, "vkDebugMarkerSetObjectNameEXT");
+        vkCmdDebugMarkerBegin = (PFN_vkCmdDebugMarkerBeginEXT)vkGetDeviceProcAddr(vkDevice_, "vkCmdDebugMarkerBeginEXT");
+        vkCmdDebugMarkerEnd = (PFN_vkCmdDebugMarkerEndEXT)vkGetDeviceProcAddr(vkDevice_, "vkCmdDebugMarkerEndEXT");
+        vkCmdDebugMarkerInsert = (PFN_vkCmdDebugMarkerInsertEXT)vkGetDeviceProcAddr(vkDevice_, "vkCmdDebugMarkerInsertEXT");
+    }
+
+    LOGI("vkDebugMarkerSetObjectTagEXT -  %p", vkDebugMarkerSetObjectTag);
+    LOGI("vkDebugMarkerSetObjectNameEXT -  %p", vkDebugMarkerSetObjectName);
+    LOGI("vkCmdDebugMarkerBeginEXT -  %p", vkCmdDebugMarkerBegin);
+    LOGI("vkCmdDebugMarkerEndEXT -  %p", vkCmdDebugMarkerEnd);
+    LOGI("vkCmdDebugMarkerInsertEXT -  %p", vkCmdDebugMarkerInsert);
 
 #if USE_VULKAN_MEMORY_ALLCATOR
     // init VMA

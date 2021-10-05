@@ -15,11 +15,14 @@ NS_RX_BEGIN
 class RenderTarget
 {
 public:
-    RenderTarget() = default;
+    RenderTarget(const std::string& debugName = "")
+        : Name_(debugName)
+    {
+    }
 
-    RenderTarget(RHI::TextureFormat format);
+    RenderTarget(RHI::TextureFormat format, const std::string& debugName = "");
 
-    RenderTarget(uint32 width, uint32 height, RHI::TextureFormat format);
+    RenderTarget(uint32 width, uint32 height, RHI::TextureFormat format, const std::string& debugName = "");
 
     virtual ~RenderTarget();
 
@@ -55,6 +58,7 @@ protected:
     void TryCreateTextureView() const;
 
 protected:
+    std::string        Name_;
     mutable bool                Dirty_          = true;
     uint32              TargetWidth_    = 1;
     uint32              TargetHeight_   = 1;

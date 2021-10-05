@@ -71,7 +71,7 @@ void GraphicPipeline::Execute(const std::vector<RenderObject*>& renderObjects)
 		DeferredPass_.Execute(renderObjects);
 	}
 
-	{
+	/*{
 		SkyBoxPass_.Reset();
 		SkyBoxPass_.Setup(&DeferredPass_, &DeferredPass_);
 		SkyBoxPass_.Execute(renderObjects);
@@ -81,12 +81,12 @@ void GraphicPipeline::Execute(const std::vector<RenderObject*>& renderObjects)
 		DownSamplePass_.Reset();
 		DownSamplePass_.Setup(&SkyBoxPass_);
 		DownSamplePass_.Execute();
-	}
+	}*/
 	
 	{
 		ScreenResolvePass_.Reset();
-		//ScreenResolvePass_.Setup(&DeferredPass_);
-		ScreenResolvePass_.Setup(&DownSamplePass_);
+		ScreenResolvePass_.Setup(&DeferredPass_);
+		//ScreenResolvePass_.Setup(&DownSamplePass_);
 		ScreenResolvePass_.Execute();
 	}
 

@@ -385,11 +385,11 @@ VKCommandBuffer::~VKCommandBuffer()
     Dispose();
 }
 
+extern PFN_vkCmdDebugMarkerBeginEXT vkCmdDebugMarkerBegin;
 
 void VKCommandBuffer::PushDebugGroup(const char* groupLabel)
 {
-    /*extern PFN_vkCmdDebugMarkerBeginEXT vkCmdDebugMarkerBeginEXT;
-    if (!vkCmdDebugMarkerBeginEXT || !VKDEVICE()->SupportDebugGroup())
+    if (! vkCmdDebugMarkerBegin|| !VKDEVICE()->SupportDebugGroup())
     {
         return;
     }
@@ -415,23 +415,25 @@ void VKCommandBuffer::PushDebugGroup(const char* groupLabel)
     }
     makeInfo.pMarkerName = groupLabel;
     
-    vkCmdDebugMarkerBeginEXT(GetNative(), &makeInfo);*/
+    vkCmdDebugMarkerBegin(GetNative(), &makeInfo);
 }
+
+extern PFN_vkCmdDebugMarkerEndEXT vkCmdDebugMarkerEnd;
 
 void VKCommandBuffer::PopDebugGroup()
 {
-    /*extern PFN_vkCmdDebugMarkerEndEXT vkCmdDebugMarkerEndEXT;
-    if (!vkCmdDebugMarkerEndEXT || !VKDEVICE()->SupportDebugGroup())
+    if (!vkCmdDebugMarkerEnd || !VKDEVICE()->SupportDebugGroup())
     {
         return;
     }
-    vkCmdDebugMarkerEndEXT(GetNative());*/
+    vkCmdDebugMarkerEnd(GetNative());
 }
+
+extern PFN_vkCmdDebugMarkerInsertEXT vkCmdDebugMarkerInsert;
 
 void VKCommandBuffer::InsertDebugMarker(const char* markerLabel)
 {
-    /*PFN_vkCmdDebugMarkerInsertEXT vkCmdDebugMarkerInsertEXT;
-    if (!vkCmdDebugMarkerInsertEXT || !VKDEVICE()->SupportDebugGroup())
+    if (!vkCmdDebugMarkerInsert || !VKDEVICE()->SupportDebugGroup())
     {
         return;
     }
@@ -445,7 +447,7 @@ void VKCommandBuffer::InsertDebugMarker(const char* markerLabel)
     makeInfo.color[3] = 1.0f;
     makeInfo.pMarkerName = markerLabel;
     
-    vkCmdDebugMarkerInsertEXT(GetNative(), &makeInfo);*/
+    vkCmdDebugMarkerInsert(GetNative(), &makeInfo);
 }
 
 void VKCommandBuffer::Draw(std::uint32_t vertexCount, std::uint32_t instanceCount,
@@ -834,9 +836,9 @@ bool VKCommandBuffer::BakeCmdBufferAsync(VkCommandBuffer vkCmdBuffer)
         static uint32_t sFrameCount = 0;
         /*snprintf(debugGroudTag, sizeof(debugGroudTag), "%p-%u", vkCommandBuffer_, pCommandList_->GetCmdCount());*/
 #endif
-        PushDebugGroup(debugGroudTag);
+        //PushDebugGroup(debugGroudTag);
         SubmitCommandList();
-        PopDebugGroup();
+        //PopDebugGroup();
     }
     
     ForceEndRenderPass();

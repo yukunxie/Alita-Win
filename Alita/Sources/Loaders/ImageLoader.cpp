@@ -11,12 +11,70 @@
 
 NS_RX_BEGIN
 
+uint32 GetMipMapLevels(uint32 n)
+{
+    uint32 level = 0;
+    for (; n != 0; level++, n = n >> 1);
+    return level;
+}
+
+std::vector<std::vector<uint8>> GenerateMipMap(uint32 width, uint32 height, const uint8* pixels, uint32 channelNum)
+{
+    RHI_ASSERT(width == height && width > 1);
+    // Pow of two
+    RHI_ASSERT((width & (width - 1)) == 0);
+
+    std::vector<std::vector<uint8>> mipmaps;
+
+    uint32 pixelSize = channelNum;
+    std::vector<uint8> mipmap0(width * height * pixelSize);
+    memcpy(mipmap0.data(), pixels, width * height * pixelSize);
+    mipmaps.push_back(std::move(mipmap0));
+
+    for (width = width >> 1, height = height >> 1; width > 0 && height > 0; width = width >> 1, height = height >> 1)
+    {
+        uint32 lwh = width << 1;
+        uint32 lBytesPerRow = lwh * pixelSize;
+        uint32 bytesPerRow = width * pixelSize;
+
+        std::vector<uint8> mipmap(width * height * pixelSize);
+        //auto mipmap = std::make_shared<uint8>(new uint8[width * height * pixelSize]);
+        const uint8* pData = mipmaps.back().data();
+
+        for (uint32 h = 0; h < height; h++)
+        {
+            for (uint32 w = 0; w < width; w++)
+            {
+                uint32 rgba[4] = { 0, 0, 0, 0 };
+                const uint8* ph0 = pData + (2 * h * lBytesPerRow + 2 * w * pixelSize);
+                const uint8* ph1 = pData + ((2 * h + 1) * lBytesPerRow + 2 *  w * pixelSize);
+                for (uint32 c = 0; c < pixelSize; ++c)
+                {
+                    rgba[c] += ph0[c];
+                    rgba[c] += ph0[c + pixelSize];
+                    rgba[c] += ph1[c + pixelSize];
+                    rgba[c] += ph1[c + pixelSize];
+
+                    // average
+                    rgba[c] /= 4;
+
+                    uint8* buffer = mipmap.data();
+                    buffer[h * bytesPerRow + w * pixelSize + c] = rgba[c];
+                }
+            }
+        }
+        mipmaps.push_back(std::move(mipmap));
+    }
+    return std::move(mipmaps);
+}
+
 namespace ImageLoader
 {
     static const std::vector<std::string> sImageExts = { ".jpg", ".png", ".tag", ".bmp", };
 
     struct ImageData
     {
+        std::string debugName;
         RHI::TextureFormat format;
         uint32 baseWidth;
         uint32 baseHeight;
@@ -53,6 +111,7 @@ namespace ImageLoader
             descriptor.arrayLayerCount = 1;
             descriptor.mipLevelCount = imageData.numLevels;
             descriptor.dimension = RHI::TextureDimension::TEXTURE_2D;
+            descriptor.debugName = imageData.debugName;
         };
         auto texture = Engine::GetGPUDevice()->CreateTexture(descriptor);
 
@@ -102,18 +161,19 @@ namespace ImageLoader
         return texture;
     }
 
-    RHI::Texture* LoadTextureFromData(uint32 texWidth, uint32 texHeight, uint32 texChannels, const std::uint8_t* pixels, std::uint32_t byteLength)
+    RHI::Texture* LoadTextureFromData(uint32 texWidth, uint32 texHeight, uint32 texChannels, const std::uint8_t* pixels, std::uint32_t byteLength, const std::string& debugName)
     {
         ImageData imageData;
         {
+            imageData.debugName = debugName;
             imageData.baseWidth = texWidth;
             imageData.baseHeight = texHeight;
             imageData.byteLength = texWidth * texHeight * 4;
             imageData.format = RHI::TextureFormat::RGBA8UNORM;
             imageData.numFaces = 1;
-            imageData.numLevels = 1;
+            imageData.numLevels = GetMipMapLevels(texWidth);
         }
-        imageData.SetOffset(0, 0, 0, 0);
+        //imageData.SetOffset(0, 0, 0, 0);
         std::vector<uint8> bytes;
 
         std::vector<uint8> tmpData;
@@ -138,27 +198,42 @@ namespace ImageLoader
             pData = pixels;
         }
 
-        imageData.bytes = pData;
-        imageData.byteLength = imageData.byteLength;
+        std::vector<uint8> buffer;
+        buffer.reserve(texWidth * texHeight * texChannels * 2);
+        texChannels = 4;
+        auto mipmaps = GenerateMipMap(texWidth, texHeight, pData, texChannels);
+        for (uint32 level = 0; level < mipmaps.size(); ++level)
+        {
+            auto w = texWidth >> level;
+            auto h = texHeight >> level;
+            auto size = w * h * texChannels;
+            auto offset = buffer.size();
+            buffer.resize(buffer.size() + size);
+            memcpy(buffer.data() + offset, mipmaps[level].data(), size);
+            imageData.SetOffset(0, 0, level, offset);
+        }
+
+        imageData.bytes = buffer.data();
+        imageData.byteLength = buffer.size();
 
         auto texture = CreateCubeTexture(imageData);
 
         return texture;
     }
 
-    RHI::Texture* LoadTextureFromData(const std::uint8_t* data, std::uint32_t byteLength)
+    RHI::Texture* LoadTextureFromData(const std::uint8_t* data, std::uint32_t byteLength, const std::string& fileName)
     {
         int texWidth, texHeight, texChannels;
         stbi_uc* pixels = stbi_load_from_memory(data, byteLength, &texWidth, &texHeight, &texChannels, STBI_default);
         RHI_ASSERT(pixels != nullptr);
 
-        auto texture = LoadTextureFromData(texWidth, texHeight, texChannels, pixels, texWidth * texHeight * texChannels);
+        auto texture = LoadTextureFromData(texWidth, texHeight, texChannels, pixels, texWidth * texHeight * texChannels, fileName);
         STBI_FREE(pixels);
 
         return texture;
     }
 
-    RHI::Texture* LoadTextureFromKtxFormat(const void* bytes, uint32 size)
+    RHI::Texture* LoadTextureFromKtxFormat(const void* bytes, uint32 size, const std::string& fileName = "")
     {
         ktxTexture* ktxTexture;
         KTX_error_code result = ktxTexture_CreateFromMemory((ktx_uint8_t*)bytes, size, KTX_TEXTURE_CREATE_LOAD_IMAGE_DATA_BIT, &ktxTexture);
@@ -169,6 +244,7 @@ namespace ImageLoader
         RHI_ASSERT(ktxTexture->glFormat == 6408);
         ImageData imageData;
         {
+            imageData.debugName = fileName;
             imageData.format = RHI::TextureFormat::RGBA8UNORM;
             imageData.baseWidth = ktxTexture->baseWidth;
             imageData.baseHeight = ktxTexture->baseHeight;
@@ -203,10 +279,10 @@ namespace ImageLoader
         const TData& imageData = FileSystem::GetInstance()->GetBinaryData(filename.c_str());
         
         if (filename.substr(filename.find_last_of(".") + 1) == "ktx") {
-            return LoadTextureFromKtxFormat(imageData.data(), imageData.size());
+            return LoadTextureFromKtxFormat(imageData.data(), imageData.size(), filename);
         }
         else {
-            return LoadTextureFromData(imageData.data(), imageData.size());
+            return LoadTextureFromData(imageData.data(), imageData.size(), filename);
         }
     }
 
@@ -229,6 +305,7 @@ namespace ImageLoader
 
         ImageData imageData;
         {
+            imageData.debugName = cubeTextureName;
             imageData.format = RHI::TextureFormat::RGBA8UNORM;
             imageData.numFaces = kFaceNum;
             imageData.numLevels = 1;
@@ -259,24 +336,38 @@ namespace ImageLoader
                     pCurrent += 4;
                 }
             }
-            uint32 offset = bytes.size();
-            imageData.SetOffset(0, face, 0, offset);
+            /*uint32 offset = bytes.size();
+            imageData.SetOffset(0, face, 0, offset);*/
             uint32 length = texWidth * texHeight * 4;
             if (face == 0)
             {
                 imageData.baseWidth = texWidth;
                 imageData.baseHeight = texHeight;
-                imageData.byteLength = texWidth * texHeight * 4 * kFaceNum;
-                bytes.reserve(imageData.byteLength);
+                //imageData.byteLength = texWidth * texHeight * 4 * kFaceNum;
+                bytes.reserve(texWidth * texHeight * 4 * kFaceNum * 2);
             }
             RHI_ASSERT(imageData.baseWidth == texWidth);
             RHI_ASSERT(imageData.baseHeight == texHeight);
 
-            bytes.resize(offset + length);
-            memcpy(bytes.data() + offset, pData, length);
+            auto mipmaps = GenerateMipMap(texWidth, texHeight, pData, texChannels);
+            for (uint32 level = 0; level < mipmaps.size(); ++level)
+            {
+                auto w = texWidth >> level;
+                auto h = texHeight >> level;
+                auto size = w * h * texChannels;
+                auto offset = bytes.size();
+                bytes.resize(bytes.size() + size);
+                memcpy(bytes.data() + offset, mipmaps[level].data(), size);
+                imageData.SetOffset(0, face, level, offset);
+            }
+
+
+            //bytes.resize(offset + length);
+            //memcpy(bytes.data() + offset, pData, length);
 
             STBI_FREE(pixels);
         }
+        imageData.numLevels = GetMipMapLevels(imageData.baseWidth);
         imageData.bytes = bytes.data();
         imageData.byteLength = bytes.size();
 

@@ -25,7 +25,9 @@ layout(location = 2) in vec2 _UV0;
 #endif
 
 #if USE_NORMAL_MAP && USE_TANGENT && USE_BITANGENT
-layout(location = 3) in mat3 _TBN;
+// layout(location = 3) in mat3 _TBN;
+layout(location = 3) in vec3 _T;
+//layout(location = 4) in vec3 _B;
 #endif
 
 layout(binding = 11) uniform texture2D   tAlbedo;
@@ -88,6 +90,18 @@ void TShading() {
     OutColor = vec4(diffuse.xyz + uShading.emissiveFactor.xyz , 1.0);
 }
 
+#if USE_NORMAL_MAP && USE_TANGENT
+vec3 calculateNormal()
+{
+    vec3 tangentNormal = texture(sampler2D(tNormalMap, sNormalMap), _UV0).xyz * 2.0 - vec3(1.0);
+    vec3 N = normalize(_WorldNormal);
+    vec3 T = normalize(_T.xyz);
+    vec3 B = normalize(cross(N, T));
+    mat3 TBN = mat3(vec3(T), vec3(B), vec3(N));
+    return normalize(TBN * tangentNormal);
+}
+#endif
+
 void TGBufferGen() {
     vec4 diffuse = uShading.baseColorFactor;
 #if USE_UV0
@@ -96,14 +110,20 @@ void TGBufferGen() {
 
     vec3 normal = vec3(0);
 
-#if USE_NORMAL_MAP && USE_TANGENT && USE_BITANGENT
-    vec3 _normal = normalize(texture(sampler2D(tNormalMap, sNormalMap), _UV0).xyz);
-    _normal = _normal * 2.0 - 1.0;
-    normal = normalize(_TBN * _normal); 
+#if USE_NORMAL_MAP && USE_TANGENT
+    normal = calculateNormal();
+    // vec3 _normal = normalize(texture(sampler2D(tNormalMap, sNormalMap), _UV0).xyz);
+    // _normal = _normal * 2.0 - 1.0;
+
+    // vec3 N = normalize(_WorldNormal);
+    // vec3 T = normalize(_T - dot(N, _T) * _WorldNormal);//对T进行修正，因为T与B和N可能不垂直
+    // vec3 B = cross(N,T);
+    // mat3 TBN= mat3(T,B,N);
+    // normal = normalize(TBN*_normal);   //转换到物体空间
 #elif USE_NORMAL
     normal = normalize(_WorldNormal);
 #endif
-    normal = normalize(_WorldNormal);
+    // normal = normalize(_WorldNormal);
 
 // #if USE_OCCLUSION_MAP
 //     diffuse.xyz += texture(sampler2D(tOcclusionMap, sOcclusionMap), _UV0).xyz * 0.0;

@@ -521,6 +521,7 @@ struct TextureDescriptor : public ObjectDescriptorBase
     TextureDimension dimension = TextureDimension::TEXTURE_2D;
     TextureFormat format;
     TextureUsageFlags usage;
+    std::string  debugName;
 };
 enum TextureViewDimension
 {

@@ -150,17 +150,17 @@ void VKCommandEncoder::ResolveQuerySet(
 
 void VKCommandEncoder::PushDebugGroup(const std::string &groupLabel)
 {
-    commandBuffer_->PushDebugGroup(groupLabel.c_str());
+    commandBuffer_->RecordCommand<DeferredCmdPushDebugGroup>(groupLabel);
 }
 
 void VKCommandEncoder::PopDebugGroup()
 {
-    commandBuffer_->PopDebugGroup();
+    commandBuffer_->RecordCommand<DeferredCmdPopDebugGroup>();
 }
 
 void VKCommandEncoder::InsertDebugMarker(const std::string &markerLabel)
 {
-    commandBuffer_->InsertDebugMarker(markerLabel.c_str());
+    commandBuffer_->RecordCommand<DeferredCmdInsertDebugMarker>(markerLabel);
 }
 
 NS_RHI_END

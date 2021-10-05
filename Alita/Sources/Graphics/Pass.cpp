@@ -17,6 +17,8 @@ void Pass::BeginPass()
 {
 	CommandEncoder_ = Engine::GetRenderScene()->GetGraphicPipeline()->GetCommandEncoder();
 
+	CommandEncoder_->PushDebugGroup(PassName_);
+
 	std::sort(attachments_.begin(), attachments_.end(), [](const AttachmentConfig& a, const AttachmentConfig& b) {return a.Slot < b.Slot; });
 
 	RHI::RenderPassDescriptor renderPassDescriptor;
@@ -65,6 +67,8 @@ void Pass::EndPass()
 	RHI_ASSERT(RenderPassEncoder_);
 	RenderPassEncoder_->EndPass();
 	RenderPassEncoder_ = nullptr;
+
+	CommandEncoder_->PopDebugGroup();
 }
 
 void IgniterPass::Execute(const std::vector<RenderObject*>& renderObjects)
@@ -73,6 +77,8 @@ void IgniterPass::Execute(const std::vector<RenderObject*>& renderObjects)
 
 ShadowMapGenPass::ShadowMapGenPass()
 {
+	PassName_ = "ShadowMapGenPass";
+
 	dsTexture_ = std::make_shared<RenderTarget>(shadowMapSize_.width, shadowMapSize_.height, RHI::TextureFormat::DEPTH24PLUS_STENCIL8);
 }
 
@@ -94,12 +100,14 @@ void ShadowMapGenPass::Execute(const std::vector<RenderObject*>& renderObjects)
 
 GBufferPass::GBufferPass()
 {
+	PassName_ = "GBufferPass";
+
 	const RHI::Extent2D extent = { 1280, 800 };
-	GBuffers_.GDiffuse = std::make_shared<RenderTarget>(extent.width, extent.height, RHI::TextureFormat::RGBA16FLOAT);
-	GBuffers_.GEmissive = std::make_shared<RenderTarget>(extent.width, extent.height, RHI::TextureFormat::RGBA16FLOAT);
-	GBuffers_.GNormal = std::make_shared<RenderTarget>(extent.width, extent.height, RHI::TextureFormat::RGBA16FLOAT);
-	GBuffers_.GPosition = std::make_shared<RenderTarget>(extent.width, extent.height, RHI::TextureFormat::RGBA32FLOAT);
-	GBuffers_.GMaterial = std::make_shared<RenderTarget>(extent.width, extent.height, RHI::TextureFormat::RGBA16FLOAT);
+	GBuffers_.GDiffuse = std::make_shared<RenderTarget>(extent.width, extent.height, RHI::TextureFormat::RGBA16FLOAT, "GDiffuse");
+	GBuffers_.GEmissive = std::make_shared<RenderTarget>(extent.width, extent.height, RHI::TextureFormat::RGBA16FLOAT, "GEmissive");
+	GBuffers_.GNormal = std::make_shared<RenderTarget>(extent.width, extent.height, RHI::TextureFormat::RGBA16FLOAT, "GNormal");
+	GBuffers_.GPosition = std::make_shared<RenderTarget>(extent.width, extent.height, RHI::TextureFormat::RGBA32FLOAT, "GPosition");
+	GBuffers_.GMaterial = std::make_shared<RenderTarget>(extent.width, extent.height, RHI::TextureFormat::RGBA16FLOAT, "GMaterial");
 	dsTexture_ = std::make_shared<RenderTarget>(extent.width, extent.height, RHI::TextureFormat::DEPTH24PLUS_STENCIL8);
 }
 
@@ -132,6 +140,8 @@ void GBufferPass::Execute(const std::vector<RenderObject*>& renderObjects)
 
 OpaquePass::OpaquePass()
 {
+	PassName_ = "OpaquePass";
+
 	rtColor_ = std::make_shared<RenderTarget>(RHI::TextureFormat::RGBA16FLOAT);
 	rtDepthStencil_ = std::make_shared<RenderTarget>(RHI::TextureFormat::DEPTH24PLUS_STENCIL8);
 }
@@ -157,6 +167,8 @@ void OpaquePass::Execute(const std::vector<RenderObject*>& renderObjects)
 
 SkyBoxPass::SkyBoxPass()
 {
+	PassName_ = "SkyBoxPass";
+
 	rtColor_ = std::make_shared<RenderTarget>(RHI::TextureFormat::RGBA16FLOAT);
 	rtDepthStencil_ = std::make_shared<RenderTarget>(RHI::TextureFormat::DEPTH24PLUS_STENCIL8);
 }
@@ -264,6 +276,8 @@ void FullScreenPass::Execute()
 DeferredPass::DeferredPass()
 	: FullScreenPass("Materials/DeferredLighting.json", ETechniqueType::TShading)
 {
+	PassName_ = "DeferredLightingPass";
+
 	rtColor_ = std::make_shared<RenderTarget>(RHI::TextureFormat::RGBA16FLOAT);
 }
 
@@ -291,6 +305,8 @@ void DeferredPass::Execute(const std::vector<RenderObject*>& renderObjects)
 
 void ScreenResolvePass::Execute()
 {
+	PassName_ = "ScreenResolvePass";
+
 	RTSwapChain_->Reset();
 	SetupOutputAttachment(0, RTSwapChain_);
 
@@ -302,6 +318,7 @@ void ScreenResolvePass::Execute()
 DownSamplePass::DownSamplePass()
 	:FullScreenPass("Materials/DownSample.json", ETechniqueType::TShading)
 {
+	PassName_ = "DownSamplePass";
 	RTColor_ = std::make_shared<RenderTarget>();
 }
 
@@ -327,6 +344,8 @@ void DownSamplePass::Execute()
 BloomBrightPass::BloomBrightPass()
 	: FullScreenPass("Materials/Bloom-Bright.json", ETechniqueType::TShading)
 {
+	PassName_ = "BloomBrightPass";
+
 	RTColor_ = std::make_shared<RenderTarget>();
 }
 
@@ -351,6 +370,8 @@ GaussianBlur::GaussianBlur()
 	: FullScreenPass("Materials/GaussianBlur.json", ETechniqueType::TShading)
 	, VerticalGuassianBlurPass_(new GaussianBlur(true))
 {
+	PassName_ = "GaussianBlur-X";
+
 	RTColor_ = std::make_shared<RenderTarget>();
 	Param = TVector4(1.0f, 0, 1.0f, 0);
 
@@ -360,6 +381,7 @@ GaussianBlur::GaussianBlur()
 GaussianBlur::GaussianBlur(bool isVertical)
 	: FullScreenPass("Materials/GaussianBlur.json", ETechniqueType::TShading)
 {
+	PassName_ = "GaussianBlur-Y";
 	RTColor_ = std::make_shared<RenderTarget>();
 	Param = TVector4(0, 1.0f, 1.0f, 0);
 }

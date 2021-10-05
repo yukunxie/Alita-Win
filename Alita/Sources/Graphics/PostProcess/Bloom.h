@@ -20,6 +20,7 @@ public:
     BloomPass()
         : FullScreenPass("Materials/Bloom.json", ETechniqueType::TShading)
     {
+        PassName_ = "BloomPass";
         RTColor_ = std::make_shared<RenderTarget>();
     }
 

@@ -266,6 +266,8 @@ PerspectiveCamera::PerspectiveCamera(float fov, float aspect, float nearPlane, f
 
 void PerspectiveCamera::OnWindowResized(uint32 width, uint32 height)
 {
+	if (width == 0 || height == 0)
+		return;
 	projMatrix_ = glm::perspective(glm::radians(fov_), float(width)/float(height), nearPlane_, farPlane_);
 	projMatrix_[1][1] *= -1;
 }

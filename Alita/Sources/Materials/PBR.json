@@ -80,9 +80,9 @@
         "magFilter":    "point",
         "minFilter":    "point",
         "mipmapFilter": "point",
-        "addressModeU": "clamp",
-        "addressModeV": "clamp",
-        "addressModeW": "clamp"
+        "addressModeU": "repeat",
+        "addressModeV": "repeat",
+        "addressModeW": "repeat"
       },
       "preprocessor": "USE_NORMAL_MAP"
     },
@@ -95,9 +95,9 @@
         "magFilter":    "point",
         "minFilter":    "point",
         "mipmapFilter": "point",
-        "addressModeU": "clamp",
-        "addressModeV": "clamp",
-        "addressModeW": "clamp"
+        "addressModeU": "repeat",
+        "addressModeV": "repeat",
+        "addressModeW": "repeat"
       },
       "preprocessor": "USE_OCCLUSION_MAP"
     },

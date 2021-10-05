@@ -13,15 +13,17 @@
 
 NS_RX_BEGIN
 
-RenderTarget::RenderTarget(RHI::TextureFormat format)
+RenderTarget::RenderTarget(RHI::TextureFormat format, const std::string& debugName)
     : Format_(format)
+    , Name_(debugName)
 {
 }
 
-RenderTarget::RenderTarget(uint32 width, uint32 height, RHI::TextureFormat format)
+RenderTarget::RenderTarget(uint32 width, uint32 height, RHI::TextureFormat format, const std::string& debugName)
     : TargetWidth_(width)
     , TargetHeight_(height)
     , Format_(format)
+    , Name_(debugName)
 {
 
 }
@@ -81,6 +83,7 @@ void RenderTarget::TryCreateTextureView() const
     descriptor.arrayLayerCount = 1;
     descriptor.mipLevelCount = 1;
     descriptor.dimension = RHI::TextureDimension::TEXTURE_2D;
+    descriptor.debugName = Name_;
     TextureView_ = Engine::GetGPUDevice()->CreateTexture(descriptor)->CreateView({});
     RHI_SAFE_RETAIN(TextureView_);
 }

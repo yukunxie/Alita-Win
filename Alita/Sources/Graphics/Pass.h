@@ -74,6 +74,7 @@ public:
     virtual void Execute(const std::vector<RenderObject*>& renderObjects) = 0;
 
 protected:
+    std::string PassName_ = "GiveAPassName:(";
     RHI::RenderPassEncoder* RenderPassEncoder_ = nullptr;
     RHI::CommandEncoder* CommandEncoder_ = nullptr;
     std::vector<AttachmentConfig> attachments_;
