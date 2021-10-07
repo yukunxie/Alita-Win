@@ -4,6 +4,7 @@
 #include "Graphics/Pass.h"
 #include "Types/Types.h"
 #include "PostProcess/Bloom.h"
+#include "PostProcess/ToneMapping.h"
 
 #include "RHI/RHI.h"
 
@@ -48,6 +49,7 @@ private:
 	DeferredPass DeferredPass_;
 	ScreenResolvePass ScreenResolvePass_;
 	BloomPass DownSamplePass_;
+	ToneMapping ToneMappingPass_;
 	TExtent2D  WindowSize_;
 
 	// RHI

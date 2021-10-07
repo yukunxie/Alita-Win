@@ -82,10 +82,16 @@ void GraphicPipeline::Execute(const std::vector<RenderObject*>& renderObjects)
 		DownSamplePass_.Setup(&SkyBoxPass_);
 		DownSamplePass_.Execute();
 	}*/
+
+	{
+		ToneMappingPass_.Reset();
+		ToneMappingPass_.Setup(&DeferredPass_);
+		ToneMappingPass_.Execute();
+	}
 	
 	{
 		ScreenResolvePass_.Reset();
-		ScreenResolvePass_.Setup(&DeferredPass_);
+		ScreenResolvePass_.Setup(&ToneMappingPass_);
 		//ScreenResolvePass_.Setup(&DownSamplePass_);
 		ScreenResolvePass_.Execute();
 	}

@@ -441,11 +441,17 @@ bool Material::SetTexture(const std::string& name, const RHI::Texture* texture)
     {
         rhiPSOMap_.clear();
     }
-    RHI_SAFE_RELEASE(param.bindingObject->Texture.texture);
+    //RHI_SAFE_RELEASE(param.bindingObject->Texture.texture);
     param.bindingObject->Texture.texture = texture;
-    RHI_SAFE_RETAIN(param.bindingObject->Texture.texture);
+    //RHI_SAFE_RETAIN(param.bindingObject->Texture.texture);
     bBindingDirty_ = true;
     return true;
+}
+
+bool Material::SetTexture(const std::string& name, std::shared_ptr<Texture>& texture)
+{
+    BindingResources_[name] = texture;
+    return SetTexture(name, texture->GetTexture());
 }
 
 void Material::ApplyModifyToBindGroup(RHI::RenderPassEncoder& passEndcoder)
@@ -653,18 +659,29 @@ void Material::ParseBindGroupLayout(const rapidjson::Document& doc)
             bindingObject->type = MaterailBindingObjectType::TEXTURE2D;
             bindingObject->name = name;
             bindingObject->binding = binding;
+            bindingObject->Texture.texture = nullptr;
             if (cfg.HasMember("cubeName"))
             {
                 std::string cubeName = cfg["cubeName"].GetString();
-                bindingObject->Texture.texture = cubeName.empty() ? nullptr : ImageLoader::LoadCubeTexture(cubeName);
+                if (!cubeName.empty())
+                {
+                    auto texture = Texture::LoadCubeTexture(cubeName);
+                    bindingObject->Texture.texture = texture->GetTexture();
+                    BindingResources_[name] = texture;
+                }
             }
             else if (cfg.HasMember("uri") && cfg["uri"].IsString() && cfg["uri"].GetStringLength())
             {
                 std::string uri = cfg["uri"].GetString();
-                bindingObject->Texture.texture = uri.empty() ? nullptr : ImageLoader::LoadTextureFromUri(uri);
+                if (!uri.empty())
+                {
+                    auto texture = Texture::LoadTextureFromUri(uri);
+                    bindingObject->Texture.texture = texture->GetTexture();
+                    BindingResources_[name] = texture;
+                }
             }
             
-            RHI_SAFE_RETAIN(bindingObject->Texture.texture);
+            //RHI_SAFE_RETAIN(bindingObject->Texture.texture);
 
             MaterialParameter param;
             param.name = bindingObject->name;

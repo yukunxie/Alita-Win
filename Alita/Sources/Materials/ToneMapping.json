@@ -1,9 +1,9 @@
 {
-  "name": "Bloom-BrightPass",
+  "name": "ToneMappaing",
   "indexFormat": "uint32",
   "code": {
     "vs": "Shaders/ScreenQuad.vert.gl",
-    "fs": "Shaders/Bloom.frag.gl"
+    "fs": "Shaders/ToneMapping.frag.gl"
   },
   "defines": [],
   "techniques": {
@@ -30,12 +30,6 @@
     {
       "name": "tAlbedo",
       "binding": 11,
-      "type": "Texture2D",
-      "uri": ""
-    },
-    {
-      "name": "tBloomMap",
-      "binding": 13,
       "type": "Texture2D",
       "uri": ""
     }

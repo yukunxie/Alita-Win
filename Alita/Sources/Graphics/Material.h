@@ -11,7 +11,7 @@
 #include "RHI/RHI.h"
 #include "Pass.h"
 #include "Backend/Vulkan/ShaderHelper.h"
-//#include "Meshes/VertexBuffer.h"
+#include "Graphics/Texture.h"
 
 #define RAPIDJSON_ASSERT(x) Assert(x, "")
 
@@ -267,6 +267,8 @@ public:
 
 	bool SetTexture(const std::string& name, const RHI::Texture* texture);
 
+	bool SetTexture(const std::string& name, std::shared_ptr<Texture>& texture);
+
 	void Apply(const Pass* pass, ETechniqueType technique, ERenderSet renderSet, RHI::RenderPassEncoder& passEndcoder);
 
 	const std::vector<InputAttribute>& GetInputAttributes() const
@@ -320,6 +322,8 @@ protected:
 
 	std::array<TechniqueShaderEntry, (int)ETechniqueType::TMaxCount> TechniqueShaderEntries_;
 	std::unordered_map< PSOKey, RHI::RenderPipeline*> rhiPSOMap_;
+
+	std::map<std::string, std::shared_ptr<Resource>> BindingResources_;
 
 	bool bBindingDirty_ = true;
 };

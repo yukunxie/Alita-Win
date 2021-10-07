@@ -22,7 +22,7 @@ void ToneMapping::Execute()
 {
 	auto extent = InputPass_->GetColorAttachments()[0].RenderTarget->GetExtent();
 	auto format = InputPass_->GetColorAttachments()[0].RenderTarget->GetFormat();
-	RTColor_->ResizeTarget(extent.width, extent.height, format);
+	RTColor_->ResizeTarget(extent.width, extent.height);
 
 	SetupOutputAttachment(0, RTColor_);
 

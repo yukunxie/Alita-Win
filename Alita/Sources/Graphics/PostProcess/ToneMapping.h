@@ -20,7 +20,8 @@ public:
     ToneMapping()
         : FullScreenPass("Materials/ToneMapping.json", ETechniqueType::TShading)
     {
-        RTColor_ = std::make_shared<RenderTarget>();
+        PassName_ = "ToneMappingPass";
+        RTColor_ = std::make_shared<RenderTarget>("ToneMapping");
     }
 
     void Setup(const Pass* inputPass);

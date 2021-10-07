@@ -1,6 +1,8 @@
 
 // global namespace, rx for RealXie
 
+#pragma once
+
 #ifdef ANDROID
 #include <android/log.h>
 #endif

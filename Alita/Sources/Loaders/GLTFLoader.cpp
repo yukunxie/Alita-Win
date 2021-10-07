@@ -2,6 +2,7 @@
 #include "ImageLoader.h"
 #include "World/MeshComponent.h"
 #include "Graphics/Material.h"
+#include "Graphics/Texture.h"
 #include <glm/gtx/matrix_decompose.hpp>
 
 #define TINYGLTF_IMPLEMENTATION
@@ -32,7 +33,7 @@ namespace GLTFLoader
 		return InputAttributeFormat::FLOAT;
 	}
 
-	RHI::Texture* _LoadTexture(const tinygltf::Image& tImage)
+	std::shared_ptr<Texture> _LoadTexture(const tinygltf::Image& tImage)
 	{
 		auto width = tImage.width;
 		auto height = tImage.height;
@@ -40,11 +41,11 @@ namespace GLTFLoader
 
 		Assert(tImage.pixel_type == TINYGLTF_COMPONENT_TYPE_UNSIGNED_BYTE, "");
 
-		return ImageLoader::LoadTextureFromData(width, height, component, tImage.image.data(), tImage.image.size());
+		return Texture::LoadTextureFromData(width, height, component, tImage.image.data(), tImage.image.size());
 	}
 
 	template<typename _TextureInfo>
-	RHI::Texture* _LoadTexture(const tinygltf::Model& tModel, const _TextureInfo& info)
+	std::shared_ptr<Texture> _LoadTexture(const tinygltf::Model& tModel, const _TextureInfo& info)
 	{
 		if (info.index == -1)
 			return nullptr;
