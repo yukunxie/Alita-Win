@@ -66,7 +66,11 @@ Camera::~Camera()
 
 void Camera::_UpdateViewMatrix()
 {
-	viewMatrix_ = _ComposeViewMatrix(transform_.Position(), transform_.Rotation());
+	if (isTransformDirty_)
+	{
+		viewMatrix_ = _ComposeViewMatrix(transform_.Position(), transform_.Rotation());
+	}
+	isTransformDirty_ = false;
 }
 
 TVector3 CalcFrontDirectionWithYawPitch(float yaw, float pitch)
@@ -111,10 +115,10 @@ void Camera::LookAt(const TVector3& from, const TVector3& center, const TVector3
 {
 	TVector3 front = glm::normalize(center - from);
 	TVector3 up = up_;
-	if (fabs(front.y) - 1 < 0.01)
-	{
-		up =  TVector3(0, 0.0f, -1);
-	}
+	//if (glm::dot(front, up) > 0.99f)
+	//{
+	//	up =  TVector3(0, 0, -1);
+	//}
 
 	viewMatrix_ = glm::lookAtRH(from, center, up);
 
@@ -136,9 +140,7 @@ void Camera::LookAt(const TVector3& from, const TVector3& center, const TVector3
 	SetPosition(from);
 	SetRotation(degrees);
 
-
-
-	//_UpdateViewMatrix();
+	isTransformDirty_ = false;
 }
 
 const float CAMERA_MOVE_SPEED = 15.0f;
@@ -149,7 +151,7 @@ void Camera::MoveForward(float speedScale)
 
 	auto posInViewSpace = glm::vec4(0, 0, -CAMERA_MOVE_SPEED * 0.01f * speedScale, 1);
 
-	transform_.Position() = glm::inverse(viewMatrix_) * posInViewSpace;
+	SetPosition( glm::inverse(viewMatrix_) * posInViewSpace);
 
 	_UpdateViewMatrix();
 }
@@ -160,7 +162,7 @@ void Camera::MoveUp(float speedScale)
 
 	auto posInViewSpace = glm::vec4(0, CAMERA_MOVE_SPEED * 0.01f * speedScale, 0, 1);
 
-	transform_.Position() = glm::inverse(viewMatrix_) * posInViewSpace;
+	SetPosition(glm::inverse(viewMatrix_) * posInViewSpace);
 
 	_UpdateViewMatrix();
 }
@@ -171,71 +173,59 @@ void Camera::MoveRight(float speedScale)
 
 	auto posInViewSpace = glm::vec4(CAMERA_MOVE_SPEED * 0.01f * speedScale, 0, 0, 1);
 
-	transform_.Position() = glm::inverse(viewMatrix_) * posInViewSpace;
+	SetPosition(glm::inverse(viewMatrix_) * posInViewSpace);
 
 	_UpdateViewMatrix();
 }
 
 void Camera::RotateAroundPoint(float x, float y)
 {
-	TVector3 center = { 0, 0, 0 };
+	glm::vec4 position(GetPosition(), 1);
+	glm::vec4 pivot(TVector3{ 0, 0, 0 }, 1);
+	float xAngle = x;
+	float yAngle = y;
+
 	TVector3 right = TVector3(glm::transpose(viewMatrix_)[0]);
 	TVector3 up = TVector3(glm::transpose(viewMatrix_)[1]);
-	TVector3 front = TVector3(glm::transpose(viewMatrix_)[2]);
+	TVector3 front = -TVector3(glm::transpose(viewMatrix_)[2]);
 
-	glm::mat3 basis(right, up, -front);
-	glm::mat3 rotX = glm::mat3(glm::rotate(x, up));
-	glm::mat3 rotY = glm::mat3(glm::rotate(y, right));
-	basis = basis * rotY * rotX;
 
-	front = -basis[2];
-	up = basis[1];
+	// Extra step to handle the problem when the camera direction is the same as the up vector
+	float cosAngle = glm::dot(front, up);
+	if (cosAngle * sgn(yAngle) > 0.99f)
+		yAngle = 0;
 
-	float distance = glm::length((GetPosition() - center));
+	// step 2: Rotate the camera around the pivot point on the first axis.
+	glm::mat4x4 rotationMatrixX(1.0f);
+	rotationMatrixX = glm::rotate(rotationMatrixX, xAngle, up);
+	position = (rotationMatrixX * (position - pivot)) + pivot;
 
-	TVector3 newPos = glm::normalize(front) * distance + center;
+	// step 3: Rotate the camera around the pivot point on the second axis.
+	glm::mat4x4 rotationMatrixY(1.0f);
+	rotationMatrixY = glm::rotate(rotationMatrixY, yAngle, right);
+	glm::vec3 finalPosition = (rotationMatrixY * (position - pivot)) + pivot;
 
-	//LOGI("%f, orginRotation = {%.03f, %.03f, %.03f}, newPos = {%.03f, %.03f, %.03f}", angle, GetRotation().x, GetRotation().y, GetRotation().z, newPos.x, newPos.y, newPos.z);
-
-	LookAt(newPos, center);
+	LookAt(finalPosition, pivot, up);
 }
 
 void Camera::RotateAroundAxis(float angle, const TVector3& axis)
 {
-	
+	// TODO
 }
 
 void Camera::YawPitch(float yaw, float pitch)
 {
-	auto rotation = GetRotation();
-	rotation.y += yaw;
-	rotation.x += pitch;
-	SetRotation(rotation);
+	TVector3 target = glm::rotate(TVector3{ 0, 0, -1 }, glm::radians(pitch), TVector3(1, 0, 0));
+	target = glm::rotate(target, glm::radians(yaw), TVector3(0, 1, 0));
+	target = glm::inverse(viewMatrix_)* TVector4(target, 1.0);
 
-	/*Yaw_ += yaw;
-
-	Front_ = CalcFrontDirectionWithYawPitch(Yaw_, Pitch_);
-	glm::vec3 right = glm::normalize(glm::cross(Front_, WorldUp_));
-
-	Up_ = glm::normalize(glm::cross(right, Front_));
-	LookAt(GetPosition(), GetPosition() + Front_, Up_);*/
+	auto direction = glm::normalize(target - GetPosition());
+	if (fabs(glm::dot(direction, TVector3(0, -1, 0))) > 0.99f)
+	{
+		return;
+	}
+	LookAt(GetPosition(), target);
 }
-
-//void Camera::Pitch(float pitch)
-//{
-//	Pitch_ += pitch;
-//
-//	if (Pitch_ > 89.0f)
-//		Pitch_ = 89.0f;
-//	if (Pitch_ < -89.0f)
-//		Pitch_ = -89.0f;
-//
-//	Front_ = CalcFrontDirectionWithYawPitch(Yaw_, Pitch_);
-//	glm::vec3 right = glm::normalize(glm::cross(Front_, WorldUp_));
-//
-//	Up_ = glm::normalize(glm::cross(right, Front_));
-//	LookAt(GetPosition(), GetPosition() + Front_, Up_);
-//}
 
 OrthoCamera::OrthoCamera(float left, float right, float bottom, float top, float zNear, float zFar)
 {
@@ -246,7 +236,7 @@ OrthoCamera::OrthoCamera(float left, float right, float bottom, float top, float
 
 void OrthoCamera::Tick(float dt)
 {
-	//_UpdateViewMatrix();
+	_UpdateViewMatrix();
 }
 
 Camera* Camera::CreatePerspectiveCamera(float fov, float aspect, float nearPlane, float farPlane)

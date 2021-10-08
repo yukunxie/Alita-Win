@@ -42,7 +42,7 @@ void EventSystem::_EventMouseHandler(float xpos, float ypos)
 	{
 		TVector2 diff = (TVector2{ xpos, ypos } - lastMousePosition_) * 0.1f;
 
-		Engine::GetWorld()->GetCamera()->YawPitch(-diff.x, diff.y);
+		Engine::GetWorld()->GetCamera()->YawPitch(diff.x, diff.y);
 	}
 
 	lastMousePosition_ = { xpos, ypos };
