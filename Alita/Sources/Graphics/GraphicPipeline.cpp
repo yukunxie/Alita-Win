@@ -6,6 +6,8 @@
 #include "Backend/Vulkan/VKSwapChain.h"
 #include "Backend/Vulkan/VKCommandBuffer.h"
 
+#include "PxPhysicsAPI.h"
+
 int g_test_released = false;
 
 NS_RX_BEGIN

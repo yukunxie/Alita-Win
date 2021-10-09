@@ -80,8 +80,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(ProjectDir)Sources;$(ProjectDir)Sources\RHI\;$(ProjectDir)Sources\RHI\Include;$(ProjectDir)Third-Party\OGLCompilersDLL;$(ProjectDir)Third-Party;$(ProjectDir)Third-Party\vulkan\Include;$(ProjectDir)Third-Party\ktx\include;$(ProjectDir)Third-Party\glfw\include;$(ProjectDir)Third-Party\ktx\other_include;$(ProjectDir)Third-Party\imgui;$(IncludePath)</IncludePath>
-    <LibraryPath>$(ProjectDir)Third-Party\vulkan\Lib\Win64;$(ProjectDir)Third-Party\glfw\Lib\Win64;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(ProjectDir)Sources;$(ProjectDir)Sources\RHI\;$(ProjectDir)Sources\RHI\Include;$(ProjectDir)Third-Party\OGLCompilersDLL;$(ProjectDir)Third-Party;$(ProjectDir)Third-Party\vulkan\Include;$(ProjectDir)Third-Party\ktx\include;$(ProjectDir)Third-Party\glfw\include;$(ProjectDir)Third-Party\ktx\other_include;$(ProjectDir)Third-Party\imgui;$(ProjectDir)Third-Party\PhysX/Include;$(ProjectDir)Third-Party\PhysX\pxshared\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(ProjectDir)Third-Party\vulkan\Lib\Win64;$(ProjectDir)Third-Party\glfw\Lib\Win64;$(ProjectDir)Third-Party\PhysX\Lib\debug;$(LibraryPath)</LibraryPath>
     <CustomBuildBeforeTargets>Run</CustomBuildBeforeTargets>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -188,6 +188,7 @@ echo "xxxxx"</Command>
     <ClCompile Include="Sources\Meshes\MeshBuilder.cpp" />
     <ClCompile Include="Sources\Meshes\SubMesh.cpp" />
     <ClCompile Include="Sources\Meshes\VertexBuffer.cpp" />
+    <ClCompile Include="Sources\Physics\Physics.cpp" />
     <ClCompile Include="Sources\Platform\Windows\Windows.cpp" />
     <ClCompile Include="Sources\RHI\Backend\Vulkan\CommandList.cpp" />
     <ClCompile Include="Sources\RHI\Backend\Vulkan\DeferredRenderCommands.cpp" />
@@ -323,6 +324,7 @@ echo "xxxxx"</Command>
     <ClInclude Include="Sources\Meshes\MeshBuilder.h" />
     <ClInclude Include="Sources\Meshes\SubMesh.h" />
     <ClInclude Include="Sources\Meshes\VertexBuffer.h" />
+    <ClInclude Include="Sources\Physics\Physics.h" />
     <ClInclude Include="Sources\Platform\Platform.h" />
     <ClInclude Include="Sources\Platform\Windows\Windows.h" />
     <ClInclude Include="Sources\RHI\Backend\Vulkan\CommandList.h" />

@@ -3,6 +3,7 @@
 #include "Base/FileSystem.h"
 #include "World/MeshComponent.h"
 #include "Graphics/RenderScene.h"
+#include "Physics/Physics.h"
 
 #include <math.h>
 
@@ -75,6 +76,13 @@ Terrain* Terrain::CreateFromHeightMap(const std::string& imgFilename, float minH
             }
         }
     }
+
+    Transform transform;
+    transform.Position() = TVector3{ 0, 0, 0 };
+    transform.Rotation() = TVector3{ 0, 0, 0 };
+    transform.Scale() = TVector3{ 1, 1, 1 };
+
+    Physics::GetInstance().AddPrimitive(transform, vertices, indices);
 
     MeshComponent* meshComp = new MeshComponent();
     meshComp->Geometry_ = new Geometry;

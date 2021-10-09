@@ -19,6 +19,30 @@
 #pragma comment(lib, "vulkan-1.lib")
 #pragma comment(lib, "VkLayer_utils.lib")
 
+// --- PhysX lib
+#pragma comment(lib, "LowLevelAABB_static_64.lib")
+#pragma comment(lib, "LowLevelDynamics_static_64.lib")
+#pragma comment(lib, "LowLevel_static_64.lib")
+#pragma comment(lib, "PhysXCharacterKinematic_static_64.lib")
+#pragma comment(lib, "PhysXCommon_64.lib")
+#pragma comment(lib, "PhysXCooking_64.lib")
+#pragma comment(lib, "PhysXExtensions_static_64.lib")
+#pragma comment(lib, "PhysXFoundation_64.lib")
+#pragma comment(lib, "PhysXPvdSDK_static_64.lib")
+#pragma comment(lib, "PhysXTask_static_64.lib")
+#pragma comment(lib, "PhysXVehicle_static_64.lib")
+#pragma comment(lib, "PhysX_64.lib")
+#pragma comment(lib, "SampleBase_static_64.lib")
+#pragma comment(lib, "SampleFramework_static_64.lib")
+#pragma comment(lib, "SamplePlatform_static_64.lib")
+#pragma comment(lib, "SampleRenderer_static_64.lib")
+#pragma comment(lib, "SamplesToolkit_static_64.lib")
+#pragma comment(lib, "Samples_64.lib")
+#pragma comment(lib, "SceneQuery_static_64.lib")
+#pragma comment(lib, "SimulationController_static_64.lib")
+#pragma comment(lib, "SnippetRender_static_64.lib")
+// --- PhysX lib end.
+
 #include <Windows.h>
 
 void mouse_callback(GLFWwindow* window, double xpos, double ypos)
