@@ -82,8 +82,6 @@ Terrain* Terrain::CreateFromHeightMap(const std::string& imgFilename, float minH
     transform.Rotation() = TVector3{ 0, 0, 0 };
     transform.Scale() = TVector3{ 1, 1, 1 };
 
-    Physics::GetInstance().AddPrimitive(transform, vertices, indices);
-
     MeshComponent* meshComp = new MeshComponent();
     meshComp->Geometry_ = new Geometry;
     meshComp->Material_ = new Material("Materials/PBR.json");
@@ -117,6 +115,7 @@ Terrain* Terrain::CreateFromHeightMap(const std::string& imgFilename, float minH
 
     auto terrain = new Terrain();
     terrain->AddComponment(meshComp);
+    Physics::GetInstance().AddPrimitive(meshComp, vertices, indices);
     return terrain;
 }
 

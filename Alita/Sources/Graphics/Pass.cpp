@@ -427,5 +427,83 @@ void GaussianBlur::Execute()
 }
 
 
+OutlineMarkPass::OutlineMarkPass()
+{
+	rtColor_ = std::make_shared<RenderTarget>(RHI::TextureFormat::RGBA8UNORM);
+	rtDepthStencil_ = std::make_shared<RenderTarget>(RHI::TextureFormat::DEPTH24PLUS_STENCIL8);
+}
+
+void OutlineMarkPass::ResizeTarget(uint32 width, uint32 height)
+{
+	rtColor_->ResizeTarget(width, height); 
+	rtDepthStencil_->ResizeTarget(width, height);
+}
+
+void OutlineMarkPass::Execute(const std::vector<RenderObject*>& renderObjects)
+{
+	SetupOutputAttachment(0, rtColor_, true);
+	SetupDepthStencilAttachemnt(rtDepthStencil_, true);
+
+	BeginPass();
+
+	for (auto ro : renderObjects)
+	{
+		if (ro->bSelected)
+		{
+			ro->Render(this, ETechniqueType::TOutline, ERenderSet::ERenderSet_Opaque, *RenderPassEncoder_);
+		}
+	}
+
+	EndPass();
+}
+
+OutlinePass::OutlinePass()
+	: FullScreenPass("Materials/Outline.json", ETechniqueType::TShading)
+{
+	rtColor_ = std::make_shared<RenderTarget>();
+}
+
+void OutlinePass::Setup(const Pass* inputPass)
+{
+	InputPass_ = inputPass;
+}
+
+void OutlinePass::Execute(const std::vector<RenderObject*>& renderObjects)
+{
+
+	auto extent = InputPass_->GetColorAttachments()[0].RenderTarget->GetExtent();
+	auto format = InputPass_->GetColorAttachments()[0].RenderTarget->GetFormat();
+
+	OutlineMarkPass_.Reset();
+	OutlineMarkPass_.ResizeTarget(extent.width, extent.height);
+	OutlineMarkPass_.Execute(renderObjects);
+
+	BlurPass_.Reset();
+	BlurPass_.Setup(&OutlineMarkPass_);
+	BlurPass_.Execute();
+
+	
+	rtColor_->ResizeTarget(extent.width, extent.height, format);
+
+	SetupOutputAttachment(0, rtColor_, true);
+
+	{
+		const auto* texture = InputPass_->GetColorAttachments()[0].RenderTarget->GetTexture();
+		SetTexture("tColorMap", texture);
+	}
+	
+	{
+		const auto* texture = OutlineMarkPass_.GetColorAttachments()[0].RenderTarget->GetTexture();
+		SetTexture("tMaskMap", texture);
+	}
+
+	{
+		const auto* texture = BlurPass_.GetColorAttachments()[0].RenderTarget->GetTexture();
+		SetTexture("tBlurMap", texture);
+	}
+
+	FullScreenPass::Execute();
+}
+
 
 NS_RX_END

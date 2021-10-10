@@ -6,10 +6,13 @@
 #include "Engine/Engine.h"
 #include "Loaders/ImageLoader.h"
 #include "RenderScene.h"
+#include "Utils/MD5/md5.h"
 
 #include <sstream>
 
 NS_RX_BEGIN
+
+std::map<std::string, std::vector<uint32>> gSprivShaderCache;
 
 static constexpr std::uint32_t _SimpleHash(const char* p, uint32 key = 31)
 {
@@ -255,14 +258,13 @@ RHI::Shader* Material::_CreateShader(const std::string& filename, RHI::ShaderTyp
         shaderText = shaderText.replace(npos, techEntryName.size(), "void main()");
     }
 
-    //strstr(shaderText.c_str())
+    std::string hash = md5::md5(" shadertype=" + std::to_string((uint32)shaderType) + "\n" + shaderText);
+    if (!gSprivShaderCache.contains(hash))
+    {
+        gSprivShaderCache[hash] = std::move(RHI::CompileGLSLToSPIRV(shaderText, shaderType));
+    }
 
-    const std::vector<uint32>& spirV = RHI::CompileGLSLToSPIRV(shaderText, shaderType);
-
-    //auto tmp = "E:\\Programs\\Alita-Win\\Alita\\x64\\Debug\\" + filename + ".spirv";
-    //auto fd = fopen(tmp.c_str(), "wb");
-    //fwrite(spirV.data(), sizeof(uint32), spirV.size(), fd);
-    //fclose(fd);
+    const std::vector<uint32>& spirV = gSprivShaderCache[hash];
     
     RHI::ShaderModuleDescriptor descriptor;
     {
@@ -304,6 +306,9 @@ Material::Material(const std::string& configFilename)
            break;
        case _SimpleHash("TSkyBox"):
            technique = ETechniqueType::TSkyBox;
+           break;
+       case _SimpleHash("TOutline"):
+           technique = ETechniqueType::TOutline;
            break;
        default:
            RHI_ASSERT(false);

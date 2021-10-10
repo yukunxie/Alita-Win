@@ -1,0 +1,25 @@
+
+layout(location = 0) in vec2 _UV0;
+
+layout(binding = 1) uniform Batch {
+    vec4 Param;
+} uBatch;
+
+layout(binding = 11) uniform texture2D   tColorMap;
+layout(binding = 12) uniform sampler     sColorMap;
+
+layout(binding = 13) uniform texture2D   tMaskMap;
+layout(binding = 14) uniform sampler     sMaskMap;
+
+layout(binding = 15) uniform texture2D   tBlurMap;
+layout(binding = 16) uniform sampler     sBlurMap;
+
+layout(location = 0) out vec4 OutColor;
+
+void TShading() {
+    vec4 color = texture(sampler2D(tColorMap, sColorMap), _UV0);
+    vec4 mask = texture(sampler2D(tMaskMap, sMaskMap), _UV0);
+    vec4 blur = texture(sampler2D(tBlurMap, sBlurMap), _UV0);
+    OutColor = color;
+    OutColor.rgb += max(blur.rgb - mask.rgb, vec3(0, 0, 0));
+}

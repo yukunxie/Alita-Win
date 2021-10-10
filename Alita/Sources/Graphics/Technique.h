@@ -11,12 +11,13 @@ NS_RX_BEGIN
 
 enum class ETechniqueType
 {
-    TShading    = 0 , 
-    TGBufferGen     ,
-    TShadowMapGen   ,
-    TSkyBox   ,
+    TShading        = 0 , 
+    TGBufferGen         ,
+    TShadowMapGen       ,
+    TOutline            ,
+    TSkyBox             ,
 
-    TMaxCount,
+    TMaxCount           ,
 };
 
 enum ERenderSet : std::uint64_t

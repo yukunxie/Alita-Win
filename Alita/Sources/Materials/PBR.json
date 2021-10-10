@@ -21,6 +21,11 @@
     {
       "vs_entry": "TShadowMapGen",
       "fs_entry": "TShadowMapGen"
+    },
+    "TOutline":
+    {
+      "vs_entry": "TShading",
+      "fs_entry": "TOutline"
     }
   },
   "bindings": [

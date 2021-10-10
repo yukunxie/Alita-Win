@@ -8,6 +8,7 @@
 #include "Base/Macros.h"
 #include "SceneComponent.h"
 #include "Camera.h"
+#include "Physics/Physics.h"
 
 NS_RX_BEGIN
 

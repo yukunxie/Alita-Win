@@ -66,11 +66,11 @@ Camera::~Camera()
 
 void Camera::_UpdateViewMatrix()
 {
-	if (isTransformDirty_)
+	if (IsTransformDirty_)
 	{
-		viewMatrix_ = _ComposeViewMatrix(transform_.Position(), transform_.Rotation());
+		viewMatrix_ = _ComposeViewMatrix(Transform_.Position(), Transform_.Rotation());
 	}
-	isTransformDirty_ = false;
+	IsTransformDirty_ = false;
 }
 
 TVector3 CalcFrontDirectionWithYawPitch(float yaw, float pitch)
@@ -140,7 +140,7 @@ void Camera::LookAt(const TVector3& from, const TVector3& center, const TVector3
 	SetPosition(from);
 	SetRotation(degrees);
 
-	isTransformDirty_ = false;
+	IsTransformDirty_ = false;
 }
 
 const float CAMERA_MOVE_SPEED = 15.0f;

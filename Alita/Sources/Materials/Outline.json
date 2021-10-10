@@ -1,0 +1,49 @@
+{
+  "name": "OutlinePass",
+  "indexFormat": "uint32",
+  "code": {
+    "vs": "Shaders/ScreenQuad.vert.gl",
+    "fs": "Shaders/Outline.frag.gl"
+  },
+  "defines": [],
+  "techniques": {
+    "TShading":
+    {
+      "vs_entry": "TShading",
+      "fs_entry": "TShading"
+    }
+  },
+  "bindings": [
+    {
+      "name": "uBatch",
+      "binding": 1,
+      "type": "Buffer",
+      "stride": 16,
+      "fields": [
+        {
+          "name": "Param",
+          "format": "float4",
+          "offset": 0
+        }
+      ]
+    },
+    {
+      "name": "tColorMap",
+      "binding": 11,
+      "type": "Texture2D",
+      "uri": ""
+    },
+    {
+      "name": "tMaskMap",
+      "binding": 13,
+      "type": "Texture2D",
+      "uri": ""
+    },
+    {
+      "name": "tBlurMap",
+      "binding": 15,
+      "type": "Texture2D",
+      "uri": ""
+    }
+  ]
+}

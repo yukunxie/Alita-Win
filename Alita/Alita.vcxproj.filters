@@ -150,6 +150,12 @@
     <Filter Include="Sources\Physics">
       <UniqueIdentifier>{61f7f5c9-c70f-4ead-b522-2c4f723b4fc2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Sources\Utils">
+      <UniqueIdentifier>{d5389122-d958-4168-81ae-3f333e1b8b8a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources\Utils\MD5">
+      <UniqueIdentifier>{114dc470-dd31-4bdb-a0cb-c2dd654f3e69}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Third-Party\StandAlone\ResourceLimits.cpp">
@@ -550,6 +556,9 @@
     </ClCompile>
     <ClCompile Include="Sources\Physics\Physics.cpp">
       <Filter>Sources\Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Utils\MD5\md5.cpp">
+      <Filter>Sources\Utils\MD5</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1158,6 +1167,9 @@
     </ClInclude>
     <ClInclude Include="Sources\Physics\Physics.h">
       <Filter>Sources\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Utils\MD5\md5.h">
+      <Filter>Sources\Utils\MD5</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

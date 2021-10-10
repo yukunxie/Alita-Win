@@ -10,6 +10,8 @@ NS_RX_BEGIN
 
 void MeshComponent::SetupRenderObject()
 {
+	RenderObject_.bSelected = IsSelected();
+
 	if (RenderObject_.MaterialObject)
 	{
 		return;

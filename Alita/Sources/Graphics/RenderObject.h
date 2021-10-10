@@ -34,6 +34,8 @@ struct RenderObject
 	std::vector<VertexBufferInfo> VertexBuffers;
 	IndexBufferInfo IndexBuffer;
 	std::uint64_t	RenderSetBits = 0;
+
+	uint8			bSelected : 1;
 };
 
 NS_RX_END

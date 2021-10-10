@@ -50,6 +50,7 @@ private:
 	ScreenResolvePass ScreenResolvePass_;
 	BloomPass DownSamplePass_;
 	ToneMapping ToneMappingPass_;
+	OutlinePass OutlinePass_;
 	TExtent2D  WindowSize_;
 
 	// RHI

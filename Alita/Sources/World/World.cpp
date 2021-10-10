@@ -53,13 +53,13 @@ World::World()
 		AddEntity(new Model());
 	}*/
 
-	{
-		auto terrain = Terrain::CreateFromHeightMap("Textures/heightmap.png", -3.f, .0f, 0.1f, { 5, 5 });
-		AddEntity(terrain);
-		auto tex = ImageLoader::LoadTextureFromUri("Textures/grass.jpg");
-		auto mesh = terrain->GetComponent<MeshComponent>();
-		mesh->GetMaterial()->SetTexture("tAlbedo", tex);
-	}
+	//{
+	//	auto terrain = Terrain::CreateFromHeightMap("Textures/heightmap.png", -3.f, .0f, 0.1f, { 5, 5 });
+	//	AddEntity(terrain);
+	//	auto tex = ImageLoader::LoadTextureFromUri("Textures/grass.jpg");
+	//	auto mesh = terrain->GetComponent<MeshComponent>();
+	//	mesh->GetMaterial()->SetTexture("tAlbedo", tex);
+	//}
 
 	{
 		//const auto& models = GLTFLoader::LoadModelFromGLTF("Models/chinesedragon.gltf");
@@ -67,8 +67,8 @@ World::World()
 		//const auto& models = GLTFLoader::LoadModelFromGLTF("Models/deer.gltf");
 		//const auto& models = GLTFLoader::LoadModelFromGLTF("Models/cerberus/cerberus.gltf");
 		//const auto& models = GLTFLoader::LoadModelFromGLTF("Models/armor/armor.gltf");
-		//const auto& models = GLTFLoader::LoadModelFromGLTF("Scenes/Sponza/Sponza.gltf");
-		const auto& models = GLTFLoader::LoadModelFromGLTF("Models/DamagedHelmet/glTF/DamagedHelmet.gltf");
+		const auto& models = GLTFLoader::LoadModelFromGLTF("Scenes/Sponza/Sponza.gltf");
+		//const auto& models = GLTFLoader::LoadModelFromGLTF("Models/DamagedHelmet/glTF/DamagedHelmet.gltf");
 		for (auto model : models)
 		{
 			AddEntity(model);

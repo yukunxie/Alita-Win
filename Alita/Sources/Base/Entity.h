@@ -33,7 +33,7 @@ public:
 	template <typename Tp_>
 	Tp_* GetComponent()
 	{
-		for (auto comp : components_)
+		for (auto comp : Components_)
 		{
 			if (dynamic_cast<Tp_*>(comp))
 			{
@@ -46,75 +46,78 @@ public:
 	template<>
 	Transform* GetComponent<Transform>()
 	{
-		return &transform_;
+		return &Transform_;
 	}
 
 	virtual void Tick(float dt);
 
 	TVector3& GetPosition()
 	{
-		return transform_.Position();
+		return Transform_.Position();
 	}
 
 	void SetPosition(const TVector3& position)
 	{
-		if (!isTransformDirty_)
+		if (!IsTransformDirty_)
 		{
-			isTransformDirty_ = transform_.Position() == position;
+			IsTransformDirty_ = Transform_.Position() == position;
 		}
-		transform_.Position() = position;
+		Transform_.Position() = position;
 	}
 
 	void SetScale(const TVector3& scale)
 	{
-		if (!isTransformDirty_)
+		if (!IsTransformDirty_)
 		{
-			isTransformDirty_ = transform_.Scale() == scale;
+			IsTransformDirty_ = Transform_.Scale() == scale;
 		}
-		transform_.Scale() = scale;
+		Transform_.Scale() = scale;
 	}
 
 	TVector3& GetScale()
 	{
-		return transform_.Scale();
+		return Transform_.Scale();
 	}
 
 	void SetRotation(const TVector3& rotation)
 	{
-		if (!isTransformDirty_)
+		if (!IsTransformDirty_)
 		{
-			isTransformDirty_ = transform_.Rotation() == rotation;
+			IsTransformDirty_ = Transform_.Rotation() == rotation;
 		}
-		transform_.Rotation() = rotation;
+		Transform_.Rotation() = rotation;
 	}
 
 	TVector3& GetRotation()
 	{
-		return transform_.Rotation();
+		return Transform_.Rotation();
 	}
 
 	const TMat4x4& GetWorldMatrix() const
 	{
 		UpdateWorldMatrix();
 
-		return worldMatrix_;
+		return WorldMatrix_;
 	}
 
 	void UpdateWorldMatrix() const;
 
+	void SetSelected(bool selected) { IsSelected_ = selected; }
+
+	bool IsSelected() const { return IsSelected_; }
+
+	void SetPhysicsData(void* data) { PhysicsData_ = data; }
+
 protected:
-	Entity* parent_ = nullptr;
-	std::vector<Entity*> children_;
-
-	std::list<Component*> components_;
-
-	mutable TMat4x4 worldMatrix_;
-
-	// All entity has a transform attribute
-	Transform transform_;
-
+	Entity* Parent_ = nullptr;
+	void* PhysicsData_ = nullptr;
+	std::vector<Entity*> Children_;
+	std::list<Component*> Components_;
+	mutable TMat4x4 WorldMatrix_;
+	Transform Transform_;
 	// boolean fileds
-	mutable bool isTransformDirty_ = true;
+	bool IsSelected_ = false;
+	mutable bool IsTransformDirty_ = true;
 };
 
 NS_RX_END

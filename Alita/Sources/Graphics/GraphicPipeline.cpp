@@ -90,10 +90,14 @@ void GraphicPipeline::Execute(const std::vector<RenderObject*>& renderObjects)
 		ToneMappingPass_.Setup(&DeferredPass_);
 		ToneMappingPass_.Execute();
 	}
+
+	OutlinePass_.Reset();
+	OutlinePass_.Setup(&ToneMappingPass_);
+	OutlinePass_.Execute(renderObjects);
 	
 	{
 		ScreenResolvePass_.Reset();
-		ScreenResolvePass_.Setup(&ToneMappingPass_);
+		ScreenResolvePass_.Setup(&OutlinePass_);
 		//ScreenResolvePass_.Setup(&DownSamplePass_);
 		ScreenResolvePass_.Execute();
 	}

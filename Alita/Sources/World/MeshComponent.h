@@ -54,10 +54,18 @@ public:
 		RenderSetBits_ &= ~renderSet;
 	}
 
+	void SetSelected(bool selected) { IsSelected_ = selected; }
+
+	bool IsSelected() const { return IsSelected_; }
+
+	void SetPhysicsData(void* data) { PhysicsData_ = data; }
+
 public:
-	RenderObject RenderObject_;
-	Material* Material_ = nullptr;
-	Geometry* Geometry_ = nullptr;
+	RenderObject	RenderObject_;
+	Material*		Material_	= nullptr;
+	Geometry*		Geometry_	= nullptr;
+	void*			PhysicsData_ = nullptr;
+	bool			IsSelected_ = false;
 
 	friend class MeshComponentBuilder;
 	friend class Terrain;

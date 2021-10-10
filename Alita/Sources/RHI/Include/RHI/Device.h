@@ -81,6 +81,8 @@ public:
     
 };
 
+typedef std::shared_ptr<Texture> TexturePTR;
+
 class Device : public RHIObjectBase
 {
 public:

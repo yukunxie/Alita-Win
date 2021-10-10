@@ -11,12 +11,12 @@ public:
     EventSystem(void* windowHandler)
     {
         _SetupEventRegisterToWindow(windowHandler);
-        instance_ = this;
+        Instance_ = this;
     }
 
     static EventSystem* GetInstance()
     {
-        return instance_;
+        return Instance_;
     }
 
 protected:
@@ -29,6 +29,8 @@ protected:
     void _EventKeyboardHandler(int key, int scancode, int action, int mods);
 
     void _EventMouseButtonHandler(int button, int action, int mods, double xpos, double ypos);
+
+    void _EventClickMouseButton(int button, double xpos, double ypos);
 
     void _EventWindowResizedHandler(int width, int height);
 
@@ -43,11 +45,16 @@ protected:
     static void _EventOnWindowResized(GLFWwindow* window, int width, int height);
 
 private:
-    static EventSystem* instance_;
+    static EventSystem* Instance_;
 
-    bool bLeftMouseBtnPressing_ = false;
-    bool bRightMouseBtnPressing_ = false;
-    TVector2 lastMousePosition_ = TVector2(0);
+    void* Window_ = nullptr;
+
+    bool LeftMouseBtnPressing_ = false;
+    bool RightMouseBtnPressing_ = false;
+    bool IsMouseMoving_ = false;
+    TVector2 LastMousePosition_ = TVector2(0);
+
+    std::chrono::high_resolution_clock::time_point MousePressDownTimestamp_;
 };
 NS_RX_END
 

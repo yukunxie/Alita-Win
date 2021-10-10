@@ -12,6 +12,8 @@
 
 NS_RX_BEGIN
 
+class MeshComponent;
+
 class Physics
 {
 public:
@@ -24,9 +26,11 @@ public:
 		return *Instance_;
 	}
 
-	void AddPrimitive(const Transform& transform, const std::vector<TVector3>& vertices, const std::vector<uint32>& indices);
+	void AddPrimitive(MeshComponent* mesh, const std::vector<TVector3>& vertices, const std::vector<uint32>& indices);
 
 	void Tick(float dt);
+
+	MeshComponent* Pick(const TVector3& origin, const TVector3& direction);
 
 
 protected:

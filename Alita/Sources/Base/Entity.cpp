@@ -8,7 +8,7 @@
 NS_RX_BEGIN
 
 Entity::Entity()
-    : worldMatrix_(1.0f)
+    : WorldMatrix_(1.0f)
 {
 }
 
@@ -18,69 +18,69 @@ Entity::~Entity()
 
 void Entity::AddComponment(Component* componment)
 {
-    components_.emplace_back(componment);
+    Components_.emplace_back(componment);
     componment->SetEntity(this);
 }
 
 void Entity::AddChild(Entity* child)
 {
-    auto it = std::find(children_.begin(), children_.end(), child);
-    if (it != children_.end())
+    auto it = std::find(Children_.begin(), Children_.end(), child);
+    if (it != Children_.end())
         return;
-    children_.push_back(child);
-    child->parent_ = this;
+    Children_.push_back(child);
+    child->Parent_ = this;
 }
 
 void Entity::RemoveChild(Entity* child)
 {
-    auto it = std::find(children_.begin(), children_.end(), child);
-    if (it != children_.end())
+    auto it = std::find(Children_.begin(), Children_.end(), child);
+    if (it != Children_.end())
     {
-        children_.erase(it);
-        child->parent_ = nullptr;
+        Children_.erase(it);
+        child->Parent_ = nullptr;
     }
 }
 
 void Entity::SetParent(Entity* parent)
 {
-    if (parent_ && parent_ != parent)
+    if (Parent_ && Parent_ != parent)
     {
-        parent_->RemoveChild(this);
+        Parent_->RemoveChild(this);
     }
 
     if (parent)
         parent->AddChild(this);
     else
-        parent_ = nullptr;
+        Parent_ = nullptr;
 }
 
 void Entity::UpdateWorldMatrix() const
 {
-    if (!isTransformDirty_)
+    if (!IsTransformDirty_)
         return;
 
-    isTransformDirty_ = false;
+    IsTransformDirty_ = false;
 
-    worldMatrix_ = glm::mat4(1);
+    WorldMatrix_ = glm::mat4(1);
 
     //translate
-    worldMatrix_ = glm::translate(worldMatrix_, transform_.Position());
+    WorldMatrix_ = glm::translate(WorldMatrix_, Transform_.Position());
 
-    worldMatrix_ = glm::scale(worldMatrix_, transform_.Scale());
+    WorldMatrix_ = glm::scale(WorldMatrix_, Transform_.Scale());
 
-    worldMatrix_ = glm::rotate(worldMatrix_, glm::radians(transform_.Rotation().x), TVector3(1.0f, 0.0f, 0.0f));
-    worldMatrix_ = glm::rotate(worldMatrix_, glm::radians(transform_.Rotation().y), TVector3(0.0f, 1.0f, 0.0f));
-    worldMatrix_ = glm::rotate(worldMatrix_, glm::radians(transform_.Rotation().z), TVector3(0.0f, 0.0f, 1.0f));
+    WorldMatrix_ = glm::rotate(WorldMatrix_, glm::radians(Transform_.Rotation().x), TVector3(1.0f, 0.0f, 0.0f));
+    WorldMatrix_ = glm::rotate(WorldMatrix_, glm::radians(Transform_.Rotation().y), TVector3(0.0f, 1.0f, 0.0f));
+    WorldMatrix_ = glm::rotate(WorldMatrix_, glm::radians(Transform_.Rotation().z), TVector3(0.0f, 0.0f, 1.0f));
 }
 
 void Entity::Tick(float dt)
 {
-    for (auto& cm : components_)
+    for (auto& cm : Components_)
     {
         cm->Tick(dt);
     }
 
-    for (auto child : children_)
+    for (auto child : Children_)
     {
         child->Tick(dt);
     }

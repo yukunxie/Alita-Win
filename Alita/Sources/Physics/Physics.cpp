@@ -4,6 +4,10 @@
 
 #include "Physics.h"
 #include "cooking/PxCooking.h"
+#include "Loaders/GLTFLoader.h"
+#include "World/World.h"
+#include "World/MeshComponent.h"
+#include "Base/Entity.h"
 
 using namespace physx;
 
@@ -52,8 +56,9 @@ Physics::Physics()
 	pxCooking_ = PxCreateCooking(PX_PHYSICS_VERSION, *pxFoundation_, params);
 }
 
-void Physics::AddPrimitive(const Transform& transform, const std::vector<TVector3>& vertices, const std::vector<uint32>& indices)
+void Physics::AddPrimitive(MeshComponent* component, const std::vector<TVector3>& vertices, const std::vector<uint32>& indices)
 {
+	const Transform* transform = component->GetOwner()->GetComponent<Transform>();
 	std::vector< physx::PxVec3>verts;
 	verts.reserve(vertices.size());
 	for (const auto vert : vertices)
@@ -80,18 +85,112 @@ void Physics::AddPrimitive(const Transform& transform, const std::vector<TVector
 
 	physx::PxDefaultMemoryInputData istream(ostream.getData(), ostream.getSize());
 	physx::PxTriangleMesh* mesh = pxPhysics_->createTriangleMesh(istream);
-
-	physx::PxShape* shape = pxPhysics_->createShape(physx::PxTriangleMeshGeometry(mesh), *pxDefaultMaterial_, true);
-	physx::PxQuat quatX(transform.Rotation().x, physx::PxVec3(1, 0, 0));
-	physx::PxQuat quatY(transform.Rotation().y, physx::PxVec3(0, 1, 0));
-	physx::PxQuat quatZ(transform.Rotation().z, physx::PxVec3(0, 0, 1));
+	physx::PxTriangleMeshGeometry pxMeshGeometry(mesh);
+	pxMeshGeometry.scale = PxMeshScale({ transform->Scale().x, transform->Scale().y, transform->Scale().z });
+	physx::PxShape* shape = pxPhysics_->createShape(pxMeshGeometry, *pxDefaultMaterial_, true);
+	physx::PxQuat quatX(transform->Rotation().x, physx::PxVec3(1, 0, 0));
+	physx::PxQuat quatY(transform->Rotation().y, physx::PxVec3(0, 1, 0));
+	physx::PxQuat quatZ(transform->Rotation().z, physx::PxVec3(0, 0, 1));
 	physx::PxQuat quat = quatX * quatY * quatZ;
-	physx::PxTransform pxTransform(transform.Position().x, transform.Position().y, transform.Position().z, quat);
+	physx::PxTransform pxTransform(transform->Position().x, transform->Position().y, transform->Position().z, quat);
 	physx::PxRigidStatic* actor = PxCreateStatic(*pxPhysics_, pxTransform, *shape);
 
-	pxScene_->addActor(*actor);
+	shape->userData = component;
+	actor->userData = component;
+	component->SetPhysicsData(actor);
 
-	Tick(0.5f);
+	pxScene_->addActor(*actor);
+}
+
+enum
+{
+	TOUCH_SHAPE_1_FLAG = 0x1,
+	TOUCH_SHAPE_2_FLAG = 0x2,
+	BLOCK_SHAPE_FLAG = 0x4,
+};
+
+struct MyFilter :public PxQueryFilterCallback
+{
+	virtual PxQueryHitType::Enum preFilter(
+		const PxFilterData& filterData, const PxShape* shape, const PxRigidActor* actor, PxHitFlags& queryFlags)
+	{
+		return PxQueryHitType::eTOUCH;
+		/*(void)shape; (void)actor; (void)queryFlags; (void)filterData;
+		PxU32 stWord0 = shape->getQueryFilterData().word0;
+		if (stWord0 & (TOUCH_SHAPE_1_FLAG | TOUCH_SHAPE_2_FLAG))
+		{
+			return PxQueryHitType::eTOUCH;
+		}
+		if (stWord0 & BLOCK_SHAPE_FLAG)
+		{
+			return PxQueryHitType::eBLOCK;
+		}
+		return PxQueryHitType::eNONE;*/
+	}
+
+	virtual PxQueryHitType::Enum postFilter(const PxFilterData& filterData, const PxQueryHit& hit)
+	{
+		(void)filterData; (void)hit;
+		return PxQueryHitType::eNONE;
+	}
+};
+
+MeshComponent* Physics::Pick(const TVector3& origin, const TVector3& direction)
+{
+	constexpr int MaxHitsCount = 10;
+	PxRaycastBufferN<MaxHitsCount> hitBuffers;
+	PxQueryFilterData stFilterData;
+	MyFilter stFilterCallback;
+	auto ret = pxScene_->raycast({ origin.x, origin.y, origin.z }, { direction.x, direction.y,  direction.z}, PX_MAX_F32, hitBuffers, PxHitFlags(PxHitFlag::eDEFAULT), stFilterData, &stFilterCallback);
+
+	if (hitBuffers.hits[0].shape == nullptr)
+	{
+		return nullptr;
+	}
+
+	MeshComponent* component = ((MeshComponent*)hitBuffers.hits[0].shape->userData);
+	float distance = hitBuffers.hits[0].distance;
+
+
+	for (int i = 1; i < MaxHitsCount; ++i)
+	{
+		if (hitBuffers.hits[i].shape == nullptr || hitBuffers.hits[i].shape->userData == nullptr)
+			continue;
+
+		auto normal = TVector3{ hitBuffers.hits[i].normal.x, hitBuffers.hits[i].normal.y, hitBuffers.hits[i].normal.z };
+		if (glm::dot(normal, -direction) < 0)
+		{
+			continue;
+		}
+		if (hitBuffers.hits[i].distance < distance)
+		{
+			distance = hitBuffers.hits[i].distance;
+			component = ((MeshComponent*)hitBuffers.hits[i].shape->userData);
+		}
+	}
+	if (component)
+	{
+		component->SetSelected(true);
+	}
+	return component;
+
+	//PxRaycastHit hit = hit1.block;
+
+	//if (hit.shape && hit.shape->userData)
+	//{
+	//	((MeshComponent*)hit.shape->userData)->SetSelected(true);
+	//	return (MeshComponent*)hit.shape->userData;
+	//	//TVector3 position{ hit.position.x, hit.position.y, hit.position.z };
+	//	//const auto& models = GLTFLoader::LoadModelFromGLTF("Models/DamagedHelmet/glTF/DamagedHelmet.gltf");
+	//	//for (auto model : models)
+	//	//{
+	//	//	Engine::GetWorld()->AddEntity(model);
+	//	//	model->SetPosition(position);
+	//	//	model->SetScale(TVector3(0.5f));
+	//	//	//model->SetRotation({ 45, 45, 45 });
+	//	//}
+	//}
+	//return nullptr;
 }
 
 void Physics::Tick(float dt)
@@ -102,6 +201,8 @@ void Physics::Tick(float dt)
 	auto ret = pxScene_->raycast({ 0, 5, 0 }, { 0, -1, 0 }, PX_MAX_F32, hit1, PxHitFlag::ePOSITION);
 
 	hit = hit1.block;
+
+	
 
 	//if (hit.shape)
 	//{

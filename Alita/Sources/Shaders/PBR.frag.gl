@@ -168,3 +168,8 @@ void TShadowMapGen()
 {
 }
 
+void TOutline() 
+{
+    OutColor = vec4(1, 0, 0, 1);
+}
+

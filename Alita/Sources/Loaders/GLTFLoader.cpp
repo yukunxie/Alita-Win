@@ -3,6 +3,7 @@
 #include "World/MeshComponent.h"
 #include "Graphics/Material.h"
 #include "Graphics/Texture.h"
+#include "Physics/Physics.h"
 #include <glm/gtx/matrix_decompose.hpp>
 
 #define TINYGLTF_IMPLEMENTATION
@@ -134,6 +135,9 @@ namespace GLTFLoader
 				}
 			}
 
+			std::vector<TVector3> vertices;
+			std::vector<uint32>   indices;
+
 			for (const auto& [attriName, aIdx] : primitive.attributes)
 			{
 				auto vaKind = VertexBuffer::NameToVBAttrKind(attriName);
@@ -153,61 +157,68 @@ namespace GLTFLoader
 					vBuffer->InitData(tData, bufferView.byteLength);
 				}
 				mc->GetGeometry()->AppendVertexBuffer(vBuffer);
+
+				if (vaKind == VertexBufferAttriKind::POSITION)
+				{
+					const float* tData = (const float*)(tBuffer.data.data() + bufferView.byteOffset);
+					const uint8* end = tBuffer.data.data() + bufferView.byteOffset + bufferView.byteLength;
+					while ((uint8*)tData < end)
+					{
+						switch (vBuffer->format)
+						{
+						case InputAttributeFormat::FLOAT:
+							vertices.emplace_back(*tData, 0, 0);
+							tData += 1; // todo stride
+							break;
+						case InputAttributeFormat::FLOAT2:
+							vertices.emplace_back(*tData, *(tData + 1), 0);
+							tData += 2; // todo stride
+							break;
+						case InputAttributeFormat::FLOAT3:
+							vertices.emplace_back(*tData, *(tData + 1), *(tData + 2));
+							tData += 3; // todo stride
+							break;
+						case InputAttributeFormat::FLOAT4:
+							vertices.emplace_back(*tData, *(tData + 1), *(tData + 2));
+							tData += 4; // todo stride
+							break;
+						default:
+							RHI_ASSERT(false);
+						}
+					}
+					
+				}
 			}
 
 			// index buffer
-			std::vector<std::uint32_t> tmpIndexData;
-			const std::uint32_t* tmpPIndex = nullptr;
 			const tinygltf::Accessor& accessor = tModel.accessors[primitive.indices];
 			const tinygltf::BufferView& bufferView = tModel.bufferViews[accessor.bufferView];
 			const tinygltf::Buffer& tBuffer = tModel.buffers[bufferView.buffer];
-			const unsigned char* tData = tBuffer.data.data() + bufferView.byteOffset;
+			indices.resize(accessor.count);
 			if (accessor.componentType == TINYGLTF_COMPONENT_TYPE_UNSIGNED_SHORT)
 			{
-				std::uint16_t* pIndices = (std::uint16_t*)tData;
-				tmpIndexData.resize(accessor.count);
+				std::uint16_t* pIndices = (std::uint16_t*)(tBuffer.data.data() + bufferView.byteOffset);
 				for (int i = 0; i < accessor.count; ++i)
 				{
-					tmpIndexData[i] = pIndices[i];
+					indices[i] = pIndices[i];
 				}
-				tmpPIndex = tmpIndexData.data();
-				mc->Geometry_->GetIndexBuffer()->InitData(tmpIndexData.data(), tmpIndexData.size() * sizeof(tmpIndexData[0]));
-			}
-			else if (accessor.componentType == TINYGLTF_COMPONENT_TYPE_UNSIGNED_INT)
-			{
-				tmpPIndex = (std::uint32_t*)tData;
-				mc->Geometry_->GetIndexBuffer()->InitData(tData, accessor.count * sizeof(int));
 			}
 			else
 			{
-				Assert(false, "invalid index type");
+				std::uint32_t* pIndices = (std::uint32_t*)(tBuffer.data.data() + bufferView.byteOffset);
+				for (int i = 0; i < accessor.count; ++i)
+				{
+					indices[i] = pIndices[i];
+				}
 			}
+			mc->Geometry_->GetIndexBuffer()->InitData(indices.data(), accessor.count * sizeof(int));
 
 			// generate tangent and bitangent
 			if (useNormapMap && !(mc->GetGeometry()->HasBiTangent() && mc->GetGeometry()->HasTangent()))
 			{
-				const uint8* pVertData = nullptr;
 				const uint8* pUVData = nullptr;
-				uint32 vertByteStride = 0;
 				uint32 uvByteStride = 0;
-				uint32 verticesCount = 0;
-
-				// position
-				{
-					int aIdx = primitive.attributes.find("POSITION")->second;
-
-					const tinygltf::Accessor& accessor = tModel.accessors[aIdx];
-					const tinygltf::BufferView& bufferView = tModel.bufferViews[accessor.bufferView];
-					const tinygltf::Buffer& tBuffer = tModel.buffers[bufferView.buffer];
-					pVertData = (tBuffer.data.data() + bufferView.byteOffset);
-
-					vertByteStride = bufferView.byteStride;
-					if (vertByteStride == 0)
-					{
-						vertByteStride = GetFormatSize(_GLTFTypeToIAFormat(accessor.type));
-					}
-					verticesCount = bufferView.byteLength / vertByteStride;
-				}
+				uint32 verticesCount = vertices.size();
 
 				// uv
 				{
@@ -225,17 +236,12 @@ namespace GLTFLoader
 					}
 				}
 
-				std::vector<TVector3> vertices(verticesCount);
 				std::vector<TVector2> textureCoords(verticesCount);
 				std::vector<TVector3> tangents(verticesCount);
 				std::vector<TVector3> bitangents(verticesCount);
 
 				for (uint32 i = 0; i < verticesCount; ++i)
 				{
-					const float* pVertices = (float*)pVertData;
-					vertices[i] = TVector3{ pVertices[0], pVertices[1], pVertices[2] };
-					pVertData += vertByteStride;
-
 					const float* pUVs = (float*)pUVData;
 					textureCoords[i] = TVector2{ pUVs [0], pUVs [1]};
 					pUVData += uvByteStride;
@@ -246,9 +252,9 @@ namespace GLTFLoader
 				// https://learnopengl.com/Advanced-Lighting/Normal-Mapping
 				for (uint32 triIdx = 0; triIdx < triangeCount; ++triIdx)
 				{
-					uint32 a = tmpPIndex[triIdx * 3 + 0];
-					uint32 b = tmpPIndex[triIdx * 3 + 1];
-					uint32 c = tmpPIndex[triIdx * 3 + 2];
+					uint32 a = indices[triIdx * 3 + 0];
+					uint32 b = indices[triIdx * 3 + 1];
+					uint32 c = indices[triIdx * 3 + 2];
 
 					TVector3 edge1 = vertices[b] - vertices[a];
 					TVector3 edge2 = vertices[c] - vertices[a];
@@ -302,6 +308,7 @@ namespace GLTFLoader
 			}
 
 			model->AddComponment(mc);
+			Physics::GetInstance().AddPrimitive(mc, vertices, indices);
 		}
 	}
 
@@ -343,24 +350,7 @@ namespace GLTFLoader
 		for (std::uint32_t idx : tScene.nodes)
 		{
 			const tinygltf::Node& tNode = tModel.nodes[idx];
-			
 			auto model = _CreateEntity(tModel, tNode);
-
-			/*Model* model = new Model();
-			{
-				if (tNode.translation.size() >= 3)
-					model->GetPosition() = { (float)tNode.translation[0], (float)tNode.translation[1], (float)tNode.translation[2] };
-				if (tNode.scale.size() >=3)
-					model->GetScale() = { (float)tNode.scale[0], (float)tNode.scale[1], (float)tNode.scale[2] };
-				if (tNode.rotation.size() >= 4)
-				{
-					glm::quat rotation = { (float)tNode.rotation[0], (float)tNode.rotation[1], (float)tNode.rotation[2], (float)tNode.rotation[2] };
-					model->GetRotation() = glm::degrees(glm::eulerAngles(rotation));
-				}
-			}
-
-			_LoadPrimitives(model, tModel, tMesh);*/
-
 			models.push_back(model);
 
 		}

@@ -281,6 +281,46 @@ protected:
     const Pass* InputPass_ = nullptr;
 };
 
+class OutlineMarkPass : public Pass
+{
+public:
+    OutlineMarkPass();
+
+    virtual ~OutlineMarkPass()
+    {
+    }
+
+    void ResizeTarget(uint32 width, uint32 height);
+
+    virtual void Execute(const std::vector<RenderObject*>& renderObjects) override;
+
+protected:
+    std::shared_ptr<RenderTarget> rtColor_ = nullptr;
+    std::shared_ptr<RenderTarget> rtDepthStencil_ = nullptr;
+};
+
+class OutlinePass : public FullScreenPass
+{
+public:
+    OutlinePass();
+
+    virtual ~OutlinePass()
+    {
+    }
+
+    void Setup(const Pass* inputPass);
+
+    virtual void Execute(const std::vector<RenderObject*>& renderObjects) override;
+
+protected:
+    std::shared_ptr<RenderTarget> rtColor_ = nullptr;
+
+    const Pass* InputPass_ = nullptr;
+    OutlineMarkPass OutlineMarkPass_;
+    GaussianBlur    BlurPass_;
+
+};
+
 NS_RX_END
 
 
