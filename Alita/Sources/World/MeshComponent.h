@@ -23,6 +23,8 @@ public:
 		return Material_;
 	}
 
+	~MeshComponent();
+
 	Geometry* GetGeometry() const
 	{
 		return Geometry_;
@@ -54,7 +56,7 @@ public:
 		RenderSetBits_ &= ~renderSet;
 	}
 
-	void SetSelected(bool selected) { IsSelected_ = selected; }
+	void SetSelected(bool selected);
 
 	bool IsSelected() const { return IsSelected_; }
 

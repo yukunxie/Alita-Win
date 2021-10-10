@@ -52,6 +52,9 @@ protected:
     Camera* defaultCamera_ = nullptr;
     Camera* shadowMapCamera_ = nullptr;
 
+public:
+    MeshComponent* CurrentSelectedMeshComponent = nullptr;
+
 };
 
 NS_RX_END

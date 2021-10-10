@@ -158,6 +158,7 @@ MeshComponent* Physics::Pick(const TVector3& origin, const TVector3& direction)
 			continue;
 
 		auto normal = TVector3{ hitBuffers.hits[i].normal.x, hitBuffers.hits[i].normal.y, hitBuffers.hits[i].normal.z };
+		// skip back face
 		if (glm::dot(normal, -direction) < 0)
 		{
 			continue;

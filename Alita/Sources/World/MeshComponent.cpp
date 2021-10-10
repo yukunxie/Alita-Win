@@ -5,8 +5,17 @@
 #include "MeshComponent.h"
 #include "Base/Entity.h"
 #include "Graphics/RenderScene.h"
+#include "World/World.h"
 
 NS_RX_BEGIN
+
+MeshComponent::~MeshComponent()
+{
+	if (Engine::GetWorld()->CurrentSelectedMeshComponent == this)
+	{
+		Engine::GetWorld()->CurrentSelectedMeshComponent = nullptr;
+	}
+}
 
 void MeshComponent::SetupRenderObject()
 {
@@ -56,6 +65,30 @@ void MeshComponent::SetupRenderObject()
 	}
 
 	Material_->SetInputAssembler({ attributes , IndexType::UINT32 });
+}
+
+void MeshComponent::SetSelected(bool selected)
+{
+	if (IsSelected_ == selected)
+	{
+		return;
+	}
+
+	IsSelected_ = selected;
+	auto world = Engine::GetWorld();
+
+	if (!IsSelected_ && world->CurrentSelectedMeshComponent == this)
+	{
+		world->CurrentSelectedMeshComponent = nullptr;
+	}
+	else if (IsSelected_ && world->CurrentSelectedMeshComponent != this)
+	{
+		if (world->CurrentSelectedMeshComponent)
+		{
+			world->CurrentSelectedMeshComponent->SetSelected(false);
+		}
+		world->CurrentSelectedMeshComponent = this;
+	}
 }
 
 void MeshComponent::Tick(float dt)
