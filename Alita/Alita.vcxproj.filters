@@ -1015,124 +1015,124 @@
     <ClInclude Include="Sources\RHI\Backend\Vulkan\VMA\VmaUsage.h">
       <Filter>Sources\RHI\Backend\Vulkan\WMA</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\RHI\Include\RHI\RenderQueue.h">
+    <ClInclude Include="Sources\RHI\Include\GFX\RenderQueue.h">
       <Filter>Sources\RHI\Include\GFX</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\RHI\Include\RHI\RenderTarget.h">
+    <ClInclude Include="Sources\RHI\Include\GFX\RenderTarget.h">
       <Filter>Sources\RHI\Include\GFX</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\RHI\Include\RHI\Runnable.h">
+    <ClInclude Include="Sources\RHI\Include\GFX\Runnable.h">
       <Filter>Sources\RHI\Include\GFX</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\RHI\Include\RHI\SampledTextureView.h">
+    <ClInclude Include="Sources\RHI\Include\GFX\SampledTextureView.h">
       <Filter>Sources\RHI\Include\GFX</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\RHI\Include\RHI\Sampler.h">
+    <ClInclude Include="Sources\RHI\Include\GFX\Sampler.h">
       <Filter>Sources\RHI\Include\GFX</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\RHI\Include\RHI\SemaphoreCXX.h">
+    <ClInclude Include="Sources\RHI\Include\GFX\SemaphoreCXX.h">
       <Filter>Sources\RHI\Include\GFX</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\RHI\Include\RHI\Shader.h">
+    <ClInclude Include="Sources\RHI\Include\GFX\Shader.h">
       <Filter>Sources\RHI\Include\GFX</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\RHI\Include\RHI\SwapChain.h">
+    <ClInclude Include="Sources\RHI\Include\GFX\SwapChain.h">
       <Filter>Sources\RHI\Include\GFX</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\RHI\Include\RHI\Texture.h">
+    <ClInclude Include="Sources\RHI\Include\GFX\Texture.h">
       <Filter>Sources\RHI\Include\GFX</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\RHI\Include\RHI\TextureView.h">
+    <ClInclude Include="Sources\RHI\Include\GFX\TextureView.h">
       <Filter>Sources\RHI\Include\GFX</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\RHI\Include\RHI\TimeProfiler.h">
+    <ClInclude Include="Sources\RHI\Include\GFX\TimeProfiler.h">
       <Filter>Sources\RHI\Include\GFX</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\RHI\Include\RHI\xxhash64.h">
+    <ClInclude Include="Sources\RHI\Include\GFX\xxhash64.h">
       <Filter>Sources\RHI\Include\GFX</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\RHI\Include\RHI\AsyncWorker.h">
+    <ClInclude Include="Sources\RHI\Include\GFX\AsyncWorker.h">
       <Filter>Sources\RHI\Include\GFX</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\RHI\Include\RHI\BindGroup.h">
+    <ClInclude Include="Sources\RHI\Include\GFX\BindGroup.h">
       <Filter>Sources\RHI\Include\GFX</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\RHI\Include\RHI\BindGroupLayout.h">
+    <ClInclude Include="Sources\RHI\Include\GFX\BindGroupLayout.h">
       <Filter>Sources\RHI\Include\GFX</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\RHI\Include\RHI\BindingResource.h">
+    <ClInclude Include="Sources\RHI\Include\GFX\BindingResource.h">
       <Filter>Sources\RHI\Include\GFX</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\RHI\Include\RHI\Buffer.h">
+    <ClInclude Include="Sources\RHI\Include\GFX\Buffer.h">
       <Filter>Sources\RHI\Include\GFX</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\RHI\Include\RHI\CanvasContext.h">
+    <ClInclude Include="Sources\RHI\Include\GFX\CanvasContext.h">
       <Filter>Sources\RHI\Include\GFX</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\RHI\Include\RHI\CommandBuffer.h">
+    <ClInclude Include="Sources\RHI\Include\GFX\CommandBuffer.h">
       <Filter>Sources\RHI\Include\GFX</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\RHI\Include\RHI\CommandEncoder.h">
+    <ClInclude Include="Sources\RHI\Include\GFX\CommandEncoder.h">
       <Filter>Sources\RHI\Include\GFX</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\RHI\Include\RHI\ComputePassEncoder.h">
+    <ClInclude Include="Sources\RHI\Include\GFX\ComputePassEncoder.h">
       <Filter>Sources\RHI\Include\GFX</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\RHI\Include\RHI\ComputePipeline.h">
+    <ClInclude Include="Sources\RHI\Include\GFX\ComputePipeline.h">
       <Filter>Sources\RHI\Include\GFX</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\RHI\Include\RHI\Constants.h">
+    <ClInclude Include="Sources\RHI\Include\GFX\Constants.h">
       <Filter>Sources\RHI\Include\GFX</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\RHI\Include\RHI\Descriptors.h">
+    <ClInclude Include="Sources\RHI\Include\GFX\Descriptors.h">
       <Filter>Sources\RHI\Include\GFX</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\RHI\Include\RHI\Device.h">
+    <ClInclude Include="Sources\RHI\Include\GFX\Device.h">
       <Filter>Sources\RHI\Include\GFX</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\RHI\Include\RHI\Fence.h">
+    <ClInclude Include="Sources\RHI\Include\GFX\Fence.h">
       <Filter>Sources\RHI\Include\GFX</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\RHI\Include\RHI\Flags.h">
+    <ClInclude Include="Sources\RHI\Include\GFX\Flags.h">
       <Filter>Sources\RHI\Include\GFX</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\RHI\Include\RHI\Framebuffer.h">
+    <ClInclude Include="Sources\RHI\Include\GFX\Framebuffer.h">
       <Filter>Sources\RHI\Include\GFX</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\RHI\Include\RHI\PipelineLayout.h">
+    <ClInclude Include="Sources\RHI\Include\GFX\PipelineLayout.h">
       <Filter>Sources\RHI\Include\GFX</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\RHI\Include\RHI\QuerySet.h">
+    <ClInclude Include="Sources\RHI\Include\GFX\QuerySet.h">
       <Filter>Sources\RHI\Include\GFX</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\RHI\Include\RHI\Queue.h">
+    <ClInclude Include="Sources\RHI\Include\GFX\Queue.h">
       <Filter>Sources\RHI\Include\GFX</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\RHI\Include\RHI\RenderBundle.h">
+    <ClInclude Include="Sources\RHI\Include\GFX\RenderBundle.h">
       <Filter>Sources\RHI\Include\GFX</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\RHI\Include\RHI\RenderBundleCommands.h">
+    <ClInclude Include="Sources\RHI\Include\GFX\RenderBundleCommands.h">
       <Filter>Sources\RHI\Include\GFX</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\RHI\Include\RHI\RenderBundleEncoder.h">
+    <ClInclude Include="Sources\RHI\Include\GFX\RenderBundleEncoder.h">
       <Filter>Sources\RHI\Include\GFX</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\RHI\Include\RHI\RenderCommandTypes.h">
+    <ClInclude Include="Sources\RHI\Include\GFX\RenderCommandTypes.h">
       <Filter>Sources\RHI\Include\GFX</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\RHI\Include\RHI\RenderPass.h">
+    <ClInclude Include="Sources\RHI\Include\GFX\RenderPass.h">
       <Filter>Sources\RHI\Include\GFX</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\RHI\Include\RHI\RenderPassEncoder.h">
+    <ClInclude Include="Sources\RHI\Include\GFX\RenderPassEncoder.h">
       <Filter>Sources\RHI\Include\GFX</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\RHI\Include\RHI\RenderPipeine.h">
+    <ClInclude Include="Sources\RHI\Include\GFX\RenderPipeine.h">
       <Filter>Sources\RHI\Include\GFX</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\RHI\Include\RHI\RenderPipeline.h">
+    <ClInclude Include="Sources\RHI\Include\GFX\RenderPipeline.h">
       <Filter>Sources\RHI\Include\GFX</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\RHI\Include\RHI\Helper\Vector.h">
+    <ClInclude Include="Sources\RHI\Include\GFX\Helper\Vector.h">
       <Filter>Sources\RHI\Include\GFX\Helper</Filter>
     </ClInclude>
     <ClInclude Include="Third-Party\RenderDoc\renderdoc_app.h">
@@ -1162,13 +1162,13 @@
     <ClInclude Include="Sources\Utils\MD5\md5.h">
       <Filter>Sources\Utils\MD5</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\RHI\Include\RHI\GFX.h">
+    <ClInclude Include="Sources\RHI\Include\GFX\GFX.h">
       <Filter>Sources\RHI\Include\GFX</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\RHI\Include\RHI\GFXBase.h">
+    <ClInclude Include="Sources\RHI\Include\GFX\GFXBase.h">
       <Filter>Sources\RHI\Include\GFX</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\RHI\Include\RHI\GFXObjectManager.h">
+    <ClInclude Include="Sources\RHI\Include\GFX\GFXObjectManager.h">
       <Filter>Sources\RHI\Include\GFX</Filter>
     </ClInclude>
   </ItemGroup>
