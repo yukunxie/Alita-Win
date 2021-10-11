@@ -6,7 +6,7 @@
 #include "PostProcess/Bloom.h"
 #include "PostProcess/ToneMapping.h"
 
-#include "RHI/RHI.h"
+#include "GFX/GFX.h"
 
 NS_RX_BEGIN
 

@@ -7,7 +7,7 @@
 
 #include "DeferredRenderCommands.h"
 
-NS_RHI_BEGIN
+NS_GFX_BEGIN
 
 class VKCommandBuffer;
 
@@ -111,6 +111,6 @@ protected:
     CommandList::DeferredCmdWrapper* pWrapperHeader_ = nullptr;
 };
 
-NS_RHI_END
+NS_GFX_END
 
 #endif //PROJ_ANDROID_COMMANDLIST_H

@@ -5,7 +5,7 @@
 #include "VKBindGroupLayout.h"
 #include "VKTypes.h"
 
-NS_RHI_BEGIN
+NS_GFX_BEGIN
 
 VKBindGroupLayout::VKBindGroupLayout(VKDevice* device)
     : BindGroupLayout(device)
@@ -77,4 +77,4 @@ VKBindGroupLayout::~VKBindGroupLayout()
     Dispose();
 }
 
-NS_RHI_END
+NS_GFX_END

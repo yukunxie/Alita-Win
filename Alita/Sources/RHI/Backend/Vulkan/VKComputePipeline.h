@@ -8,7 +8,7 @@
 #include "VKDevice.h"
 #include "VKPipelineLayout.h"
 
-NS_RHI_BEGIN
+NS_GFX_BEGIN
 
 class VKComputePipeline final : public ComputePipeline
 {
@@ -41,7 +41,7 @@ private:
     friend class VKDevice;
 };
 
-NS_RHI_END
+NS_GFX_END
 
 
 #endif //RHI_VKCOMPUTEPIPELINE_H

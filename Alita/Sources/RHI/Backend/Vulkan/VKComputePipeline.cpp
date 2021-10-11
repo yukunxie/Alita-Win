@@ -7,7 +7,7 @@
 #include "VKPipelineLayout.h"
 #include "VKRenderPass.h"
 
-NS_RHI_BEGIN
+NS_GFX_BEGIN
 
 VKComputePipeline::VKComputePipeline(VKDevice* device)
     : ComputePipeline(device)
@@ -71,4 +71,4 @@ VkPipelineLayout VKComputePipeline::GetPipelineLayout() const
     return pipelineLayout_->GetNative();
 }
 
-NS_RHI_END
+NS_GFX_END

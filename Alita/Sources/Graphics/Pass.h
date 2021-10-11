@@ -6,7 +6,7 @@
 #define ALITA_PASS_H
 
 #include "Base/ObjectBase.h"
-#include "RHI/RHI.h"
+#include "GFX/GFX.h"
 #include "Types/Types.h"
 #include "World/Camera.h"
 #include "Technique.h"

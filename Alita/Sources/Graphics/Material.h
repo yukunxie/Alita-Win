@@ -8,7 +8,7 @@
 #include "Base/ObjectBase.h"
 #include "Base/FileSystem.h"
 #include "Effect.h"
-#include "RHI/RHI.h"
+#include "GFX/GFX.h"
 #include "Pass.h"
 #include "Backend/Vulkan/ShaderHelper.h"
 #include "Graphics/Texture.h"

@@ -9,7 +9,7 @@
 #include "VKTexture.h"
 #include "VKTextureView.h"
 
-NS_RHI_BEGIN
+NS_GFX_BEGIN
 
 class VKTextureViewManager
 {
@@ -101,6 +101,6 @@ protected:
     std::multimap<Texture*, TextureViewCacheItem> cache_;
 };
 
-NS_RHI_END
+NS_GFX_END
 
 #endif //PROJ_ANDROID_VKTEXTUREVIEWMANAGER_H

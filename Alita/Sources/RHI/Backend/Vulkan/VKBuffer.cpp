@@ -6,7 +6,7 @@
 #include "VKTypes.h"
 #include "RenderThreading.h"
 
-NS_RHI_BEGIN
+NS_GFX_BEGIN
 
 VKBuffer::VKBuffer(VKDevice* device)
     : Buffer(device)
@@ -271,4 +271,4 @@ void VKBuffer::SetSubData(std::uint32_t offset, std::uint32_t byteSize, const vo
     Unmap();
 }
 
-NS_RHI_END
+NS_GFX_END

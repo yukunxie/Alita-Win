@@ -8,7 +8,7 @@
 #include "VKDevice.h"
 #include "VKBindGroupLayout.h"
 
-NS_RHI_BEGIN
+NS_GFX_BEGIN
 
 class VKPipelineLayout final : public PipelineLayout
 {
@@ -32,7 +32,7 @@ private:
     friend class VKDevice;
 };
 
-NS_RHI_END
+NS_GFX_END
 
 
 #endif //RHI_VKPIPELINELAYOUT_H

@@ -18,7 +18,7 @@
 #include "VKTypes.h"
 
 
-NS_RHI_BEGIN
+NS_GFX_BEGIN
 
 void DeferredCmdBeginCommandBuffer::Execute(RHI::VKCommandBuffer* commandBuffer)
 {
@@ -322,4 +322,4 @@ void DeferredCmdPipelineBarrier::Execute(VKCommandBuffer* commandBuffer)
 }
 
 
-NS_RHI_END
+NS_GFX_END

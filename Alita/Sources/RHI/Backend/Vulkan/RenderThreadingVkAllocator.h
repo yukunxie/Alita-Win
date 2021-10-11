@@ -7,7 +7,7 @@
 
 #include "VKDevice.h"
 
-NS_RHI_BEGIN
+NS_GFX_BEGIN
 
 class ThreadLocalVulkanAllocator
 {
@@ -82,6 +82,6 @@ private:
     std::vector<VkCommandBuffer> vkCommandBuffers_;
 };
 
-NS_RHI_END
+NS_GFX_END
 
 #endif //PROJ_ANDROID_RENDERTHREADINGVKALLOCATOR_H

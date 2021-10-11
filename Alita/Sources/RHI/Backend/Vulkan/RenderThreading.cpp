@@ -17,7 +17,7 @@
 
 using namespace std::chrono_literals;
 
-NS_RHI_BEGIN
+NS_GFX_BEGIN
 
 void AsyncWorkerVulkan::PostProcessDoneTask(AsyncTaskPtr task)
 {
@@ -309,6 +309,6 @@ bool AsyncTaskBufferMapWrite::Execute()
 
 // ----
 
-NS_RHI_END
+NS_GFX_END
 
 

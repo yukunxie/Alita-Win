@@ -5,9 +5,9 @@
 #ifndef RHI_VKDEVICE_HELPER_H
 #define RHI_VKDEVICE_HELPER_H
 
-#include "RHI/RHI.h"
-#include "RHI/Helper/Vector.h"
-#include "RHI/xxhash64.h"
+#include "GFX/GFX.h"
+#include "GFX/Helper/Vector.h"
+#include "GFX/xxhash64.h"
 
 #include "VulkanMacros.h"
 #include "VKTypes.h"
@@ -27,7 +27,7 @@
 #include <array>
 #include <functional>
 
-NS_RHI_BEGIN
+NS_GFX_BEGIN
 
 class VKFramebuffer;
 
@@ -173,6 +173,6 @@ struct FramebufferCacheQueryFuncs
 
 typedef std::unordered_map<FramebufferCacheQuery, VKFramebuffer*, FramebufferCacheQueryFuncs, FramebufferCacheQueryFuncs> FramebufferCache;
 
-NS_RHI_END
+NS_GFX_END
 
 #endif //RHI_VKDEVICE_HELPER_H

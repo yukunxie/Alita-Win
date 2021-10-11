@@ -5,7 +5,7 @@
 #ifndef PROJ_ANDROID_DEFERREDRENDERCOMMANDS_H
 #define PROJ_ANDROID_DEFERREDRENDERCOMMANDS_H
 
-#include "RHI/RHI.h"
+#include "GFX/GFX.h"
 
 #include <array>
 #include <vulkan/vulkan_core.h>
@@ -15,7 +15,7 @@ class VKCommandBuffer;
 
 class VKBindGroup;
 
-NS_RHI_BEGIN
+NS_GFX_BEGIN
 
 // 注意，所有的command都使用栈上分配内存，消除所有动态分配内存的逻辑，如string, vector等所有的使用都是非法的。
 // 所以，所有的command的dtor都被声明成delete了。
@@ -686,6 +686,6 @@ private:
     TextureUsageFlags dstUsageFlags_;
 };
 
-NS_RHI_END
+NS_GFX_END
 
 #endif //PROJ_ANDROID_DEFERREDRENDERCOMMANDS_H

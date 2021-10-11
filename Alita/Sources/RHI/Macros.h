@@ -32,8 +32,8 @@
 #endif
 
 
-#define NS_RHI_BEGIN namespace RHI {
-#define NS_RHI_END }
+#define NS_GFX_BEGIN namespace RHI {
+#define NS_GFX_END }
 
 #if RHI_DEBUG
 #define RHI_ASSERT(cond, ...) assert(cond)
@@ -128,6 +128,8 @@ static const char* kTAG = "RHI";
 
 #define SCOPED_LOCK(mutex) std::lock_guard<std::remove_cv_t<decltype(mutex)>> MACRO_COMBINE(scroped_lock_guarder_,__LINE__)(mutex)
 
+#ifndef Assert
 #define Assert(cond, msg) VASSERT(cond, msg)
+#endif
 
 #endif //ALITA_MACROS_H

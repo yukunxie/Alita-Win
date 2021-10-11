@@ -4,7 +4,7 @@
 
 #include "VKRenderBundle.h"
 
-NS_RHI_BEGIN
+NS_GFX_BEGIN
 
 VKRenderBundle::VKRenderBundle(VKDevice* device)
 : RenderBundle(device)
@@ -16,4 +16,4 @@ bool VKRenderBundle::Init()
     return true;
 }
 
-NS_RHI_END
+NS_GFX_END

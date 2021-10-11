@@ -11,7 +11,7 @@
 
 #include <array>
 
-NS_RHI_BEGIN
+NS_GFX_BEGIN
 
 VKRenderPipeline::VKRenderPipeline(VKDevice* device)
     : RenderPipeline(device)
@@ -374,4 +374,4 @@ VKRenderPipeline::~VKRenderPipeline()
     Dispose();
 }
 
-NS_RHI_END
+NS_GFX_END

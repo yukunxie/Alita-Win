@@ -4,7 +4,7 @@
 
 #include "VKTypes.h"
 
-NS_RHI_BEGIN
+NS_GFX_BEGIN
 
 const char* GetVkResultString(VkResult code)
 {
@@ -1130,5 +1130,5 @@ VkImageAspectFlags VulkanAspectMask(TextureFormat format)
     return VK_IMAGE_ASPECT_COLOR_BIT;
 }
 
-NS_RHI_END
+NS_GFX_END
 

@@ -8,7 +8,7 @@
 #include "VKDevice.h"
 #include "VKTexture.h"
 
-NS_RHI_BEGIN
+NS_GFX_BEGIN
 
 class VKTextureViewManager;
 
@@ -69,7 +69,7 @@ private:
     friend class VKTexture;
 };
 
-NS_RHI_END
+NS_GFX_END
 
 
 #endif //RHI_VKTEXTUREVIEW_H

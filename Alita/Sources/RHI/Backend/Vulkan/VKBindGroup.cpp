@@ -11,7 +11,7 @@
 #include "RenderThreading.h"
 
 
-NS_RHI_BEGIN
+NS_GFX_BEGIN
 
 VKBindGroup::VKBindGroup(VKDevice* device)
     : BindGroup(device)
@@ -257,4 +257,4 @@ std::vector<VKBuffer *> VKBindGroup::getBindingBuffers()
     return result;
 }
 
-NS_RHI_END
+NS_GFX_END

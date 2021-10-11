@@ -7,7 +7,7 @@
 #include "VKComputePipeline.h"
 #include "VKBindGroup.h"
 
-NS_RHI_BEGIN
+NS_GFX_BEGIN
 
 VKComputePassEncoder::VKComputePassEncoder(VKDevice* device)
     : ComputePassEncoder(device)
@@ -67,4 +67,4 @@ VKComputePassEncoder::SetBindGroup(std::uint32_t index, BindGroup* bindGroup, st
     commandBuffer_->AddBindingObject(bindGroup);
 }
 
-NS_RHI_END
+NS_GFX_END

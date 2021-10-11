@@ -5,9 +5,9 @@
 #ifndef RHI_VKDEVICE_H
 #define RHI_VKDEVICE_H
 
-#include "RHI/RHI.h"
-#include "RHI/Helper/Vector.h"
-#include "RHI/xxhash64.h"
+#include "GFX/GFX.h"
+#include "GFX/Helper/Vector.h"
+#include "GFX/xxhash64.h"
 
 #include "Platform/Platform.h"
 
@@ -37,7 +37,7 @@
 
 #define USE_VULKAN_MEMORY_ALLCATOR 0
 
-NS_RHI_BEGIN
+NS_GFX_BEGIN
 
 #define VKDEVICE() RHI_CAST(VKDevice*, GetGPUDevice())
 
@@ -453,7 +453,7 @@ private:
     friend class VKSwapChain;
 };
 
-NS_RHI_END
+NS_GFX_END
 
 
 #endif //RHI_VKDEVICE_H

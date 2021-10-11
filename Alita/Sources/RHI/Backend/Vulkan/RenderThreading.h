@@ -11,7 +11,7 @@
 #include "VKSwapChain.h"
 #include "RenderThreadingVkAllocator.h"
 
-NS_RHI_BEGIN
+NS_GFX_BEGIN
 
 class VKDevice;
 
@@ -158,6 +158,6 @@ protected:
     std::uint32_t size_ = 0;
 };
 
-NS_RHI_END
+NS_GFX_END
 
 #endif //PROJ_ANDROID_RENDERTHREADING_H

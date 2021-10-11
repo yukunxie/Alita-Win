@@ -8,7 +8,7 @@
 #include "Base/ObjectBase.h"
 #include "Engine/Engine.h"
 #include "Types/TData.h"
-#include "RHI/RHI.h"
+#include "GFX/GFX.h"
 #include "Graphics/Material.h"
 
 NS_RX_BEGIN

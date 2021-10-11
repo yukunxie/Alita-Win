@@ -8,7 +8,7 @@
 #include "VKDevice.h"
 #include "VKFramebuffer.h"
 
-NS_RHI_BEGIN
+NS_GFX_BEGIN
 
 class VKRenderBundleEncoder final : public RenderBundleEncoder
 {
@@ -79,7 +79,7 @@ private:
     friend class VKDevice;
 };
 
-NS_RHI_END
+NS_GFX_END
 
 
 #endif //RHI_VKRENDERBUNDLEENCODER_H

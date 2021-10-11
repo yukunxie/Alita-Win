@@ -13,7 +13,7 @@
 #include <chrono>
 
 
-NS_RHI_BEGIN
+NS_GFX_BEGIN
 
 VKSwapChain::VKSwapChain(VKDevice* device)
     : SwapChain(device)
@@ -321,4 +321,4 @@ void VKSwapChain::Present(std::uint32_t imageIndex, VkSemaphore semaWaiting, boo
     
     NotifyPresentDone(hasDrawCommands);
 }
-NS_RHI_END
+NS_GFX_END

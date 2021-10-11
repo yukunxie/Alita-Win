@@ -7,7 +7,7 @@
 
 #include "VKDevice.h"
 
-NS_RHI_BEGIN
+NS_GFX_BEGIN
 
 
 class VKRenderPass final : public RenderPass
@@ -32,7 +32,7 @@ private:
     friend class VKDevice;
 };
 
-NS_RHI_END
+NS_GFX_END
 
 
 #endif //RHI_VKRENDERPASS_H

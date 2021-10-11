@@ -4,14 +4,14 @@
 
 #include "ShaderHelper.h"
 
-#include "RHI/RHI.h"
+#include "GFX/GFX.h"
 
 #include "glslang/Public/ShaderLang.h"
 #include "SPIRV/GlslangToSpv.h"
 #include "StandAlone/DirStackFileIncluder.h"
 #include <regex>
 
-NS_RHI_BEGIN
+NS_GFX_BEGIN
 
 static bool glslangInitialized = false;
 
@@ -246,4 +246,4 @@ CompileGLSLToSPIRV(const char* source, ShaderType type, const std::string &inclu
     return spirVShader;
 }
 
-NS_RHI_END
+NS_GFX_END

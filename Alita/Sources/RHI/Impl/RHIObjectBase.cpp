@@ -2,16 +2,16 @@
 // Created by realxie on 2020/8/24.
 //
 
-#include "RHI/RHIObjectBase.h"
-#include "RHI/Device.h"
+#include "GFX/GFXBase.h"
+#include "GFX/Device.h"
 
-NS_RHI_BEGIN
+NS_GFX_BEGIN
 
 #if RHI_TRACE_OBJ_REF_COUNT
 
 static std::vector<const std::string> sCoarseFunctionCallStack;
 
-void RHIObjectBase::PushTraceback(const char* file, const char* funcName, std::uint32_t lineno)
+void GfxBase::PushTraceback(const char* file, const char* funcName, std::uint32_t lineno)
 {
     const static char* separator = "/cocos2d-x-lite/";
     const char* ptr = strstr(file, separator);
@@ -20,7 +20,7 @@ void RHIObjectBase::PushTraceback(const char* file, const char* funcName, std::u
     sCoarseFunctionCallStack.push_back(std::move(info));
 }
 
-void RHIObjectBase::PopTraceback()
+void GfxBase::PopTraceback()
 {
     if (!sCoarseFunctionCallStack.empty())
     {
@@ -45,17 +45,17 @@ void RHIObjectBase::PopTraceback()
 #endif
 
 #if defined(RHI_DEBUG) && RHI_DEBUG
-std::thread::native_handle_type RHIObjectBase::mainThreadId_ = 0;
+std::thread::native_handle_type GfxBase::mainThreadId_ = 0;
 #endif
 
-RHIObjectBase::~RHIObjectBase()
+GfxBase::~GfxBase()
 {
     RHI_ASSERT(globalId__ != INVALID_OBJECT_ID);
     RHI_ASSERT(bindingScriptObject_ == nullptr);
     RHI_SAFE_RELEASE(GPUDevice_);
 }
 
-RHIObjectBase::RHIObjectBase(RHIObjectType objectType)
+GfxBase::GfxBase(RHIObjectType objectType)
     : objectType__(objectType)
 {
     CheckThread();
@@ -66,14 +66,14 @@ RHIObjectBase::RHIObjectBase(RHIObjectType objectType)
 #endif
 }
 
-RHIObjectBase::RHIObjectBase(Device* device, RHIObjectType objectType)
-: RHIObjectBase(objectType)
+GfxBase::GfxBase(Device* device, RHIObjectType objectType)
+: GfxBase(objectType)
 {
     RHI_PTR_ASSIGN(GPUDevice_, device);
     GPUDevice_->GetObjectManager().AddObject(this);
 }
 
-RHIObjectBase* RHIObjectBase::AutoRelease()
+GfxBase* GfxBase::AutoRelease()
 {
     if (this->GetObjectType() == RHIObjectType::Device)
     {
@@ -90,7 +90,7 @@ RHIObjectBase* RHIObjectBase::AutoRelease()
     return this;
 }
 
-void RHIObjectBase::Retain() const
+void GfxBase::Retain() const
 {
     NEW_OBJ_REF_COUNT_TRACEBACK(xxxfuncCallRetainTracebacks_);
     
@@ -100,7 +100,7 @@ void RHIObjectBase::Retain() const
     ++referenceCount__;
 }
 
-void RHIObjectBase::Release() const
+void GfxBase::Release() const
 {
     NEW_OBJ_REF_COUNT_TRACEBACK(xxxfuncCallReleaseTracebacks_);
 
@@ -119,5 +119,5 @@ void RHIObjectBase::Release() const
     }
 }
 
-NS_RHI_END
+NS_GFX_END
 

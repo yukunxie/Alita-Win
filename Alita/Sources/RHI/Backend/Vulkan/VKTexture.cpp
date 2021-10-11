@@ -10,7 +10,7 @@
 #include "DeferredRenderCommands.h"
 #include "VKCommandBuffer.h"
 
-NS_RHI_BEGIN
+NS_GFX_BEGIN
 
 extern PFN_vkDebugMarkerSetObjectNameEXT vkDebugMarkerSetObjectName;
 
@@ -266,4 +266,4 @@ void VKTexture::TransToTargetImageLayout_(VKCommandBuffer* commandBuffer, Textur
     currentTexUsageForMemLayout_ = targetTextureUsage;
 }
 
-NS_RHI_END
+NS_GFX_END

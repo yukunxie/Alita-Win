@@ -395,9 +395,9 @@ echo "xxxxx"</Command>
     <ClInclude Include="Sources\RHI\Include\RHI\RenderPipeline.h" />
     <ClInclude Include="Sources\RHI\Include\RHI\RenderQueue.h" />
     <ClInclude Include="Sources\RHI\Include\RHI\RenderTarget.h" />
-    <ClInclude Include="Sources\RHI\Include\RHI\RHI.h" />
-    <ClInclude Include="Sources\RHI\Include\RHI\RHIObjectBase.h" />
-    <ClInclude Include="Sources\RHI\Include\RHI\RHIObjectManager.h" />
+    <ClInclude Include="Sources\RHI\Include\RHI\GFX.h" />
+    <ClInclude Include="Sources\RHI\Include\RHI\GFXBase.h" />
+    <ClInclude Include="Sources\RHI\Include\RHI\GFXObjectManager.h" />
     <ClInclude Include="Sources\RHI\Include\RHI\Runnable.h" />
     <ClInclude Include="Sources\RHI\Include\RHI\SampledTextureView.h" />
     <ClInclude Include="Sources\RHI\Include\RHI\Sampler.h" />

@@ -5,7 +5,7 @@
 #ifndef ALITA_ENGINE_H
 #define ALITA_ENGINE_H
 
-#include "RHI/RHI.h"
+#include "GFX/GFX.h"
 #include "Base/Macros.h"
 #include "Types/Types.h"
 

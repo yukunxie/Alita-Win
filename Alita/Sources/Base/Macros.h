@@ -19,14 +19,16 @@
 
 #define RX_SAFE_RELEASE(obj) do {if(obj)(obj)->Release(); (obj) = nullptr;} while(0)
 
-#define RX_ASSERT(cond) Assert(cond, "")
-
 #ifdef _DEBUG
+#ifndef Assert
 #define Assert(cond, format, ...) void(0)
+#endif
 //#define Assert(cond, format, ...)  do {if (!(cond)) AssertImpl(__FILE__, "", __LINE__, format, ##__VA_ARGS__); } while(0)
 #else 
 #define Assert(cond, ...) ((void)0)
 #endif
+
+#define RX_ASSERT(cond) Assert(cond, "")
 
 
 //#ifdef ANDROID

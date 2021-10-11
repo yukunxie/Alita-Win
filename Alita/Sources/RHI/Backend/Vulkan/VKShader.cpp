@@ -8,7 +8,7 @@
 #include "SPIRV/GlslangToSpv.h"
 #include "StandAlone/DirStackFileIncluder.h"
 
-NS_RHI_BEGIN
+NS_GFX_BEGIN
 
 VKShader::VKShader(VKDevice* device)
     : Shader(device)
@@ -49,4 +49,4 @@ bool VKShader::Init(const ShaderModuleDescriptor &descriptor)
     return VK_NULL_HANDLE != vkShaderModule_;
 }
 
-NS_RHI_END
+NS_GFX_END

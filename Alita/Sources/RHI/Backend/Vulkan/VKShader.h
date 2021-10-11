@@ -7,7 +7,7 @@
 
 #include "VKDevice.h"
 
-NS_RHI_BEGIN
+NS_GFX_BEGIN
 
 class VKShader final : public Shader
 {
@@ -31,6 +31,6 @@ private:
     friend class VKDevice;
 };
 
-NS_RHI_END
+NS_GFX_END
 
 #endif //RHI_VKSHADER_H

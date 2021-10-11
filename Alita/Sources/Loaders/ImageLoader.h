@@ -2,7 +2,7 @@
 
 #include "Base/ObjectBase.h"
 #include "World/Model.h"
-#include "RHI/RHI.h"
+#include "GFX/GFX.h"
 
 
 NS_RX_BEGIN

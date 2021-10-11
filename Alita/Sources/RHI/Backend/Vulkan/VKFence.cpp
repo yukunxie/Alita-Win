@@ -5,7 +5,7 @@
 #include "VKFence.h"
 #include "VKCommandBuffer.h"
 
-NS_RHI_BEGIN
+NS_GFX_BEGIN
 
 VKFence::VKFence(VKDevice* device)
     : Fence(device)
@@ -30,4 +30,4 @@ bool VKFence::Init(const FenceDescriptor& descriptor)
     return true;
 }
 
-NS_RHI_END
+NS_GFX_END

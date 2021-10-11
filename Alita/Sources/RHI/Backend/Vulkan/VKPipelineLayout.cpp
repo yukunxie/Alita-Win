@@ -4,7 +4,7 @@
 
 #include "VKPipelineLayout.h"
 
-NS_RHI_BEGIN
+NS_GFX_BEGIN
 
 VKPipelineLayout::VKPipelineLayout(VKDevice* device)
     : PipelineLayout(device)
@@ -52,4 +52,4 @@ bool VKPipelineLayout::Init(const PipelineLayoutDescriptor &descriptor)
     return VK_NULL_HANDLE != vkPipelineLayout_;
 }
 
-NS_RHI_END
+NS_GFX_END

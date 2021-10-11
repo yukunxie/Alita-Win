@@ -7,7 +7,7 @@
 
 #include "../Base/ObjectBase.h"
 #include "VertexBuffer.h"
-#include "RHI/RHI.h"
+#include "GFX/GFX.h"
 
 NS_RX_BEGIN
 

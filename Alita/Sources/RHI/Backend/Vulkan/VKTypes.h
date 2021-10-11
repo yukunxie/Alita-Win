@@ -6,12 +6,12 @@
 #define RHI_VKTYPES_H
 
 #include "Macros.h"
-#include "RHI/Flags.h"
-#include "RHI/Descriptors.h"
+#include "GFX/Flags.h"
+#include "GFX/Descriptors.h"
 
 #include <vulkan/vulkan.h>
 
-NS_RHI_BEGIN
+NS_GFX_BEGIN
 
 template<typename _Tp>
 bool IsZero(const _Tp &value)
@@ -106,6 +106,6 @@ VkPipelineStageFlags VulkanPipelineStage(TextureUsageFlags usage, TextureFormat 
 
 VkImageAspectFlags VulkanAspectMask(TextureFormat format);
 
-NS_RHI_END
+NS_GFX_END
 
 #endif //RHI_VKTYPES_H

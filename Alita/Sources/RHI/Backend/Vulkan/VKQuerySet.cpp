@@ -4,7 +4,7 @@
 
 #include "VKQuerySet.h"
 
-NS_RHI_BEGIN
+NS_GFX_BEGIN
 
 
 VKQuerySet::VKQuerySet(VKDevice* device)
@@ -49,4 +49,4 @@ bool VKQuerySet::Init(const QuerySetDescriptor &descriptor)
     return VK_NULL_HANDLE != vkQueryPool_;
 }
 
-NS_RHI_END
+NS_GFX_END

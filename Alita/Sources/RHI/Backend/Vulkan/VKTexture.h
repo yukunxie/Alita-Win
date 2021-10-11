@@ -7,7 +7,7 @@
 
 #include "VKDevice.h"
 
-NS_RHI_BEGIN
+NS_GFX_BEGIN
 
 class VKTextureView;
 
@@ -94,7 +94,7 @@ public:
     inline bool GetIsSwapChainTexture() const { return isSwapChainTexture_; }
 };
 
-NS_RHI_END
+NS_GFX_END
 
 
 #endif //RHI_VKTEXTURE_H

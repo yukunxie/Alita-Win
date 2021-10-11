@@ -9,7 +9,7 @@
 #include "VKDevice.h"
 #include "VKPipelineLayout.h"
 
-NS_RHI_BEGIN
+NS_GFX_BEGIN
 
 class VKComputePassEncoder final : public ComputePassEncoder
 {
@@ -56,7 +56,7 @@ private:
     friend class VKDevice;
 };
 
-NS_RHI_END
+NS_GFX_END
 
 
 #endif //RHI_VKCOMPUTEPASSENCODER_H

@@ -7,7 +7,7 @@
 
 #include "VKDevice.h"
 
-NS_RHI_BEGIN
+NS_GFX_BEGIN
 
 class VKSampler final : public Sampler
 {
@@ -31,7 +31,7 @@ private:
     friend class VKDevice;
 };
 
-NS_RHI_END
+NS_GFX_END
 
 
 #endif //RHI_VKSAMPLER_H

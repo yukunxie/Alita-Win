@@ -9,7 +9,7 @@
 #include <iomanip>
 #include <fstream>
 
-#include "RHI/RHI.h"
+#include "GFX/GFX.h"
 #include "Backend/Vulkan/VKDevice.h"
 
 //   0 = 黑色      8 = 灰色
@@ -55,7 +55,7 @@ void SetConsoleColor(ConsoleForegroundColor foreColor = enmCFC_White, ConsoleBac
     SetConsoleTextAttribute(handle, foreColor | backColor);
 }
 
-NS_RHI_BEGIN
+NS_GFX_BEGIN
 
 //Device* CreateDeviceHelper(DeviceType deviceType, void* data)
 //{
@@ -64,7 +64,7 @@ NS_RHI_BEGIN
 //}
 
 
-NS_RHI_END
+NS_GFX_END
 
 void _OutputLog(LogLevel level, const char* format, ...)
 {

@@ -9,7 +9,7 @@
 #include <vector>
 #include <vulkan/vulkan.h>
 
-NS_RHI_BEGIN
+NS_GFX_BEGIN
 
 class VKFramebuffer final : public Framebuffer
 {
@@ -63,7 +63,7 @@ private:
     friend class VKDevice;
 };
 
-NS_RHI_END
+NS_GFX_END
 
 
 #endif //RHI_VKFRAMEBUFFER_H

@@ -3,9 +3,9 @@
 //
 
 #include "VKCommandBuffer.h"
-#include "RHI/RenderBundleCommands.h"
+#include "GFX/RenderBundleCommands.h"
 
-NS_RHI_BEGIN
+NS_GFX_BEGIN
 
 
 void CmdSetRenderPipeline::Execute(CommandBuffer* commandBuffer)
@@ -80,6 +80,6 @@ void CmdInsertDebugMarker::Execute(CommandBuffer* commandBuffer)
     RHI_CAST(VKCommandBuffer*, commandBuffer)->InsertDebugMarker(markerLabel.c_str());
 }
 
-NS_RHI_END
+NS_GFX_END
 
 

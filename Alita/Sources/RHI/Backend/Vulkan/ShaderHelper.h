@@ -9,7 +9,7 @@
 
 #include <string>
 
-NS_RHI_BEGIN
+NS_GFX_BEGIN
 
 enum class ShaderType
 {
@@ -22,7 +22,7 @@ std::vector<std::uint32_t> CompileGLSLToSPIRV(const std::string& code, ShaderTyp
 
 std::vector<std::uint32_t> CompileGLSLToSPIRV(const char* code, ShaderType type, const std::string& includeSearchPath = "");
 
-NS_RHI_END
+NS_GFX_END
 
 
 #endif //RHI_SHADERHELPER_H

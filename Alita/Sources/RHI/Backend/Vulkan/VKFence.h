@@ -10,7 +10,7 @@
 #include <mutex>
 #include <condition_variable>
 
-NS_RHI_BEGIN
+NS_GFX_BEGIN
 
 class VKFence final : public Fence
 {
@@ -32,7 +32,7 @@ private:
     friend class VKDevice;
 };
 
-NS_RHI_END
+NS_GFX_END
 
 
 #endif //RHI_VKFence_H

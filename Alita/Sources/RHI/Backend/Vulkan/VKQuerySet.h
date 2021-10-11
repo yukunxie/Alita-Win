@@ -7,7 +7,7 @@
 
 #include "VKDevice.h"
 
-NS_RHI_BEGIN
+NS_GFX_BEGIN
 
 class VKQuerySet : public QuerySet
 {
@@ -28,7 +28,7 @@ private:
     VkQueryPool vkQueryPool_ = VK_NULL_HANDLE;
 };
 
-NS_RHI_END
+NS_GFX_END
 
 
 #endif //PROJ_ANDROID_VKQUERYSET_H

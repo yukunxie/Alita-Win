@@ -11,9 +11,9 @@
 #include <array>
 #include <vulkan/vulkan.h>
 
-#include "RHI/xxhash64.h"
+#include "GFX/xxhash64.h"
 
-NS_RHI_BEGIN
+NS_GFX_BEGIN
 
 VKRenderPass::VKRenderPass(VKDevice* device)
     : RenderPass(device)
@@ -181,4 +181,4 @@ bool VKRenderPass::Init(const RenderPassCacheQuery &query)
     return VK_NULL_HANDLE != vkRenderPass_;
 }
 
-NS_RHI_END
+NS_GFX_END

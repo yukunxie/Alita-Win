@@ -4,7 +4,7 @@
 
 #include "VKSampler.h"
 
-NS_RHI_BEGIN
+NS_GFX_BEGIN
 
 VKSampler::VKSampler(VKDevice* device)
     : Sampler(device)
@@ -55,4 +55,4 @@ bool VKSampler::Init(const SamplerDescriptor &descriptor)
     return VK_NULL_HANDLE != vkSampler_;
 }
 
-NS_RHI_END
+NS_GFX_END

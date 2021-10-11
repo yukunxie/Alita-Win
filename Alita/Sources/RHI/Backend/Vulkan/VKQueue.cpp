@@ -9,7 +9,7 @@
 #include "RenderThreading.h"
 #include <chrono>
 
-NS_RHI_BEGIN
+NS_GFX_BEGIN
 
 VKQueue::VKQueue(VKDevice* device)
     : Queue(device)
@@ -124,4 +124,4 @@ VKCommandBuffer* VKQueue::GetImageLayoutInitCommandBuffer()
     return imageLayoutInitCommandBuffer_;
 }
 
-NS_RHI_END
+NS_GFX_END

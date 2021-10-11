@@ -29,7 +29,7 @@
 #include "VKSwapChain.h"
 #include "VKFramebuffer.h"
 #include "VKFence.h"
-#include "RHI/xxhash64.h"
+#include "GFX/xxhash64.h"
 #include "CommandList.h"
 
 #include <vector>
@@ -40,7 +40,7 @@
 #include <android/log.h>
 #endif
 
-NS_RHI_BEGIN
+NS_GFX_BEGIN
 
 PFN_vkDebugMarkerSetObjectTagEXT vkDebugMarkerSetObjectTag = VK_NULL_HANDLE;
 PFN_vkDebugMarkerSetObjectNameEXT vkDebugMarkerSetObjectName = VK_NULL_HANDLE;
@@ -71,7 +71,7 @@ static VKDevice* sActivedDevice_ = nullptr;
 VKDevice* VKDevice::Create(const DeviceDescriptor &descriptor, std::unique_ptr<IDeviceExternalDeps>&& deviceExternalDeps)
 {
 #if defined(RHI_DEBUG) && RHI_DEBUG
-    RHIObjectBase::SetMainThreadId(pthread_self());
+    GfxBase::SetMainThreadId(pthread_self());
 #endif
     
     auto device = new VKDevice(std::move(deviceExternalDeps));
@@ -1852,4 +1852,4 @@ void DumpVulkanErrorMessage(VkResult code, const char* filename, uint32_t lineno
     LOGE("Vulkan error [%s-%d]. File[%s], line[%d] \n", message, code, filename, lineno);
 }
 
-NS_RHI_END
+NS_GFX_END

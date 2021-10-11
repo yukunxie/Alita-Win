@@ -17,7 +17,7 @@
 #include <array>
 #include <vulkan/vulkan.h>
 
-NS_RHI_BEGIN
+NS_GFX_BEGIN
 
 VKRenderPassEncoder::VKRenderPassEncoder(VKDevice* device)
     : RenderPassEncoder(device)
@@ -393,4 +393,4 @@ void VKRenderPassEncoder::EndPass()
     RHI_SAFE_RELEASE(vkFramebuffer_);
 }
 
-NS_RHI_END
+NS_GFX_END

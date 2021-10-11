@@ -7,7 +7,7 @@
 #include "VKTextureView.h"
 #include <vector>
 
-NS_RHI_BEGIN
+NS_GFX_BEGIN
 
 VKFramebuffer::VKFramebuffer(VKDevice* device)
     : Framebuffer(device)
@@ -103,4 +103,4 @@ VKFramebuffer::~VKFramebuffer()
 }
 
 
-NS_RHI_END
+NS_GFX_END

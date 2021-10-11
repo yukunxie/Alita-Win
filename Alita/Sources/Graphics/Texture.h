@@ -6,7 +6,7 @@
 
 #include "Base/ObjectBase.h"
 #include "Base/Resource.h"
-#include "RHI/RHI.h"
+#include "GFX/GFX.h"
 #include <memory>
 #include <string>
 

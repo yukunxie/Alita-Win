@@ -2,11 +2,11 @@
 // Created by realxie on 2020/8/24.
 //
 
-#include "RHI/Device.h"
+#include "GFX/Device.h"
 
-NS_RHI_BEGIN
+NS_GFX_BEGIN
 
-void Device::AddAutoReleaseObjectToPool(RHIObjectBase* object)
+void Device::AddAutoReleaseObjectToPool(GfxBase* object)
 {
     RHI_ASSERT(object);
     if (!object) return;
@@ -36,4 +36,4 @@ void Device::PurgeAutoReleasePool()
     autoReleasedObjectPool_.clear();
 }
 
-NS_RHI_END
+NS_GFX_END

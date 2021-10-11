@@ -11,7 +11,7 @@
 
 extern int g_test_released;
 
-NS_RHI_BEGIN
+NS_GFX_BEGIN
 
 VKCommandEncoder::VKCommandEncoder(VKDevice* device)
     : CommandEncoder(device)
@@ -163,4 +163,4 @@ void VKCommandEncoder::InsertDebugMarker(const std::string &markerLabel)
     commandBuffer_->RecordCommand<DeferredCmdInsertDebugMarker>(markerLabel);
 }
 
-NS_RHI_END
+NS_GFX_END

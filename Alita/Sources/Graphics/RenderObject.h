@@ -1,6 +1,6 @@
 #pragma once
 
-#include "RHI/RHI.h"
+#include "GFX/GFX.h"
 
 #include "Base/ObjectBase.h"
 #include "Meshes/VertexBuffer.h"
@@ -10,8 +10,9 @@
 
 NS_RX_BEGIN
 
-struct RenderObject
+class RenderObject
 {
+public:
 	void Render(const Pass* pass, ETechniqueType technique, ERenderSet renderSet, RHI::RenderPassEncoder& passEndcoder);
 
 	struct VertexBufferInfo

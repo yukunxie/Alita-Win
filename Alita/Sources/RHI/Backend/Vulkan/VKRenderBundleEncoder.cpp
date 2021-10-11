@@ -6,7 +6,7 @@
 #include "VKBindGroup.h"
 #include "VKRenderBundle.h"
 
-NS_RHI_BEGIN
+NS_GFX_BEGIN
 
 VKRenderBundleEncoder::VKRenderBundleEncoder(VKDevice* device)
     : RenderBundleEncoder(device)
@@ -157,4 +157,4 @@ void VKRenderBundleEncoder::Reset()
     RHI_PTR_ASSIGN(renderBundle_, tmp);
 }
 
-NS_RHI_END
+NS_GFX_END

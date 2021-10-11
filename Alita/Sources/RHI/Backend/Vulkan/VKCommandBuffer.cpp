@@ -15,7 +15,7 @@
 #include "VKTextureView.h"
 #include "VKQuerySet.h"
 
-NS_RHI_BEGIN
+NS_GFX_BEGIN
 
 RenderPassEntry::RenderPassEntry(RenderPass* renderPass,
                                  Framebuffer* framebuffer,
@@ -289,7 +289,7 @@ void VKCommandBuffer::DispatchIndirect(Buffer* indirectBuffer, BufferSize indire
     bindingObjects_.pushBack(indirectBuffer);
 }
 
-void VKCommandBuffer::AddBindingObject(RHIObjectBase* object)
+void VKCommandBuffer::AddBindingObject(GfxBase* object)
 {
     if (!object) return;
     
@@ -869,4 +869,4 @@ void VKCommandBuffer::ForceEndRenderPass()
     occlusionQuerySetBinding_ = nullptr;
 }
 
-NS_RHI_END
+NS_GFX_END

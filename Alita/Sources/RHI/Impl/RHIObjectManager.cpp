@@ -2,14 +2,14 @@
 // Created by realxie on 2020/8/28.
 //
 
-#include "RHI/Buffer.h"
-#include "RHI/Texture.h"
-#include "RHI/RHIObjectManager.h"
+#include "GFX/Buffer.h"
+#include "GFX/Texture.h"
+#include "GFX/GfxObjectManager.h"
 
-NS_RHI_BEGIN
+NS_GFX_BEGIN
 
 
-void RHIObjectManager::AddObject(RHIObjectBase* objectBase)
+void GfxObjectManager::AddObject(GfxBase* objectBase)
 {
     if (TestObject(objectBase))
     {
@@ -21,7 +21,7 @@ void RHIObjectManager::AddObject(RHIObjectBase* objectBase)
     {
         if (id != INVALID_OBJECT_ID)
         {
-            LOGE("RHIObjectManager-AddObject, Invalid id");
+            LOGE("GfxObjectManager-AddObject, Invalid id");
         }
 
         if (!freeIds_.empty())
@@ -68,7 +68,7 @@ void RHIObjectManager::AddObject(RHIObjectBase* objectBase)
 #endif
 }
     
-void RHIObjectManager::RemoveObject(const RHIObjectBase* object)
+void GfxObjectManager::RemoveObject(const GfxBase* object)
 {
     if (object->GetObjectType() == RHIObjectType::CommandBuffer)
     {
@@ -86,7 +86,7 @@ void RHIObjectManager::RemoveObject(const RHIObjectBase* object)
     {
         bufferCount_--;
 
-        RHIObjectBase* baseObj = const_cast<RHIObjectBase*>(object);
+        GfxBase* baseObj = const_cast<GfxBase*>(object);
         auto buffer = RHI_CAST(Buffer*, baseObj);
         bufferSize_ -= buffer->GetBufferSize();
     }
@@ -94,7 +94,7 @@ void RHIObjectManager::RemoveObject(const RHIObjectBase* object)
     {
         textureCount_--;
 
-        RHIObjectBase* baseObj = const_cast<RHIObjectBase*>(object);
+        GfxBase* baseObj = const_cast<GfxBase*>(object);
         auto tex = RHI_CAST(Texture*, baseObj);
         textureMemory_ -= tex->getMemoryUsage();
     }
@@ -136,7 +136,7 @@ void RHIObjectManager::RemoveObject(const RHIObjectBase* object)
 
     
 #if RHI_DEBUG
-void RHIObjectManager::TrackObjectDebugging_(const RHIObjectBase* object)
+void GfxObjectManager::TrackObjectDebugging_(const GfxBase* object)
 {
     auto type = (std::uint32_t) object->GetObjectType();
     RHI_ASSERT(type > 0 && type < kMaxRHIObjectTypeCount);
@@ -144,7 +144,7 @@ void RHIObjectManager::TrackObjectDebugging_(const RHIObjectBase* object)
     objectTrackerCount_++;
 }
 
-bool RHIObjectManager::FindObjectDebugging_(const RHIObjectBase* object)
+bool GfxObjectManager::FindObjectDebugging_(const GfxBase* object)
 {
     for (std::uint32_t i = 0; i < kMaxRHIObjectTypeCount; ++i)
     {
@@ -156,7 +156,7 @@ bool RHIObjectManager::FindObjectDebugging_(const RHIObjectBase* object)
     return false;
 }
 
-void RHIObjectManager::RemoveTrackedObjectDebugging_(const RHIObjectBase* object)
+void GfxObjectManager::RemoveTrackedObjectDebugging_(const GfxBase* object)
 {
     if (!FindObjectDebugging_(object))
     {
@@ -177,5 +177,5 @@ void RHIObjectManager::RemoveTrackedObjectDebugging_(const RHIObjectBase* object
 }
 #endif // #if RHI_DEBUG
 
-NS_RHI_END
+NS_GFX_END
 

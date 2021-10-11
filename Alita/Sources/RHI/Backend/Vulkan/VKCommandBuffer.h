@@ -13,7 +13,7 @@
 #include "VKFramebuffer.h"
 #include "VKQuerySet.h"
 
-NS_RHI_BEGIN
+NS_GFX_BEGIN
 
 class VKBindGroup;
 
@@ -108,7 +108,7 @@ public:
     
     virtual void DispatchIndirect(Buffer* indirectBuffer, BufferSize indirectOffset) override;
     
-    void AddBindingObject(RHIObjectBase* object);
+    void AddBindingObject(GfxBase* object);
     
     void ResetCommandBuffer();
     
@@ -189,7 +189,7 @@ protected:
 private:
     VkCommandBuffer vkCommandBuffer_ = VK_NULL_HANDLE;
     
-    Vector<RHIObjectBase*> bindingObjects_;
+    Vector<GfxBase*> bindingObjects_;
     // 将不同render pass中的bindGroup聚合在不同的列表中
     std::vector<std::vector<VKBindGroup*>> bindGroupCatagories_;
     bool isRecording_ = false;
@@ -223,7 +223,7 @@ private:
     // bool enableCalcBindBufferCount_ = true;
 };
 
-NS_RHI_END
+NS_GFX_END
 
 
 #endif //RHI_VKCOMMANDBUFFER_H

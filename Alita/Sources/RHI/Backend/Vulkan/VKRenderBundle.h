@@ -8,7 +8,7 @@
 
 #include "VKDevice.h"
 
-NS_RHI_BEGIN
+NS_GFX_BEGIN
 
 class VKRenderBundle : public RenderBundle
 {
@@ -21,6 +21,6 @@ public:
     bool Init();
 };
 
-NS_RHI_END
+NS_GFX_END
 
 #endif //PROJ_ANDROID_VKRENDERBUNDLE_H

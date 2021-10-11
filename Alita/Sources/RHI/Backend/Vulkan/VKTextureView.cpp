@@ -5,7 +5,7 @@
 #include "VKTextureView.h"
 #include "VKTypes.h"
 
-NS_RHI_BEGIN
+NS_GFX_BEGIN
 
 VKTextureView::VKTextureView(VKDevice* device)
     : TextureView(device)
@@ -101,4 +101,4 @@ bool VKTextureView::Init(VKTexture* vkTexture, const TextureViewDescriptor &desc
     return VK_NULL_HANDLE != vkImageView_;
 }
 
-NS_RHI_END
+NS_GFX_END

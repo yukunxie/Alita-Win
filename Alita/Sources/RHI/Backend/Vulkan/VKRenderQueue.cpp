@@ -4,7 +4,7 @@
 
 #include "VKRenderQueue.h"
 
-NS_RHI_BEGIN
+NS_GFX_BEGIN
 
 VKRenderQueue::VKRenderQueue(VKDevice* device)
     : RenderQueue(device)
@@ -23,4 +23,4 @@ VKRenderQueue::~VKRenderQueue()
     Dispose();
 }
 
-NS_RHI_END
+NS_GFX_END

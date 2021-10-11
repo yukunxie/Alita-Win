@@ -4,7 +4,7 @@
 
 #include "CommandList.h"
 
-NS_RHI_BEGIN
+NS_GFX_BEGIN
 
 void CommandList::Reset()
 {
@@ -23,4 +23,4 @@ void CommandList::Reset()
     lastCommandNode_ = nullptr;
 }
 
-NS_RHI_END
+NS_GFX_END

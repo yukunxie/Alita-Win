@@ -8,7 +8,7 @@
 #include "VKDevice.h"
 #include "VKTextureView.h"
 
-NS_RHI_BEGIN
+NS_GFX_BEGIN
 
 struct FrameResource
 {
@@ -133,7 +133,7 @@ private:
     friend class VKDevice;
 };
 
-NS_RHI_END
+NS_GFX_END
 
 
 #endif //RHI_VKSWAPCHAIN_H
