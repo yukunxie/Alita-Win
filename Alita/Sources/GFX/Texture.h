@@ -26,15 +26,10 @@ public:
         textureFormat_ = descriptor.format;
         textureUsage_ = descriptor.usage;
         mipLevelCount_ = descriptor.mipLevelCount;
-        arrayLayerCount_ = 1;
+        arrayLayerCount_ = descriptor.arrayLayerCount;
         textureDimension_ = descriptor.dimension;
         sampleCount_ = descriptor.sampleCount;
         textureSize_ = descriptor.size;
-    
-        if (descriptor.dimension == TextureDimension::TEXTURE_2D) {
-            textureSize_.depth = 1;
-            arrayLayerCount_ = descriptor.size.depth;
-        }
         return true;
     }
     

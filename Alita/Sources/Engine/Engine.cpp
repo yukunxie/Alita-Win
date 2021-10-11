@@ -8,8 +8,8 @@
 #include "Graphics/RenderScene.h"
 #include "Event/EventSystem.h"
 
-#include "Backend/Vulkan/ShaderHelper.h"
-#include "Backend/Vulkan/VKDevice.h"
+#include "GFX/Backend/Vulkan/ShaderHelper.h"
+#include "GFX/Backend/Vulkan/VKDevice.h"
 
 NS_RX_BEGIN
 

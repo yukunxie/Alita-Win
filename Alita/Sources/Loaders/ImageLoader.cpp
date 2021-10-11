@@ -107,8 +107,8 @@ namespace ImageLoader
             descriptor.sampleCount = 1;
             descriptor.format = gfx::TextureFormat::RGBA8UNORM;
             descriptor.usage = gfx::TextureUsage::SAMPLED | gfx::TextureUsage::COPY_DST;
-            descriptor.size = { imageData.baseWidth, imageData.baseHeight, imageData.numFaces };
-            descriptor.arrayLayerCount = 1;
+            descriptor.size = { imageData.baseWidth, imageData.baseHeight, 1 };
+            descriptor.arrayLayerCount = imageData.numFaces;
             descriptor.mipLevelCount = imageData.numLevels;
             descriptor.dimension = gfx::TextureDimension::TEXTURE_2D;
             descriptor.debugName = imageData.debugName;

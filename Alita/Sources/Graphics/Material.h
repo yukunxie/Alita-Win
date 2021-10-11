@@ -10,7 +10,7 @@
 #include "Effect.h"
 #include "GFX/GFX.h"
 #include "Pass.h"
-#include "Backend/Vulkan/ShaderHelper.h"
+#include "GFX/Backend/Vulkan/ShaderHelper.h"
 #include "Graphics/Texture.h"
 
 #define RAPIDJSON_ASSERT(x) Assert(x, "")

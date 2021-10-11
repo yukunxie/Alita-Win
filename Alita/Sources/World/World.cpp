@@ -12,40 +12,10 @@
 #include "SkyBox.h"
 #include "MeshComponent.h"
 
-#include "PxPhysicsAPI.h"
-
 NS_RX_BEGIN
 
 World::World()
 {
-	//physx::PxFoundation* gFoundation = PxCreateFoundation(PX_PHYSICS_VERSION, gAllocator, gErrorCallback);
-
-	//physx::PxPhysics* gPhysics = PxCreatePhysics(PX_PHYSICS_VERSION, *gFoundation, physx::PxTolerancesScale(), true);
-
-	//physx::PxSceneDesc sceneDesc(physx::PxTolerancesScale{});
-
-	//physx::PxScene* pxScene = gPhysics->createScene(sceneDesc);
-
-	//physx::PxCollection* collection = PxCreateCollection();
-	//PX_ASSERT(collection);
-
-	//physx::PxMaterial* material = gPhysics->createMaterial(0.5f, 0.5f, 0.6f);
-	//PX_ASSERT(material);
-	//physx::PxShape* shape = gPhysics->createShape(physx::PxBoxGeometry(2.f, 2.f, 2.f), *material);
-	//physx::PxRigidStatic* theStatic = PxCreateStatic(*gPhysics, physx::PxTransform(physx::PxIdentity), *shape);
-
-	//collection->add(*material);
-	//collection->add(*shape);
-	//collection->add(*theStatic);
-
-	///*physx::PxDefaultFileOutputStream s("D://test.px");
-	//physx::PxSerializationRegistry* gSerializationRegistry = NULL;
-	//bool bret = physx::PxSerialization::serializeCollectionToBinary(s, *collection, *gSerializationRegistry);
-
-	//physx::PxSerialization::dumpBinaryMetaData(s, *gSerializationRegistry);*/
-
-	//collection->release();
-
 
 	SetupDefaultCamera();
 
@@ -67,8 +37,8 @@ World::World()
 		//const auto& models = GLTFLoader::LoadModelFromGLTF("Models/deer.gltf");
 		//const auto& models = GLTFLoader::LoadModelFromGLTF("Models/cerberus/cerberus.gltf");
 		//const auto& models = GLTFLoader::LoadModelFromGLTF("Models/armor/armor.gltf");
-		const auto& models = GLTFLoader::LoadModelFromGLTF("Scenes/Sponza/Sponza.gltf");
-		//const auto& models = GLTFLoader::LoadModelFromGLTF("Models/DamagedHelmet/glTF/DamagedHelmet.gltf");
+		//const auto& models = GLTFLoader::LoadModelFromGLTF("Scenes/Sponza/Sponza.gltf");
+		const auto& models = GLTFLoader::LoadModelFromGLTF("Models/DamagedHelmet/glTF/DamagedHelmet.gltf");
 		for (auto model : models)
 		{
 			AddEntity(model);

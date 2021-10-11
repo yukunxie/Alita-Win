@@ -64,8 +64,10 @@ void GraphicPipeline::Execute(const std::vector<RenderObject*>& renderObjects)
 {
 	CommandEncoder_->Reset();
 
-	ShadowGenPass_.Reset();
-	ShadowGenPass_.Execute(renderObjects);
+	{
+		ShadowGenPass_.Reset();
+		ShadowGenPass_.Execute(renderObjects);
+	}
 
 	{
 		DeferredPass_.Reset(); 
@@ -73,12 +75,7 @@ void GraphicPipeline::Execute(const std::vector<RenderObject*>& renderObjects)
 		DeferredPass_.Execute(renderObjects);
 	}
 
-	/*{
-		SkyBoxPass_.Reset();
-		SkyBoxPass_.Setup(&DeferredPass_, &DeferredPass_);
-		SkyBoxPass_.Execute(renderObjects);
-	}
-
+	/*
 	{
 		DownSamplePass_.Reset();
 		DownSamplePass_.Setup(&SkyBoxPass_);
@@ -86,19 +83,26 @@ void GraphicPipeline::Execute(const std::vector<RenderObject*>& renderObjects)
 	}*/
 
 	{
+		SkyBoxPass_.Reset();
+		SkyBoxPass_.Setup(&DeferredPass_, &DeferredPass_);
+		SkyBoxPass_.Execute(renderObjects);
+	}
+
+	{
 		ToneMappingPass_.Reset();
-		ToneMappingPass_.Setup(&DeferredPass_);
+		ToneMappingPass_.Setup(&SkyBoxPass_);
 		ToneMappingPass_.Execute();
 	}
 
-	OutlinePass_.Reset();
-	OutlinePass_.Setup(&ToneMappingPass_);
-	OutlinePass_.Execute(renderObjects);
-	
+	{
+		OutlinePass_.Reset();
+		OutlinePass_.Setup(&ToneMappingPass_);
+		OutlinePass_.Execute(renderObjects);
+	}
+
 	{
 		ScreenResolvePass_.Reset();
 		ScreenResolvePass_.Setup(&OutlinePass_);
-		//ScreenResolvePass_.Setup(&DownSamplePass_);
 		ScreenResolvePass_.Execute();
 	}
 

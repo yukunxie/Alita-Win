@@ -429,6 +429,7 @@ void GaussianBlur::Execute()
 
 OutlineMarkPass::OutlineMarkPass()
 {
+	PassName_ = "OutlineMarkPass";
 	rtColor_ = std::make_shared<RenderTarget>(gfx::TextureFormat::RGBA8UNORM);
 	rtDepthStencil_ = std::make_shared<RenderTarget>(gfx::TextureFormat::DEPTH24PLUS_STENCIL8);
 }
@@ -455,11 +456,14 @@ void OutlineMarkPass::Execute(const std::vector<RenderObject*>& renderObjects)
 	}
 
 	EndPass();
+
+	
 }
 
 OutlinePass::OutlinePass()
 	: FullScreenPass("Materials/Outline.json", ETechniqueType::TShading)
 {
+	PassName_ = "OutlinePass";
 	rtColor_ = std::make_shared<RenderTarget>();
 }
 
@@ -470,6 +474,8 @@ void OutlinePass::Setup(const Pass* inputPass)
 
 void OutlinePass::Execute(const std::vector<RenderObject*>& renderObjects)
 {
+	CommandEncoder_ = Engine::GetRenderScene()->GetGraphicPipeline()->GetCommandEncoder();
+	CommandEncoder_->PushDebugGroup("Outline");
 
 	auto extent = InputPass_->GetColorAttachments()[0].RenderTarget->GetExtent();
 	auto format = InputPass_->GetColorAttachments()[0].RenderTarget->GetFormat();
@@ -503,6 +509,8 @@ void OutlinePass::Execute(const std::vector<RenderObject*>& renderObjects)
 	}
 
 	FullScreenPass::Execute();
+
+	CommandEncoder_->PopDebugGroup();
 }
 
 

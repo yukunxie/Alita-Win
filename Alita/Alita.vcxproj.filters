@@ -60,18 +60,6 @@
     <Filter Include="Sources\Engine\Private">
       <UniqueIdentifier>{55aabc01-f451-4ab6-b648-a845238b1dc2}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Sources\RHI">
-      <UniqueIdentifier>{8e69034d-4fba-419c-95bd-6b09440b014b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Sources\RHI\Include">
-      <UniqueIdentifier>{a707e5d5-c957-4870-bccc-05b28a9aa6f7}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Sources\RHI\Backend">
-      <UniqueIdentifier>{bf847b89-e3e2-437c-940c-701ed0af92b6}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Sources\RHI\Backend\Vulkan">
-      <UniqueIdentifier>{4c38e4e4-8e78-42e4-bd67-b2d12d8945c5}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Sources\Platform">
       <UniqueIdentifier>{59f5fa2a-5414-42ff-bd62-8973ee20da09}</UniqueIdentifier>
     </Filter>
@@ -129,12 +117,6 @@
     <Filter Include="Sources\Event">
       <UniqueIdentifier>{189c92ca-2386-4abf-a9e4-c3c9c309c3b4}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Sources\RHI\Impl">
-      <UniqueIdentifier>{e7698937-d82e-4c8d-9d8c-70c27054d4bd}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Sources\RHI\Backend\Vulkan\WMA">
-      <UniqueIdentifier>{6b21ab81-5f1e-495d-8833-cf6dddb5594d}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Third-Party\RenderDoc">
       <UniqueIdentifier>{7046677d-6f5b-4497-b72c-dc631e3c5bfc}</UniqueIdentifier>
     </Filter>
@@ -150,11 +132,17 @@
     <Filter Include="Sources\Utils\MD5">
       <UniqueIdentifier>{114dc470-dd31-4bdb-a0cb-c2dd654f3e69}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Sources\RHI\Include\GFX">
-      <UniqueIdentifier>{4decb27a-b118-4165-87b9-6accbcfa901f}</UniqueIdentifier>
+    <Filter Include="Sources\GFX">
+      <UniqueIdentifier>{4d0fa087-af8c-4313-820e-85bba5436b34}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Sources\RHI\Include\GFX\Helper">
-      <UniqueIdentifier>{6584cb33-fda7-49e8-bf0c-f471815f6fd1}</UniqueIdentifier>
+    <Filter Include="Sources\Backend">
+      <UniqueIdentifier>{bf847b89-e3e2-437c-940c-701ed0af92b6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources\Backend\Vulkan">
+      <UniqueIdentifier>{4c38e4e4-8e78-42e4-bd67-b2d12d8945c5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources\Backend\Vulkan\WMA">
+      <UniqueIdentifier>{6b21ab81-5f1e-495d-8833-cf6dddb5594d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -395,101 +383,98 @@
     <ClCompile Include="Sources\Loaders\GLTFLoader.cpp">
       <Filter>Sources\Loader</Filter>
     </ClCompile>
-    <ClCompile Include="Sources\RHI\Impl\Device.cpp">
-      <Filter>Sources\RHI\Impl</Filter>
+    <ClCompile Include="Sources\GFX\Backend\Vulkan\VKSampler.cpp">
+      <Filter>Sources\Backend\Vulkan</Filter>
     </ClCompile>
-    <ClCompile Include="Sources\RHI\Backend\Vulkan\VKSampler.cpp">
-      <Filter>Sources\RHI\Backend\Vulkan</Filter>
+    <ClCompile Include="Sources\GFX\Backend\Vulkan\VKShader.cpp">
+      <Filter>Sources\Backend\Vulkan</Filter>
     </ClCompile>
-    <ClCompile Include="Sources\RHI\Backend\Vulkan\VKShader.cpp">
-      <Filter>Sources\RHI\Backend\Vulkan</Filter>
+    <ClCompile Include="Sources\GFX\Backend\Vulkan\VKSwapChain.cpp">
+      <Filter>Sources\Backend\Vulkan</Filter>
     </ClCompile>
-    <ClCompile Include="Sources\RHI\Backend\Vulkan\VKSwapChain.cpp">
-      <Filter>Sources\RHI\Backend\Vulkan</Filter>
+    <ClCompile Include="Sources\GFX\Backend\Vulkan\VKTexture.cpp">
+      <Filter>Sources\Backend\Vulkan</Filter>
     </ClCompile>
-    <ClCompile Include="Sources\RHI\Backend\Vulkan\VKTexture.cpp">
-      <Filter>Sources\RHI\Backend\Vulkan</Filter>
+    <ClCompile Include="Sources\GFX\Backend\Vulkan\VKTextureView.cpp">
+      <Filter>Sources\Backend\Vulkan</Filter>
     </ClCompile>
-    <ClCompile Include="Sources\RHI\Backend\Vulkan\VKTextureView.cpp">
-      <Filter>Sources\RHI\Backend\Vulkan</Filter>
+    <ClCompile Include="Sources\GFX\Backend\Vulkan\VKTypes.cpp">
+      <Filter>Sources\Backend\Vulkan</Filter>
     </ClCompile>
-    <ClCompile Include="Sources\RHI\Backend\Vulkan\VKTypes.cpp">
-      <Filter>Sources\RHI\Backend\Vulkan</Filter>
+    <ClCompile Include="Sources\GFX\Backend\Vulkan\CommandList.cpp">
+      <Filter>Sources\Backend\Vulkan</Filter>
     </ClCompile>
-    <ClCompile Include="Sources\RHI\Backend\Vulkan\CommandList.cpp">
-      <Filter>Sources\RHI\Backend\Vulkan</Filter>
+    <ClCompile Include="Sources\GFX\Backend\Vulkan\DeferredRenderCommands.cpp">
+      <Filter>Sources\Backend\Vulkan</Filter>
     </ClCompile>
-    <ClCompile Include="Sources\RHI\Backend\Vulkan\DeferredRenderCommands.cpp">
-      <Filter>Sources\RHI\Backend\Vulkan</Filter>
+    <ClCompile Include="Sources\GFX\Backend\Vulkan\RenderThreading.cpp">
+      <Filter>Sources\Backend\Vulkan</Filter>
     </ClCompile>
-    <ClCompile Include="Sources\RHI\Backend\Vulkan\RenderThreading.cpp">
-      <Filter>Sources\RHI\Backend\Vulkan</Filter>
+    <ClCompile Include="Sources\GFX\Backend\Vulkan\ShaderHelper.cpp">
+      <Filter>Sources\Backend\Vulkan</Filter>
     </ClCompile>
-    <ClCompile Include="Sources\RHI\Backend\Vulkan\ShaderHelper.cpp">
-      <Filter>Sources\RHI\Backend\Vulkan</Filter>
+    <ClCompile Include="Sources\GFX\Backend\Vulkan\VKBindGroup.cpp">
+      <Filter>Sources\Backend\Vulkan</Filter>
     </ClCompile>
-    <ClCompile Include="Sources\RHI\Backend\Vulkan\VKBindGroup.cpp">
-      <Filter>Sources\RHI\Backend\Vulkan</Filter>
+    <ClCompile Include="Sources\GFX\Backend\Vulkan\VKBindGroupLayout.cpp">
+      <Filter>Sources\Backend\Vulkan</Filter>
     </ClCompile>
-    <ClCompile Include="Sources\RHI\Backend\Vulkan\VKBindGroupLayout.cpp">
-      <Filter>Sources\RHI\Backend\Vulkan</Filter>
+    <ClCompile Include="Sources\GFX\Backend\Vulkan\VKBuffer.cpp">
+      <Filter>Sources\Backend\Vulkan</Filter>
     </ClCompile>
-    <ClCompile Include="Sources\RHI\Backend\Vulkan\VKBuffer.cpp">
-      <Filter>Sources\RHI\Backend\Vulkan</Filter>
+    <ClCompile Include="Sources\GFX\Backend\Vulkan\VKCommandBuffer.cpp">
+      <Filter>Sources\Backend\Vulkan</Filter>
     </ClCompile>
-    <ClCompile Include="Sources\RHI\Backend\Vulkan\VKCommandBuffer.cpp">
-      <Filter>Sources\RHI\Backend\Vulkan</Filter>
+    <ClCompile Include="Sources\GFX\Backend\Vulkan\VKCommandEncoder.cpp">
+      <Filter>Sources\Backend\Vulkan</Filter>
     </ClCompile>
-    <ClCompile Include="Sources\RHI\Backend\Vulkan\VKCommandEncoder.cpp">
-      <Filter>Sources\RHI\Backend\Vulkan</Filter>
+    <ClCompile Include="Sources\GFX\Backend\Vulkan\VKComputePassEncoder.cpp">
+      <Filter>Sources\Backend\Vulkan</Filter>
     </ClCompile>
-    <ClCompile Include="Sources\RHI\Backend\Vulkan\VKComputePassEncoder.cpp">
-      <Filter>Sources\RHI\Backend\Vulkan</Filter>
+    <ClCompile Include="Sources\GFX\Backend\Vulkan\VKComputePipeline.cpp">
+      <Filter>Sources\Backend\Vulkan</Filter>
     </ClCompile>
-    <ClCompile Include="Sources\RHI\Backend\Vulkan\VKComputePipeline.cpp">
-      <Filter>Sources\RHI\Backend\Vulkan</Filter>
+    <ClCompile Include="Sources\GFX\Backend\Vulkan\VKDevice.cpp">
+      <Filter>Sources\Backend\Vulkan</Filter>
     </ClCompile>
-    <ClCompile Include="Sources\RHI\Backend\Vulkan\VKDevice.cpp">
-      <Filter>Sources\RHI\Backend\Vulkan</Filter>
+    <ClCompile Include="Sources\GFX\Backend\Vulkan\VKFence.cpp">
+      <Filter>Sources\Backend\Vulkan</Filter>
     </ClCompile>
-    <ClCompile Include="Sources\RHI\Backend\Vulkan\VKFence.cpp">
-      <Filter>Sources\RHI\Backend\Vulkan</Filter>
+    <ClCompile Include="Sources\GFX\Backend\Vulkan\VKFramebuffer.cpp">
+      <Filter>Sources\Backend\Vulkan</Filter>
     </ClCompile>
-    <ClCompile Include="Sources\RHI\Backend\Vulkan\VKFramebuffer.cpp">
-      <Filter>Sources\RHI\Backend\Vulkan</Filter>
+    <ClCompile Include="Sources\GFX\Backend\Vulkan\VKPipelineLayout.cpp">
+      <Filter>Sources\Backend\Vulkan</Filter>
     </ClCompile>
-    <ClCompile Include="Sources\RHI\Backend\Vulkan\VKPipelineLayout.cpp">
-      <Filter>Sources\RHI\Backend\Vulkan</Filter>
+    <ClCompile Include="Sources\GFX\Backend\Vulkan\VKQuerySet.cpp">
+      <Filter>Sources\Backend\Vulkan</Filter>
     </ClCompile>
-    <ClCompile Include="Sources\RHI\Backend\Vulkan\VKQuerySet.cpp">
-      <Filter>Sources\RHI\Backend\Vulkan</Filter>
+    <ClCompile Include="Sources\GFX\Backend\Vulkan\VKQueue.cpp">
+      <Filter>Sources\Backend\Vulkan</Filter>
     </ClCompile>
-    <ClCompile Include="Sources\RHI\Backend\Vulkan\VKQueue.cpp">
-      <Filter>Sources\RHI\Backend\Vulkan</Filter>
+    <ClCompile Include="Sources\GFX\Backend\Vulkan\VKRenderBundle.cpp">
+      <Filter>Sources\Backend\Vulkan</Filter>
     </ClCompile>
-    <ClCompile Include="Sources\RHI\Backend\Vulkan\VKRenderBundle.cpp">
-      <Filter>Sources\RHI\Backend\Vulkan</Filter>
+    <ClCompile Include="Sources\GFX\Backend\Vulkan\VKRenderBundleCommandImpl.cpp">
+      <Filter>Sources\Backend\Vulkan</Filter>
     </ClCompile>
-    <ClCompile Include="Sources\RHI\Backend\Vulkan\VKRenderBundleCommandImpl.cpp">
-      <Filter>Sources\RHI\Backend\Vulkan</Filter>
+    <ClCompile Include="Sources\GFX\Backend\Vulkan\VKRenderBundleEncoder.cpp">
+      <Filter>Sources\Backend\Vulkan</Filter>
     </ClCompile>
-    <ClCompile Include="Sources\RHI\Backend\Vulkan\VKRenderBundleEncoder.cpp">
-      <Filter>Sources\RHI\Backend\Vulkan</Filter>
+    <ClCompile Include="Sources\GFX\Backend\Vulkan\VKRenderPass.cpp">
+      <Filter>Sources\Backend\Vulkan</Filter>
     </ClCompile>
-    <ClCompile Include="Sources\RHI\Backend\Vulkan\VKRenderPass.cpp">
-      <Filter>Sources\RHI\Backend\Vulkan</Filter>
+    <ClCompile Include="Sources\GFX\Backend\Vulkan\VKRenderPassEncoder.cpp">
+      <Filter>Sources\Backend\Vulkan</Filter>
     </ClCompile>
-    <ClCompile Include="Sources\RHI\Backend\Vulkan\VKRenderPassEncoder.cpp">
-      <Filter>Sources\RHI\Backend\Vulkan</Filter>
+    <ClCompile Include="Sources\GFX\Backend\Vulkan\VKRenderPipeline.cpp">
+      <Filter>Sources\Backend\Vulkan</Filter>
     </ClCompile>
-    <ClCompile Include="Sources\RHI\Backend\Vulkan\VKRenderPipeline.cpp">
-      <Filter>Sources\RHI\Backend\Vulkan</Filter>
+    <ClCompile Include="Sources\GFX\Backend\Vulkan\VKRenderQueue.cpp">
+      <Filter>Sources\Backend\Vulkan</Filter>
     </ClCompile>
-    <ClCompile Include="Sources\RHI\Backend\Vulkan\VKRenderQueue.cpp">
-      <Filter>Sources\RHI\Backend\Vulkan</Filter>
-    </ClCompile>
-    <ClCompile Include="Sources\RHI\Backend\Vulkan\VMA\VmaUsage.cpp">
-      <Filter>Sources\RHI\Backend\Vulkan\WMA</Filter>
+    <ClCompile Include="Sources\GFX\Backend\Vulkan\VMA\VmaUsage.cpp">
+      <Filter>Sources\Backend\Vulkan\WMA</Filter>
     </ClCompile>
     <ClCompile Include="Sources\World\SkyBox.cpp">
       <Filter>Sources\World\Private</Filter>
@@ -554,11 +539,14 @@
     <ClCompile Include="Sources\Utils\MD5\md5.cpp">
       <Filter>Sources\Utils\MD5</Filter>
     </ClCompile>
-    <ClCompile Include="Sources\RHI\Impl\GFXBase.cpp">
-      <Filter>Sources\RHI\Impl</Filter>
+    <ClCompile Include="Sources\GFX\Device.cpp">
+      <Filter>Sources\GFX</Filter>
     </ClCompile>
-    <ClCompile Include="Sources\RHI\Impl\GFXObjectManager.cpp">
-      <Filter>Sources\RHI\Impl</Filter>
+    <ClCompile Include="Sources\GFX\GFXBase.cpp">
+      <Filter>Sources\GFX</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\GFX\GFXObjectManager.cpp">
+      <Filter>Sources\GFX</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -904,236 +892,116 @@
     <ClInclude Include="Sources\Types\Enums.h">
       <Filter>Sources\Types</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\RHI\Backend\Vulkan\VKRenderQueue.h">
-      <Filter>Sources\RHI\Backend\Vulkan</Filter>
+    <ClInclude Include="Sources\GFX\Backend\Vulkan\VKRenderQueue.h">
+      <Filter>Sources\Backend\Vulkan</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\RHI\Backend\Vulkan\VKSampler.h">
-      <Filter>Sources\RHI\Backend\Vulkan</Filter>
+    <ClInclude Include="Sources\GFX\Backend\Vulkan\VKSampler.h">
+      <Filter>Sources\Backend\Vulkan</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\RHI\Backend\Vulkan\VKShader.h">
-      <Filter>Sources\RHI\Backend\Vulkan</Filter>
+    <ClInclude Include="Sources\GFX\Backend\Vulkan\VKShader.h">
+      <Filter>Sources\Backend\Vulkan</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\RHI\Backend\Vulkan\VKSwapChain.h">
-      <Filter>Sources\RHI\Backend\Vulkan</Filter>
+    <ClInclude Include="Sources\GFX\Backend\Vulkan\VKSwapChain.h">
+      <Filter>Sources\Backend\Vulkan</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\RHI\Backend\Vulkan\VKTexture.h">
-      <Filter>Sources\RHI\Backend\Vulkan</Filter>
+    <ClInclude Include="Sources\GFX\Backend\Vulkan\VKTexture.h">
+      <Filter>Sources\Backend\Vulkan</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\RHI\Backend\Vulkan\VKTextureView.h">
-      <Filter>Sources\RHI\Backend\Vulkan</Filter>
+    <ClInclude Include="Sources\GFX\Backend\Vulkan\VKTextureView.h">
+      <Filter>Sources\Backend\Vulkan</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\RHI\Backend\Vulkan\VKTextureViewManager.h">
-      <Filter>Sources\RHI\Backend\Vulkan</Filter>
+    <ClInclude Include="Sources\GFX\Backend\Vulkan\VKTextureViewManager.h">
+      <Filter>Sources\Backend\Vulkan</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\RHI\Backend\Vulkan\VKTypes.h">
-      <Filter>Sources\RHI\Backend\Vulkan</Filter>
+    <ClInclude Include="Sources\GFX\Backend\Vulkan\VKTypes.h">
+      <Filter>Sources\Backend\Vulkan</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\RHI\Backend\Vulkan\VulkanMacros.h">
-      <Filter>Sources\RHI\Backend\Vulkan</Filter>
+    <ClInclude Include="Sources\GFX\Backend\Vulkan\VulkanMacros.h">
+      <Filter>Sources\Backend\Vulkan</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\RHI\Backend\Vulkan\VulkanMarcos.h">
-      <Filter>Sources\RHI\Backend\Vulkan</Filter>
+    <ClInclude Include="Sources\GFX\Backend\Vulkan\VulkanMarcos.h">
+      <Filter>Sources\Backend\Vulkan</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\RHI\Backend\Vulkan\CommandList.h">
-      <Filter>Sources\RHI\Backend\Vulkan</Filter>
+    <ClInclude Include="Sources\GFX\Backend\Vulkan\CommandList.h">
+      <Filter>Sources\Backend\Vulkan</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\RHI\Backend\Vulkan\DeferredRenderCommands.h">
-      <Filter>Sources\RHI\Backend\Vulkan</Filter>
+    <ClInclude Include="Sources\GFX\Backend\Vulkan\DeferredRenderCommands.h">
+      <Filter>Sources\Backend\Vulkan</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\RHI\Backend\Vulkan\RenderThreading.h">
-      <Filter>Sources\RHI\Backend\Vulkan</Filter>
+    <ClInclude Include="Sources\GFX\Backend\Vulkan\RenderThreading.h">
+      <Filter>Sources\Backend\Vulkan</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\RHI\Backend\Vulkan\RenderThreadingVkAllocator.h">
-      <Filter>Sources\RHI\Backend\Vulkan</Filter>
+    <ClInclude Include="Sources\GFX\Backend\Vulkan\RenderThreadingVkAllocator.h">
+      <Filter>Sources\Backend\Vulkan</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\RHI\Backend\Vulkan\ShaderHelper.h">
-      <Filter>Sources\RHI\Backend\Vulkan</Filter>
+    <ClInclude Include="Sources\GFX\Backend\Vulkan\ShaderHelper.h">
+      <Filter>Sources\Backend\Vulkan</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\RHI\Backend\Vulkan\VKBindGroup.h">
-      <Filter>Sources\RHI\Backend\Vulkan</Filter>
+    <ClInclude Include="Sources\GFX\Backend\Vulkan\VKBindGroup.h">
+      <Filter>Sources\Backend\Vulkan</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\RHI\Backend\Vulkan\VKBindGroupLayout.h">
-      <Filter>Sources\RHI\Backend\Vulkan</Filter>
+    <ClInclude Include="Sources\GFX\Backend\Vulkan\VKBindGroupLayout.h">
+      <Filter>Sources\Backend\Vulkan</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\RHI\Backend\Vulkan\VKBuffer.h">
-      <Filter>Sources\RHI\Backend\Vulkan</Filter>
+    <ClInclude Include="Sources\GFX\Backend\Vulkan\VKBuffer.h">
+      <Filter>Sources\Backend\Vulkan</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\RHI\Backend\Vulkan\VKCommandBuffer.h">
-      <Filter>Sources\RHI\Backend\Vulkan</Filter>
+    <ClInclude Include="Sources\GFX\Backend\Vulkan\VKCommandBuffer.h">
+      <Filter>Sources\Backend\Vulkan</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\RHI\Backend\Vulkan\VKCommandEncoder.h">
-      <Filter>Sources\RHI\Backend\Vulkan</Filter>
+    <ClInclude Include="Sources\GFX\Backend\Vulkan\VKCommandEncoder.h">
+      <Filter>Sources\Backend\Vulkan</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\RHI\Backend\Vulkan\VKComputePassEncoder.h">
-      <Filter>Sources\RHI\Backend\Vulkan</Filter>
+    <ClInclude Include="Sources\GFX\Backend\Vulkan\VKComputePassEncoder.h">
+      <Filter>Sources\Backend\Vulkan</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\RHI\Backend\Vulkan\VKComputePipeline.h">
-      <Filter>Sources\RHI\Backend\Vulkan</Filter>
+    <ClInclude Include="Sources\GFX\Backend\Vulkan\VKComputePipeline.h">
+      <Filter>Sources\Backend\Vulkan</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\RHI\Backend\Vulkan\VKDevice.h">
-      <Filter>Sources\RHI\Backend\Vulkan</Filter>
+    <ClInclude Include="Sources\GFX\Backend\Vulkan\VKDevice.h">
+      <Filter>Sources\Backend\Vulkan</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\RHI\Backend\Vulkan\VKDevice_Helper.h">
-      <Filter>Sources\RHI\Backend\Vulkan</Filter>
+    <ClInclude Include="Sources\GFX\Backend\Vulkan\VKDevice_Helper.h">
+      <Filter>Sources\Backend\Vulkan</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\RHI\Backend\Vulkan\VKFence.h">
-      <Filter>Sources\RHI\Backend\Vulkan</Filter>
+    <ClInclude Include="Sources\GFX\Backend\Vulkan\VKFence.h">
+      <Filter>Sources\Backend\Vulkan</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\RHI\Backend\Vulkan\VKFramebuffer.h">
-      <Filter>Sources\RHI\Backend\Vulkan</Filter>
+    <ClInclude Include="Sources\GFX\Backend\Vulkan\VKFramebuffer.h">
+      <Filter>Sources\Backend\Vulkan</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\RHI\Backend\Vulkan\VKPipelineLayout.h">
-      <Filter>Sources\RHI\Backend\Vulkan</Filter>
+    <ClInclude Include="Sources\GFX\Backend\Vulkan\VKPipelineLayout.h">
+      <Filter>Sources\Backend\Vulkan</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\RHI\Backend\Vulkan\VKQuerySet.h">
-      <Filter>Sources\RHI\Backend\Vulkan</Filter>
+    <ClInclude Include="Sources\GFX\Backend\Vulkan\VKQuerySet.h">
+      <Filter>Sources\Backend\Vulkan</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\RHI\Backend\Vulkan\VKQueue.h">
-      <Filter>Sources\RHI\Backend\Vulkan</Filter>
+    <ClInclude Include="Sources\GFX\Backend\Vulkan\VKQueue.h">
+      <Filter>Sources\Backend\Vulkan</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\RHI\Backend\Vulkan\VKRenderBundle.h">
-      <Filter>Sources\RHI\Backend\Vulkan</Filter>
+    <ClInclude Include="Sources\GFX\Backend\Vulkan\VKRenderBundle.h">
+      <Filter>Sources\Backend\Vulkan</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\RHI\Backend\Vulkan\VKRenderBundleEncoder.h">
-      <Filter>Sources\RHI\Backend\Vulkan</Filter>
+    <ClInclude Include="Sources\GFX\Backend\Vulkan\VKRenderBundleEncoder.h">
+      <Filter>Sources\Backend\Vulkan</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\RHI\Backend\Vulkan\VKRenderCommands.h">
-      <Filter>Sources\RHI\Backend\Vulkan</Filter>
+    <ClInclude Include="Sources\GFX\Backend\Vulkan\VKRenderCommands.h">
+      <Filter>Sources\Backend\Vulkan</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\RHI\Backend\Vulkan\VKRenderPass.h">
-      <Filter>Sources\RHI\Backend\Vulkan</Filter>
+    <ClInclude Include="Sources\GFX\Backend\Vulkan\VKRenderPass.h">
+      <Filter>Sources\Backend\Vulkan</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\RHI\Backend\Vulkan\VKRenderPassEncoder.h">
-      <Filter>Sources\RHI\Backend\Vulkan</Filter>
+    <ClInclude Include="Sources\GFX\Backend\Vulkan\VKRenderPassEncoder.h">
+      <Filter>Sources\Backend\Vulkan</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\RHI\Backend\Vulkan\VKRenderPipeline.h">
-      <Filter>Sources\RHI\Backend\Vulkan</Filter>
+    <ClInclude Include="Sources\GFX\Backend\Vulkan\VKRenderPipeline.h">
+      <Filter>Sources\Backend\Vulkan</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\RHI\Backend\Vulkan\VMA\vk_mem_alloc.h">
-      <Filter>Sources\RHI\Backend\Vulkan\WMA</Filter>
+    <ClInclude Include="Sources\GFX\Backend\Vulkan\VMA\vk_mem_alloc.h">
+      <Filter>Sources\Backend\Vulkan\WMA</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\RHI\Backend\Vulkan\VMA\VmaUsage.h">
-      <Filter>Sources\RHI\Backend\Vulkan\WMA</Filter>
-    </ClInclude>
-    <ClInclude Include="Sources\RHI\Include\GFX\RenderQueue.h">
-      <Filter>Sources\RHI\Include\GFX</Filter>
-    </ClInclude>
-    <ClInclude Include="Sources\RHI\Include\GFX\RenderTarget.h">
-      <Filter>Sources\RHI\Include\GFX</Filter>
-    </ClInclude>
-    <ClInclude Include="Sources\RHI\Include\GFX\Runnable.h">
-      <Filter>Sources\RHI\Include\GFX</Filter>
-    </ClInclude>
-    <ClInclude Include="Sources\RHI\Include\GFX\SampledTextureView.h">
-      <Filter>Sources\RHI\Include\GFX</Filter>
-    </ClInclude>
-    <ClInclude Include="Sources\RHI\Include\GFX\Sampler.h">
-      <Filter>Sources\RHI\Include\GFX</Filter>
-    </ClInclude>
-    <ClInclude Include="Sources\RHI\Include\GFX\SemaphoreCXX.h">
-      <Filter>Sources\RHI\Include\GFX</Filter>
-    </ClInclude>
-    <ClInclude Include="Sources\RHI\Include\GFX\Shader.h">
-      <Filter>Sources\RHI\Include\GFX</Filter>
-    </ClInclude>
-    <ClInclude Include="Sources\RHI\Include\GFX\SwapChain.h">
-      <Filter>Sources\RHI\Include\GFX</Filter>
-    </ClInclude>
-    <ClInclude Include="Sources\RHI\Include\GFX\Texture.h">
-      <Filter>Sources\RHI\Include\GFX</Filter>
-    </ClInclude>
-    <ClInclude Include="Sources\RHI\Include\GFX\TextureView.h">
-      <Filter>Sources\RHI\Include\GFX</Filter>
-    </ClInclude>
-    <ClInclude Include="Sources\RHI\Include\GFX\TimeProfiler.h">
-      <Filter>Sources\RHI\Include\GFX</Filter>
-    </ClInclude>
-    <ClInclude Include="Sources\RHI\Include\GFX\xxhash64.h">
-      <Filter>Sources\RHI\Include\GFX</Filter>
-    </ClInclude>
-    <ClInclude Include="Sources\RHI\Include\GFX\AsyncWorker.h">
-      <Filter>Sources\RHI\Include\GFX</Filter>
-    </ClInclude>
-    <ClInclude Include="Sources\RHI\Include\GFX\BindGroup.h">
-      <Filter>Sources\RHI\Include\GFX</Filter>
-    </ClInclude>
-    <ClInclude Include="Sources\RHI\Include\GFX\BindGroupLayout.h">
-      <Filter>Sources\RHI\Include\GFX</Filter>
-    </ClInclude>
-    <ClInclude Include="Sources\RHI\Include\GFX\BindingResource.h">
-      <Filter>Sources\RHI\Include\GFX</Filter>
-    </ClInclude>
-    <ClInclude Include="Sources\RHI\Include\GFX\Buffer.h">
-      <Filter>Sources\RHI\Include\GFX</Filter>
-    </ClInclude>
-    <ClInclude Include="Sources\RHI\Include\GFX\CanvasContext.h">
-      <Filter>Sources\RHI\Include\GFX</Filter>
-    </ClInclude>
-    <ClInclude Include="Sources\RHI\Include\GFX\CommandBuffer.h">
-      <Filter>Sources\RHI\Include\GFX</Filter>
-    </ClInclude>
-    <ClInclude Include="Sources\RHI\Include\GFX\CommandEncoder.h">
-      <Filter>Sources\RHI\Include\GFX</Filter>
-    </ClInclude>
-    <ClInclude Include="Sources\RHI\Include\GFX\ComputePassEncoder.h">
-      <Filter>Sources\RHI\Include\GFX</Filter>
-    </ClInclude>
-    <ClInclude Include="Sources\RHI\Include\GFX\ComputePipeline.h">
-      <Filter>Sources\RHI\Include\GFX</Filter>
-    </ClInclude>
-    <ClInclude Include="Sources\RHI\Include\GFX\Constants.h">
-      <Filter>Sources\RHI\Include\GFX</Filter>
-    </ClInclude>
-    <ClInclude Include="Sources\RHI\Include\GFX\Descriptors.h">
-      <Filter>Sources\RHI\Include\GFX</Filter>
-    </ClInclude>
-    <ClInclude Include="Sources\RHI\Include\GFX\Device.h">
-      <Filter>Sources\RHI\Include\GFX</Filter>
-    </ClInclude>
-    <ClInclude Include="Sources\RHI\Include\GFX\Fence.h">
-      <Filter>Sources\RHI\Include\GFX</Filter>
-    </ClInclude>
-    <ClInclude Include="Sources\RHI\Include\GFX\Flags.h">
-      <Filter>Sources\RHI\Include\GFX</Filter>
-    </ClInclude>
-    <ClInclude Include="Sources\RHI\Include\GFX\Framebuffer.h">
-      <Filter>Sources\RHI\Include\GFX</Filter>
-    </ClInclude>
-    <ClInclude Include="Sources\RHI\Include\GFX\PipelineLayout.h">
-      <Filter>Sources\RHI\Include\GFX</Filter>
-    </ClInclude>
-    <ClInclude Include="Sources\RHI\Include\GFX\QuerySet.h">
-      <Filter>Sources\RHI\Include\GFX</Filter>
-    </ClInclude>
-    <ClInclude Include="Sources\RHI\Include\GFX\Queue.h">
-      <Filter>Sources\RHI\Include\GFX</Filter>
-    </ClInclude>
-    <ClInclude Include="Sources\RHI\Include\GFX\RenderBundle.h">
-      <Filter>Sources\RHI\Include\GFX</Filter>
-    </ClInclude>
-    <ClInclude Include="Sources\RHI\Include\GFX\RenderBundleCommands.h">
-      <Filter>Sources\RHI\Include\GFX</Filter>
-    </ClInclude>
-    <ClInclude Include="Sources\RHI\Include\GFX\RenderBundleEncoder.h">
-      <Filter>Sources\RHI\Include\GFX</Filter>
-    </ClInclude>
-    <ClInclude Include="Sources\RHI\Include\GFX\RenderCommandTypes.h">
-      <Filter>Sources\RHI\Include\GFX</Filter>
-    </ClInclude>
-    <ClInclude Include="Sources\RHI\Include\GFX\RenderPass.h">
-      <Filter>Sources\RHI\Include\GFX</Filter>
-    </ClInclude>
-    <ClInclude Include="Sources\RHI\Include\GFX\RenderPassEncoder.h">
-      <Filter>Sources\RHI\Include\GFX</Filter>
-    </ClInclude>
-    <ClInclude Include="Sources\RHI\Include\GFX\RenderPipeine.h">
-      <Filter>Sources\RHI\Include\GFX</Filter>
-    </ClInclude>
-    <ClInclude Include="Sources\RHI\Include\GFX\RenderPipeline.h">
-      <Filter>Sources\RHI\Include\GFX</Filter>
-    </ClInclude>
-    <ClInclude Include="Sources\RHI\Include\GFX\Helper\Vector.h">
-      <Filter>Sources\RHI\Include\GFX\Helper</Filter>
+    <ClInclude Include="Sources\GFX\Backend\Vulkan\VMA\VmaUsage.h">
+      <Filter>Sources\Backend\Vulkan\WMA</Filter>
     </ClInclude>
     <ClInclude Include="Third-Party\RenderDoc\renderdoc_app.h">
       <Filter>Third-Party\RenderDoc</Filter>
@@ -1162,14 +1030,134 @@
     <ClInclude Include="Sources\Utils\MD5\md5.h">
       <Filter>Sources\Utils\MD5</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\RHI\Include\GFX\GFX.h">
-      <Filter>Sources\RHI\Include\GFX</Filter>
+    <ClInclude Include="Sources\GFX\Helper\Vector.h">
+      <Filter>Sources\GFX</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\RHI\Include\GFX\GFXBase.h">
-      <Filter>Sources\RHI\Include\GFX</Filter>
+    <ClInclude Include="Sources\GFX\AsyncWorker.h">
+      <Filter>Sources\GFX</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\RHI\Include\GFX\GFXObjectManager.h">
-      <Filter>Sources\RHI\Include\GFX</Filter>
+    <ClInclude Include="Sources\GFX\BindGroup.h">
+      <Filter>Sources\GFX</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\GFX\BindGroupLayout.h">
+      <Filter>Sources\GFX</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\GFX\BindingResource.h">
+      <Filter>Sources\GFX</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\GFX\Buffer.h">
+      <Filter>Sources\GFX</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\GFX\CanvasContext.h">
+      <Filter>Sources\GFX</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\GFX\CommandBuffer.h">
+      <Filter>Sources\GFX</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\GFX\CommandEncoder.h">
+      <Filter>Sources\GFX</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\GFX\ComputePassEncoder.h">
+      <Filter>Sources\GFX</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\GFX\ComputePipeline.h">
+      <Filter>Sources\GFX</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\GFX\Constants.h">
+      <Filter>Sources\GFX</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\GFX\Descriptors.h">
+      <Filter>Sources\GFX</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\GFX\Device.h">
+      <Filter>Sources\GFX</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\GFX\Fence.h">
+      <Filter>Sources\GFX</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\GFX\Flags.h">
+      <Filter>Sources\GFX</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\GFX\Framebuffer.h">
+      <Filter>Sources\GFX</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\GFX\GFX.h">
+      <Filter>Sources\GFX</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\GFX\GFXBase.h">
+      <Filter>Sources\GFX</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\GFX\GFXObjectManager.h">
+      <Filter>Sources\GFX</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\GFX\PipelineLayout.h">
+      <Filter>Sources\GFX</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\GFX\QuerySet.h">
+      <Filter>Sources\GFX</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\GFX\Queue.h">
+      <Filter>Sources\GFX</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\GFX\RenderBundle.h">
+      <Filter>Sources\GFX</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\GFX\RenderBundleCommands.h">
+      <Filter>Sources\GFX</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\GFX\RenderBundleEncoder.h">
+      <Filter>Sources\GFX</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\GFX\RenderCommandTypes.h">
+      <Filter>Sources\GFX</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\GFX\RenderPass.h">
+      <Filter>Sources\GFX</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\GFX\RenderPassEncoder.h">
+      <Filter>Sources\GFX</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\GFX\RenderPipeine.h">
+      <Filter>Sources\GFX</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\GFX\RenderPipeline.h">
+      <Filter>Sources\GFX</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\GFX\RenderQueue.h">
+      <Filter>Sources\GFX</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\GFX\RenderTarget.h">
+      <Filter>Sources\GFX</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\GFX\Runnable.h">
+      <Filter>Sources\GFX</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\GFX\SampledTextureView.h">
+      <Filter>Sources\GFX</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\GFX\Sampler.h">
+      <Filter>Sources\GFX</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\GFX\SemaphoreCXX.h">
+      <Filter>Sources\GFX</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\GFX\Shader.h">
+      <Filter>Sources\GFX</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\GFX\SwapChain.h">
+      <Filter>Sources\GFX</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\GFX\Texture.h">
+      <Filter>Sources\GFX</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\GFX\TextureView.h">
+      <Filter>Sources\GFX</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\GFX\TimeProfiler.h">
+      <Filter>Sources\GFX</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\GFX\xxhash64.h">
+      <Filter>Sources\GFX</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
