@@ -132,9 +132,11 @@ static ConstantBufferFieldArray sGlobalUnfiormFields
     {MaterialParameterType::FLOAT4,     "EyePos"},
     {MaterialParameterType::FLOAT4,     "SunLight"},
     {MaterialParameterType::FLOAT4,     "SunLightColor"},
+    {MaterialParameterType::FLOAT4,     "ScreenInfo"},
     {MaterialParameterType::MAT4,       "ViewMatrix"},
     {MaterialParameterType::MAT4,       "ProjMatrix"},
     {MaterialParameterType::MAT4,       "ViewProjMatrix"},
+    {MaterialParameterType::MAT4,       "ViewProjMatrixInverse"},
     {MaterialParameterType::MAT4,       "ShadowViewProjMatrix"},
 };
 
@@ -334,6 +336,13 @@ void Material::Apply(const Pass* pass, ETechniqueType technique, ERenderSet rend
         SetFloat("ProjMatrix", 0, 16, (float*)&params.projMatrix);
         SetFloat("ViewProjMatrix", 0, 16, (float*)&params.viewProjMatrix);
         SetFloat("ShadowViewProjMatrix", 0, 16, (float*)&params.shadowViewProjMatrix); 
+
+        auto viewProjMatrixInverse = glm::inverse(params.viewProjMatrix);
+        SetFloat("ViewProjMatrixInverse", 0, 16, (float*)&viewProjMatrixInverse);
+
+        auto wsize = Engine::GetRenderScene()->GetGraphicPipeline()->GetWindowSize();
+        float screenInfo[4] = { wsize.width, wsize.height, 1.0f / wsize.width, 1.0f / wsize.height };
+        SetFloat("ScreenInfo", 0, 4, screenInfo);
     }
 
     PSOKey psoKey{};
