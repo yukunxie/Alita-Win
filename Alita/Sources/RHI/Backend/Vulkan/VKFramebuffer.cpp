@@ -19,14 +19,14 @@ bool VKFramebuffer::Init(const FramebufferCacheQuery &query)
     colorAttachments_.fill(nullptr);
     
     renderPass_ = query.renderPass;
-    RHI_SAFE_RETAIN(renderPass_);
+    GFX_SAFE_RETAIN(renderPass_);
     
     for (std::uint32_t i = 0; i < kMaxColorAttachments; ++i)
     {
         if (query.attachments[i])
         {
             colorAttachments_[colorAttachmentCount_] = query.attachments[i];
-            RHI_SAFE_RETAIN(colorAttachments_[colorAttachmentCount_]);
+            GFX_SAFE_RETAIN(colorAttachments_[colorAttachmentCount_]);
             ++colorAttachmentCount_;
         }
     }
@@ -80,7 +80,7 @@ void VKFramebuffer::Invalidate()
 
 void VKFramebuffer::Dispose()
 {
-    RHI_DISPOSE_BEGIN();
+    GFX_DISPOSE_BEGIN();
     
     if (vkFramebuffer_)
     {
@@ -90,11 +90,11 @@ void VKFramebuffer::Dispose()
     
     for (std::uint32_t i = 0; i < colorAttachmentCount_; ++i)
     {
-        RHI_SAFE_RELEASE(colorAttachments_[i]);
+        GFX_SAFE_RELEASE(colorAttachments_[i]);
     }
-    RHI_SAFE_RELEASE(renderPass_);
+    GFX_SAFE_RELEASE(renderPass_);
     
-    RHI_DISPOSE_END();
+    GFX_DISPOSE_END();
 }
 
 VKFramebuffer::~VKFramebuffer()

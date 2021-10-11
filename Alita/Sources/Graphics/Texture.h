@@ -15,23 +15,23 @@ NS_RX_BEGIN
 class Texture : public Resource
 {
 public:
-    Texture(RHI::Texture* texture);
+    Texture(gfx::Texture* texture);
 
-    Texture(uint32 width, uint32 height, RHI::TextureFormat format, const RHI::Color& color);
+    Texture(uint32 width, uint32 height, gfx::TextureFormat format, const gfx::Color& color);
 
     virtual ~Texture();
 
-    virtual const RHI::TextureView* GetTextureView() const;
+    virtual const gfx::TextureView* GetTextureView() const;
 
-    virtual const RHI::Texture* GetTexture() const;
+    virtual const gfx::Texture* GetTexture() const;
 
-    virtual RHI::Extent3D GetExtent() const { return { Width_, Height_, 1 }; }
+    virtual gfx::Extent3D GetExtent() const { return { Width_, Height_, 1 }; }
 
     virtual uint32 GetWidth() const { return Width_; }
 
     virtual uint32 GetHeight() const { return Height_; }
 
-    virtual RHI::TextureFormat GetFormat() const { return Format_; }
+    virtual gfx::TextureFormat GetFormat() const { return Format_; }
 
     void SetDebugName(const std::string& debugName) { Name_ = debugName; }
 
@@ -48,8 +48,8 @@ protected:
     std::string                 Name_;
     uint32                      Width_          = 1;
     uint32                      Height_         = 1;
-    RHI::TextureFormat          Format_         = RHI::TextureFormat::RGBA8UNORM;
-    RHI::Texture*               Texture_        = nullptr;
-    mutable RHI::TextureView*   TextureView_    = nullptr;
+    gfx::TextureFormat          Format_         = gfx::TextureFormat::RGBA8UNORM;
+    gfx::Texture*               Texture_        = nullptr;
+    mutable gfx::TextureView*   TextureView_    = nullptr;
 };
 NS_RX_END

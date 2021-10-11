@@ -61,7 +61,7 @@ public:
     {
         if (threadId_)
         {
-            RHI_ASSERT(pthread_self() == threadId_);
+            GFX_ASSERT(pthread_self() == threadId_);
         }
     }
     

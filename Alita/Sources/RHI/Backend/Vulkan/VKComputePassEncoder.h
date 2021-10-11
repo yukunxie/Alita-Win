@@ -37,17 +37,17 @@ public:
     
     virtual void PushDebugGroup(const std::string &groupLabel) override
     {
-        RHI_ASSERT(false, "unimplemented.");
+        GFX_ASSERT(false, "unimplemented.");
     }
     
     virtual void PopDebugGroup() override
     {
-        RHI_ASSERT(false, "unimplemented.");
+        GFX_ASSERT(false, "unimplemented.");
     }
     
     virtual void InsertDebugMarker(const std::string &markerLabel) override
     {
-        RHI_ASSERT(false, "unimplemented.");
+        GFX_ASSERT(false, "unimplemented.");
     }
 
 private:

@@ -129,7 +129,7 @@ public:
     
     FORCE_INLINE RHIObjectType GetObjectType() const
     {
-        RHI_ASSERT(objectType__ != RHIObjectType::UNDEFINED);
+        GFX_ASSERT(objectType__ != RHIObjectType::UNDEFINED);
         return objectType__;
     }
     
@@ -140,7 +140,7 @@ public:
     
     void SetId(std::uint32_t id)
     {
-        RHI_ASSERT(globalId__ == INVALID_OBJECT_ID || id == INVALID_OBJECT_ID);
+        GFX_ASSERT(globalId__ == INVALID_OBJECT_ID || id == INVALID_OBJECT_ID);
         globalId__ = id;
     }
     
@@ -181,17 +181,17 @@ public:
     FORCE_INLINE static void CheckThread()
     {
         // TODO realxie Recreate swapchain时会触发Assert，暂时先关掉
-#if defined(RHI_DEBUG) && RHI_DEBUG && 0
+#if defined(GFX_DEBUG) && GFX_DEBUG && 0
         if (mainThreadId_ && mainThreadId_ != pthread_self())
         {
-            RHI_ASSERT(false, "Only support in the main thread.");
+            GFX_ASSERT(false, "Only support in the main thread.");
         }
 #endif
     }
     
     FORCE_INLINE static void SetMainThreadId(std::thread::native_handle_type mainThreadId)
     {
-#if defined(RHI_DEBUG) && RHI_DEBUG
+#if defined(GFX_DEBUG) && GFX_DEBUG
         mainThreadId_ = mainThreadId;
 #endif
     }
@@ -214,7 +214,7 @@ private:
     void* bindingScriptObject_ = nullptr;
     Device* GPUDevice_ = nullptr;
     
-#if defined(RHI_DEBUG) && RHI_DEBUG
+#if defined(GFX_DEBUG) && GFX_DEBUG
     static std::thread::native_handle_type mainThreadId_;
 #endif
     
@@ -243,24 +243,24 @@ struct RHIObjectWrapper final
     
     RHIObjectWrapper(TP_* data)
     {
-        RHI_PTR_ASSIGN(data_, data);
+        GFX_PTR_ASSIGN(data_, data);
     }
 
     RHIObjectWrapper(const RHIObjectWrapper &entity)
     {
-        RHI_PTR_ASSIGN(data_, entity.data_);
+        GFX_PTR_ASSIGN(data_, entity.data_);
     }
     
     RHIObjectWrapper(RHIObjectWrapper &&entity)
     {
-        RHI_SAFE_RELEASE(data_);
+        GFX_SAFE_RELEASE(data_);
         data_ = entity.data_;
         entity.data_ = nullptr;
     }
 
     ~RHIObjectWrapper()
     {
-        RHI_SAFE_RELEASE(data_);
+        GFX_SAFE_RELEASE(data_);
     }
     
     TP_* Get() const
@@ -270,13 +270,13 @@ struct RHIObjectWrapper final
     
     RHIObjectWrapper<TP_>& operator =(const TP_& __r)
     {
-        RHI_PTR_ASSIGN(data_, __r.data_);
+        GFX_PTR_ASSIGN(data_, __r.data_);
         return *this;
     }
     
     RHIObjectWrapper<TP_>& operator =(TP_&& __r)
     {
-        RHI_SAFE_RELEASE(data_);
+        GFX_SAFE_RELEASE(data_);
         data_ = __r.data_;
         __r.data_ = nullptr;
         return *this;
@@ -284,13 +284,13 @@ struct RHIObjectWrapper final
     
     RHIObjectWrapper<TP_>& operator =(TP_* __r)
     {
-        RHI_PTR_ASSIGN(data_, __r);
+        GFX_PTR_ASSIGN(data_, __r);
         return *this;
     }
     
     RHIObjectWrapper<TP_>& operator =(const TP_* __r)
     {
-        RHI_PTR_ASSIGN(data_, __r);
+        GFX_PTR_ASSIGN(data_, __r);
         return *this;
     }
 
@@ -312,7 +312,7 @@ struct RHIObjectWrapper final
     
     void Reset()
     {
-        RHI_SAFE_RELEASE(data_);
+        GFX_SAFE_RELEASE(data_);
     }
 
 protected:

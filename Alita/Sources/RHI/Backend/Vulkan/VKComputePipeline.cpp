@@ -21,7 +21,7 @@ VKComputePipeline::~VKComputePipeline()
 
 void VKComputePipeline::Dispose()
 {
-    RHI_DISPOSE_BEGIN();
+    GFX_DISPOSE_BEGIN();
     
     if (VK_NULL_HANDLE != vkComputePipeline_)
     {
@@ -29,15 +29,15 @@ void VKComputePipeline::Dispose()
         vkComputePipeline_ = VK_NULL_HANDLE;
     }
     
-    RHI_SAFE_RELEASE(pipelineLayout_);
-    RHI_SAFE_RELEASE(renderPass_);
+    GFX_SAFE_RELEASE(pipelineLayout_);
+    GFX_SAFE_RELEASE(renderPass_);
     
-    RHI_DISPOSE_END();
+    GFX_DISPOSE_END();
 }
 
 bool VKComputePipeline::Init(const ComputePipelineDescriptor &descriptor)
 {
-    RHI_PTR_ASSIGN(pipelineLayout_, RHI_CAST(VKPipelineLayout * , descriptor.layout));
+    GFX_PTR_ASSIGN(pipelineLayout_, GFX_CAST(VKPipelineLayout * , descriptor.layout));
     
     VkPipelineCache pipelineCache = VK_NULL_HANDLE;
     
@@ -55,7 +55,7 @@ bool VKComputePipeline::Init(const ComputePipelineDescriptor &descriptor)
     createInfo.stage.pNext = nullptr;
     createInfo.stage.flags = 0;
     createInfo.stage.stage = VK_SHADER_STAGE_COMPUTE_BIT;
-    createInfo.stage.module = RHI_CAST(VKShader*, descriptor.computeStage.shader)->GetNative();
+    createInfo.stage.module = GFX_CAST(VKShader*, descriptor.computeStage.shader)->GetNative();
     createInfo.stage.pName = descriptor.computeStage.entryPoint.c_str();
     createInfo.stage.pSpecializationInfo = nullptr;
     

@@ -222,8 +222,8 @@ echo "xxxxx"</Command>
     <ClCompile Include="Sources\RHI\Backend\Vulkan\VKTypes.cpp" />
     <ClCompile Include="Sources\RHI\Backend\Vulkan\VMA\VmaUsage.cpp" />
     <ClCompile Include="Sources\RHI\Impl\Device.cpp" />
-    <ClCompile Include="Sources\RHI\Impl\RHIObjectBase.cpp" />
-    <ClCompile Include="Sources\RHI\Impl\RHIObjectManager.cpp" />
+    <ClCompile Include="Sources\RHI\Impl\GFXBase.cpp" />
+    <ClCompile Include="Sources\RHI\Impl\GFXObjectManager.cpp" />
     <ClCompile Include="Sources\Types\TData.cpp" />
     <ClCompile Include="Sources\Utils\MD5\md5.cpp" />
     <ClCompile Include="Sources\World\Camera.cpp" />

@@ -16,18 +16,18 @@ NS_GFX_BEGIN
 VKCommandEncoder::VKCommandEncoder(VKDevice* device)
     : CommandEncoder(device)
 {
-    RHI_PTR_ASSIGN(commandBuffer_, VKDEVICE()->CreateCommandBuffer());
+    GFX_PTR_ASSIGN(commandBuffer_, VKDEVICE()->CreateCommandBuffer());
 }
 
 void VKCommandEncoder::Dispose()
 {
-    RHI_DISPOSE_BEGIN();
+    GFX_DISPOSE_BEGIN();
     
-    RHI_SAFE_RELEASE(commandBuffer_);
-    RHI_SAFE_RELEASE(renderPassEncoder_);
-    RHI_SAFE_RELEASE(computePassEncoder_);
+    GFX_SAFE_RELEASE(commandBuffer_);
+    GFX_SAFE_RELEASE(renderPassEncoder_);
+    GFX_SAFE_RELEASE(computePassEncoder_);
     
-    RHI_DISPOSE_END();
+    GFX_DISPOSE_END();
 }
 
 VKCommandEncoder::~VKCommandEncoder()
@@ -47,11 +47,11 @@ bool VKCommandEncoder::Init()
 
 void VKCommandEncoder::Reset()
 {
-    RHI_SAFE_RELEASE(commandBuffer_);
-    RHI_SAFE_RELEASE(renderPassEncoder_);
-    RHI_SAFE_RELEASE(computePassEncoder_);
+    GFX_SAFE_RELEASE(commandBuffer_);
+    GFX_SAFE_RELEASE(renderPassEncoder_);
+    GFX_SAFE_RELEASE(computePassEncoder_);
     
-    RHI_PTR_ASSIGN(commandBuffer_, VKDEVICE()->CreateCommandBuffer());
+    GFX_PTR_ASSIGN(commandBuffer_, VKDEVICE()->CreateCommandBuffer());
 }
 
 RenderPassEncoder* VKCommandEncoder::BeginRenderPass(const RenderPassDescriptor &descriptor)
@@ -60,10 +60,10 @@ RenderPassEncoder* VKCommandEncoder::BeginRenderPass(const RenderPassDescriptor 
     {
         renderPassEncoder_->EndPass();
     }
-    RHI_SAFE_RELEASE(renderPassEncoder_);
+    GFX_SAFE_RELEASE(renderPassEncoder_);
     
     auto newRenderPassEncoder = VKDEVICE()->CreateObject<VKRenderPassEncoder>(commandBuffer_, descriptor);
-    RHI_PTR_ASSIGN(renderPassEncoder_, newRenderPassEncoder);
+    GFX_PTR_ASSIGN(renderPassEncoder_, newRenderPassEncoder);
     
     return renderPassEncoder_;
 }
@@ -76,7 +76,7 @@ ComputePassEncoder* VKCommandEncoder::BeginComputePass(const ComputePassDescript
     }
     
     auto newComputePassEncoder = VKDEVICE()->CreateObject<VKComputePassEncoder>(commandBuffer_, descriptor);
-    RHI_PTR_ASSIGN(computePassEncoder_, newComputePassEncoder);
+    GFX_PTR_ASSIGN(computePassEncoder_, newComputePassEncoder);
     
     return computePassEncoder_;
 }
@@ -114,7 +114,7 @@ void VKCommandEncoder::CopyTextureToBuffer(
     BufferCopyView &destination,
     Extent3D &copySize)
 {
-    VKTexture* texture = RHI_CAST(VKTexture*, source.texture);
+    VKTexture* texture = GFX_CAST(VKTexture*, source.texture);
     if (false == texture->TestTextureUsage(TextureUsage::COPY_SRC))
     {
         LOGE("CopyTextureToBuffer: the source texture must has COPY_SRC bit");

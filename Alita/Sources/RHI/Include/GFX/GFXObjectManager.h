@@ -40,7 +40,7 @@ public:
     
     void RemoveObjectFromCache(const GfxBase* object)
     {
-        RHI_ASSERT(TestObject(object));
+        GFX_ASSERT(TestObject(object));
         RHIObjectType type = object->GetObjectType();
         auto itStart = weakedRefObjectCache_.lower_bound(type);
         auto itEnd = weakedRefObjectCache_.upper_bound(type);
@@ -98,7 +98,7 @@ protected:
     std::multimap<RHIObjectType, GfxBase*> weakedRefObjectCache_;
 
 private:
-#if RHI_DEBUG
+#if GFX_DEBUG
     void TrackObjectDebugging_(const GfxBase* object);
     
     bool FindObjectDebugging_(const GfxBase* object);

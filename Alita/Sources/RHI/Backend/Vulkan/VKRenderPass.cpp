@@ -22,7 +22,7 @@ VKRenderPass::VKRenderPass(VKDevice* device)
 
 void VKRenderPass::Dispose()
 {
-    RHI_DISPOSE_BEGIN();
+    GFX_DISPOSE_BEGIN();
     
     if (VK_NULL_HANDLE != vkRenderPass_)
     {
@@ -30,7 +30,7 @@ void VKRenderPass::Dispose()
         vkRenderPass_ = VK_NULL_HANDLE;
     }
     
-    RHI_DISPOSE_END();
+    GFX_DISPOSE_END();
 }
 
 VKRenderPass::~VKRenderPass()

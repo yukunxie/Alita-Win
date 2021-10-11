@@ -60,16 +60,16 @@ bool VKBindGroupLayout::Init(const BindGroupLayoutDescriptor &descriptor)
 
 void VKBindGroupLayout::Dispose()
 {
-    RHI_DISPOSE_BEGIN();
+    GFX_DISPOSE_BEGIN();
     
     if (vkBindGroupLayout_)
     {
-        VkDevice deviceVk = RHI_CAST(VKDevice*, GetGPUDevice())->GetNative();
+        VkDevice deviceVk = GFX_CAST(VKDevice*, GetGPUDevice())->GetNative();
         vkDestroyDescriptorSetLayout(deviceVk, vkBindGroupLayout_, nullptr);
         vkBindGroupLayout_ = VK_NULL_HANDLE;
     }
     
-    RHI_DISPOSE_END();
+    GFX_DISPOSE_END();
 }
 
 VKBindGroupLayout::~VKBindGroupLayout()

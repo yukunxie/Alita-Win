@@ -14,7 +14,7 @@ VKPipelineLayout::VKPipelineLayout(VKDevice* device)
 
 void VKPipelineLayout::Dispose()
 {
-    RHI_DISPOSE_BEGIN();
+    GFX_DISPOSE_BEGIN();
     
     if (vkPipelineLayout_)
     {
@@ -22,7 +22,7 @@ void VKPipelineLayout::Dispose()
         vkPipelineLayout_ = VK_NULL_HANDLE;
     }
     
-    RHI_DISPOSE_END();
+    GFX_DISPOSE_END();
 }
 
 VKPipelineLayout::~VKPipelineLayout()

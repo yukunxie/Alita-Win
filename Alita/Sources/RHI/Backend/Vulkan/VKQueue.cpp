@@ -18,11 +18,11 @@ VKQueue::VKQueue(VKDevice* device)
 
 void VKQueue::Dispose()
 {
-    RHI_DISPOSE_BEGIN();
+    GFX_DISPOSE_BEGIN();
     
     for (auto cmdBuffer : commandBufferCaches_)
     {
-        RHI_SAFE_RELEASE(cmdBuffer);
+        GFX_SAFE_RELEASE(cmdBuffer);
     }
     commandBufferCaches_.clear();
     
@@ -32,7 +32,7 @@ void VKQueue::Dispose()
         vkQueue_ = VK_NULL_HANDLE;
     }
     
-    RHI_DISPOSE_END();
+    GFX_DISPOSE_END();
 }
 
 VKQueue::~VKQueue()
@@ -67,8 +67,8 @@ void VKQueue::Submit(std::uint32_t commandBufferCount, CommandBuffer* const* com
 {
     for (int i = 0; i < commandBufferCount; ++i)
     {
-        auto cmdBuffer = RHI_CAST(VKCommandBuffer*, commandBuffers[i]);
-        RHI_SAFE_RETAIN(cmdBuffer);
+        auto cmdBuffer = GFX_CAST(VKCommandBuffer*, commandBuffers[i]);
+        GFX_SAFE_RETAIN(cmdBuffer);
         commandBufferCaches_.push_back(cmdBuffer);
     }
 }
@@ -91,7 +91,7 @@ void VKQueue::SubmitInternal()
     
     for (auto cmdBuffer : commandBufferCaches_)
     {
-        RHI_SAFE_RELEASE(cmdBuffer);
+        GFX_SAFE_RELEASE(cmdBuffer);
     }
     commandBufferCaches_.clear();
     
@@ -101,7 +101,7 @@ void VKQueue::SubmitInternal()
     {
         device->ScheduleAsyncTask<AsyncTaskFenceCompletion>(device,
                                                             this,
-                                                            RHI_CAST(VKFence*, fence));
+                                                            GFX_CAST(VKFence*, fence));
     }
     waitingFences_.clear();
     
@@ -118,7 +118,7 @@ VKCommandBuffer* VKQueue::GetImageLayoutInitCommandBuffer()
     if (!imageLayoutInitCommandBuffer_)
     {
         imageLayoutInitCommandBuffer_ = VKDEVICE()->CreateCommandBuffer();
-        RHI_SAFE_RETAIN(imageLayoutInitCommandBuffer_);
+        GFX_SAFE_RETAIN(imageLayoutInitCommandBuffer_);
         commandBufferCaches_.insert(commandBufferCaches_.begin(),imageLayoutInitCommandBuffer_);
     }
     return imageLayoutInitCommandBuffer_;

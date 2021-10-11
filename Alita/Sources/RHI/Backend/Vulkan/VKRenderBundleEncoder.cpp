@@ -20,17 +20,17 @@ VKRenderBundleEncoder::~VKRenderBundleEncoder()
 
 void VKRenderBundleEncoder::Dispose()
 {
-    RHI_DISPOSE_BEGIN();
+    GFX_DISPOSE_BEGIN();
     
-    RHI_SAFE_RELEASE(renderBundle_);
+    GFX_SAFE_RELEASE(renderBundle_);
     
-    RHI_DISPOSE_END();
+    GFX_DISPOSE_END();
 }
 
 bool VKRenderBundleEncoder::Init(const RenderBundleEncoderDescriptor &descriptor)
 {
     // TODO realxie : descriptor ????
-    RHI_PTR_ASSIGN(renderBundle_, VKDEVICE()->CreateObject<VKRenderBundle>());
+    GFX_PTR_ASSIGN(renderBundle_, VKDEVICE()->CreateObject<VKRenderBundle>());
     return nullptr != renderBundle_;
 }
 
@@ -144,7 +144,7 @@ void VKRenderBundleEncoder::InsertDebugMarker(const std::string &markerLabel)
 
 RenderBundle* VKRenderBundleEncoder::Finish(const RenderBundleDescriptor &descriptor)
 {
-    RHI_ASSERT(renderBundle_, "renderBundle_ must not be; nullptr.");
+    GFX_ASSERT(renderBundle_, "renderBundle_ must not be; nullptr.");
     renderBundle_->AutoRelease();
     auto tmp = renderBundle_;
     renderBundle_ = nullptr;
@@ -154,7 +154,7 @@ RenderBundle* VKRenderBundleEncoder::Finish(const RenderBundleDescriptor &descri
 void VKRenderBundleEncoder::Reset()
 {
     auto tmp = VKDEVICE()->CreateObject<VKRenderBundle>();
-    RHI_PTR_ASSIGN(renderBundle_, tmp);
+    GFX_PTR_ASSIGN(renderBundle_, tmp);
 }
 
 NS_GFX_END

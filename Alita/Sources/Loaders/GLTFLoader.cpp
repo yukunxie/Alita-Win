@@ -183,7 +183,7 @@ namespace GLTFLoader
 							tData += 4; // todo stride
 							break;
 						default:
-							RHI_ASSERT(false);
+							GFX_ASSERT(false);
 						}
 					}
 					

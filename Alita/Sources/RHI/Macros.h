@@ -20,34 +20,34 @@
 #endif 
 
 #if defined(COCOS2D_DEBUG) && COCOS2D_DEBUG
-#define RHI_DEBUG 1
+#define GFX_DEBUG 1
 #else
-#define RHI_DEBUG 1
+#define GFX_DEBUG 1
 #endif
 
-#if RHI_DEBUG
-#define RHI_TRACE_OBJ_REF_COUNT 0
+#if GFX_DEBUG
+#define GFX_TRACE_OBJ_REF_COUNT 0
 #else
-#define RHI_TRACE_OBJ_REF_COUNT 0
+#define GFX_TRACE_OBJ_REF_COUNT 0
 #endif
 
 
-#define NS_GFX_BEGIN namespace RHI {
+#define NS_GFX_BEGIN namespace gfx {
 #define NS_GFX_END }
 
-#if RHI_DEBUG
-#define RHI_ASSERT(cond, ...) assert(cond)
+#if GFX_DEBUG
+#define GFX_ASSERT(cond, ...) assert(cond)
 #else
-#define RHI_ASSERT(cond, ...)
+#define GFX_ASSERT(cond, ...)
 #endif
 
-#define RHI_SAFE_DELETE(obj)    \
+#define GFX_SAFE_DELETE(obj)    \
 do {                            \
 if (obj) delete obj;            \
 obj = nullptr;                  \
 } while (0)
 
-#if RHI_TRACE_OBJ_REF_COUNT
+#if GFX_TRACE_OBJ_REF_COUNT
 #define PUSH_TRACEBACK  tmp->PushTraceback(__FILE__, __FUNCTION__, __LINE__);
 #define POP_TRACEBACK tmp->PopTraceback();
 #else
@@ -55,7 +55,7 @@ obj = nullptr;                  \
 #define POP_TRACEBACK
 #endif
 
-#define RHI_SAFE_RETAIN(obj)    \
+#define GFX_SAFE_RETAIN(obj)    \
     do {                        \
         auto tmp = obj;         \
         if (tmp)                \
@@ -66,14 +66,14 @@ obj = nullptr;                  \
         }                       \
     } while (0)
 
-// #define RHI_SAFE_RETAIN(obj)    \
+// #define GFX_SAFE_RETAIN(obj)    \
 // do {                            \
 // auto tmp = obj;                 \
 // if (tmp) tmp->Retain();         \
 // } while (0)
 
 
-#define RHI_SAFE_RELEASE(obj)   \
+#define GFX_SAFE_RELEASE(obj)   \
 do {                            \
     auto tmp = obj;             \
     PUSH_TRACEBACK              \
@@ -82,33 +82,33 @@ do {                            \
     POP_TRACEBACK               \
 } while (0)
 
-#define RHI_PTR_ASSIGN(dstObjPtr, srcObjPtr)    \
+#define GFX_PTR_ASSIGN(dstObjPtr, srcObjPtr)    \
 do {                                            \
     auto srcObjPtr_ = (srcObjPtr);              \
     if (dstObjPtr != srcObjPtr_)                \
     {                                           \
-        RHI_SAFE_RELEASE(dstObjPtr);            \
+        GFX_SAFE_RELEASE(dstObjPtr);            \
         dstObjPtr = (decltype(dstObjPtr))srcObjPtr_;                 \
-        RHI_SAFE_RETAIN(dstObjPtr);             \
+        GFX_SAFE_RETAIN(dstObjPtr);             \
     }                                           \
 } while (0)
 
-#define RHI_CAST(TYPE, obj) (static_cast<TYPE>(obj))
+#define GFX_CAST(TYPE, obj) (static_cast<TYPE>(obj))
 
-#define RHI_DISPOSE_BEGIN()         \
+#define GFX_DISPOSE_BEGIN()         \
 do {                                \
     if (IsDisposed())               \
         return;                     \
     SetDisposed();                  \
 } while (0)
 
-#define RHI_DISPOSE_END()                   \
+#define GFX_DISPOSE_END()                   \
 do{                                         \
-    RHI_ASSERT(IsDisposed());               \
+    GFX_ASSERT(IsDisposed());               \
 } while (0)
 
 // Android log function wrappers
-static const char* kTAG = "RHI";
+static const char* kTAG = "gfx";
 
 #if defined(_MSC_VER)
 #define FORCE_INLINE __forceinline

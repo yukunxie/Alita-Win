@@ -170,7 +170,7 @@ public:
 
 private:
     GfxObjectManager rhiObjectManager_;
-#if RHI_DEBUG
+#if GFX_DEBUG
     std::multimap<RHIObjectType, GfxBase*> autoReleasedObjectPool_;
 #else
     std::vector<GfxBase*> autoReleasedObjectPool_;

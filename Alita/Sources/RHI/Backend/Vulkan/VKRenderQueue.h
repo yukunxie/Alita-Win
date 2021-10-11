@@ -27,7 +27,7 @@ public:
     
     virtual void Submit(const CommandBuffer* commandBuffer) override
     {
-        RHI_ASSERT(false, "unimplemented.");
+        GFX_ASSERT(false, "unimplemented.");
     }
 
 private:

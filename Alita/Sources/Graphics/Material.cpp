@@ -52,7 +52,7 @@ MaterialParameterType ToMaterialParameterType(const char* format)
     case _SimpleHash("Sampler2D"): return MaterialParameterType::SAMPLER2D;
     case _SimpleHash("Texture2D"): return MaterialParameterType::TEXTURE2D;
     default:
-        RHI_ASSERT(false, "invalid format");
+        GFX_ASSERT(false, "invalid format");
     }
 }
 
@@ -93,7 +93,7 @@ std::uint32_t GetFormatSize(InputAttributeFormat format)
     case InputAttributeFormat::FLOAT4:
         return 16;
     }
-    RHI_ASSERT(false, "");
+    GFX_ASSERT(false, "");
     return 0;
 }
 
@@ -189,7 +189,7 @@ void Material::SetupConstantBufferLayout()
         param.name    = std::get<1>(field);
 
         const uint32 byteAlign = sShaderDataTypeToGLType[param.format].Align;
-        RHI_ASSERT((byteAlign & (byteAlign - 1)) == 0);
+        GFX_ASSERT((byteAlign & (byteAlign - 1)) == 0);
         offset = (offset + byteAlign - 1) & (~(byteAlign - 1));
         param.offset = offset;
         offset += sShaderDataTypeToGLType[param.format].Size;
@@ -203,13 +203,13 @@ void Material::SetupConstantBufferLayout()
     bindingObject->binding  = binding;
     bindingObject->Buffer.stride   = offset;
 
-    RHI::BufferDescriptor bufferDescriptor;
+    gfx::BufferDescriptor bufferDescriptor;
     {
         bufferDescriptor.size = bindingObject->Buffer.stride;
-        bufferDescriptor.usage = RHI::BufferUsage::UNIFORM;
+        bufferDescriptor.usage = gfx::BufferUsage::UNIFORM;
     };
     bindingObject->Buffer.buffer = Engine::GetGPUDevice()->CreateBuffer(bufferDescriptor);
-    RHI_SAFE_RETAIN(bindingObject->Buffer.buffer);
+    GFX_SAFE_RETAIN(bindingObject->Buffer.buffer);
 
     for (auto& param : parameters)
     {
@@ -218,7 +218,7 @@ void Material::SetupConstantBufferLayout()
     }
 }
 
-RHI::Shader* Material::_CreateShader(const std::string& filename, RHI::ShaderType shaderType, ETechniqueType techType, const std::vector<std::string>& userDefines)
+gfx::Shader* Material::_CreateShader(const std::string& filename, gfx::ShaderType shaderType, ETechniqueType techType, const std::vector<std::string>& userDefines)
 {
     std::string data = FileSystem::GetInstance()->GetStringData(filename.c_str());
 
@@ -235,24 +235,24 @@ RHI::Shader* Material::_CreateShader(const std::string& filename, RHI::ShaderTyp
         + globalCBuffer + "\n"
         + data;
 
-    RHI_ASSERT(TechniqueShaderEntries_[(int)techType].Declared);
+    GFX_ASSERT(TechniqueShaderEntries_[(int)techType].Declared);
     std::string techEntryName = "";
     switch (shaderType)
     {
-    case  RHI::ShaderType::VERTEX:
+    case  gfx::ShaderType::VERTEX:
         techEntryName = TechniqueShaderEntries_[(int)techType].VertexShaderEntry;
         break;
-    case  RHI::ShaderType::FRAGMENT:
+    case  gfx::ShaderType::FRAGMENT:
         techEntryName = TechniqueShaderEntries_[(int)techType].FragmentShaderEntry;
         break;
     default:
-        RHI_ASSERT(false);
+        GFX_ASSERT(false);
     }
 
     techEntryName = "void " + techEntryName + "()";  
 
     auto npos = shaderText.find(techEntryName.c_str(), 0);
-    RHI_ASSERT(npos != std::string::npos);
+    GFX_ASSERT(npos != std::string::npos);
     if (npos != std::string::npos)
     {
         shaderText = shaderText.replace(npos, techEntryName.size(), "void main()");
@@ -261,16 +261,16 @@ RHI::Shader* Material::_CreateShader(const std::string& filename, RHI::ShaderTyp
     std::string hash = md5::md5(" shadertype=" + std::to_string((uint32)shaderType) + "\n" + shaderText);
     if (!gSprivShaderCache.contains(hash))
     {
-        gSprivShaderCache[hash] = std::move(RHI::CompileGLSLToSPIRV(shaderText, shaderType));
+        gSprivShaderCache[hash] = std::move(gfx::CompileGLSLToSPIRV(shaderText, shaderType));
     }
 
     const std::vector<uint32>& spirV = gSprivShaderCache[hash];
     
-    RHI::ShaderModuleDescriptor descriptor;
+    gfx::ShaderModuleDescriptor descriptor;
     {
         descriptor.code.resize(spirV.size() * sizeof(spirV[0]));
         memcpy(descriptor.code.data(), spirV.data(), descriptor.code.size());
-        descriptor.codeType = RHI::ShaderCodeType::BINARY;
+        descriptor.codeType = gfx::ShaderCodeType::BINARY;
     }
    
     return Engine::GetGPUDevice()->CreateShaderModule(descriptor);
@@ -311,7 +311,7 @@ Material::Material(const std::string& configFilename)
            technique = ETechniqueType::TOutline;
            break;
        default:
-           RHI_ASSERT(false);
+           GFX_ASSERT(false);
        }
 
        TechniqueShaderEntries_[(int)technique].Declared = true;
@@ -322,7 +322,7 @@ Material::Material(const std::string& configFilename)
     ParseBindGroupLayout(doc);
 }
 
-void Material::Apply(const Pass* pass, ETechniqueType technique, ERenderSet renderSet, RHI::RenderPassEncoder& passEndcoder)
+void Material::Apply(const Pass* pass, ETechniqueType technique, ERenderSet renderSet, gfx::RenderPassEncoder& passEndcoder)
 {
     // update binding buffer.
     {
@@ -341,7 +341,7 @@ void Material::Apply(const Pass* pass, ETechniqueType technique, ERenderSet rend
     SetupPSOKey(psoKey, renderSet);
     SetupPSOKey(psoKey, pass);
 
-    RHI::RenderPipeline* pso = nullptr;
+    gfx::RenderPipeline* pso = nullptr;
 
     if (rhiPSOMap_.contains(psoKey))
     {
@@ -353,7 +353,7 @@ void Material::Apply(const Pass* pass, ETechniqueType technique, ERenderSet rend
         ShaderSet shaders = CreateShaderSet(technique);
         pso = CreatePipelineState(psoKey, shaders);
         rhiPSOMap_[psoKey] = pso;
-        RHI_SAFE_RETAIN(pso);
+        GFX_SAFE_RETAIN(pso);
     }
 
     ApplyModifyToBindGroup(passEndcoder);
@@ -371,7 +371,7 @@ void Material::SetupPSOKey(PSOKey& psoKey, ERenderSet renderSet)
         break;
     case rx::ERenderSet_PostProcess:
         psoKey.DepthWrite = 0;
-        psoKey.DepthCmpFunc = (int)RHI::CompareFunction::ALWAYS;
+        psoKey.DepthCmpFunc = (int)gfx::CompareFunction::ALWAYS;
         break;
     default:
         break;
@@ -407,7 +407,7 @@ void Material::SetupPSOKey(PSOKey& psoKey, const Pass* pass)
 {
     for (const auto& tp : pass->GetColorAttachments())
     {
-        RHI_ASSERT(tp.Slot < kMaxAttachmentCount);
+        GFX_ASSERT(tp.Slot < kMaxAttachmentCount);
         psoKey.AttachmentFormats[tp.Slot] = (uint8)tp.RenderTarget->GetFormat();
     }
     if (auto ds = pass->GetDSAttachment(); ds)
@@ -430,7 +430,7 @@ bool Material::SetFloat(const std::string& name, std::uint32_t offset, std::uint
     return true;
 }
 
-bool Material::SetTexture(const std::string& name, const RHI::Texture* texture)
+bool Material::SetTexture(const std::string& name, const gfx::Texture* texture)
 {
     Assert(texture != nullptr, "null is invalid");
     const auto it = parameters_.find(name);
@@ -446,9 +446,9 @@ bool Material::SetTexture(const std::string& name, const RHI::Texture* texture)
     {
         rhiPSOMap_.clear();
     }
-    //RHI_SAFE_RELEASE(param.bindingObject->Texture.texture);
+    //GFX_SAFE_RELEASE(param.bindingObject->Texture.texture);
     param.bindingObject->Texture.texture = texture;
-    //RHI_SAFE_RETAIN(param.bindingObject->Texture.texture);
+    //GFX_SAFE_RETAIN(param.bindingObject->Texture.texture);
     bBindingDirty_ = true;
     return true;
 }
@@ -459,24 +459,24 @@ bool Material::SetTexture(const std::string& name, std::shared_ptr<Texture>& tex
     return SetTexture(name, texture->GetTexture());
 }
 
-void Material::ApplyModifyToBindGroup(RHI::RenderPassEncoder& passEndcoder)
+void Material::ApplyModifyToBindGroup(gfx::RenderPassEncoder& passEndcoder)
 {
     if (!bBindingDirty_)
         return;
 
     bBindingDirty_ = false;
-    RHI_SAFE_RELEASE(rhiBindGroup_);
+    GFX_SAFE_RELEASE(rhiBindGroup_);
 
-    RHI::BindGroupDescriptor descriptor;
+    gfx::BindGroupDescriptor descriptor;
     descriptor.layout = rhiBindGroupLayout_;
 
     for (auto it : bindingObjects_)
     {
         if (it->type == MaterailBindingObjectType::BUFFER)
         {
-            auto resource = Engine::GetGPUDevice()->CreateBufferBinding((RHI::Buffer*)it->Buffer.buffer, 0, it->Buffer.stride);
-            RHI_SAFE_RETAIN(resource);
-            RHI::BindGroupBinding tmp;
+            auto resource = Engine::GetGPUDevice()->CreateBufferBinding((gfx::Buffer*)it->Buffer.buffer, 0, it->Buffer.stride);
+            GFX_SAFE_RETAIN(resource);
+            gfx::BindGroupBinding tmp;
             {
                 tmp.binding = it->binding;
                 tmp.resource = resource;
@@ -487,15 +487,15 @@ void Material::ApplyModifyToBindGroup(RHI::RenderPassEncoder& passEndcoder)
         {
             if (it->Texture.texture != nullptr)
             {
-                RHI::TextureViewDescriptor tvDescriptor;
+                gfx::TextureViewDescriptor tvDescriptor;
                 if (it->Texture.texture->GetArrayLayerCount() == 6)
                 {
-                    tvDescriptor.dimension = RHI::TextureViewDimension::DIM_CUBE;
+                    tvDescriptor.dimension = gfx::TextureViewDimension::DIM_CUBE;
                 }
 
-                auto tv = Engine::GetGPUDevice()->CreateTextureViewBinding(((RHI::Texture*)it->Texture.texture)->CreateView(tvDescriptor));
-                RHI_SAFE_RETAIN(tv);
-                RHI::BindGroupBinding tmp;
+                auto tv = Engine::GetGPUDevice()->CreateTextureViewBinding(((gfx::Texture*)it->Texture.texture)->CreateView(tvDescriptor));
+                GFX_SAFE_RETAIN(tv);
+                gfx::BindGroupBinding tmp;
                 {
                     tmp.binding = it->binding;
                     tmp.resource = tv;
@@ -503,30 +503,30 @@ void Material::ApplyModifyToBindGroup(RHI::RenderPassEncoder& passEndcoder)
                 descriptor.entries.push_back(tmp);
 
                 // create sampler for this texture
-                auto sampler = Engine::GetGPUDevice()->CreateSamplerBinding((RHI::Sampler*)it->Texture.sampler);
-                RHI_SAFE_RETAIN(sampler);
-                descriptor.entries.push_back(RHI::BindGroupBinding{ it->binding + 1 , sampler });
+                auto sampler = Engine::GetGPUDevice()->CreateSamplerBinding((gfx::Sampler*)it->Texture.sampler);
+                GFX_SAFE_RETAIN(sampler);
+                descriptor.entries.push_back(gfx::BindGroupBinding{ it->binding + 1 , sampler });
             }
         }
         else
         {
-            RHI_ASSERT(false);
+            GFX_ASSERT(false);
         }
     }
     rhiBindGroup_ = Engine::GetGPUDevice()->CreateBindGroup(descriptor);
-    RHI_SAFE_RETAIN(rhiBindGroup_);
+    GFX_SAFE_RETAIN(rhiBindGroup_);
 }
 
-RHI::SamplerDescriptor Material::ParseSamplerDescriptor(const rapidjson::Value& doc)
+gfx::SamplerDescriptor Material::ParseSamplerDescriptor(const rapidjson::Value& doc)
 {
-    RHI::SamplerDescriptor descriptor;
+    gfx::SamplerDescriptor descriptor;
     {
-        descriptor.minFilter = RHI::FilterMode::LINEAR;
-        descriptor.magFilter = RHI::FilterMode::LINEAR;
-        descriptor.mipmapFilter = RHI::FilterMode::LINEAR;
-        descriptor.addressModeU = RHI::AddressMode::REPEAT;
-        descriptor.addressModeV = RHI::AddressMode::REPEAT;
-        descriptor.addressModeW = RHI::AddressMode::REPEAT;
+        descriptor.minFilter = gfx::FilterMode::LINEAR;
+        descriptor.magFilter = gfx::FilterMode::LINEAR;
+        descriptor.mipmapFilter = gfx::FilterMode::LINEAR;
+        descriptor.addressModeU = gfx::AddressMode::REPEAT;
+        descriptor.addressModeV = gfx::AddressMode::REPEAT;
+        descriptor.addressModeW = gfx::AddressMode::REPEAT;
     }
     if (!doc.HasMember("filter"))
     {
@@ -537,12 +537,12 @@ RHI::SamplerDescriptor Material::ParseSamplerDescriptor(const rapidjson::Value& 
         switch (_SimpleHash(text))
         {
         case _SimpleHash("linear"):
-            return RHI::FilterMode::LINEAR;
+            return gfx::FilterMode::LINEAR;
         case _SimpleHash("nearest"):
         case _SimpleHash("point"):
-            return RHI::FilterMode::NEAREST;
+            return gfx::FilterMode::NEAREST;
         default:
-            return RHI::FilterMode::LINEAR;
+            return gfx::FilterMode::LINEAR;
         }
     };
 
@@ -550,13 +550,13 @@ RHI::SamplerDescriptor Material::ParseSamplerDescriptor(const rapidjson::Value& 
         switch (_SimpleHash(text))
         {
         case _SimpleHash("repeat"):
-            return RHI::AddressMode::REPEAT;
+            return gfx::AddressMode::REPEAT;
         case _SimpleHash("clamp"):
-            return RHI::AddressMode::CLAMP_TO_EDGE;
+            return gfx::AddressMode::CLAMP_TO_EDGE;
         case _SimpleHash("mirror"):
-            return RHI::AddressMode::MIRROR_REPEAT;
+            return gfx::AddressMode::MIRROR_REPEAT;
         default:
-            return RHI::AddressMode::REPEAT;
+            return gfx::AddressMode::REPEAT;
         }
     };
 
@@ -631,13 +631,13 @@ void Material::ParseBindGroupLayout(const rapidjson::Document& doc)
                     fields.push_back(param);
                 }
 
-                RHI::BufferDescriptor bufferDescriptor;
+                gfx::BufferDescriptor bufferDescriptor;
                 {
                     bufferDescriptor.size = bindingObject->Buffer.stride;
-                    bufferDescriptor.usage = RHI::BufferUsage::UNIFORM;
+                    bufferDescriptor.usage = gfx::BufferUsage::UNIFORM;
                 };
                 bindingObject->Buffer.buffer = Engine::GetGPUDevice()->CreateBuffer(bufferDescriptor);
-                RHI_SAFE_RETAIN(bindingObject->Buffer.buffer);
+                GFX_SAFE_RETAIN(bindingObject->Buffer.buffer);
 
                 for (auto& field : fields)
                 {
@@ -686,7 +686,7 @@ void Material::ParseBindGroupLayout(const rapidjson::Document& doc)
                 }
             }
             
-            //RHI_SAFE_RETAIN(bindingObject->Texture.texture);
+            //GFX_SAFE_RETAIN(bindingObject->Texture.texture);
 
             MaterialParameter param;
             param.name = bindingObject->name;
@@ -697,13 +697,13 @@ void Material::ParseBindGroupLayout(const rapidjson::Document& doc)
             parameters_[param.name] = param;
             
             // sampler
-            RHI::SamplerDescriptor descriptor = ParseSamplerDescriptor(cfg);
+            gfx::SamplerDescriptor descriptor = ParseSamplerDescriptor(cfg);
             bindingObject->Texture.sampler = Engine::GetGPUDevice()->CreateSampler(descriptor);
-            RHI_SAFE_RETAIN(bindingObject->Texture.sampler);
+            GFX_SAFE_RETAIN(bindingObject->Texture.sampler);
         }
         else
         {
-            RHI_ASSERT(false, "");
+            GFX_ASSERT(false, "");
         }
 
     }
@@ -719,17 +719,17 @@ void Material::ParseBindGroupLayout(const rapidjson::Document& doc)
 void Material::PrepareBindingLayout()
 {
     SystemDefines_.clear();
-    RHI::BindGroupLayoutDescriptor descriptor;
+    gfx::BindGroupLayoutDescriptor descriptor;
     for (const auto& bo : bindingObjects_)
     {
         switch (bo->type)
         {
         case MaterailBindingObjectType::BUFFER:
         {
-            RHI::BindGroupLayoutBinding target;
+            gfx::BindGroupLayoutBinding target;
             target.binding = bo->binding;
-            target.visibility = RHI::ShaderStage::VERTEX | RHI::ShaderStage::FRAGMENT;
-            target.type = RHI::BindingType::UNIFORM_BUFFER;
+            target.visibility = gfx::ShaderStage::VERTEX | gfx::ShaderStage::FRAGMENT;
+            target.type = gfx::BindingType::UNIFORM_BUFFER;
             descriptor.entries.push_back(target);
 
             break;
@@ -741,19 +741,19 @@ void Material::PrepareBindingLayout()
             {
                 // texture
                 {
-                    RHI::BindGroupLayoutBinding target;
+                    gfx::BindGroupLayoutBinding target;
                     target.binding = bo->binding;
-                    target.visibility = RHI::ShaderStage::VERTEX | RHI::ShaderStage::FRAGMENT;
-                    target.type = RHI::BindingType::SAMPLED_TEXTURE;
+                    target.visibility = gfx::ShaderStage::VERTEX | gfx::ShaderStage::FRAGMENT;
+                    target.type = gfx::BindingType::SAMPLED_TEXTURE;
                     descriptor.entries.push_back(target);
                 }
 
                 // sampler
                 {
-                    RHI::BindGroupLayoutBinding target;
+                    gfx::BindGroupLayoutBinding target;
                     target.binding = bo->binding + 1;
-                    target.visibility = RHI::ShaderStage::VERTEX | RHI::ShaderStage::FRAGMENT;
-                    target.type = RHI::BindingType::SAMPLER;
+                    target.visibility = gfx::ShaderStage::VERTEX | gfx::ShaderStage::FRAGMENT;
+                    target.type = gfx::BindingType::SAMPLER;
                     descriptor.entries.push_back(target);
                 }
 
@@ -766,14 +766,14 @@ void Material::PrepareBindingLayout()
         }
 
         default:
-            RHI_ASSERT(false);
+            GFX_ASSERT(false);
         }
 
     }
     rhiBindGroupLayout_ = Engine::GetGPUDevice()->CreateBindGroupLayout(descriptor);
 
     {
-        RHI::PipelineLayoutDescriptor desc;
+        gfx::PipelineLayoutDescriptor desc;
         {
             desc.bindGroupLayouts.push_back(rhiBindGroupLayout_);
         }
@@ -781,12 +781,12 @@ void Material::PrepareBindingLayout()
     }
 }
 
-RHI::RenderPipeline* Material::CreatePipelineState(const PSOKey& psoKey, const ShaderSet& shaderSet)
+gfx::RenderPipeline* Material::CreatePipelineState(const PSOKey& psoKey, const ShaderSet& shaderSet)
 {
-    RHI::RenderPipelineDescriptor psoDesc;
+    gfx::RenderPipelineDescriptor psoDesc;
     {
         psoDesc.layout = rhiPipelineLayout_;
-        psoDesc.primitiveTopology = RHI::PrimitiveTopology::TRIANGLE_LIST;
+        psoDesc.primitiveTopology = gfx::PrimitiveTopology::TRIANGLE_LIST;
 
         {
             psoDesc.vertexStage.shader = shaderSet.VertexShader;
@@ -797,10 +797,10 @@ RHI::RenderPipeline* Material::CreatePipelineState(const PSOKey& psoKey, const S
 
         // TODO read from json
         {
-            psoDesc.depthStencilState = RHI::DepthStencilStateDescriptor();
-            psoDesc.depthStencilState.format = RHI::TextureFormat::DEPTH24PLUS_STENCIL8;
+            psoDesc.depthStencilState = gfx::DepthStencilStateDescriptor();
+            psoDesc.depthStencilState.format = gfx::TextureFormat::DEPTH24PLUS_STENCIL8;
             psoDesc.depthStencilState.depthWriteEnabled = psoKey.DepthWrite;
-            psoDesc.depthStencilState.depthCompare = (RHI::CompareFunction)psoKey.DepthCmpFunc;
+            psoDesc.depthStencilState.depthCompare = (gfx::CompareFunction)psoKey.DepthCmpFunc;
             psoDesc.depthStencilState.stencilFront = {};
             psoDesc.depthStencilState.stencilBack = {};
         }
@@ -809,8 +809,8 @@ RHI::RenderPipeline* Material::CreatePipelineState(const PSOKey& psoKey, const S
         psoDesc.vertexState = inputAssembler_.ToRHIDescriptor();
 
         psoDesc.rasterizationState = {
-            .frontFace = (RHI::FrontFace)psoKey.FrontFace,
-            .cullMode = (RHI::CullMode)psoKey.CullMode,
+            .frontFace = (gfx::FrontFace)psoKey.FrontFace,
+            .cullMode = (gfx::CullMode)psoKey.CullMode,
             .depthBias = psoKey.DepthBias
         };
 
@@ -818,12 +818,12 @@ RHI::RenderPipeline* Material::CreatePipelineState(const PSOKey& psoKey, const S
         {
             if (psoKey.AttachmentFormats[i] != 0)
             {
-                RHI::ColorStateDescriptor csd;
+                gfx::ColorStateDescriptor csd;
                 {
-                    csd.format = (RHI::TextureFormat)psoKey.AttachmentFormats[i];
+                    csd.format = (gfx::TextureFormat)psoKey.AttachmentFormats[i];
                     csd.alphaBlend = {};
                     csd.colorBlend = {};
-                    csd.writeMask = RHI::ColorWrite::ALL;
+                    csd.writeMask = gfx::ColorWrite::ALL;
                 }
                 psoDesc.colorStates.push_back(csd);
             }
@@ -839,7 +839,7 @@ RHI::RenderPipeline* Material::CreatePipelineState(const PSOKey& psoKey, const S
     return Engine::GetGPUDevice()->CreateRenderPipeline(psoDesc);
 }
 
-void Material::BindPSO(RHI::RenderPassEncoder& passEndcoder)
+void Material::BindPSO(gfx::RenderPassEncoder& passEndcoder)
 {
 }
 
@@ -898,12 +898,12 @@ ShaderSet Material::CreateShaderSet(ETechniqueType technique)
 
     if (vsFilename_.size())
     {
-        shaderSet.VertexShader = _CreateShader(vsFilename_, RHI::ShaderType::VERTEX, technique, userDefines);
+        shaderSet.VertexShader = _CreateShader(vsFilename_, gfx::ShaderType::VERTEX, technique, userDefines);
     }
 
     if (fsFilename_.size() && technique != ETechniqueType::TShadowMapGen)
     {
-        shaderSet.FragmentShader = _CreateShader(fsFilename_, RHI::ShaderType::FRAGMENT, technique, userDefines);
+        shaderSet.FragmentShader = _CreateShader(fsFilename_, gfx::ShaderType::FRAGMENT, technique, userDefines);
     }
 
     return shaderSet;

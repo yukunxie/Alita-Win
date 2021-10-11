@@ -26,16 +26,16 @@ VKRenderPassEncoder::VKRenderPassEncoder(VKDevice* device)
 
 void VKRenderPassEncoder::Dispose()
 {
-    RHI_DISPOSE_BEGIN();
+    GFX_DISPOSE_BEGIN();
     
     attachments_.clear();
     resolveTargets_.clear();
-    RHI_SAFE_RELEASE(commandBuffer_);
-    RHI_SAFE_RELEASE(depthStencilAttachemnt_);
-    RHI_SAFE_RELEASE(renderPass_);
-    RHI_SAFE_RELEASE(vkFramebuffer_);
+    GFX_SAFE_RELEASE(commandBuffer_);
+    GFX_SAFE_RELEASE(depthStencilAttachemnt_);
+    GFX_SAFE_RELEASE(renderPass_);
+    GFX_SAFE_RELEASE(vkFramebuffer_);
     
-    RHI_DISPOSE_END();
+    GFX_DISPOSE_END();
 }
 
 VKRenderPassEncoder::~VKRenderPassEncoder()
@@ -70,8 +70,8 @@ bool VKRenderPassEncoder::Init(VKCommandBuffer* commandBuffer,
         }
     }
     
-    RHI_PTR_ASSIGN(depthStencilAttachemnt_, descriptor.depthStencilAttachment.attachment);
-    RHI_PTR_ASSIGN(commandBuffer_, commandBuffer);
+    GFX_PTR_ASSIGN(depthStencilAttachemnt_, descriptor.depthStencilAttachment.attachment);
+    GFX_PTR_ASSIGN(commandBuffer_, commandBuffer);
     
     std::vector<VkClearAttachment> clearAttachments;
     
@@ -86,7 +86,7 @@ bool VKRenderPassEncoder::Init(VKCommandBuffer* commandBuffer,
                            attachment.loadOp,
                            attachment.storeOp,
                            attachment.resolveTarget != nullptr,
-                           RHI_CAST(const VKTextureView*, attachment.attachment)->GetSampleCount());
+                           GFX_CAST(const VKTextureView*, attachment.attachment)->GetSampleCount());
             if (attachment.loadOp == LoadOp::CLEAR)
             {
                 VkClearAttachment clearAttachment;
@@ -98,7 +98,7 @@ bool VKRenderPassEncoder::Init(VKCommandBuffer* commandBuffer,
                 clearAttachments.push_back(clearAttachment);
             }
 
-            auto view = RHI_CAST(const VKTextureView*, attachment.attachment);
+            auto view = GFX_CAST(const VKTextureView*, attachment.attachment);
             query.bIsSwapchainTextures[i] = view->GetTexture()->IsSwapchainImage();
 
             attachmentCount++;
@@ -133,16 +133,16 @@ bool VKRenderPassEncoder::Init(VKCommandBuffer* commandBuffer,
             clearAttachments.push_back(clearAttachment);
         }
         
-        RHI_PTR_ASSIGN(renderPass_, VKDEVICE()->GetOrCreateRenderPass(query));
+        GFX_PTR_ASSIGN(renderPass_, VKDEVICE()->GetOrCreateRenderPass(query));
     }
     
     {
         const VKTextureView* colorAttachment = nullptr;
         if (!descriptor.colorAttachments.empty())
         {
-            colorAttachment = RHI_CAST(const VKTextureView*, descriptor.colorAttachments[0].attachment);
+            colorAttachment = GFX_CAST(const VKTextureView*, descriptor.colorAttachments[0].attachment);
         }
-        auto dsAttachment = RHI_CAST(const VKTextureView*, descriptor.depthStencilAttachment.attachment);
+        auto dsAttachment = GFX_CAST(const VKTextureView*, descriptor.depthStencilAttachment.attachment);
         
         Extent3D attachmentSize;
         if (colorAttachment)
@@ -172,7 +172,7 @@ bool VKRenderPassEncoder::Init(VKCommandBuffer* commandBuffer,
             const auto &attachment = descriptor.colorAttachments[i];
             if (attachment.attachment)
             {
-                query.attachments[attachmentCount++] = RHI_CAST(const VKTextureView*,
+                query.attachments[attachmentCount++] = GFX_CAST(const VKTextureView*,
                                                                 attachment.attachment);
             }
         }
@@ -182,7 +182,7 @@ bool VKRenderPassEncoder::Init(VKCommandBuffer* commandBuffer,
             const auto &attachment = descriptor.colorAttachments[i];
             if (attachment.resolveTarget)
             {
-                query.attachments[attachmentCount++] = RHI_CAST(const VKTextureView*,
+                query.attachments[attachmentCount++] = GFX_CAST(const VKTextureView*,
                                                                 attachment.resolveTarget);
             }
         }
@@ -192,7 +192,7 @@ bool VKRenderPassEncoder::Init(VKCommandBuffer* commandBuffer,
             query.attachments[attachmentCount++] = dsAttachment;
         }
         
-        RHI_PTR_ASSIGN(vkFramebuffer_, VKDEVICE()->GetOrCreateFramebuffer(query));
+        GFX_PTR_ASSIGN(vkFramebuffer_, VKDEVICE()->GetOrCreateFramebuffer(query));
     }
     
     if (descriptor.colorAttachments.size() <= kMaxColorAttachments)
@@ -227,7 +227,7 @@ bool VKRenderPassEncoder::Init(VKCommandBuffer* commandBuffer,
     }
     else
     {
-        RHI_ASSERT(false);
+        GFX_ASSERT(false);
     }
     
     return true;
@@ -387,10 +387,10 @@ void VKRenderPassEncoder::EndPass()
     
     attachments_.clear();
     resolveTargets_.clear();
-    RHI_SAFE_RELEASE(commandBuffer_);
-    RHI_SAFE_RELEASE(depthStencilAttachemnt_);
-    RHI_SAFE_RELEASE(renderPass_);
-    RHI_SAFE_RELEASE(vkFramebuffer_);
+    GFX_SAFE_RELEASE(commandBuffer_);
+    GFX_SAFE_RELEASE(depthStencilAttachemnt_);
+    GFX_SAFE_RELEASE(renderPass_);
+    GFX_SAFE_RELEASE(vkFramebuffer_);
 }
 
 NS_GFX_END

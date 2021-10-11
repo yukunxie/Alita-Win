@@ -22,7 +22,7 @@ bool VKRenderPipeline::Init(const RenderPipelineDescriptor &descriptor)
 {
     RenderPipeline::Init(descriptor);
     
-    RHI_PTR_ASSIGN(pipelineLayout_, RHI_CAST(VKPipelineLayout * , descriptor.layout));
+    GFX_PTR_ASSIGN(pipelineLayout_, GFX_CAST(VKPipelineLayout * , descriptor.layout));
     
     VkPipelineShaderStageCreateInfo shaderStages[2];
     int shaderStageCount = 0;
@@ -34,7 +34,7 @@ bool VKRenderPipeline::Init(const RenderPipelineDescriptor &descriptor)
         shaderStages[0].pNext = nullptr;
         shaderStages[0].flags = 0;
         shaderStages[0].stage = VK_SHADER_STAGE_VERTEX_BIT;
-        shaderStages[0].module = RHI_CAST(const VKShader*, vertexStageInfo.shader)->GetNative();
+        shaderStages[0].module = GFX_CAST(const VKShader*, vertexStageInfo.shader)->GetNative();
         shaderStages[0].pName = vertexStageInfo.entryPoint.c_str();
         shaderStages[0].pSpecializationInfo = nullptr;
         shaderStageCount++;
@@ -45,7 +45,7 @@ bool VKRenderPipeline::Init(const RenderPipelineDescriptor &descriptor)
             shaderStages[1].pNext = nullptr;
             shaderStages[1].flags = 0;
             shaderStages[1].stage = VK_SHADER_STAGE_FRAGMENT_BIT;
-            shaderStages[1].module = RHI_CAST(const VKShader*, fragmentStageInfo.shader)->GetNative();
+            shaderStages[1].module = GFX_CAST(const VKShader*, fragmentStageInfo.shader)->GetNative();
             shaderStages[1].pName = fragmentStageInfo.entryPoint.c_str();
             shaderStages[1].pSpecializationInfo = nullptr;
             shaderStageCount++;
@@ -313,7 +313,7 @@ bool VKRenderPipeline::Init(const RenderPipelineDescriptor &descriptor)
                                   StoreOp::STORE);
         }
         
-        RHI_PTR_ASSIGN(renderPass_, VKDEVICE()->GetOrCreateRenderPass(query));
+        GFX_PTR_ASSIGN(renderPass_, VKDEVICE()->GetOrCreateRenderPass(query));
     }
     
     // The create info chains in a bunch of things created on the stack here or inside state
@@ -334,7 +334,7 @@ bool VKRenderPipeline::Init(const RenderPipelineDescriptor &descriptor)
         createInfo.pDepthStencilState = &depthStencilStateCreateInfo;
         createInfo.pColorBlendState = &colorBlending;
         createInfo.pDynamicState = &dynamic;
-        createInfo.layout = RHI_CAST(const VKPipelineLayout*, descriptor.layout)->GetNative();
+        createInfo.layout = GFX_CAST(const VKPipelineLayout*, descriptor.layout)->GetNative();
         createInfo.renderPass = renderPass_->GetNative();
         createInfo.subpass = 0;
         createInfo.basePipelineHandle = VK_NULL_HANDLE;
@@ -356,17 +356,17 @@ VkPipelineLayout VKRenderPipeline::GetPipelineLayout() const
 
 void VKRenderPipeline::Dispose()
 {
-    RHI_DISPOSE_BEGIN();
+    GFX_DISPOSE_BEGIN();
     
     if (vkGraphicsPipeline_)
     {
         vkDestroyPipeline(VKDEVICE()->GetNative(), vkGraphicsPipeline_, nullptr);
         vkGraphicsPipeline_ = VK_NULL_HANDLE;
     }
-    RHI_SAFE_RELEASE(pipelineLayout_);
-    RHI_SAFE_RELEASE(renderPass_);
+    GFX_SAFE_RELEASE(pipelineLayout_);
+    GFX_SAFE_RELEASE(renderPass_);
     
-    RHI_DISPOSE_END();
+    GFX_DISPOSE_END();
 }
 
 VKRenderPipeline::~VKRenderPipeline()

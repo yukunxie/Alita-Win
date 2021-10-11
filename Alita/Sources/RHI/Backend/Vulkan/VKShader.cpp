@@ -17,7 +17,7 @@ VKShader::VKShader(VKDevice* device)
 
 void VKShader::Dispose()
 {
-    RHI_DISPOSE_BEGIN();
+    GFX_DISPOSE_BEGIN();
     
     if (vkShaderModule_)
     {
@@ -25,7 +25,7 @@ void VKShader::Dispose()
         vkShaderModule_ = VK_NULL_HANDLE;
     }
     
-    RHI_DISPOSE_END();
+    GFX_DISPOSE_END();
 }
 
 VKShader::~VKShader()
@@ -43,7 +43,7 @@ bool VKShader::Init(const ShaderModuleDescriptor &descriptor)
         createInfo.pCode = reinterpret_cast<const std::uint32_t*>(descriptor.code.data());
         
         CALL_VK(
-            vkCreateShaderModule(RHI_CAST(VKDevice*, GetGPUDevice())->GetNative(), &createInfo, nullptr, &vkShaderModule_));
+            vkCreateShaderModule(GFX_CAST(VKDevice*, GetGPUDevice())->GetNative(), &createInfo, nullptr, &vkShaderModule_));
     }
     
     return VK_NULL_HANDLE != vkShaderModule_;

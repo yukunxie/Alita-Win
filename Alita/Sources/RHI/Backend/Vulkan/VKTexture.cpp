@@ -22,11 +22,11 @@ VKTexture::VKTexture(VKDevice* device)
 
 void VKTexture::Dispose()
 {
-    RHI_DISPOSE_BEGIN();
+    GFX_DISPOSE_BEGIN();
     
     DisposeNativeHandle();
     
-    RHI_DISPOSE_END();
+    GFX_DISPOSE_END();
 }
 
 VKTexture::~VKTexture()
@@ -109,7 +109,7 @@ bool VKTexture::Init(const TextureDescriptor &descriptor)
     
     if (textureUsage_ & TextureUsage::PRESENT)
     {
-        VKCommandBuffer* commandBuffer = RHI_CAST(VKQueue*, VKDEVICE()->GetQueue())->GetImageLayoutInitCommandBuffer();
+        VKCommandBuffer* commandBuffer = GFX_CAST(VKQueue*, VKDEVICE()->GetQueue())->GetImageLayoutInitCommandBuffer();
         commandBuffer->RecordCommand<DeferredCmdPipelineBarrier>(this, TextureUsage::UNDEFINED, TextureUsage::PRESENT);
         commandBuffer->AddBindingObject(this);
         currentTexUsageForMemLayout_ = TextureUsage::PRESENT;
@@ -131,7 +131,7 @@ bool VKTexture::Init(VkImage vkImage, const TextureDescriptor &descriptor)
     
     if (textureUsage_ & TextureUsage::PRESENT)
     {
-        VKCommandBuffer* commandBuffer = RHI_CAST(VKQueue*, VKDEVICE()->GetQueue())->GetImageLayoutInitCommandBuffer();
+        VKCommandBuffer* commandBuffer = GFX_CAST(VKQueue*, VKDEVICE()->GetQueue())->GetImageLayoutInitCommandBuffer();
         commandBuffer->RecordCommand<DeferredCmdPipelineBarrier>(this, TextureUsage::UNDEFINED, TextureUsage::PRESENT);
         commandBuffer->AddBindingObject(this);
         currentTexUsageForMemLayout_ = TextureUsage::PRESENT;
@@ -170,14 +170,14 @@ void VKTexture::DisposeNativeHandle()
 
 void VKTexture::SetVkImageHandleDirectly(VkImage vkImage)
 {
-    RHI_ASSERT(vkImage_ == VK_NULL_HANDLE);
+    GFX_ASSERT(vkImage_ == VK_NULL_HANDLE);
     
     vkImage_ = vkImage;
     currentTexUsageForMemLayout_ = TextureUsage::UNDEFINED;
     
     if (textureUsage_ & TextureUsage::PRESENT)
     {
-        VKCommandBuffer* commandBuffer = RHI_CAST(VKQueue*, VKDEVICE()->GetQueue())->GetImageLayoutInitCommandBuffer();
+        VKCommandBuffer* commandBuffer = GFX_CAST(VKQueue*, VKDEVICE()->GetQueue())->GetImageLayoutInitCommandBuffer();
         commandBuffer->RecordCommand<DeferredCmdPipelineBarrier>(this, TextureUsage::UNDEFINED, TextureUsage::PRESENT);
         commandBuffer->AddBindingObject(this);
         currentTexUsageForMemLayout_ = TextureUsage::PRESENT;
@@ -254,7 +254,7 @@ void VKTexture::TransToTargetImageLayout_(VKCommandBuffer* commandBuffer, Textur
     barrier.image = vkImage_;
 
     // This transitions the whole resource but assumes it is a 2D texture
-    RHI_ASSERT(textureDimension_ == TextureDimension::TEXTURE_2D);
+    GFX_ASSERT(textureDimension_ == TextureDimension::TEXTURE_2D);
     barrier.subresourceRange.aspectMask = VulkanAspectMask(format);
     barrier.subresourceRange.baseMipLevel = 0;
     barrier.subresourceRange.levelCount = mipLevelCount_;

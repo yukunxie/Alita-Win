@@ -14,7 +14,7 @@ VKQuerySet::VKQuerySet(VKDevice* device)
 
 void VKQuerySet::Dispose()
 {
-    RHI_DISPOSE_BEGIN();
+    GFX_DISPOSE_BEGIN();
     
     if (vkQueryPool_ != VK_NULL_HANDLE)
     {
@@ -22,7 +22,7 @@ void VKQuerySet::Dispose()
         vkQueryPool_ = VK_NULL_HANDLE;
     }
     
-    RHI_DISPOSE_END();
+    GFX_DISPOSE_END();
 }
 
 VKQuerySet::~VKQuerySet()

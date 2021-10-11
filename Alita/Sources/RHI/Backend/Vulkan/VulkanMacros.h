@@ -16,7 +16,7 @@ do {                                                      \
     if (VK_SUCCESS != code)                               \
     {                                                     \
         DumpVulkanErrorMessage(code, __FILE__, __LINE__); \
-        RHI_ASSERT(false);                                \
+        GFX_ASSERT(false);                                \
     }                                                     \
 } while (0)
 

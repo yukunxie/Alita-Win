@@ -20,9 +20,9 @@ uint32 GetMipMapLevels(uint32 n)
 
 std::vector<std::vector<uint8>> GenerateMipMap(uint32 width, uint32 height, const uint8* pixels, uint32 channelNum)
 {
-    RHI_ASSERT(width == height && width > 1);
+    GFX_ASSERT(width == height && width > 1);
     // Pow of two
-    RHI_ASSERT((width & (width - 1)) == 0);
+    GFX_ASSERT((width & (width - 1)) == 0);
 
     std::vector<std::vector<uint8>> mipmaps;
 
@@ -75,7 +75,7 @@ namespace ImageLoader
     struct ImageData
     {
         std::string debugName;
-        RHI::TextureFormat format;
+        gfx::TextureFormat format;
         uint32 baseWidth;
         uint32 baseHeight;
         uint32 numLevels;
@@ -98,27 +98,27 @@ namespace ImageLoader
         }
     };
 
-    RHI::Texture* CreateCubeTexture(const ImageData& imageData)
+    gfx::Texture* CreateCubeTexture(const ImageData& imageData)
     {
-        RHI_ASSERT(imageData.format == RHI::TextureFormat::RGBA8UNORM);
+        GFX_ASSERT(imageData.format == gfx::TextureFormat::RGBA8UNORM);
 
-        RHI::TextureDescriptor descriptor;
+        gfx::TextureDescriptor descriptor;
         {
             descriptor.sampleCount = 1;
-            descriptor.format = RHI::TextureFormat::RGBA8UNORM;
-            descriptor.usage = RHI::TextureUsage::SAMPLED | RHI::TextureUsage::COPY_DST;
+            descriptor.format = gfx::TextureFormat::RGBA8UNORM;
+            descriptor.usage = gfx::TextureUsage::SAMPLED | gfx::TextureUsage::COPY_DST;
             descriptor.size = { imageData.baseWidth, imageData.baseHeight, imageData.numFaces };
             descriptor.arrayLayerCount = 1;
             descriptor.mipLevelCount = imageData.numLevels;
-            descriptor.dimension = RHI::TextureDimension::TEXTURE_2D;
+            descriptor.dimension = gfx::TextureDimension::TEXTURE_2D;
             descriptor.debugName = imageData.debugName;
         };
         auto texture = Engine::GetGPUDevice()->CreateTexture(descriptor);
 
-        RHI::BufferDescriptor bufferDescriptor;
+        gfx::BufferDescriptor bufferDescriptor;
         {
             bufferDescriptor.size = imageData.byteLength;
-            bufferDescriptor.usage = RHI::BufferUsage::COPY_DST | RHI::BufferUsage::COPY_SRC;
+            bufferDescriptor.usage = gfx::BufferUsage::COPY_DST | gfx::BufferUsage::COPY_SRC;
         }
 
         auto buffer = Engine::GetGPUDevice()->CreateBuffer(bufferDescriptor);
@@ -133,7 +133,7 @@ namespace ImageLoader
                 // Calculate offset into staging buffer for the current mip level and face
                 uint32 offset = imageData.GetOffset(0, face, level);
 
-                RHI::BufferCopyView bufferCopyView;
+                gfx::BufferCopyView bufferCopyView;
                 {
                     bufferCopyView.buffer = buffer;
                     bufferCopyView.offset = offset;
@@ -141,27 +141,27 @@ namespace ImageLoader
                     bufferCopyView.bytesPerRow = (imageData.baseWidth >> level) * 4;
                 }
 
-                RHI::TextureCopyView textureCopyView;
+                gfx::TextureCopyView textureCopyView;
                 {
                     textureCopyView.texture = texture;
                     textureCopyView.origin = { 0, 0, (std::int32_t)face };
                     textureCopyView.mipLevel = level;
                 }
 
-                auto size = RHI::Extent3D{ imageData.baseHeight >> level, imageData.baseWidth >> level, 1 };
+                auto size = gfx::Extent3D{ imageData.baseHeight >> level, imageData.baseWidth >> level, 1 };
                 commandEncoder->CopyBufferToTexture(bufferCopyView, textureCopyView, size);
             }
         }
 
         auto cmdBuffer = commandEncoder->Finish();
-        RHI_SAFE_RETAIN(cmdBuffer);
+        GFX_SAFE_RETAIN(cmdBuffer);
         Engine::GetGPUDevice()->GetQueue()->Submit(1, &cmdBuffer);
-        RHI_SAFE_RELEASE(cmdBuffer);
+        GFX_SAFE_RELEASE(cmdBuffer);
 
         return texture;
     }
 
-    RHI::Texture* LoadTextureFromData(uint32 texWidth, uint32 texHeight, uint32 texChannels, const std::uint8_t* pixels, std::uint32_t byteLength, const std::string& debugName)
+    gfx::Texture* LoadTextureFromData(uint32 texWidth, uint32 texHeight, uint32 texChannels, const std::uint8_t* pixels, std::uint32_t byteLength, const std::string& debugName)
     {
         ImageData imageData;
         {
@@ -169,7 +169,7 @@ namespace ImageLoader
             imageData.baseWidth = texWidth;
             imageData.baseHeight = texHeight;
             imageData.byteLength = texWidth * texHeight * 4;
-            imageData.format = RHI::TextureFormat::RGBA8UNORM;
+            imageData.format = gfx::TextureFormat::RGBA8UNORM;
             imageData.numFaces = 1;
             imageData.numLevels = GetMipMapLevels(texWidth);
         }
@@ -221,11 +221,11 @@ namespace ImageLoader
         return texture;
     }
 
-    RHI::Texture* LoadTextureFromData(const std::uint8_t* data, std::uint32_t byteLength, const std::string& fileName)
+    gfx::Texture* LoadTextureFromData(const std::uint8_t* data, std::uint32_t byteLength, const std::string& fileName)
     {
         int texWidth, texHeight, texChannels;
         stbi_uc* pixels = stbi_load_from_memory(data, byteLength, &texWidth, &texHeight, &texChannels, STBI_default);
-        RHI_ASSERT(pixels != nullptr);
+        GFX_ASSERT(pixels != nullptr);
 
         auto texture = LoadTextureFromData(texWidth, texHeight, texChannels, pixels, texWidth * texHeight * texChannels, fileName);
         STBI_FREE(pixels);
@@ -233,19 +233,19 @@ namespace ImageLoader
         return texture;
     }
 
-    RHI::Texture* LoadTextureFromKtxFormat(const void* bytes, uint32 size, const std::string& fileName = "")
+    gfx::Texture* LoadTextureFromKtxFormat(const void* bytes, uint32 size, const std::string& fileName = "")
     {
         ktxTexture* ktxTexture;
         KTX_error_code result = ktxTexture_CreateFromMemory((ktx_uint8_t*)bytes, size, KTX_TEXTURE_CREATE_LOAD_IMAGE_DATA_BIT, &ktxTexture);
-        RHI_ASSERT(result == KTX_SUCCESS);
+        GFX_ASSERT(result == KTX_SUCCESS);
 
-        RHI::Texture* texture;
+        gfx::Texture* texture;
 
-        RHI_ASSERT(ktxTexture->glFormat == 6408);
+        GFX_ASSERT(ktxTexture->glFormat == 6408);
         ImageData imageData;
         {
             imageData.debugName = fileName;
-            imageData.format = RHI::TextureFormat::RGBA8UNORM;
+            imageData.format = gfx::TextureFormat::RGBA8UNORM;
             imageData.baseWidth = ktxTexture->baseWidth;
             imageData.baseHeight = ktxTexture->baseHeight;
             imageData.numLevels = ktxTexture->numLevels;
@@ -274,7 +274,7 @@ namespace ImageLoader
         return texture;
     }
 
-    RHI::Texture* LoadTextureFromUri(const std::string& filename)
+    gfx::Texture* LoadTextureFromUri(const std::string& filename)
     {
         const TData& imageData = FileSystem::GetInstance()->GetBinaryData(filename.c_str());
         
@@ -286,7 +286,7 @@ namespace ImageLoader
         }
     }
 
-    RHI::Texture* LoadCubeTexture(const std::string& cubeTextureName)
+    gfx::Texture* LoadCubeTexture(const std::string& cubeTextureName)
     {
         constexpr uint32 kFaceNum = 6;
         const char* kFaceNames[kFaceNum] = {"px", "nx", "py", "ny", "pz", "nz"};
@@ -301,12 +301,12 @@ namespace ImageLoader
             }
         }
 
-        RHI_ASSERT(!fileExt.empty());
+        GFX_ASSERT(!fileExt.empty());
 
         ImageData imageData;
         {
             imageData.debugName = cubeTextureName;
-            imageData.format = RHI::TextureFormat::RGBA8UNORM;
+            imageData.format = gfx::TextureFormat::RGBA8UNORM;
             imageData.numFaces = kFaceNum;
             imageData.numLevels = 1;
         }
@@ -346,8 +346,8 @@ namespace ImageLoader
                 //imageData.byteLength = texWidth * texHeight * 4 * kFaceNum;
                 bytes.reserve(texWidth * texHeight * 4 * kFaceNum * 2);
             }
-            RHI_ASSERT(imageData.baseWidth == texWidth);
-            RHI_ASSERT(imageData.baseHeight == texHeight);
+            GFX_ASSERT(imageData.baseWidth == texWidth);
+            GFX_ASSERT(imageData.baseHeight == texHeight);
 
             auto mipmaps = GenerateMipMap(texWidth, texHeight, pData, texChannels);
             for (uint32 level = 0; level < mipmaps.size(); ++level)

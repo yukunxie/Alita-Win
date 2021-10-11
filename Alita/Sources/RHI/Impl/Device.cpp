@@ -8,9 +8,9 @@ NS_GFX_BEGIN
 
 void Device::AddAutoReleaseObjectToPool(GfxBase* object)
 {
-    RHI_ASSERT(object);
+    GFX_ASSERT(object);
     if (!object) return;
-#if RHI_DEBUG
+#if GFX_DEBUG
     autoReleasedObjectPool_.emplace(object->GetObjectType(), object);
 #else
     autoReleasedObjectPool_.push_back(object);
@@ -20,16 +20,16 @@ void Device::AddAutoReleaseObjectToPool(GfxBase* object)
 void Device::PurgeAutoReleasePool()
 {
     int index = 0;
-#if RHI_DEBUG
+#if GFX_DEBUG
     for (auto it : autoReleasedObjectPool_)
     {
-        RHI_SAFE_RELEASE(it.second);
+        GFX_SAFE_RELEASE(it.second);
         index++;
     }
 #else
     for (auto it : autoReleasedObjectPool_)
     {
-        RHI_SAFE_RELEASE(it);
+        GFX_SAFE_RELEASE(it);
     }
 #endif
     

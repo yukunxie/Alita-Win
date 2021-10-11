@@ -36,7 +36,7 @@ public:
         
         for (auto tv : pendingReleasedTVs)
         {
-            RHI_SAFE_RELEASE(tv);
+            GFX_SAFE_RELEASE(tv);
         }
         
         LOGI("Purge VKTextureViewManager done.");
@@ -56,7 +56,7 @@ public:
         
         for (auto tv : pendingReleasedTVs)
         {
-            RHI_SAFE_RELEASE(tv);
+            GFX_SAFE_RELEASE(tv);
         }
     }
     
@@ -71,9 +71,9 @@ public:
             }
         }
         
-        auto vkTexture = RHI_CAST(VKTexture*, texture);
+        auto vkTexture = GFX_CAST(VKTexture*, texture);
         auto texView = device_->CreateObject<VKTextureView>(vkTexture, descriptor);
-        RHI_SAFE_RETAIN(texView);
+        GFX_SAFE_RETAIN(texView);
         cache_.emplace(texture, TextureViewCacheItem{texView, descriptor});
         
         return texView;

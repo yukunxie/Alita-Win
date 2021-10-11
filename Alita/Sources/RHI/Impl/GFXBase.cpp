@@ -7,7 +7,7 @@
 
 NS_GFX_BEGIN
 
-#if RHI_TRACE_OBJ_REF_COUNT
+#if GFX_TRACE_OBJ_REF_COUNT
 
 static std::vector<const std::string> sCoarseFunctionCallStack;
 
@@ -44,22 +44,22 @@ void GfxBase::PopTraceback()
 
 #endif
 
-#if defined(RHI_DEBUG) && RHI_DEBUG
+#if defined(GFX_DEBUG) && GFX_DEBUG
 std::thread::native_handle_type GfxBase::mainThreadId_ = 0;
 #endif
 
 GfxBase::~GfxBase()
 {
-    RHI_ASSERT(globalId__ != INVALID_OBJECT_ID);
-    RHI_ASSERT(bindingScriptObject_ == nullptr);
-    RHI_SAFE_RELEASE(GPUDevice_);
+    GFX_ASSERT(globalId__ != INVALID_OBJECT_ID);
+    GFX_ASSERT(bindingScriptObject_ == nullptr);
+    GFX_SAFE_RELEASE(GPUDevice_);
 }
 
 GfxBase::GfxBase(RHIObjectType objectType)
     : objectType__(objectType)
 {
     CheckThread();
-    RHI_ASSERT(objectType__ != RHIObjectType::UNDEFINED);
+    GFX_ASSERT(objectType__ != RHIObjectType::UNDEFINED);
 
 #if AUTO_UNWIND_TRACEBACK_ENABLED
     UNWIND_CURRENT_STACK_TRACEBACK(_unwindTraceback);
@@ -69,7 +69,7 @@ GfxBase::GfxBase(RHIObjectType objectType)
 GfxBase::GfxBase(Device* device, RHIObjectType objectType)
 : GfxBase(objectType)
 {
-    RHI_PTR_ASSIGN(GPUDevice_, device);
+    GFX_PTR_ASSIGN(GPUDevice_, device);
     GPUDevice_->GetObjectManager().AddObject(this);
 }
 
@@ -77,11 +77,11 @@ GfxBase* GfxBase::AutoRelease()
 {
     if (this->GetObjectType() == RHIObjectType::Device)
     {
-        RHI_CAST(Device * , this)->AddAutoReleaseObjectToPool(this);
+        GFX_CAST(Device * , this)->AddAutoReleaseObjectToPool(this);
     }
     else
     {
-        RHI_ASSERT(GPUDevice_);
+        GFX_ASSERT(GPUDevice_);
         GPUDevice_->AddAutoReleaseObjectToPool(this);
     }
     
@@ -95,8 +95,8 @@ void GfxBase::Retain() const
     NEW_OBJ_REF_COUNT_TRACEBACK(xxxfuncCallRetainTracebacks_);
     
     CheckThread();
-    RHI_ASSERT(!IsDisposed());
-    RHI_ASSERT((int) objectType__ >= 0 && (int) objectType__ <= (int) RHIObjectType::MAX_COUNT);
+    GFX_ASSERT(!IsDisposed());
+    GFX_ASSERT((int) objectType__ >= 0 && (int) objectType__ <= (int) RHIObjectType::MAX_COUNT);
     ++referenceCount__;
 }
 
@@ -105,8 +105,8 @@ void GfxBase::Release() const
     NEW_OBJ_REF_COUNT_TRACEBACK(xxxfuncCallReleaseTracebacks_);
 
     CheckThread();
-    RHI_ASSERT(referenceCount__ > 0);
-    RHI_ASSERT((int) objectType__ >= 0 && (int) objectType__ <= (int) RHIObjectType::MAX_COUNT);
+    GFX_ASSERT(referenceCount__ > 0);
+    GFX_ASSERT((int) objectType__ >= 0 && (int) objectType__ <= (int) RHIObjectType::MAX_COUNT);
     
     if (0 == --referenceCount__)
     {

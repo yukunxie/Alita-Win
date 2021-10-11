@@ -20,7 +20,7 @@
 
 NS_GFX_BEGIN
 
-void DeferredCmdBeginCommandBuffer::Execute(RHI::VKCommandBuffer* commandBuffer)
+void DeferredCmdBeginCommandBuffer::Execute(gfx::VKCommandBuffer* commandBuffer)
 {
     commandBuffer->BeginCommandBuffer();
 }
@@ -47,12 +47,12 @@ void DeferredCmdSetComputePipeline::Execute(VKCommandBuffer* commandBuffer)
     commandBuffer->BindComputePipeline(computePipeline_);
 }
 
-void DeferredCmdDispatch::Execute(RHI::VKCommandBuffer* commandBuffer)
+void DeferredCmdDispatch::Execute(gfx::VKCommandBuffer* commandBuffer)
 {
     commandBuffer->Dispatch(x_, y_, z_);
 }
 
-void DeferredCmdDispatchIndirect::Execute(RHI::VKCommandBuffer* commandBuffer)
+void DeferredCmdDispatchIndirect::Execute(gfx::VKCommandBuffer* commandBuffer)
 {
     commandBuffer->DispatchIndirect(indirectBuffer_, indirectOffset_);
 }
@@ -62,7 +62,7 @@ void DeferredCmdDraw::Execute(VKCommandBuffer* commandBuffer)
     commandBuffer->Draw(vertexCount_, instanceCount_, firstVertex_, firstInstance_);
 }
 
-void DeferredCmdDrawIndexed::Execute(RHI::VKCommandBuffer* commandBuffer)
+void DeferredCmdDrawIndexed::Execute(gfx::VKCommandBuffer* commandBuffer)
 {
     commandBuffer->DrawIndexed(indexCount_, instanceCount_, firstIndex_, baseVertex_,
                                firstInstance_);
@@ -134,8 +134,8 @@ void DeferredCmdCopyBufferToTexture::Execute(VKCommandBuffer* commandBuffer_)
     auto &destination = destination_;
     auto &copySize = copySize_;
     
-    auto buffer = RHI_CAST(VKBuffer*, source.buffer);
-    auto texture = RHI_CAST(VKTexture*, destination.texture);
+    auto buffer = GFX_CAST(VKBuffer*, source.buffer);
+    auto texture = GFX_CAST(VKTexture*, destination.texture);
     
     
     texture->TransToCopyDstImageLayout(commandBuffer_);
@@ -161,14 +161,14 @@ void DeferredCmdCopyBufferToTexture::Execute(VKCommandBuffer* commandBuffer_)
                              &bufferImageCopy);
 }
 
-void DeferredCmdCopyTextureToBuffer::Execute(RHI::VKCommandBuffer* commandBuffer_)
+void DeferredCmdCopyTextureToBuffer::Execute(gfx::VKCommandBuffer* commandBuffer_)
 {
     auto &source = source_;
     auto &destination = destination_;
     auto &copySize = copySize_;
     
-    VKTexture* texture = RHI_CAST(VKTexture*, source.texture);
-    VKBuffer* buffer = RHI_CAST(VKBuffer*, destination.buffer);
+    VKTexture* texture = GFX_CAST(VKTexture*, source.texture);
+    VKBuffer* buffer = GFX_CAST(VKBuffer*, destination.buffer);
     
     // Auto trans image layout to valid image layout.
     texture->TransToCopySrcImageLayout(commandBuffer_);
@@ -190,14 +190,14 @@ void DeferredCmdCopyTextureToBuffer::Execute(RHI::VKCommandBuffer* commandBuffer
                              &region);
 }
 
-void DeferredCmdCopyTextureToTexture::Execute(RHI::VKCommandBuffer* commandBuffer_)
+void DeferredCmdCopyTextureToTexture::Execute(gfx::VKCommandBuffer* commandBuffer_)
 {
     auto &source = source_;
     auto &destination = destination_;
     auto &copySize = copySize_;
     
-    auto vkSrcTexture = RHI_CAST(VKTexture*, source.texture);
-    auto vkDstTexture = RHI_CAST(VKTexture*, destination.texture);
+    auto vkSrcTexture = GFX_CAST(VKTexture*, source.texture);
+    auto vkDstTexture = GFX_CAST(VKTexture*, destination.texture);
     
     vkSrcTexture->TransToCopySrcImageLayout(commandBuffer_);
     vkDstTexture->TransToCopyDstImageLayout(commandBuffer_);
@@ -207,8 +207,8 @@ void DeferredCmdCopyTextureToTexture::Execute(RHI::VKCommandBuffer* commandBuffe
     int32_t dstOffestZ = 0;
     
     // 3D纹理暂未处理
-    RHI_ASSERT(!source.texture->Is3DImage());
-    RHI_ASSERT(!destination.texture->Is3DImage());
+    GFX_ASSERT(!source.texture->Is3DImage());
+    GFX_ASSERT(!destination.texture->Is3DImage());
     
     VkImageCopy region;
     region.extent = {copySize.width, copySize.height, copySize.depth};
@@ -233,10 +233,10 @@ void DeferredCmdCopyTextureToTexture::Execute(RHI::VKCommandBuffer* commandBuffe
                      &region);
 }
 
-void DeferredCmdCopyBufferToBuffer::Execute(RHI::VKCommandBuffer* commandBuffer)
+void DeferredCmdCopyBufferToBuffer::Execute(gfx::VKCommandBuffer* commandBuffer)
 {
-    VkBuffer srcBuffer = RHI_CAST(VKBuffer*, source_)->GetNative();
-    VkBuffer dstBuffer = RHI_CAST(VKBuffer*, destination_)->GetNative();
+    VkBuffer srcBuffer = GFX_CAST(VKBuffer*, source_)->GetNative();
+    VkBuffer dstBuffer = GFX_CAST(VKBuffer*, destination_)->GetNative();
     VkBufferCopy region;
     {
         region.size = size_;
@@ -246,47 +246,47 @@ void DeferredCmdCopyBufferToBuffer::Execute(RHI::VKCommandBuffer* commandBuffer)
     vkCmdCopyBuffer(commandBuffer->GetNative(), srcBuffer, dstBuffer, 1, &region);
 }
 
-void DeferredCmdSetBlendColor::Execute(RHI::VKCommandBuffer* commandBuffer)
+void DeferredCmdSetBlendColor::Execute(gfx::VKCommandBuffer* commandBuffer)
 {
     commandBuffer->SetBlendColor(color_);
 }
 
-void DeferredCmdSetDepthBias::Execute(RHI::VKCommandBuffer* commandBuffer)
+void DeferredCmdSetDepthBias::Execute(gfx::VKCommandBuffer* commandBuffer)
 {
     commandBuffer->SetDepthBias(depthBiasConstantFactor_, depthBiasClamp_, depthBiasSlopeFactor_);
 }
 
-void DeferredCmdPushDebugGroup::Execute(RHI::VKCommandBuffer* commandBuffer)
+void DeferredCmdPushDebugGroup::Execute(gfx::VKCommandBuffer* commandBuffer)
 {
     commandBuffer->PushDebugGroup(strings_.data());
 }
 
-void DeferredCmdPopDebugGroup::Execute(RHI::VKCommandBuffer* commandBuffer)
+void DeferredCmdPopDebugGroup::Execute(gfx::VKCommandBuffer* commandBuffer)
 {
     commandBuffer->PopDebugGroup();
 }
 
-void DeferredCmdInsertDebugMarker::Execute(RHI::VKCommandBuffer* commandBuffer)
+void DeferredCmdInsertDebugMarker::Execute(gfx::VKCommandBuffer* commandBuffer)
 {
     commandBuffer->PushDebugGroup(strings_.data());
 }
 
-void DeferredCmdExecuteBundle::Execute(RHI::VKCommandBuffer* commandBuffer)
+void DeferredCmdExecuteBundle::Execute(gfx::VKCommandBuffer* commandBuffer)
 {
     renderBundle_->Execute(commandBuffer);
 }
 
-void DeferredCmdBeginOcclusionQuery::Execute(RHI::VKCommandBuffer* commandBuffer)
+void DeferredCmdBeginOcclusionQuery::Execute(gfx::VKCommandBuffer* commandBuffer)
 {
     commandBuffer->BeginOcclusionQuery(queryIndex_);
 }
 
-void DeferredCmdEndOcclusionQuery::Execute(RHI::VKCommandBuffer* commandBuffer)
+void DeferredCmdEndOcclusionQuery::Execute(gfx::VKCommandBuffer* commandBuffer)
 {
     commandBuffer->EndOcclusionQuery(queryIndex_);
 }
 
-void DeferredCmdResolveQuerySet::Execute(RHI::VKCommandBuffer* commandBuffer)
+void DeferredCmdResolveQuerySet::Execute(gfx::VKCommandBuffer* commandBuffer)
 {
     commandBuffer->ResolveQuerySet(querySet_, queryFirstIndex_, queryCount_, dstBuffer_,
                                    dstOffset_);
@@ -308,7 +308,7 @@ void DeferredCmdPipelineBarrier::Execute(VKCommandBuffer* commandBuffer)
     barrier.newLayout = GetVulkanImageLayout(dstUsageFlags_, textureFormat);
     barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
     barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-    barrier.image = RHI_CAST(VKTexture*, texture_)->GetNative();
+    barrier.image = GFX_CAST(VKTexture*, texture_)->GetNative();
     
     // This transitions the whole resource but assumes it is a 2D texture
     barrier.subresourceRange.aspectMask = VulkanAspectMask(textureFormat);

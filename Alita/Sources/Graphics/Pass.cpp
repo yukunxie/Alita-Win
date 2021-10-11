@@ -21,19 +21,19 @@ void Pass::BeginPass()
 
 	std::sort(attachments_.begin(), attachments_.end(), [](const AttachmentConfig& a, const AttachmentConfig& b) {return a.Slot < b.Slot; });
 
-	RHI::RenderPassDescriptor renderPassDescriptor;
+	gfx::RenderPassDescriptor renderPassDescriptor;
 
-	RHI::Extent3D extent;
+	gfx::Extent3D extent;
 
 	for (const auto& tp : attachments_)
 	{
-		RHI::RenderPassColorAttachmentDescriptor descriptor;
+		gfx::RenderPassColorAttachmentDescriptor descriptor;
 		{
 			descriptor.attachment = tp.RenderTarget->GetTextureView();
 			descriptor.resolveTarget = nullptr;
 			descriptor.loadValue = tp.RenderTarget->GetClearColor();
-			descriptor.loadOp = tp.Clear? RHI::LoadOp::CLEAR : RHI::LoadOp::LOAD;
-			descriptor.storeOp = RHI::StoreOp::STORE;
+			descriptor.loadOp = tp.Clear? gfx::LoadOp::CLEAR : gfx::LoadOp::LOAD;
+			descriptor.storeOp = gfx::StoreOp::STORE;
 		}
 		renderPassDescriptor.colorAttachments.push_back(descriptor);
 		extent = tp.RenderTarget->GetExtent();
@@ -43,17 +43,17 @@ void Pass::BeginPass()
 	{
 		renderPassDescriptor.depthStencilAttachment = {
 		.attachment = DepthStencilAttachment_.RenderTarget->GetTextureView(),
-		.depthLoadOp = DepthStencilAttachment_.Clear? RHI::LoadOp::CLEAR : RHI::LoadOp::LOAD,
-		.depthStoreOp = RHI::StoreOp::STORE,
+		.depthLoadOp = DepthStencilAttachment_.Clear? gfx::LoadOp::CLEAR : gfx::LoadOp::LOAD,
+		.depthStoreOp = gfx::StoreOp::STORE,
 		.depthLoadValue = DepthStencilAttachment_.RenderTarget->GetClearDepth(),
-		.stencilLoadOp = DepthStencilAttachment_.Clear ? RHI::LoadOp::CLEAR : RHI::LoadOp::LOAD,
-		.stencilStoreOp = RHI::StoreOp::STORE,
+		.stencilLoadOp = DepthStencilAttachment_.Clear ? gfx::LoadOp::CLEAR : gfx::LoadOp::LOAD,
+		.stencilStoreOp = gfx::StoreOp::STORE,
 		.stencilLoadValue = DepthStencilAttachment_.RenderTarget->GetClearStencil(),
 		};
 		extent = DepthStencilAttachment_.RenderTarget->GetExtent();
 	}
 
-	RHI_ASSERT(RenderPassEncoder_ == nullptr);
+	GFX_ASSERT(RenderPassEncoder_ == nullptr);
 	RenderPassEncoder_ = CommandEncoder_->BeginRenderPass(renderPassDescriptor);
 	{
 		RenderPassEncoder_->SetViewport(0, 0, extent.width, extent.height, 0, 1);
@@ -64,7 +64,7 @@ void Pass::BeginPass()
 
 void Pass::EndPass()
 {
-	RHI_ASSERT(RenderPassEncoder_);
+	GFX_ASSERT(RenderPassEncoder_);
 	RenderPassEncoder_->EndPass();
 	RenderPassEncoder_ = nullptr;
 
@@ -79,7 +79,7 @@ ShadowMapGenPass::ShadowMapGenPass()
 {
 	PassName_ = "ShadowMapGenPass";
 
-	dsTexture_ = std::make_shared<RenderTarget>(shadowMapSize_.width, shadowMapSize_.height, RHI::TextureFormat::DEPTH24PLUS_STENCIL8);
+	dsTexture_ = std::make_shared<RenderTarget>(shadowMapSize_.width, shadowMapSize_.height, gfx::TextureFormat::DEPTH24PLUS_STENCIL8);
 }
 
 void ShadowMapGenPass::Execute(const std::vector<RenderObject*>& renderObjects)
@@ -102,13 +102,13 @@ GBufferPass::GBufferPass()
 {
 	PassName_ = "GBufferPass";
 
-	const RHI::Extent2D extent = { 1280, 800 };
-	GBuffers_.GDiffuse = std::make_shared<RenderTarget>(extent.width, extent.height, RHI::TextureFormat::RGBA16FLOAT, "GDiffuse");
-	GBuffers_.GEmissive = std::make_shared<RenderTarget>(extent.width, extent.height, RHI::TextureFormat::RGBA16FLOAT, "GEmissive");
-	GBuffers_.GNormal = std::make_shared<RenderTarget>(extent.width, extent.height, RHI::TextureFormat::RGBA16FLOAT, "GNormal");
-	GBuffers_.GPosition = std::make_shared<RenderTarget>(extent.width, extent.height, RHI::TextureFormat::RGBA32FLOAT, "GPosition");
-	GBuffers_.GMaterial = std::make_shared<RenderTarget>(extent.width, extent.height, RHI::TextureFormat::RGBA16FLOAT, "GMaterial");
-	dsTexture_ = std::make_shared<RenderTarget>(extent.width, extent.height, RHI::TextureFormat::DEPTH24PLUS_STENCIL8);
+	const gfx::Extent2D extent = { 1280, 800 };
+	GBuffers_.GDiffuse = std::make_shared<RenderTarget>(extent.width, extent.height, gfx::TextureFormat::RGBA16FLOAT, "GDiffuse");
+	GBuffers_.GEmissive = std::make_shared<RenderTarget>(extent.width, extent.height, gfx::TextureFormat::RGBA16FLOAT, "GEmissive");
+	GBuffers_.GNormal = std::make_shared<RenderTarget>(extent.width, extent.height, gfx::TextureFormat::RGBA16FLOAT, "GNormal");
+	GBuffers_.GPosition = std::make_shared<RenderTarget>(extent.width, extent.height, gfx::TextureFormat::RGBA32FLOAT, "GPosition");
+	GBuffers_.GMaterial = std::make_shared<RenderTarget>(extent.width, extent.height, gfx::TextureFormat::RGBA16FLOAT, "GMaterial");
+	dsTexture_ = std::make_shared<RenderTarget>(extent.width, extent.height, gfx::TextureFormat::DEPTH24PLUS_STENCIL8);
 }
 
 void GBufferPass::Execute(const std::vector<RenderObject*>& renderObjects)
@@ -142,8 +142,8 @@ OpaquePass::OpaquePass()
 {
 	PassName_ = "OpaquePass";
 
-	rtColor_ = std::make_shared<RenderTarget>(RHI::TextureFormat::RGBA16FLOAT);
-	rtDepthStencil_ = std::make_shared<RenderTarget>(RHI::TextureFormat::DEPTH24PLUS_STENCIL8);
+	rtColor_ = std::make_shared<RenderTarget>(gfx::TextureFormat::RGBA16FLOAT);
+	rtDepthStencil_ = std::make_shared<RenderTarget>(gfx::TextureFormat::DEPTH24PLUS_STENCIL8);
 }
 
 void OpaquePass::Execute(const std::vector<RenderObject*>& renderObjects)
@@ -169,8 +169,8 @@ SkyBoxPass::SkyBoxPass()
 {
 	PassName_ = "SkyBoxPass";
 
-	rtColor_ = std::make_shared<RenderTarget>(RHI::TextureFormat::RGBA16FLOAT);
-	rtDepthStencil_ = std::make_shared<RenderTarget>(RHI::TextureFormat::DEPTH24PLUS_STENCIL8);
+	rtColor_ = std::make_shared<RenderTarget>(gfx::TextureFormat::RGBA16FLOAT);
+	rtDepthStencil_ = std::make_shared<RenderTarget>(gfx::TextureFormat::DEPTH24PLUS_STENCIL8);
 }
 
 void SkyBoxPass::Setup(const Pass* mainPass, const Pass* depthPass)
@@ -249,7 +249,7 @@ FullScreenPass::FullScreenPass(const std::string& materialName, ETechniqueType t
 	meshComponent_ = meshComp;
 }
 
-void FullScreenPass::SetTexture(const std::string& name, const RHI::Texture* texture)
+void FullScreenPass::SetTexture(const std::string& name, const gfx::Texture* texture)
 {
 	meshComponent_->GetRenderObject()->MaterialObject->SetTexture(name, texture);
 }
@@ -278,7 +278,7 @@ DeferredPass::DeferredPass()
 {
 	PassName_ = "DeferredLightingPass";
 
-	rtColor_ = std::make_shared<RenderTarget>(RHI::TextureFormat::RGBA16FLOAT);
+	rtColor_ = std::make_shared<RenderTarget>(gfx::TextureFormat::RGBA16FLOAT);
 }
 
 void DeferredPass::Execute(const std::vector<RenderObject*>& renderObjects)
@@ -429,8 +429,8 @@ void GaussianBlur::Execute()
 
 OutlineMarkPass::OutlineMarkPass()
 {
-	rtColor_ = std::make_shared<RenderTarget>(RHI::TextureFormat::RGBA8UNORM);
-	rtDepthStencil_ = std::make_shared<RenderTarget>(RHI::TextureFormat::DEPTH24PLUS_STENCIL8);
+	rtColor_ = std::make_shared<RenderTarget>(gfx::TextureFormat::RGBA8UNORM);
+	rtDepthStencil_ = std::make_shared<RenderTarget>(gfx::TextureFormat::DEPTH24PLUS_STENCIL8);
 }
 
 void OutlineMarkPass::ResizeTarget(uint32 width, uint32 height)

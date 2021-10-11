@@ -13,9 +13,9 @@ VKRenderQueue::VKRenderQueue(VKDevice* device)
 
 void VKRenderQueue::Dispose()
 {
-    RHI_DISPOSE_BEGIN();
+    GFX_DISPOSE_BEGIN();
     
-    RHI_DISPOSE_END();
+    GFX_DISPOSE_END();
 }
 
 VKRenderQueue::~VKRenderQueue()

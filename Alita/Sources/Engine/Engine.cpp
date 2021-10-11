@@ -13,7 +13,7 @@
 
 NS_RX_BEGIN
 
-class DeviceHandler : public RHI::IDeviceExternalDeps
+class DeviceHandler : public gfx::IDeviceExternalDeps
 {
 public:
     DeviceHandler() = delete;
@@ -71,7 +71,7 @@ Engine::Engine(void* windowHandler)
 
 bool Engine::Init()
 {
-    gpuDevice_ = RHI::VKDevice::Create({}, std::make_unique<DeviceHandler>(this));
+    gpuDevice_ = gfx::VKDevice::Create({}, std::make_unique<DeviceHandler>(this));
     LOGI("Engine::Init gpuDevice_=%p", gpuDevice_);
     world_ = new World();
     LOGI("Engine::Init world_=%p", world_);

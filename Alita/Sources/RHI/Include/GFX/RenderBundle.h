@@ -94,7 +94,7 @@ public:
                     idx += sizeof(CmdInsertDebugMarker);
                     break;
                 default:
-                    RHI_ASSERT(false);
+                    GFX_ASSERT(false);
             }
             
             idx = CalcCmdAlignment(idx);
@@ -176,7 +176,7 @@ public:
                     break;
                 
                 default:
-                    RHI_ASSERT(false);
+                    GFX_ASSERT(false);
             }
     
             idx = CalcCmdAlignment(idx);

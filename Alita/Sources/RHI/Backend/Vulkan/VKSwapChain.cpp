@@ -33,7 +33,7 @@ VKSwapChain::~VKSwapChain()
     
     // TODO realxie 这里需要仔细处理一下commandbuffer的所有权问题
     for (auto cmdBuffer : renderingFrameInfo_.commandBuffers) {
-        RHI_SAFE_RELEASE(cmdBuffer);
+        GFX_SAFE_RELEASE(cmdBuffer);
     }
     renderingFrameInfo_.commandBuffers.clear();
 }
@@ -117,13 +117,13 @@ void VKSwapChain::CreateVulkanSwapChain()
     }
     
     // create swapchain.
-    CALL_VK(vkCreateSwapchainKHR(RHI_CAST(VKDevice * , GetGPUDevice())->GetNative(), &createInfo,
+    CALL_VK(vkCreateSwapchainKHR(GFX_CAST(VKDevice * , GetGPUDevice())->GetNative(), &createInfo,
                                    nullptr, &vkSwapChain_));
 }
 
 void VKSwapChain::Init()
 {
-    auto vkDevice = RHI_CAST(VKDevice*, GetGPUDevice())->GetNative();
+    auto vkDevice = GFX_CAST(VKDevice*, GetGPUDevice())->GetNative();
     
     std::vector<VkImage> swapChainImages;
     
@@ -131,7 +131,7 @@ void VKSwapChain::Init()
     swapChainImages.resize(imageCount_);
     vkGetSwapchainImagesKHR(vkDevice, vkSwapChain_, &imageCount_, swapChainImages.data());
     
-    RHI_ASSERT(swapchainTextures_.size() <= swapChainImages.size());
+    GFX_ASSERT(swapchainTextures_.size() <= swapChainImages.size());
     if (swapchainTextures_.size() != swapChainImages.size())
     {
         swapchainTextures_.resize(swapChainImages.size());
@@ -159,7 +159,7 @@ void VKSwapChain::Init()
                                                                         descriptor);
             swapchainTextures_[i]->MarkSwapchainImage();
             swapchainTextures_[i]->SetIsSwapChainTexture(true);
-            RHI_SAFE_RETAIN(swapchainTextures_[i]);
+            GFX_SAFE_RETAIN(swapchainTextures_[i]);
         }
     }
 }
@@ -181,13 +181,13 @@ void VKSwapChain::Dispose()
         {
             textureViewCache->RemoveByTexture(texture);
         }
-        RHI_SAFE_RELEASE(texture);
+        GFX_SAFE_RELEASE(texture);
     }
     swapchainTextures_.clear();
     
     if (vkSwapChain_)
     {
-        vkDestroySwapchainKHR(RHI_CAST(VKDevice*, GetGPUDevice())->GetNative(), vkSwapChain_,
+        vkDestroySwapchainKHR(GFX_CAST(VKDevice*, GetGPUDevice())->GetNative(), vkSwapChain_,
                                 nullptr);
         vkSwapChain_ = VK_NULL_HANDLE;
     }
@@ -218,7 +218,7 @@ bool VKSwapChain::RecreateSwapChainInternal()
     
     if (vkSwapChain_)
     {
-        vkDestroySwapchainKHR(RHI_CAST(VKDevice*, GetGPUDevice())->GetNative(), vkSwapChain_,
+        vkDestroySwapchainKHR(GFX_CAST(VKDevice*, GetGPUDevice())->GetNative(), vkSwapChain_,
                                 nullptr);
         vkSwapChain_ = VK_NULL_HANDLE;
     }
@@ -302,7 +302,7 @@ void VKSwapChain::Present(std::uint32_t imageIndex, VkSemaphore semaWaiting, boo
         presentInfo.pResults = &result;
     }
     
-    VKQueue* queue = RHI_CAST(VKQueue*, VKDEVICE()->GetQueue());
+    VKQueue* queue = GFX_CAST(VKQueue*, VKDEVICE()->GetQueue());
     
     VkResult code = vkQueuePresentKHR(queue->GetNative(), &presentInfo);
     if (code != VK_SUCCESS || result != VK_SUCCESS)

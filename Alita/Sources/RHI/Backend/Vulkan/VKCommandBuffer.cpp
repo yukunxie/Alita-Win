@@ -27,11 +27,11 @@ RenderPassEntry::RenderPassEntry(RenderPass* renderPass,
     char buffer[2048];
     size_t offset = 0;
     char* header = buffer;
-    const VkRenderPass vkRenderPass = RHI_CAST(VKRenderPass*, renderPass)->GetNative();
+    const VkRenderPass vkRenderPass = GFX_CAST(VKRenderPass*, renderPass)->GetNative();
     memcpy(header, &vkRenderPass, sizeof(vkRenderPass));
     header = header + sizeof(vkRenderPass);
     
-    const VkFramebuffer vkFramebuffer = RHI_CAST(VKFramebuffer*, framebuffer)->GetNative();
+    const VkFramebuffer vkFramebuffer = GFX_CAST(VKFramebuffer*, framebuffer)->GetNative();
     memcpy(header, &vkFramebuffer, sizeof(vkFramebuffer));
     header = header + sizeof(vkFramebuffer);
     
@@ -61,11 +61,11 @@ bool VKCommandBuffer::Init()
 
 void VKCommandBuffer::Dispose()
 {
-    RHI_DISPOSE_BEGIN();
+    GFX_DISPOSE_BEGIN();
     
     ResetCommandBuffer();
     
-    RHI_DISPOSE_END();
+    GFX_DISPOSE_END();
 }
 
 void VKCommandBuffer::BeginRenderPass(RenderPass* pass,
@@ -76,8 +76,8 @@ void VKCommandBuffer::BeginRenderPass(RenderPass* pass,
                                       float clearDepth,
                                       uint32_t clearStencil)
 {
-    VKRenderPass* vkRenderPass = RHI_CAST(VKRenderPass*, pass);
-    VKFramebuffer* vkFramebuffer = RHI_CAST(VKFramebuffer*, framebuffer);
+    VKRenderPass* vkRenderPass = GFX_CAST(VKRenderPass*, pass);
+    VKFramebuffer* vkFramebuffer = GFX_CAST(VKFramebuffer*, framebuffer);
     
     if (renderPassBinding_ && framebufferBinding_)
     {
@@ -92,7 +92,7 @@ void VKCommandBuffer::BeginRenderPass(RenderPass* pass,
     
     renderPassBinding_ = vkRenderPass;
     framebufferBinding_ = vkFramebuffer;
-    occlusionQuerySetBinding_ = RHI_CAST(VKQuerySet*, occlusionQuerySet);
+    occlusionQuerySetBinding_ = GFX_CAST(VKQuerySet*, occlusionQuerySet);
     
     VkOffset2D offset = {0, 0};
     const auto &fbSize = framebufferBinding_->GetExtent2D();
@@ -107,7 +107,7 @@ void VKCommandBuffer::BeginRenderPass(RenderPass* pass,
     renderPassBeginInfo.renderArea.extent = extent;
     
     std::array<VkClearValue, kMaxColorAttachments + 1> vkClearValues;
-    RHI_ASSERT(clearValueCount + 1 <= vkClearValues.size());
+    GFX_ASSERT(clearValueCount + 1 <= vkClearValues.size());
     for (std::uint32_t i = 0; i < clearValueCount; ++i)
     {
         auto &value = clearValues[i];
@@ -123,7 +123,7 @@ void VKCommandBuffer::BeginRenderPass(RenderPass* pass,
     if (occlusionQuerySet && occlusionQuerySet->GetCount())
     {
         // vkCmdResetQueryPool must only be called outside of a render pass instance
-        vkCmdResetQueryPool(GetNative(), RHI_CAST(VKQuerySet*, occlusionQuerySet)->GetNative(), 0, occlusionQuerySet->GetCount());
+        vkCmdResetQueryPool(GetNative(), GFX_CAST(VKQuerySet*, occlusionQuerySet)->GetNative(), 0, occlusionQuerySet->GetCount());
     }
     
     {
@@ -134,7 +134,7 @@ void VKCommandBuffer::BeginRenderPass(RenderPass* pass,
             auto texture = (VKTexture*)textureView->GetTexture();
             texture->TransToOutputAttachmentImageLayout(this);
         }
-        RHI_ASSERT(currentRenderPassIndex_ < bindGroupCatagories_.size());
+        GFX_ASSERT(currentRenderPassIndex_ < bindGroupCatagories_.size());
         std::vector<VKBindGroup*>& bindGroups = bindGroupCatagories_[currentRenderPassIndex_];
         for (VKBindGroup* pBindGroup : bindGroups)
         {
@@ -151,7 +151,7 @@ void VKCommandBuffer::BeginRenderPass(RenderPass* pass,
 void VKCommandBuffer::ClearAttachment(VkClearAttachment clearAttachment)
 {
     // TODO realxie, 这种操作具有比较大的性能损失，并不能代替renderpass中的clear操作
-    // RHI_ASSERT(framebufferBinding_);
+    // GFX_ASSERT(framebufferBinding_);
     //
     // VkOffset2D offset;
     // offset.x = 0;
@@ -184,10 +184,10 @@ void SetBindGroupToGraphicPipelineImpl(VKCommandBuffer* thiz,
                                        uint32_t dynamicOffsetCount,
                                        const uint32_t* pDynamicOffsets)
 {
-    auto bindGroupLayout = RHI_CAST(VKBindGroup*, bindGroup)->GetBindGroupLayout();
+    auto bindGroupLayout = GFX_CAST(VKBindGroup*, bindGroup)->GetBindGroupLayout();
     auto expectedOffsetCount = bindGroupLayout->GetDynamicOffsetCount();
     
-    auto vkDescriptorSet = thiz->AsyncWriteBindGroupToGPU(RHI_CAST(VKBindGroup*, bindGroup));
+    auto vkDescriptorSet = thiz->AsyncWriteBindGroupToGPU(GFX_CAST(VKBindGroup*, bindGroup));
     
     if (dynamicOffsetCount >= expectedOffsetCount)
     {
@@ -214,7 +214,7 @@ void VKCommandBuffer::SetBindGroupToGraphicPipeline(std::uint32_t index, BindGro
                                                     uint32_t dynamicOffsetCount,
                                                     const uint32_t* pDynamicOffsets)
 {
-    RHI_ASSERT(graphicPipelineBinding_, "graphicPipelineBinding_ can't be NULL");
+    GFX_ASSERT(graphicPipelineBinding_, "graphicPipelineBinding_ can't be NULL");
     SetBindGroupToGraphicPipelineImpl(this,
                                       graphicPipelineBinding_,
                                       index,
@@ -227,7 +227,7 @@ void VKCommandBuffer::SetBindGroupToComputePipeline(std::uint32_t index, BindGro
                                                     uint32_t dynamicOffsetCount,
                                                     const uint32_t* pDynamicOffsets)
 {
-    RHI_ASSERT(computePipelineBinding_, "computePipelineBinding_ can't be NULL");
+    GFX_ASSERT(computePipelineBinding_, "computePipelineBinding_ can't be NULL");
     SetBindGroupToGraphicPipelineImpl(this,
                                       computePipelineBinding_,
                                       index,
@@ -243,9 +243,9 @@ void VKCommandBuffer::BindGraphicsPipeline(RenderPipeline* graphicPipeline)
     {
         return;
     }
-    graphicPipelineBinding_ = RHI_CAST(VKRenderPipeline*, graphicPipeline);
+    graphicPipelineBinding_ = GFX_CAST(VKRenderPipeline*, graphicPipeline);
     vkCmdBindPipeline(GetNative(), VK_PIPELINE_BIND_POINT_GRAPHICS,
-                        RHI_CAST(VKRenderPipeline *, graphicPipeline)->GetNative());
+                        GFX_CAST(VKRenderPipeline *, graphicPipeline)->GetNative());
 }
 
 void VKCommandBuffer::BindComputePipeline(ComputePipeline* computePipeline)
@@ -254,24 +254,24 @@ void VKCommandBuffer::BindComputePipeline(ComputePipeline* computePipeline)
     {
         return;
     }
-    computePipelineBinding_ = RHI_CAST(VKComputePipeline*, computePipeline);
+    computePipelineBinding_ = GFX_CAST(VKComputePipeline*, computePipeline);
     
     vkCmdBindPipeline(GetNative(), VK_PIPELINE_BIND_POINT_COMPUTE,
-                        RHI_CAST(VKComputePipeline *, computePipeline)->GetNative());
+                        GFX_CAST(VKComputePipeline *, computePipeline)->GetNative());
 }
 
 void VKCommandBuffer::SetIndexBuffer(Buffer* buffer, std::uint32_t offset)
 {
     // The format of indexBuffer depends on the GraphicPipeline, so, we need to delay set the index buffer
     // by SetIndexBufferInternal
-    boundIndexBufferItem_.indexBuffer = RHI_CAST(VKBuffer*, buffer);
+    boundIndexBufferItem_.indexBuffer = GFX_CAST(VKBuffer*, buffer);
     boundIndexBufferItem_.offset = offset;
 }
 
 void
 VKCommandBuffer::SetVertexBuffer(Buffer* buffer, std::uint32_t offset, std::uint32_t slot)
 {
-    auto vkBuffer = RHI_CAST(VKBuffer *, buffer)->GetNative();
+    auto vkBuffer = GFX_CAST(VKBuffer *, buffer)->GetNative();
     VkDeviceSize vkOffset = offset;
     vkCmdBindVertexBuffers(GetNative(), slot, 1, &vkBuffer, &vkOffset);
 }
@@ -284,7 +284,7 @@ void VKCommandBuffer::Dispatch(std::uint32_t groupCountX, std::uint32_t groupCou
 
 void VKCommandBuffer::DispatchIndirect(Buffer* indirectBuffer, BufferSize indirectOffset)
 {
-    vkCmdDispatchIndirect(GetNative(), RHI_CAST(VKBuffer *, indirectBuffer)->GetNative(),
+    vkCmdDispatchIndirect(GetNative(), GFX_CAST(VKBuffer *, indirectBuffer)->GetNative(),
                             indirectOffset);
     bindingObjects_.pushBack(indirectBuffer);
 }
@@ -297,14 +297,14 @@ void VKCommandBuffer::AddBindingObject(GfxBase* object)
     
     if (object->GetObjectType() == RHIObjectType::Buffer)
     {
-        auto buffer = RHI_CAST(VKBuffer*, object);
+        auto buffer = GFX_CAST(VKBuffer*, object);
         buffer->increaseBindCount();
         bindBuffers_.push_back(buffer);
     }
 
     if (isInRenderPass_ && (object->GetObjectType() == RHIObjectType::BindGroup))
     {
-        auto bindGroup = RHI_CAST(VKBindGroup*, object);
+        auto bindGroup = GFX_CAST(VKBindGroup*, object);
         bindGroupCatagories_.back().push_back(bindGroup);
 
         const std::vector<VKBuffer *>& buffs = bindGroup->getBindingBuffers();
@@ -501,12 +501,12 @@ void VKCommandBuffer::DrawIndirect(Buffer* indirectBuffer, BufferSize indirectOf
     
     BufferSize bufferSize = indirectBuffer->GetBufferSize();
     
-    RHI_ASSERT(bufferSize > indirectOffset);
+    GFX_ASSERT(bufferSize > indirectOffset);
     std::uint32_t stride = sizeof(VkDrawIndirectCommand);
     std::uint32_t drawCount = (bufferSize - indirectOffset) / stride;
     
     vkCmdDrawIndirect(GetNative(),
-                        RHI_CAST(VKBuffer *, indirectBuffer)->GetNative(),
+                        GFX_CAST(VKBuffer *, indirectBuffer)->GetNative(),
                         indirectOffset,
                         drawCount,
                         stride);
@@ -520,12 +520,12 @@ void VKCommandBuffer::DrawIndexedIndirect(Buffer* indirectBuffer, BufferSize ind
     
     BufferSize bufferSize = indirectBuffer->GetBufferSize();
     
-    RHI_ASSERT(bufferSize > indirectOffset);
+    GFX_ASSERT(bufferSize > indirectOffset);
     std::uint32_t stride = sizeof(VkDrawIndexedIndirectCommand);
     std::uint32_t drawCount = (bufferSize - indirectOffset) / stride;
     
     vkCmdDrawIndexedIndirect(GetNative(),
-                               RHI_CAST(VKBuffer *, indirectBuffer)->GetNative(),
+                               GFX_CAST(VKBuffer *, indirectBuffer)->GetNative(),
                                indirectOffset,
                                drawCount,
                                stride);
@@ -578,7 +578,7 @@ void VKCommandBuffer::SetDepthBias(float depthBiasConstantFactor, float depthBia
 
 void VKCommandBuffer::BeginOcclusionQuery(std::uint32_t queryIndex)
 {
-    RHI_ASSERT(occlusionQuerySetBinding_);
+    GFX_ASSERT(occlusionQuerySetBinding_);
     vkCmdBeginQuery(GetNative(),
                       occlusionQuerySetBinding_->GetNative(),
                       queryIndex,
@@ -587,7 +587,7 @@ void VKCommandBuffer::BeginOcclusionQuery(std::uint32_t queryIndex)
 
 void VKCommandBuffer::EndOcclusionQuery(std::uint32_t queryIndex)
 {
-    RHI_ASSERT(occlusionQuerySetBinding_);
+    GFX_ASSERT(occlusionQuerySetBinding_);
     vkCmdEndQuery(GetNative(),
                       occlusionQuerySetBinding_->GetNative(),
                       queryIndex);
@@ -601,10 +601,10 @@ void VKCommandBuffer::ResolveQuerySet(
     std::uint32_t dstOffset)
 {
     vkCmdCopyQueryPoolResults(GetNative(),
-                                RHI_CAST(VKQuerySet*, querySet)->GetNative(),
+                                GFX_CAST(VKQuerySet*, querySet)->GetNative(),
                                 queryFirstIndex,
                                 queryCount,
-                                RHI_CAST(VKBuffer*, dstBuffer)->GetNative(),
+                                GFX_CAST(VKBuffer*, dstBuffer)->GetNative(),
                                 dstOffset,
                                 sizeof(std::uint32_t),
                                 VK_QUERY_RESULT_WAIT_BIT);
@@ -632,7 +632,7 @@ void VKCommandBuffer::CheckViewportScissorBeforDraw()
 
 VkDescriptorSet VKCommandBuffer::AsyncWriteBindGroupToGPU(VKBindGroup* bindGroup)
 {
-#if defined(RHI_DEBUG) && RHI_DEBUG
+#if defined(GFX_DEBUG) && GFX_DEBUG
     VKDEVICE()->GetAsyncWorker()->CheckThread();
 #endif
     bindGroup->UpdateDescriptorSetAsync();
@@ -785,7 +785,7 @@ void VKCommandBuffer::SubmitCommandList()
     
             default:
                 LOGE("unprocessed command: %d", cmd->commandType);
-                RHI_ASSERT(false);
+                GFX_ASSERT(false);
         }
 #endif
     }
@@ -827,7 +827,7 @@ bool VKCommandBuffer::BakeCmdBufferAsync(VkCommandBuffer vkCmdBuffer)
     vkCommandBuffer_ = vkCmdBuffer;
     
     {
-#if defined(RHI_DEBUG) && RHI_DEBUG
+#if defined(GFX_DEBUG) && GFX_DEBUG
         char debugGroudTag[128];
         static uint32_t sFrameCount = 0;
         snprintf(debugGroudTag, sizeof(debugGroudTag), "%p", vkCommandBuffer_);

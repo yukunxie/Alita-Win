@@ -31,38 +31,38 @@ std::shared_ptr<Texture> Texture::LoadTextureFromData(uint32 width, uint32 heigh
     return std::make_shared<Texture>(ImageLoader::LoadTextureFromData(width, height, component, data, byteLength, debugName));
 }
 
-Texture::Texture(RHI::Texture* texture)
+Texture::Texture(gfx::Texture* texture)
     : Resource(EResourceType::Texture)
 {
-    RHI_SAFE_RELEASE(Texture_);
+    GFX_SAFE_RELEASE(Texture_);
     Texture_ = texture;
-    RHI_SAFE_RETAIN(Texture_);
+    GFX_SAFE_RETAIN(Texture_);
 }
 
-Texture::Texture(uint32 width, uint32 height, RHI::TextureFormat format, const RHI::Color& color)
+Texture::Texture(uint32 width, uint32 height, gfx::TextureFormat format, const gfx::Color& color)
     : Resource(EResourceType::Texture)
 {
-    RHI_ASSERT(false);
+    GFX_ASSERT(false);
 }
 
 Texture::~Texture()
 {
-    RHI_SAFE_RELEASE(TextureView_);
-    RHI_SAFE_RELEASE(Texture_);
+    GFX_SAFE_RELEASE(TextureView_);
+    GFX_SAFE_RELEASE(Texture_);
 }
 
-const RHI::TextureView* Texture::GetTextureView() const
+const gfx::TextureView* Texture::GetTextureView() const
 {
     if (TextureView_)
     {
         return TextureView_;
     }
     TextureView_ = Texture_->CreateView({});
-    RHI_SAFE_RETAIN(TextureView_);
+    GFX_SAFE_RETAIN(TextureView_);
     return TextureView_;
 }
 
-const RHI::Texture* Texture::GetTexture() const
+const gfx::Texture* Texture::GetTexture() const
 {
     return Texture_;
 }

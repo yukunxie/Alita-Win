@@ -41,15 +41,15 @@ struct MaterialParameter
 
 struct TextureSamplerBindingObject
 {
-	const RHI::Texture* texture = nullptr;
-	const RHI::Sampler* sampler = nullptr;
+	const gfx::Texture* texture = nullptr;
+	const gfx::Sampler* sampler = nullptr;
 	std::string			preprocessor  = "";
 };
 
 struct BufferBindingObject
 {
 	std::uint32_t stride = 0;
-	const RHI::Buffer* buffer = nullptr;
+	const gfx::Buffer* buffer = nullptr;
 };
 
 struct MaterialBindingObject
@@ -76,21 +76,21 @@ struct InputAttribute
 	InputAttributeFormat format;
 	VertexBufferAttriKind kind = VertexBufferAttriKind::INVALID;
 
-	RHI::VertexFormat ToRHIFormat() const
+	gfx::VertexFormat ToRHIFormat() const
 	{
 		switch (format)
 		{
 		case rx::InputAttributeFormat::FLOAT:
-			return RHI::VertexFormat::FLOAT;
+			return gfx::VertexFormat::FLOAT;
 		case rx::InputAttributeFormat::FLOAT2:
-			return RHI::VertexFormat::FLOAT2;
+			return gfx::VertexFormat::FLOAT2;
 		case rx::InputAttributeFormat::FLOAT3:
-			return RHI::VertexFormat::FLOAT3;
+			return gfx::VertexFormat::FLOAT3;
 		case rx::InputAttributeFormat::FLOAT4:
-			return RHI::VertexFormat::FLOAT4;
+			return gfx::VertexFormat::FLOAT4;
 		}
 		Assert(false, "invalid format");
-		return RHI::VertexFormat::FLOAT;
+		return gfx::VertexFormat::FLOAT;
 	}
 };
 
@@ -115,17 +115,17 @@ public:
 		indexType_ = indexType;
 	}
 
-	RHI::VertexStateDescriptor ToRHIDescriptor()
+	gfx::VertexStateDescriptor ToRHIDescriptor()
 	{
-		RHI::VertexStateDescriptor ret;
-		ret.indexFormat = indexType_ == IndexType::UINT32? RHI::IndexFormat::UINT32 : RHI::IndexFormat::UINT16;
+		gfx::VertexStateDescriptor ret;
+		ret.indexFormat = indexType_ == IndexType::UINT32? gfx::IndexFormat::UINT32 : gfx::IndexFormat::UINT16;
 		for (const auto& ia : inputAttributes_)
 		{
-			RHI::VertexBufferDescriptor vbDesc;
-			vbDesc.stepMode = RHI::InputStepMode::VERTEX;
+			gfx::VertexBufferDescriptor vbDesc;
+			vbDesc.stepMode = gfx::InputStepMode::VERTEX;
 			vbDesc.arrayStride = ia.stride;
 
-			RHI::VertexAttributeDescriptor vaDesc;
+			gfx::VertexAttributeDescriptor vaDesc;
 			vaDesc.format = ia.ToRHIFormat();
 			vaDesc.offset = ia.offset;
 			vaDesc.shaderLocation = ia.location;
@@ -160,9 +160,9 @@ protected:
 
 struct ShadingStateHasher
 {
-	RHI::Format attachments[kMaxAttachmentCount];
-	RHI::FrontFace frontFace : 1;
-	RHI::CullMode cullMode : 2; 
+	gfx::Format attachments[kMaxAttachmentCount];
+	gfx::FrontFace frontFace : 1;
+	gfx::CullMode cullMode : 2; 
 };
 
 struct PSOKey
@@ -173,15 +173,15 @@ struct PSOKey
 		this->Technique = (int)ETechniqueType::TShading;
 		this->DepthBias = 0;
 		this->DepthWrite = 1;
-		this->DepthCmpFunc = (int)RHI::CompareFunction::LESS_EQUAL;
+		this->DepthCmpFunc = (int)gfx::CompareFunction::LESS_EQUAL;
 		this->StencilWrite = 0;
-		this->StencilCmpFunc = (int)RHI::CompareFunction::NEVER;
-		this->StencilFailOp = (int)RHI::StencilOperation::KEEP;
-		this->StencilDepthFailOp = (int)RHI::StencilOperation::KEEP;
-		this->StencilPassOp = (int)RHI::StencilOperation::KEEP;
+		this->StencilCmpFunc = (int)gfx::CompareFunction::NEVER;
+		this->StencilFailOp = (int)gfx::StencilOperation::KEEP;
+		this->StencilDepthFailOp = (int)gfx::StencilOperation::KEEP;
+		this->StencilPassOp = (int)gfx::StencilOperation::KEEP;
 		this->StencilMask = 0;
-		this->FrontFace = (int)RHI::FrontFace::COUNTER_CLOCKWISE;
-		this->CullMode = (int)RHI::CullMode::BACK_BIT;
+		this->FrontFace = (int)gfx::FrontFace::COUNTER_CLOCKWISE;
+		this->CullMode = (int)gfx::CullMode::BACK_BIT;
 	}
 
 	PSOKey(const PSOKey& lhr) noexcept
@@ -244,9 +244,9 @@ NS_RX_BEGIN
 
 struct ShaderSet
 {
-	RHI::Shader* VertexShader = nullptr;
-	RHI::Shader* FragmentShader = nullptr;
-	RHI::Shader* ComputeShader = nullptr;
+	gfx::Shader* VertexShader = nullptr;
+	gfx::Shader* FragmentShader = nullptr;
+	gfx::Shader* ComputeShader = nullptr;
 };
 
 struct TechniqueShaderEntry
@@ -265,11 +265,11 @@ public:
 
 	bool SetFloat(const std::string& name, std::uint32_t offset, std::uint32_t count, const float* data);
 
-	bool SetTexture(const std::string& name, const RHI::Texture* texture);
+	bool SetTexture(const std::string& name, const gfx::Texture* texture);
 
 	bool SetTexture(const std::string& name, std::shared_ptr<Texture>& texture);
 
-	void Apply(const Pass* pass, ETechniqueType technique, ERenderSet renderSet, RHI::RenderPassEncoder& passEndcoder);
+	void Apply(const Pass* pass, ETechniqueType technique, ERenderSet renderSet, gfx::RenderPassEncoder& passEndcoder);
 
 	const std::vector<InputAttribute>& GetInputAttributes() const
 	{
@@ -279,19 +279,19 @@ public:
 	void SetInputAssembler(const InputAssembler& IA)
 	{
 		inputAssembler_ = IA;
-		RHI_SAFE_RELEASE(rhiPipelineState_);
+		GFX_SAFE_RELEASE(rhiPipelineState_);
 	}
 
 protected:
-	RHI::Shader* _CreateShader(const std::string& filename, RHI::ShaderType shaderType, ETechniqueType techType, const std::vector<std::string>& userDefines);
-	RHI::RenderPipeline* CreatePipelineState(const PSOKey& psoKey, const ShaderSet& shaderSet);
-	RHI::SamplerDescriptor ParseSamplerDescriptor(const rapidjson::Value& doc);
+	gfx::Shader* _CreateShader(const std::string& filename, gfx::ShaderType shaderType, ETechniqueType techType, const std::vector<std::string>& userDefines);
+	gfx::RenderPipeline* CreatePipelineState(const PSOKey& psoKey, const ShaderSet& shaderSet);
+	gfx::SamplerDescriptor ParseSamplerDescriptor(const rapidjson::Value& doc);
 	void ParseBindGroupLayout(const rapidjson::Document& doc);
 	void SetupConstantBufferLayout();
 
 	void PrepareBindingLayout();
-	void ApplyModifyToBindGroup(RHI::RenderPassEncoder& passEndcoder);
-	void BindPSO(RHI::RenderPassEncoder& passEndcoder);
+	void ApplyModifyToBindGroup(gfx::RenderPassEncoder& passEndcoder);
+	void BindPSO(gfx::RenderPassEncoder& passEndcoder);
 
 	void SetupPSOKey(PSOKey& psoKey, ERenderSet renderSet);
 	void SetupPSOKey(PSOKey& psoKey, ETechniqueType technique);
@@ -313,15 +313,15 @@ protected:
 	std::vector<std::string> SystemDefines_;
 
 	// RHI
-	RHI::BindGroupLayout* rhiBindGroupLayout_ = nullptr;
-	RHI::PipelineLayout* rhiPipelineLayout_ = nullptr;
-	RHI::BindGroup* rhiBindGroup_ = nullptr;
-	RHI::Shader* rhiVertShader_ = nullptr;
-	RHI::Shader* rhiFragShader_ = nullptr;
-	RHI::RenderPipeline* rhiPipelineState_ = nullptr;
+	gfx::BindGroupLayout* rhiBindGroupLayout_ = nullptr;
+	gfx::PipelineLayout* rhiPipelineLayout_ = nullptr;
+	gfx::BindGroup* rhiBindGroup_ = nullptr;
+	gfx::Shader* rhiVertShader_ = nullptr;
+	gfx::Shader* rhiFragShader_ = nullptr;
+	gfx::RenderPipeline* rhiPipelineState_ = nullptr;
 
 	std::array<TechniqueShaderEntry, (int)ETechniqueType::TMaxCount> TechniqueShaderEntries_;
-	std::unordered_map< PSOKey, RHI::RenderPipeline*> rhiPSOMap_;
+	std::unordered_map< PSOKey, gfx::RenderPipeline*> rhiPSOMap_;
 
 	std::map<std::string, std::shared_ptr<Resource>> BindingResources_;
 

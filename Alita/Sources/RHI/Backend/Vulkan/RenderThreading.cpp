@@ -27,7 +27,7 @@ void AsyncWorkerVulkan::PostProcessDoneTask(AsyncTaskPtr task)
 AsyncWorkerVulkan::~AsyncWorkerVulkan()
 {
     LOGW("AsyncWorkerVulkan exit begin.");
-    RHI_ASSERT(isThreadStopped_);
+    GFX_ASSERT(isThreadStopped_);
     device_->GetQueue()->WaitQueueIdle();
     pVulkanAllocator_.reset();
     LOGW("AsyncWorkerVulkan exit end.");
@@ -42,12 +42,12 @@ AsyncTaskSumbitCommandBufferAndPresent::AsyncTaskSumbitCommandBufferAndPresent(V
     for (size_t i = 0; i < commandBuffers_.size(); ++i)
     {
         commandBuffers_[i] = commandBuffers[i];
-        RHI_SAFE_RETAIN(commandBuffers_[i]);
+        GFX_SAFE_RETAIN(commandBuffers_[i]);
     }
     
     device_ = device;
     frameResource_ = frameResource;
-    queue_ = RHI_CAST(VKQueue*, device_->GetQueue());
+    queue_ = GFX_CAST(VKQueue*, device_->GetQueue());
 }
 
 bool AsyncTaskSumbitCommandBufferAndPresent::RecordCommandBuffer(VkCommandBuffer vkCommandBuffer)
@@ -65,7 +65,7 @@ bool AsyncTaskSumbitCommandBufferAndPresent::RecordCommandBuffer(VkCommandBuffer
     // RHI_SCOPED_PROFILING_GUARD("RecordVkCommandBuffer");
     for (int i = 0; i < commandBuffers_.size(); ++i)
     {
-        auto cmdBuffer = RHI_CAST(VKCommandBuffer*, commandBuffers_[i]);
+        auto cmdBuffer = GFX_CAST(VKCommandBuffer*, commandBuffers_[i]);
         cmdBuffer->BakeCmdBufferAsync(vkCommandBuffer);
         hasDrawCmdInPresentableImage |= cmdBuffer->HasDrawCmdInPresentableImage();
     }
@@ -100,7 +100,7 @@ void AsyncTaskSumbitCommandBufferAndPresent::WaitingLastSubmissionDone()
             device_->ScheduleCallbackExecutedInGameThread([cmdBuffer](VKDevice* device) {
                 auto commandBuffer = cmdBuffer;
                 commandBuffer->PostprocessCommandBuffer();
-                RHI_SAFE_RELEASE(commandBuffer);
+                GFX_SAFE_RELEASE(commandBuffer);
             });
         }
         renderingFrameInfo->commandBuffers.clear();
@@ -219,7 +219,7 @@ AsyncTaskSumbitCommandBufferAndPresent::~AsyncTaskSumbitCommandBufferAndPresent(
     for (int i = 0; i < commandBuffers_.size(); ++i)
     {
         auto cmdBuffer = commandBuffers_[i];
-        RHI_SAFE_RELEASE(cmdBuffer);
+        GFX_SAFE_RELEASE(cmdBuffer);
     }
     commandBuffers_.clear();
 }
@@ -244,12 +244,12 @@ AsyncTaskReturnVkSemaphore::~AsyncTaskReturnVkSemaphore()
 AsyncTaskFenceCompletion::AsyncTaskFenceCompletion(VKDevice* device, VKQueue* queue, VKFence* fence)
     : device_(device)
 {
-    RHI_PTR_ASSIGN(fence_, fence);
+    GFX_PTR_ASSIGN(fence_, fence);
 }
 
 AsyncTaskFenceCompletion::~AsyncTaskFenceCompletion()
 {
-    RHI_SAFE_RELEASE(fence_);
+    GFX_SAFE_RELEASE(fence_);
 }
 
 bool AsyncTaskFenceCompletion::Execute()
@@ -268,12 +268,12 @@ AsyncTaskBufferMapRead::AsyncTaskBufferMapRead(VKDevice* device, VKBuffer* buffe
     device_ = device;
     offset_ = offset;
     size_ = size;
-    RHI_PTR_ASSIGN(buffer_, buffer);
+    GFX_PTR_ASSIGN(buffer_, buffer);
 }
 
 AsyncTaskBufferMapRead::~AsyncTaskBufferMapRead()
 {
-    RHI_SAFE_RELEASE(buffer_);
+    GFX_SAFE_RELEASE(buffer_);
 }
 
 bool AsyncTaskBufferMapRead::Execute()
@@ -291,12 +291,12 @@ AsyncTaskBufferMapWrite::AsyncTaskBufferMapWrite(VKDevice* device, VKBuffer* buf
     device_ = device;
     offset_ = offset;
     size_ = size;
-    RHI_PTR_ASSIGN(buffer_, buffer);
+    GFX_PTR_ASSIGN(buffer_, buffer);
 }
 
 AsyncTaskBufferMapWrite::~AsyncTaskBufferMapWrite()
 {
-    RHI_SAFE_RELEASE(buffer_);
+    GFX_SAFE_RELEASE(buffer_);
 }
 
 bool AsyncTaskBufferMapWrite::Execute()

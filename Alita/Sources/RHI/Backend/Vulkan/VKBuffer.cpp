@@ -15,7 +15,7 @@ VKBuffer::VKBuffer(VKDevice* device)
 
 void VKBuffer::Dispose()
 {
-    RHI_DISPOSE_BEGIN();
+    GFX_DISPOSE_BEGIN();
     
     if (pData_)
     {
@@ -44,7 +44,7 @@ void VKBuffer::Dispose()
     }
 #endif
     
-    RHI_DISPOSE_END();
+    GFX_DISPOSE_END();
 }
 
 VKBuffer::~VKBuffer()
@@ -88,7 +88,7 @@ bool VKBuffer::Init(const BufferDescriptor &descriptor)
     
     CALL_VK(vkCreateBuffer(deviceVk, &bufferInfo, nullptr, &vkBuffer_));
     
-    RHI_ASSERT(vkBuffer_ != VK_NULL_HANDLE);
+    GFX_ASSERT(vkBuffer_ != VK_NULL_HANDLE);
     
     //
     // // Allocate buffer memory
@@ -122,7 +122,7 @@ void VKBuffer::UpdateBuffer(const void* data, std::uint32_t offset, std::uint32_
 
 const void* VKBuffer::MapRead(std::uint32_t offset, std::uint32_t size) const
 {
-    RHI_ASSERT(pData_ == nullptr);
+    GFX_ASSERT(pData_ == nullptr);
     /**
      * flag must be zero now
      * VkMemoryMapFlags is a bitmask type for setting a mask, but is currently reserved for future use.
@@ -143,7 +143,7 @@ const void* VKBuffer::MapRead(std::uint32_t offset, std::uint32_t size) const
 
 void* VKBuffer::MapWrite(std::uint32_t offset, std::uint32_t size) const
 {
-    RHI_ASSERT(pData_ == nullptr);
+    GFX_ASSERT(pData_ == nullptr);
 
 #if USE_VULKAN_MEMORY_ALLCATOR
     vmaMapMemory(VKDEVICE()->GetVmaAllocator(), vmaAllocation_, &pData_);
@@ -248,7 +248,7 @@ void VKBuffer::CallMapWriteCallback(std::uint32_t offset, std::uint32_t size)
 
 void VKBuffer::Unmap() const
 {
-    RHI_ASSERT(pData_);
+    GFX_ASSERT(pData_);
 #if USE_VULKAN_MEMORY_ALLCATOR
     vmaUnmapMemory(VKDEVICE()->GetVmaAllocator(), vmaAllocation_);
 #else
@@ -264,9 +264,9 @@ void VKBuffer::Destroy()
 
 void VKBuffer::SetSubData(std::uint32_t offset, std::uint32_t byteSize, const void* data) const
 {
-    RHI_ASSERT(byteSize > 0);
+    GFX_ASSERT(byteSize > 0);
     auto pAddress = (std::uint8_t*) MapWrite(offset, byteSize);
-    RHI_ASSERT(pAddress);
+    GFX_ASSERT(pAddress);
     memcpy(pAddress, data, byteSize);
     Unmap();
 }

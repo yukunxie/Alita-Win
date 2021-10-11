@@ -20,17 +20,17 @@ public:
     {
     }
 
-    RenderTarget(RHI::TextureFormat format, const std::string& debugName = "");
+    RenderTarget(gfx::TextureFormat format, const std::string& debugName = "");
 
-    RenderTarget(uint32 width, uint32 height, RHI::TextureFormat format, const std::string& debugName = "");
+    RenderTarget(uint32 width, uint32 height, gfx::TextureFormat format, const std::string& debugName = "");
 
     virtual ~RenderTarget();
 
-    void ResizeTarget(uint32 width, uint32 height, RHI::TextureFormat format = RHI::TextureFormat::INVALID);
+    void ResizeTarget(uint32 width, uint32 height, gfx::TextureFormat format = gfx::TextureFormat::INVALID);
 
-    virtual const RHI::TextureView* GetTextureView() const;
+    virtual const gfx::TextureView* GetTextureView() const;
 
-    virtual const RHI::Texture* GetTexture() const;
+    virtual const gfx::Texture* GetTexture() const;
 
     // Getters / Setters
 
@@ -42,17 +42,17 @@ public:
 
     void SetClearStencil(uint8 stencil) { ClearStencil_ = stencil; }
 
-    const RHI::Color& GetClearColor() const { return ClearColor_; }
+    const gfx::Color& GetClearColor() const { return ClearColor_; }
 
-    void SetClearColor(const RHI::Color& color) { ClearColor_ = color; }
+    void SetClearColor(const gfx::Color& color) { ClearColor_ = color; }
 
-    virtual RHI::Extent3D GetExtent() const { return { TargetWidth_, TargetHeight_, 1 }; }
+    virtual gfx::Extent3D GetExtent() const { return { TargetWidth_, TargetHeight_, 1 }; }
 
     virtual uint32 GetWidth() const { return TargetWidth_; }
 
     virtual uint32 GetHeight() const { return TargetHeight_; }
 
-    virtual RHI::TextureFormat GetFormat() const { return Format_; }
+    virtual gfx::TextureFormat GetFormat() const { return Format_; }
 
 protected:
     void TryCreateTextureView() const;
@@ -62,11 +62,11 @@ protected:
     mutable bool                Dirty_          = true;
     uint32              TargetWidth_    = 1;
     uint32              TargetHeight_   = 1;
-    RHI::TextureFormat  Format_         = RHI::TextureFormat::RGBA8UNORM;
+    gfx::TextureFormat  Format_         = gfx::TextureFormat::RGBA8UNORM;
     uint8               ClearStencil_   = 0;
     float               ClearDepth_     = 1.0f;
-    RHI::Color          ClearColor_     = { 0, 0, 0, 1 };
-    mutable RHI::TextureView*   TextureView_    = nullptr;
+    gfx::Color          ClearColor_     = { 0, 0, 0, 1 };
+    mutable gfx::TextureView*   TextureView_    = nullptr;
 };
 
 class RenderTargetSwapChain : public RenderTarget
@@ -75,19 +75,19 @@ public:
     RenderTargetSwapChain();
     virtual ~RenderTargetSwapChain();
 
-    virtual const RHI::TextureView* GetTextureView() const;
+    virtual const gfx::TextureView* GetTextureView() const;
 
-    virtual const RHI::Texture* GetTexture() const;
+    virtual const gfx::Texture* GetTexture() const;
 
     // Getters / Setters
 
-    virtual RHI::Extent3D GetExtent() const override;
+    virtual gfx::Extent3D GetExtent() const override;
 
     virtual uint32 GetWidth() const override;
 
     virtual uint32 GetHeight() const override;
 
-    virtual RHI::TextureFormat GetFormat() const  override;
+    virtual gfx::TextureFormat GetFormat() const  override;
 
     void  Reset();
 

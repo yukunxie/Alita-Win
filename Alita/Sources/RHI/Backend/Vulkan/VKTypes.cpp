@@ -410,12 +410,12 @@ VkFormat ToVulkanType(TextureFormat format)
         case TextureFormat::DEPTH32FLOAT :
             return VkFormat::VK_FORMAT_D32_SFLOAT;
         case TextureFormat::DEPTH24PLUS :
-            RHI_ASSERT(false);
+            GFX_ASSERT(false);
         case TextureFormat::DEPTH24PLUS_STENCIL8 :
             return VkFormat::VK_FORMAT_D24_UNORM_S8_UINT;
         
         default:
-            RHI_ASSERT(false);
+            GFX_ASSERT(false);
             return VkFormat::VK_FORMAT_UNDEFINED;
     }
 }
@@ -475,11 +475,11 @@ std::uint32_t GetTextureFormatPixelSize(TextureFormat format)
             return 4;
         
         case TextureFormat::DEPTH24PLUS :
-            RHI_ASSERT(false);
+            GFX_ASSERT(false);
             return 3;
         
         default:
-            RHI_ASSERT(false);
+            GFX_ASSERT(false);
             return 0;
     }
 }
@@ -570,7 +570,7 @@ TextureFormat ToVulkanType(VkFormat format)
             return TextureFormat::DEPTH24PLUS_STENCIL8;
         
         default:
-            RHI_ASSERT(false);
+            GFX_ASSERT(false);
             return TextureFormat::INVALID;
     }
 }
@@ -829,7 +829,7 @@ VkBlendFactor ToVulkanType(BlendFactor factor)
         case BlendFactor::ONE_MINUS_SRC1_ALPHA:
             return VK_BLEND_FACTOR_ONE_MINUS_SRC1_ALPHA;
     }
-    RHI_ASSERT(false);
+    GFX_ASSERT(false);
 }
 
 VkBlendOp ToVulkanType(BlendOp op)
@@ -851,7 +851,7 @@ VkBlendOp ToVulkanType(BlendOp op)
         case BlendOp::MAX:
             return VK_BLEND_OP_MAX;
     }
-    RHI_ASSERT(false);
+    GFX_ASSERT(false);
 }
 
 VkImageAspectFlags ToVulkanType(TextureAspect aspect, VkFormat format)
@@ -1103,7 +1103,7 @@ VkPipelineStageFlags VulkanPipelineStage(TextureUsageFlags usage, TextureFormat 
     }
     
     // A zero value isn't a valid pipeline stage mask
-    RHI_ASSERT(flags != 0);
+    GFX_ASSERT(flags != 0);
     return flags;
 }
 

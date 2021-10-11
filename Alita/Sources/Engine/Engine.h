@@ -49,7 +49,7 @@ public:
 		return windowHandler_;
 	}
 
-	static RHI::Device* GetGPUDevice()
+	static gfx::Device* GetGPUDevice()
 	{
 		return Engine::GetEngine()->gpuDevice_;
 	}
@@ -59,7 +59,7 @@ public:
 		return Engine::GetEngine()->renderScene_;
 	}
 
-	RHI::SwapChain* GetSwapchain()
+	gfx::SwapChain* GetSwapchain()
 	{
 		return rhiSwapChain_;
 	}
@@ -92,10 +92,10 @@ protected:
 	std::uint32_t schedulerIDRecorder_ = 0;
 	std::map<std::uint32_t, SchedulerEntity> schedulers_;
 
-	RHI::Device* gpuDevice_ = nullptr;
+	gfx::Device* gpuDevice_ = nullptr;
 
-	RHI::CommandEncoder* rhiCommandEncoder_ = nullptr;
-	RHI::SwapChain* rhiSwapChain_ = nullptr;
+	gfx::CommandEncoder* rhiCommandEncoder_ = nullptr;
+	gfx::SwapChain* rhiSwapChain_ = nullptr;
 
 	int  WindowWidth_ = 0;
 	int  WindowHeight_ = 0;

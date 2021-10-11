@@ -14,9 +14,9 @@ VKFence::VKFence(VKDevice* device)
 
 void VKFence::Dispose()
 {
-    RHI_DISPOSE_BEGIN();
+    GFX_DISPOSE_BEGIN();
     
-    RHI_DISPOSE_END();
+    GFX_DISPOSE_END();
 }
 
 VKFence::~VKFence()

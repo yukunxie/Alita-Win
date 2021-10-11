@@ -395,12 +395,6 @@
     <ClCompile Include="Sources\Loaders\GLTFLoader.cpp">
       <Filter>Sources\Loader</Filter>
     </ClCompile>
-    <ClCompile Include="Sources\RHI\Impl\RHIObjectBase.cpp">
-      <Filter>Sources\RHI\Impl</Filter>
-    </ClCompile>
-    <ClCompile Include="Sources\RHI\Impl\RHIObjectManager.cpp">
-      <Filter>Sources\RHI\Impl</Filter>
-    </ClCompile>
     <ClCompile Include="Sources\RHI\Impl\Device.cpp">
       <Filter>Sources\RHI\Impl</Filter>
     </ClCompile>
@@ -559,6 +553,12 @@
     </ClCompile>
     <ClCompile Include="Sources\Utils\MD5\md5.cpp">
       <Filter>Sources\Utils\MD5</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\RHI\Impl\GFXBase.cpp">
+      <Filter>Sources\RHI\Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\RHI\Impl\GFXObjectManager.cpp">
+      <Filter>Sources\RHI\Impl</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -15,11 +15,11 @@ bool CheckSkipRenderObjects(ETechniqueType technique, std::uint64_t renderSetBit
 	case ETechniqueType::TSkyBox:
 		return !(ERenderSet_SkyBox & renderSetBits);
 	}
-	RHI_ASSERT(false);
+	GFX_ASSERT(false);
 	return false;
 }
 
-void RenderObject::Render(const Pass* pass, ETechniqueType technique, ERenderSet renderSet, RHI::RenderPassEncoder& passEndcoder)
+void RenderObject::Render(const Pass* pass, ETechniqueType technique, ERenderSet renderSet, gfx::RenderPassEncoder& passEndcoder)
 {
 	if (CheckSkipRenderObjects(technique, this->RenderSetBits))
 	{

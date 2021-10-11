@@ -26,7 +26,7 @@ void VKTextureView::Recreate()
 
 void VKTextureView::Dispose()
 {
-    RHI_DISPOSE_BEGIN();
+    GFX_DISPOSE_BEGIN();
     
     if (vkImageView_)
     {
@@ -36,7 +36,7 @@ void VKTextureView::Dispose()
     }
     texture_.Reset();
     
-    RHI_DISPOSE_END();
+    GFX_DISPOSE_END();
 }
 
 VKTextureView::~VKTextureView()

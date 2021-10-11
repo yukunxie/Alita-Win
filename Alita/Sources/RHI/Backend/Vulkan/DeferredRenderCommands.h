@@ -27,12 +27,12 @@ public:
     
     virtual void Execute(VKCommandBuffer* commandBuffer)
     {
-        RHI_ASSERT(false);
+        GFX_ASSERT(false);
     }
     
     ~DeferredCmdBase()
     {
-        RHI_ASSERT(false, "Don't call the dtor");
+        GFX_ASSERT(false, "Don't call the dtor");
     }
 
 protected:
@@ -65,7 +65,7 @@ struct DeferredCmdBeginRenderPass final : public DeferredCmdBase
         framebuffer_ = framebuffer;
         occlusionQuerySet_ = occlusionQuerySet;
         clearValueCount_ = clearValueCount;
-        RHI_ASSERT(clearValueCount <= clearColors_.size());
+        GFX_ASSERT(clearValueCount <= clearColors_.size());
         memcpy(clearColors_.data(), clearValues, clearValueCount * sizeof(clearColors_[0]));
         clearDepth_ = clearDepth;
         clearStencil_ = clearStencil;
@@ -385,7 +385,7 @@ struct DeferredCmdSetBindGroup final : public DeferredCmdBase
         dynamicOffsetCount_ = dynamicOffsetCount;
         std::uint32_t* pData = nullptr;
         
-        RHI_ASSERT(dynamicOffsetCount_ <= kMaxBindingsPerGroup);
+        GFX_ASSERT(dynamicOffsetCount_ <= kMaxBindingsPerGroup);
         
         if (dynamicOffsetCount_ <= kMaxBindingsPerGroup)
         {

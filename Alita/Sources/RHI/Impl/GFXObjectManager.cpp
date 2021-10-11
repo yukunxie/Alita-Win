@@ -4,7 +4,7 @@
 
 #include "GFX/Buffer.h"
 #include "GFX/Texture.h"
-#include "GFX/GfxObjectManager.h"
+#include "GFX/GFXObjectManager.h"
 
 NS_GFX_BEGIN
 
@@ -63,7 +63,7 @@ void GfxObjectManager::AddObject(GfxBase* objectBase)
         textureCount_++;
     }
 
-#if RHI_DEBUG
+#if GFX_DEBUG
     TrackObjectDebugging_(objectBase);
 #endif
 }
@@ -87,7 +87,7 @@ void GfxObjectManager::RemoveObject(const GfxBase* object)
         bufferCount_--;
 
         GfxBase* baseObj = const_cast<GfxBase*>(object);
-        auto buffer = RHI_CAST(Buffer*, baseObj);
+        auto buffer = GFX_CAST(Buffer*, baseObj);
         bufferSize_ -= buffer->GetBufferSize();
     }
     else if (object->GetObjectType() == RHIObjectType::Texture)
@@ -95,7 +95,7 @@ void GfxObjectManager::RemoveObject(const GfxBase* object)
         textureCount_--;
 
         GfxBase* baseObj = const_cast<GfxBase*>(object);
-        auto tex = RHI_CAST(Texture*, baseObj);
+        auto tex = GFX_CAST(Texture*, baseObj);
         textureMemory_ -= tex->getMemoryUsage();
     }
 
@@ -129,17 +129,17 @@ void GfxObjectManager::RemoveObject(const GfxBase* object)
     trackedObjects_[id] = nullptr;
     freeIds_.push_back(id);
 
-#if RHI_DEBUG
+#if GFX_DEBUG
     RemoveTrackedObjectDebugging_(object);
 #endif
 }
 
     
-#if RHI_DEBUG
+#if GFX_DEBUG
 void GfxObjectManager::TrackObjectDebugging_(const GfxBase* object)
 {
     auto type = (std::uint32_t) object->GetObjectType();
-    RHI_ASSERT(type > 0 && type < kMaxRHIObjectTypeCount);
+    GFX_ASSERT(type > 0 && type < kMaxRHIObjectTypeCount);
     objectTrackers_[type][object] = object->GetObjectType();
     objectTrackerCount_++;
 }
@@ -164,18 +164,18 @@ void GfxObjectManager::RemoveTrackedObjectDebugging_(const GfxBase* object)
     }
     
     auto type = (std::uint32_t) object->GetObjectType();
-    RHI_ASSERT(type > 0 && type < kMaxRHIObjectTypeCount);
+    GFX_ASSERT(type > 0 && type < kMaxRHIObjectTypeCount);
     auto &objects = objectTrackers_[type];
     
     auto it = objects.find(object);
-    RHI_ASSERT(it != objects.end());
+    GFX_ASSERT(it != objects.end());
     if (it != objects.end())
     {
         objects.erase(it);
     }
     objectTrackerCount_--;
 }
-#endif // #if RHI_DEBUG
+#endif // #if GFX_DEBUG
 
 NS_GFX_END
 

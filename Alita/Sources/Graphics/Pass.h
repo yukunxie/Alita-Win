@@ -69,17 +69,17 @@ public:
 
     const std::shared_ptr<RenderTarget> GetDSAttachment() const { return DepthStencilAttachment_.RenderTarget; }
 
-    RHI::RenderPassEncoder* GetRenderPassEncoder() const { return rhiPassEncoder_; }
+    gfx::RenderPassEncoder* GetRenderPassEncoder() const { return rhiPassEncoder_; }
 
     virtual void Execute(const std::vector<RenderObject*>& renderObjects) = 0;
 
 protected:
     std::string PassName_ = "GiveAPassName:(";
-    RHI::RenderPassEncoder* RenderPassEncoder_ = nullptr;
-    RHI::CommandEncoder* CommandEncoder_ = nullptr;
+    gfx::RenderPassEncoder* RenderPassEncoder_ = nullptr;
+    gfx::CommandEncoder* CommandEncoder_ = nullptr;
     std::vector<AttachmentConfig> attachments_;
     AttachmentConfig DepthStencilAttachment_;
-    RHI::RenderPassEncoder* rhiPassEncoder_ = nullptr;
+    gfx::RenderPassEncoder* rhiPassEncoder_ = nullptr;
 };
 
 class IgniterPass : public Pass
@@ -160,7 +160,7 @@ public:
     virtual void Execute(const std::vector<RenderObject*>& renderObjects) override {}
 
 protected:
-    void SetTexture(const std::string& name, const RHI::Texture* texture);
+    void SetTexture(const std::string& name, const gfx::Texture* texture);
 
     void SetFloat(const std::string& name, std::uint32_t offset, std::uint32_t count, const float* data);
 

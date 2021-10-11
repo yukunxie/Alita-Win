@@ -90,7 +90,7 @@ public:
     
     void SetRenderingFrameInfo(FrameResource* frameResource, VkCommandBuffer vkCommandBuffer, ssize_t count,  VKCommandBuffer **commandBuffers)
     {
-        RHI_ASSERT(renderingFrameInfo_.commandBuffers.empty());
+        GFX_ASSERT(renderingFrameInfo_.commandBuffers.empty());
         renderingFrameInfo_.frameResource = frameResource;
         renderingFrameInfo_.vkCommandBuffer = vkCommandBuffer;
         for (int i = 0; i < count; ++i)

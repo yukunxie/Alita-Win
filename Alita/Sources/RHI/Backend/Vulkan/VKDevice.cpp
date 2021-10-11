@@ -70,7 +70,7 @@ static VKDevice* sActivedDevice_ = nullptr;
 
 VKDevice* VKDevice::Create(const DeviceDescriptor &descriptor, std::unique_ptr<IDeviceExternalDeps>&& deviceExternalDeps)
 {
-#if defined(RHI_DEBUG) && RHI_DEBUG
+#if defined(GFX_DEBUG) && GFX_DEBUG
     GfxBase::SetMainThreadId(pthread_self());
 #endif
     
@@ -94,9 +94,9 @@ VKDevice::VKDevice(std::unique_ptr<IDeviceExternalDeps>&& deviceExternalDeps)
     if (sActivedDevice_)
     {
         deviceExternalDeps_->ShowDebugMessage("Fatal Error, VKDevice has been leaked!");
-        RHI_ASSERT(sActivedDevice_ == nullptr);
+        GFX_ASSERT(sActivedDevice_ == nullptr);
         LOGW("Force delete sActivedDevice_");
-        RHI_SAFE_DELETE(sActivedDevice_);
+        GFX_SAFE_DELETE(sActivedDevice_);
     }
     sActivedDevice_ = this;
     
@@ -158,19 +158,19 @@ void VKDevice::ReleaseCaches()
     
     for (auto tp : renderPipelineCache_)
     {
-        RHI_SAFE_RELEASE(tp.second);
+        GFX_SAFE_RELEASE(tp.second);
     }
     renderPipelineCache_.clear();
     
     for (auto tp : bindGroupLayoutCache_)
     {
-        RHI_SAFE_RELEASE(tp.second);
+        GFX_SAFE_RELEASE(tp.second);
     }
     bindGroupLayoutCache_.clear();
     
     for (auto tp : pipelineLayoutCache_)
     {
-        RHI_SAFE_RELEASE(tp.second);
+        GFX_SAFE_RELEASE(tp.second);
     }
     pipelineLayoutCache_.clear();
     
@@ -226,9 +226,9 @@ void VKDevice::ReleaseCaches()
     }
     framebufferCache_.clear();
     
-    RHI_SAFE_RELEASE(renderQueue_);
+    GFX_SAFE_RELEASE(renderQueue_);
     
-    RHI_SAFE_RELEASE(imageLayoutTransistQueue_);
+    GFX_SAFE_RELEASE(imageLayoutTransistQueue_);
     
     if (pTextureViewMgr_)
     {
@@ -305,7 +305,7 @@ void VKDevice::OnFrameCallback(float dt)
 
 void VKDevice::OnFrameEnd()
 {
-    RHI_CAST(VKQueue*, renderQueue_)->SubmitInternal();
+    GFX_CAST(VKQueue*, renderQueue_)->SubmitInternal();
 }
 
 void VKDevice::OnWindowResized()
@@ -315,7 +315,7 @@ void VKDevice::OnWindowResized()
 
 void VKDevice::Dispose()
 {
-    RHI_DISPOSE_BEGIN();
+    GFX_DISPOSE_BEGIN();
     
     ReleaseCaches();
     
@@ -398,7 +398,7 @@ VKRenderPass* VKDevice::GetOrCreateRenderPass(const RenderPassCacheQuery &query)
     
     auto renderPass = CreateObject<VKRenderPass>(query);
     renderPassCache_[query] = renderPass;
-    RHI_SAFE_RETAIN(renderPass);
+    GFX_SAFE_RETAIN(renderPass);
     
     return renderPass;
 }
@@ -415,7 +415,7 @@ VKFramebuffer* VKDevice::GetOrCreateFramebuffer(const FramebufferCacheQuery &que
     
     auto framebuffer = CreateObject<VKFramebuffer>(query);
     framebufferCache_[query] = framebuffer;
-    RHI_SAFE_RETAIN(framebuffer);
+    GFX_SAFE_RETAIN(framebuffer);
     
     return framebuffer;
 }
@@ -768,7 +768,7 @@ bool VKDevice::InitInstance()
 
 bool VKDevice::CreateSurface(VkFormat surfaceFormat /*= VK_FORMAT_R8G8B8A8_UNORM*/)
 {
-    RHI_ASSERT(vkInstance_ != nullptr);
+    GFX_ASSERT(vkInstance_ != nullptr);
 
 #ifdef WIN32
     GLFWwindow* window = (GLFWwindow*)deviceExternalDeps_->GetNativeWindowHandle();
@@ -850,7 +850,7 @@ bool VKDevice::CreateSurface(VkFormat surfaceFormat /*= VK_FORMAT_R8G8B8A8_UNORM
 
 bool VKDevice::InitPhysicDevice()
 {
-    RHI_ASSERT(vkInstance_ != nullptr);
+    GFX_ASSERT(vkInstance_ != nullptr);
     
     uint32_t gpuCount = 0;
     CALL_VK(vkEnumeratePhysicalDevices(vkInstance_, &gpuCount, nullptr));
@@ -874,7 +874,7 @@ bool VKDevice::InitPhysicDevice()
 
 void VKDevice::QueryDeviceFeatures()
 {
-    RHI_ASSERT(vkPhysicalDevice_);
+    GFX_ASSERT(vkPhysicalDevice_);
     
     vkGetPhysicalDeviceFeatures(vkPhysicalDevice_, &deviceFeatures_);
     
@@ -1114,7 +1114,7 @@ void VKDevice::QueryDeviceFeatures()
 
 void VKDevice::QueryDeviceMemoryProperties()
 {
-    RHI_ASSERT(vkPhysicalDevice_);
+    GFX_ASSERT(vkPhysicalDevice_);
     
     vkGetPhysicalDeviceMemoryProperties(vkPhysicalDevice_, &memoryProperties_);
     
@@ -1162,8 +1162,8 @@ void VKDevice::QueryDeviceMemoryProperties()
 
 bool VKDevice::InitDevice()
 {
-    RHI_ASSERT(vkInstance_ != nullptr);
-    RHI_ASSERT(vkPhysicalDevice_ != nullptr);
+    GFX_ASSERT(vkInstance_ != nullptr);
+    GFX_ASSERT(vkPhysicalDevice_ != nullptr);
     
     // check for vulkan info on this GPU device
     VkPhysicalDeviceProperties gpuProperties;
@@ -1177,7 +1177,7 @@ bool VKDevice::InitDevice()
     // Find a GFX queue family
     uint32_t queueFamilyCount;
     vkGetPhysicalDeviceQueueFamilyProperties(vkPhysicalDevice_, &queueFamilyCount, nullptr);
-    RHI_ASSERT(queueFamilyCount);
+    GFX_ASSERT(queueFamilyCount);
     std::vector<VkQueueFamilyProperties> queueFamilyProperties(queueFamilyCount);
     vkGetPhysicalDeviceQueueFamilyProperties(vkPhysicalDevice_, &queueFamilyCount,
                                                queueFamilyProperties.data());
@@ -1191,7 +1191,7 @@ bool VKDevice::InitDevice()
             break;
         }
     }
-    RHI_ASSERT(queueFamilyIndex < queueFamilyCount);
+    GFX_ASSERT(queueFamilyIndex < queueFamilyCount);
     graphicQueueFamilyIndex_ = queueFamilyIndex;
     
     float priorities[] = {1.0f,};
@@ -1509,7 +1509,7 @@ RenderPipeline* VKDevice::CreateRenderPipeline(RenderPipelineDescriptor &descrip
     
     auto pipeline = CreateObject<VKRenderPipeline>(descriptor);
     renderPipelineCache_.emplace_back(descriptor, pipeline);
-    RHI_SAFE_RETAIN(pipeline);
+    GFX_SAFE_RETAIN(pipeline);
     
     return pipeline;
 }
@@ -1561,7 +1561,7 @@ BindGroupLayout* VKDevice::CreateBindGroupLayout(const BindGroupLayoutDescriptor
     
     auto bindGroupLayout = CreateObject<VKBindGroupLayout>(descriptor);
     bindGroupLayoutCache_.emplace_back(descriptor, bindGroupLayout);
-    RHI_SAFE_RETAIN(bindGroupLayout);
+    GFX_SAFE_RETAIN(bindGroupLayout);
     
     return bindGroupLayout;
 }
@@ -1584,7 +1584,7 @@ VKDevice::CreatePipelineLayout(const PipelineLayoutDescriptor &descriptor)
     
     auto pipelineLayout = CreateObject<VKPipelineLayout>(descriptor);
     pipelineLayoutCache_.emplace_back(descriptor, pipelineLayout);
-    RHI_SAFE_RETAIN(pipelineLayout);
+    GFX_SAFE_RETAIN(pipelineLayout);
     
     return pipelineLayout;
 }
@@ -1613,7 +1613,7 @@ Queue* VKDevice::GetQueue()
 {
     if (!renderQueue_)
     {
-        RHI_PTR_ASSIGN(renderQueue_, CreateQueue());
+        GFX_PTR_ASSIGN(renderQueue_, CreateQueue());
     }
     return renderQueue_;
 }
@@ -1625,7 +1625,7 @@ VKCommandBuffer* VKDevice::CreateCommandBuffer()
     {
         obj = CreateObject<VKCommandBuffer>();
     }
-    return RHI_CAST(VKCommandBuffer*, obj);
+    return GFX_CAST(VKCommandBuffer*, obj);
 }
 
 VKTextureView* VKDevice::CreateTextureView(VKTexture* vkTexture,

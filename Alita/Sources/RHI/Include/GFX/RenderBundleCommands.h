@@ -43,12 +43,12 @@ public:
     CmdSetRenderPipeline(RenderPipeline* pipeline)
         : RenderCommandBase(RenderCommand::SetGraphicPipeline)
     {
-        RHI_PTR_ASSIGN(pipeline_, pipeline);
+        GFX_PTR_ASSIGN(pipeline_, pipeline);
     }
     
     ~CmdSetRenderPipeline()
     {
-        RHI_SAFE_RELEASE(pipeline_);
+        GFX_SAFE_RELEASE(pipeline_);
     }
     
     void Execute(CommandBuffer* commandBuffer);
@@ -122,7 +122,7 @@ public:
                     const std::uint32_t* dynamicOffsets)
         : RenderCommandBase(RenderCommand::SetBindGroup), index_(index)
     {
-        RHI_PTR_ASSIGN(bindGroup_, bindGroup);
+        GFX_PTR_ASSIGN(bindGroup_, bindGroup);
         dynamicOffsets_.resize(count);
         for (std::uint32_t i = 0; i < count; ++i)
         {
@@ -132,7 +132,7 @@ public:
     
     ~CmdSetBindGroup()
     {
-        RHI_SAFE_RELEASE(bindGroup_);
+        GFX_SAFE_RELEASE(bindGroup_);
     }
     
     void Execute(CommandBuffer* commandBuffer);
@@ -149,12 +149,12 @@ public:
     CmdSetVertexBuffer(Buffer* buffer, std::uint32_t offset, std::uint32_t slot)
         : RenderCommandBase(RenderCommand::SetVertexBuffer), offset_(offset), slot_(slot)
     {
-        RHI_PTR_ASSIGN(buffer_, buffer);
+        GFX_PTR_ASSIGN(buffer_, buffer);
     }
     
     ~CmdSetVertexBuffer()
     {
-        RHI_SAFE_RELEASE(buffer_);
+        GFX_SAFE_RELEASE(buffer_);
     }
     
     void Execute(CommandBuffer* commandBuffer);
@@ -171,12 +171,12 @@ public:
     CmdSetIndexBuffer(Buffer* buffer, std::uint32_t offset)
         : RenderCommandBase(RenderCommand::SetIndexBuffer), offset_(offset)
     {
-        RHI_PTR_ASSIGN(buffer_, buffer);
+        GFX_PTR_ASSIGN(buffer_, buffer);
     }
     
     ~CmdSetIndexBuffer()
     {
-        RHI_SAFE_RELEASE(buffer_);
+        GFX_SAFE_RELEASE(buffer_);
     }
     
     void Execute(CommandBuffer* commandBuffer);
@@ -236,14 +236,14 @@ public:
         : RenderCommandBase(RenderCommand::DrawIndirect),
           indirectOffset(indirectOffset_)
     {
-        RHI_PTR_ASSIGN(buffer, buffer_);
+        GFX_PTR_ASSIGN(buffer, buffer_);
     }
     
     void Execute(CommandBuffer* commandBuffer);
     
     ~CmdDrawIndirect()
     {
-        RHI_SAFE_RELEASE(buffer);
+        GFX_SAFE_RELEASE(buffer);
     }
 
 public:
@@ -258,14 +258,14 @@ public:
         : RenderCommandBase(RenderCommand::DrawIndexedIndirect),
           indirectOffset(indirectOffset_)
     {
-        RHI_PTR_ASSIGN(buffer, buffer_);
+        GFX_PTR_ASSIGN(buffer, buffer_);
     }
     
     void Execute(CommandBuffer* commandBuffer);
     
     ~CmdDrawIndexedIndirect()
     {
-        RHI_SAFE_RELEASE(buffer);
+        GFX_SAFE_RELEASE(buffer);
     }
 
 public:

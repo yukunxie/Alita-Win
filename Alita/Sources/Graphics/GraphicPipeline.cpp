@@ -18,46 +18,46 @@ GraphicPipeline::GraphicPipeline()
 	LOGI("xxxx 0");
 
 	GraphicQueue_ = Engine::GetGPUDevice()->GetQueue();
-	RHI_SAFE_RETAIN(GraphicQueue_);
+	GFX_SAFE_RETAIN(GraphicQueue_);
 
 	LOGI("xxxx 1");
 
 	CommandEncoder_ = Engine::GetGPUDevice()->CreateCommandEncoder();
-	RHI_SAFE_RETAIN(CommandEncoder_);
-	RHI_SAFE_RETAIN(CommandEncoder_);
+	GFX_SAFE_RETAIN(CommandEncoder_);
+	GFX_SAFE_RETAIN(CommandEncoder_);
 	g_test_released = true;
 
 	LOGI("xxxx 2");
 
-	RHI::SwapChainDescriptor swapChainDescriptor;
+	gfx::SwapChainDescriptor swapChainDescriptor;
 	swapChainDescriptor.device = Engine::GetGPUDevice();
-	swapChainDescriptor.format = RHI::TextureFormat::RGBA8UNORM;
+	swapChainDescriptor.format = gfx::TextureFormat::RGBA8UNORM;
 
 	RHISwapChain_ = Engine::GetGPUDevice()->CreateSwapchain(swapChainDescriptor);
-	RHI_SAFE_RETAIN(RHISwapChain_);
+	GFX_SAFE_RETAIN(RHISwapChain_);
 
 	WindowSize_ = { RHISwapChain_->GetExtent().width, RHISwapChain_->GetExtent().height };
 	{
-		RHI::TextureDescriptor descriptor;
+		gfx::TextureDescriptor descriptor;
 		{
 			descriptor.sampleCount = 1;
-			descriptor.format = RHI::TextureFormat::DEPTH24PLUS_STENCIL8;
-			descriptor.usage = RHI::TextureUsage::OUTPUT_ATTACHMENT;
+			descriptor.format = gfx::TextureFormat::DEPTH24PLUS_STENCIL8;
+			descriptor.usage = gfx::TextureUsage::OUTPUT_ATTACHMENT;
 			descriptor.size = { WindowSize_.width, WindowSize_.height };
 			descriptor.arrayLayerCount = 1;
 			descriptor.mipLevelCount = 1;
-			descriptor.dimension = RHI::TextureDimension::TEXTURE_2D;
+			descriptor.dimension = gfx::TextureDimension::TEXTURE_2D;
 		};
 		rhiDSTexture_ = Engine::GetGPUDevice()->CreateTexture(descriptor);
-		RHI_SAFE_RETAIN(rhiDSTexture_);
+		GFX_SAFE_RETAIN(rhiDSTexture_);
 		rhiDSTextureView_ = rhiDSTexture_->CreateView({});
-		RHI_SAFE_RETAIN(rhiDSTextureView_);
+		GFX_SAFE_RETAIN(rhiDSTextureView_);
 	}
 }
 
 GraphicPipeline::~GraphicPipeline()
 {
-	RHI_SAFE_RELEASE(CommandEncoder_);
+	GFX_SAFE_RELEASE(CommandEncoder_);
 }
 
 void GraphicPipeline::Execute(const std::vector<RenderObject*>& renderObjects)
@@ -102,8 +102,8 @@ void GraphicPipeline::Execute(const std::vector<RenderObject*>& renderObjects)
 		ScreenResolvePass_.Execute();
 	}
 
-		RHI::CommandBuffer* cmdBuffer = CommandEncoder_->Finish();
-		RHI_SAFE_RETAIN(cmdBuffer);
+		gfx::CommandBuffer* cmdBuffer = CommandEncoder_->Finish();
+		GFX_SAFE_RETAIN(cmdBuffer);
 
 		GraphicQueue_->Submit(1, &cmdBuffer);
 		Engine::GetGPUDevice()->OnFrameEnd();

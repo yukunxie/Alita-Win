@@ -13,7 +13,7 @@ VKSampler::VKSampler(VKDevice* device)
 
 void VKSampler::Dispose()
 {
-    RHI_DISPOSE_BEGIN();
+    GFX_DISPOSE_BEGIN();
     
     if (vkSampler_)
     {
@@ -21,7 +21,7 @@ void VKSampler::Dispose()
         vkSampler_ = VK_NULL_HANDLE;
     }
     
-    RHI_DISPOSE_END();
+    GFX_DISPOSE_END();
 }
 
 VKSampler::~VKSampler()

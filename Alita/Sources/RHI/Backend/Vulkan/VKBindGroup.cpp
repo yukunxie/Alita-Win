@@ -20,14 +20,14 @@ VKBindGroup::VKBindGroup(VKDevice* device)
 
 bool VKBindGroup::Init(BindGroupDescriptor &descriptor)
 {
-    bindGroupLayout_ = RHI_CAST(VKBindGroupLayout * , descriptor.layout);
+    bindGroupLayout_ = GFX_CAST(VKBindGroupLayout * , descriptor.layout);
     
     bindingResources_.resize(descriptor.entries.size());
     for (size_t i = 0; i < descriptor.entries.size(); ++i)
     {
         auto &res = descriptor.entries[i];
         bindingResources_[i] = res;
-        RHI_SAFE_RETAIN(res.resource);
+        GFX_SAFE_RETAIN(res.resource);
     }
     
     VkDescriptorSetLayout layout = bindGroupLayout_->GetNative();
@@ -55,7 +55,7 @@ void VKBindGroup::UpdateDescriptorSetAsync()
     }
     
     hasUpdateDescriptorSet_ = true;
-    VkDevice deviceVk = RHI_CAST(VKDevice*, GetGPUDevice())->GetNative();
+    VkDevice deviceVk = GFX_CAST(VKDevice*, GetGPUDevice())->GetNative();
     
     for (std::uint32_t i = 0; i < bindingResources_.size(); ++i)
     {
@@ -66,8 +66,8 @@ void VKBindGroup::UpdateDescriptorSetAsync()
         {
             case BindingResourceType::Buffer:
             {
-                auto bindingBuffer = RHI_CAST(BufferBinding*, resource);
-                auto* buffer = RHI_CAST(VKBuffer*, bindingBuffer->GetBuffer());
+                auto bindingBuffer = GFX_CAST(BufferBinding*, resource);
+                auto* buffer = GFX_CAST(VKBuffer*, bindingBuffer->GetBuffer());
                 VkDescriptorBufferInfo bufferInfo;
                 {
                     bufferInfo.buffer = buffer->GetNative();
@@ -103,8 +103,8 @@ void VKBindGroup::UpdateDescriptorSetAsync()
             case BindingResourceType::Sampler:
             {
                 VkDescriptorImageInfo imageInfo;
-                SamplerBinding* samplerBinding = RHI_CAST(SamplerBinding*, resource);
-                imageInfo.sampler = RHI_CAST(VKSampler*, samplerBinding->GetSampler())->GetNative();
+                SamplerBinding* samplerBinding = GFX_CAST(SamplerBinding*, resource);
+                imageInfo.sampler = GFX_CAST(VKSampler*, samplerBinding->GetSampler())->GetNative();
                 
                 VkWriteDescriptorSet descriptorWrite;
                 {
@@ -129,9 +129,9 @@ void VKBindGroup::UpdateDescriptorSetAsync()
                 VkDescriptorImageInfo imageInfo;
                 {
                     imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-                    TextureViewBinding* textureViewBinding = RHI_CAST(TextureViewBinding*,
+                    TextureViewBinding* textureViewBinding = GFX_CAST(TextureViewBinding*,
                                                                       resource);
-                    VKTextureView* textureView = RHI_CAST(VKTextureView*,
+                    VKTextureView* textureView = GFX_CAST(VKTextureView*,
                                                           textureViewBinding->GetTextureView());
                     imageInfo.imageView = textureView->GetNative();
                 }
@@ -156,9 +156,9 @@ void VKBindGroup::UpdateDescriptorSetAsync()
                 
                 // case RHIObjectType::SampledTextureView:
                 // {
-                //     auto combinedST = RHI_CAST(SampledTextureView*, binding.resource);
-                //     auto vkTextureView = RHI_CAST(VKTextureView*, combinedST->GetTextureView());
-                //     auto vkSampler = RHI_CAST(VKSampler *, combinedST->GetSampler());
+                //     auto combinedST = GFX_CAST(SampledTextureView*, binding.resource);
+                //     auto vkTextureView = GFX_CAST(VKTextureView*, combinedST->GetTextureView());
+                //     auto vkSampler = GFX_CAST(VKSampler *, combinedST->GetSampler());
                 //
                 //     VkDescriptorImageInfo imageInfo;
                 //     {
@@ -179,12 +179,12 @@ void VKBindGroup::UpdateDescriptorSetAsync()
                 //         descriptorWrite.pImageInfo = &imageInfo;
                 //         descriptorWrite.pTexelBufferView = nullptr; // optional
                 //     }
-                //     vkUpdateDescriptorSets(RHI_CAST(VKDevice*, GetGPUDevice())->GetNative(), 1, &descriptorWrite, 0, nullptr);
+                //     vkUpdateDescriptorSets(GFX_CAST(VKDevice*, GetGPUDevice())->GetNative(), 1, &descriptorWrite, 0, nullptr);
                 // }
                 //     break;
             
             default:
-                RHI_ASSERT(false);
+                GFX_ASSERT(false);
                 break;
         }
     }
@@ -197,9 +197,9 @@ void VKBindGroup::TransImageLayoutToSampled(VKCommandBuffer *commandBuffer)
         auto resource = bindingResources_[i].resource;
         if (BindingResourceType::TextureView == resource->GetResourceType())
         {
-            TextureViewBinding* textureViewBinding = RHI_CAST(TextureViewBinding*,
+            TextureViewBinding* textureViewBinding = GFX_CAST(TextureViewBinding*,
                                                               resource);
-            VKTextureView* textureView = RHI_CAST(VKTextureView*,
+            VKTextureView* textureView = GFX_CAST(VKTextureView*,
                                                   textureViewBinding->GetTextureView());
             
             ((VKTexture*)textureView->GetTexture())->TransToSampledImageLayout(commandBuffer);
@@ -209,16 +209,16 @@ void VKBindGroup::TransImageLayoutToSampled(VKCommandBuffer *commandBuffer)
 
 void VKBindGroup::Dispose()
 {
-    RHI_DISPOSE_BEGIN();
+    GFX_DISPOSE_BEGIN();
     
     for (size_t i = 0; i < bindingResources_.size(); ++i)
     {
         auto &res = bindingResources_[i];
-        RHI_SAFE_RELEASE(res.resource);
+        GFX_SAFE_RELEASE(res.resource);
     }
     bindingResources_.clear();
     
-    VKDevice* device = RHI_CAST(VKDevice*, GetGPUDevice());
+    VKDevice* device = GFX_CAST(VKDevice*, GetGPUDevice());
     CALL_VK(vkFreeDescriptorSets(device->GetNative(),
                                    device->GetDescriptorPool(),
                                    1,
@@ -228,7 +228,7 @@ void VKBindGroup::Dispose()
     
     bindGroupLayout_.Reset();
     
-    RHI_DISPOSE_END();
+    GFX_DISPOSE_END();
 }
 
 VKBindGroup::~VKBindGroup()
@@ -249,8 +249,8 @@ std::vector<VKBuffer *> VKBindGroup::getBindingBuffers()
         if (resource->GetResourceType() != BindingResourceType::Buffer) 
             continue;
 
-        auto bindingBuffer = RHI_CAST(BufferBinding*, resource);
-        auto* buffer = RHI_CAST(VKBuffer*, bindingBuffer->GetBuffer());
+        auto bindingBuffer = GFX_CAST(BufferBinding*, resource);
+        auto* buffer = GFX_CAST(VKBuffer*, bindingBuffer->GetBuffer());
 
         result.push_back(buffer);
     }

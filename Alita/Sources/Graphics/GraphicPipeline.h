@@ -31,9 +31,9 @@ public:
 		return 1.0;
 	}
 
-	RHI::CommandEncoder* GetCommandEncoder() { return CommandEncoder_; }
+	gfx::CommandEncoder* GetCommandEncoder() { return CommandEncoder_; }
 
-	RHI::SwapChain* GetSwapChain() 
+	gfx::SwapChain* GetSwapChain() 
 	{ 
 		return RHISwapChain_;
 	}
@@ -54,12 +54,12 @@ private:
 	TExtent2D  WindowSize_;
 
 	// RHI
-	RHI::SwapChain* RHISwapChain_ = nullptr;
-	RHI::Queue* GraphicQueue_ = nullptr;
-	RHI::CommandEncoder* CommandEncoder_ = nullptr;
+	gfx::SwapChain* RHISwapChain_ = nullptr;
+	gfx::Queue* GraphicQueue_ = nullptr;
+	gfx::CommandEncoder* CommandEncoder_ = nullptr;
 	
-	RHI::Texture* rhiDSTexture_ = nullptr;
-	RHI::TextureView* rhiDSTextureView_ = nullptr;
+	gfx::Texture* rhiDSTexture_ = nullptr;
+	gfx::TextureView* rhiDSTextureView_ = nullptr;
 };
 
 NS_RX_END

@@ -15,7 +15,7 @@ void ToneMapping::Setup(const Pass* inputPass)
 {
 	InputPass_ = inputPass;
 	auto inputTarget = inputPass->GetColorAttachments()[0].RenderTarget;
-	RTColor_->ResizeTarget(inputTarget->GetWidth(), inputTarget->GetHeight(), RHI::TextureFormat::RGBA8UNORM);
+	RTColor_->ResizeTarget(inputTarget->GetWidth(), inputTarget->GetHeight(), gfx::TextureFormat::RGBA8UNORM);
 }
 
 void ToneMapping::Execute()

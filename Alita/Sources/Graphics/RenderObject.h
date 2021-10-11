@@ -13,18 +13,18 @@ NS_RX_BEGIN
 class RenderObject
 {
 public:
-	void Render(const Pass* pass, ETechniqueType technique, ERenderSet renderSet, RHI::RenderPassEncoder& passEndcoder);
+	void Render(const Pass* pass, ETechniqueType technique, ERenderSet renderSet, gfx::RenderPassEncoder& passEndcoder);
 
 	struct VertexBufferInfo
 	{
-		RHI::Buffer*	GpuBuffer = nullptr;
+		gfx::Buffer*	GpuBuffer = nullptr;
 		std::uint32_t	Offset = 0;
 		std::uint32_t	Slot = 0xFFFFFFFF;
 	};
 
 	struct IndexBufferInfo
 	{
-		RHI::Buffer*	GpuBuffer = nullptr;
+		gfx::Buffer*	GpuBuffer = nullptr;
 		std::uint32_t	Offset = 0;
 		std::uint32_t	IndexCount = 0;
 		std::uint32_t	InstanceCount = 0;

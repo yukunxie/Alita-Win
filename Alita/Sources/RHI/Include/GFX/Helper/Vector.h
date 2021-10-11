@@ -258,7 +258,7 @@ public:
     /** Returns the element at position 'index' in the Vector. */
     T at(ssize_t index) const
     {
-        RHI_ASSERT(index >= 0 && index < size(), "index out of range in getObjectAtIndex()");
+        GFX_ASSERT(index >= 0 && index < size(), "index out of range in getObjectAtIndex()");
         return _data[index];
     }
     
@@ -321,9 +321,9 @@ public:
     /** Adds a new element at the end of the Vector. */
     void pushBack(T object)
     {
-        RHI_ASSERT(object != nullptr, "The object should not be nullptr");
+        GFX_ASSERT(object != nullptr, "The object should not be nullptr");
         _data.push_back(object);
-        RHI_SAFE_RETAIN(object);
+        GFX_SAFE_RETAIN(object);
     }
     
     /** Push all elements of an existing Vector to the end of current Vector. */
@@ -332,7 +332,7 @@ public:
         for (auto &obj : other)
         {
             _data.push_back(obj);
-            RHI_SAFE_RETAIN(obj);
+            GFX_SAFE_RETAIN(obj);
         }
     }
     
@@ -343,10 +343,10 @@ public:
      */
     void insert(ssize_t index, T object)
     {
-        RHI_ASSERT(index >= 0 && index <= size(), "Invalid index!");
-        RHI_ASSERT(object != nullptr, "The object should not be nullptr");
+        GFX_ASSERT(index >= 0 && index <= size(), "Invalid index!");
+        GFX_ASSERT(object != nullptr, "The object should not be nullptr");
         _data.insert((std::begin(_data) + index), object);
-        RHI_SAFE_RETAIN(object);
+        GFX_SAFE_RETAIN(object);
     }
     
     // Removes Objects
@@ -354,10 +354,10 @@ public:
     /** Removes the last element in the Vector. */
     void popBack()
     {
-        RHI_ASSERT(!_data.empty(), "no objects added");
+        GFX_ASSERT(!_data.empty(), "no objects added");
         auto last = _data.back();
         _data.pop_back();
-        RHI_SAFE_RETAIN(last);
+        GFX_SAFE_RETAIN(last);
     }
     
     /** Remove a certain object in Vector.
@@ -367,7 +367,7 @@ public:
      */
     void eraseObject(T object, bool removeAll = false)
     {
-        RHI_ASSERT(object != nullptr, "The object should not be nullptr");
+        GFX_ASSERT(object != nullptr, "The object should not be nullptr");
         
         if (removeAll)
         {
@@ -376,7 +376,7 @@ public:
                 if ((*iter) == object)
                 {
                     iter = _data.erase(iter);
-                    RHI_SAFE_RELEASE(object);
+                    GFX_SAFE_RELEASE(object);
                 }
                 else
                 {
@@ -390,7 +390,7 @@ public:
             if (iter != _data.end())
             {
                 _data.erase(iter);
-                RHI_SAFE_RELEASE(object);
+                GFX_SAFE_RELEASE(object);
             }
         }
     }
@@ -402,8 +402,8 @@ public:
      */
     iterator erase(iterator position)
     {
-        RHI_ASSERT(position >= _data.begin() && position < _data.end(), "Invalid position!");
-        RHI_SAFE_RELEASE(*position);
+        GFX_ASSERT(position >= _data.begin() && position < _data.end(), "Invalid position!");
+        GFX_SAFE_RELEASE(*position);
         return _data.erase(position);
     }
     
@@ -417,7 +417,7 @@ public:
     {
         for (auto iter = first; iter != last; ++iter)
         {
-            RHI_SAFE_RELEASE(*iter);
+            GFX_SAFE_RELEASE(*iter);
         }
         
         return _data.erase(first, last);
@@ -429,9 +429,9 @@ public:
      */
     iterator erase(ssize_t index)
     {
-        RHI_ASSERT(!_data.empty() && index >= 0 && index < size(), "Invalid index!");
+        GFX_ASSERT(!_data.empty() && index >= 0 && index < size(), "Invalid index!");
         auto it = std::next(begin(), index);
-        RHI_SAFE_RELEASE(*it);
+        GFX_SAFE_RELEASE(*it);
         return _data.erase(it);
     }
     
@@ -442,7 +442,7 @@ public:
     {
         for (auto &it : _data)
         {
-            RHI_SAFE_RELEASE(it);
+            GFX_SAFE_RELEASE(it);
         }
         _data.clear();
     }
@@ -455,7 +455,7 @@ public:
         ssize_t idx1 = getIndex(object1);
         ssize_t idx2 = getIndex(object2);
         
-        RHI_ASSERT(idx1 >= 0 && idx2 >= 0, "invalid object index");
+        GFX_ASSERT(idx1 >= 0 && idx2 >= 0, "invalid object index");
         
         std::swap(_data[idx1], _data[idx2]);
     }
@@ -463,7 +463,7 @@ public:
     /** Swap two elements by indexes. */
     void swap(ssize_t index1, ssize_t index2)
     {
-        RHI_ASSERT(index1 >= 0 && index1 < size() && index2 >= 0 && index2 < size(),
+        GFX_ASSERT(index1 >= 0 && index1 < size() && index2 >= 0 && index2 < size(),
                    "Invalid indices");
         
         std::swap(_data[index1], _data[index2]);
@@ -472,10 +472,10 @@ public:
     /** Replace value at index with given object. */
     void replace(ssize_t index, T object)
     {
-        RHI_ASSERT(index >= 0 && index < size(), "Invalid index!");
-        RHI_ASSERT(object != nullptr, "The object should not be nullptr");
+        GFX_ASSERT(index >= 0 && index < size(), "Invalid index!");
+        GFX_ASSERT(object != nullptr, "The object should not be nullptr");
         
-        RHI_PTR_ASSIGN(_data[index], object);
+        GFX_PTR_ASSIGN(_data[index], object);
     }
     
     /** Reverses the Vector. */
@@ -497,7 +497,7 @@ protected:
     {
         for (const auto &obj : _data)
         {
-            RHI_SAFE_RETAIN(obj);
+            GFX_SAFE_RETAIN(obj);
         }
     }
     

@@ -34,7 +34,7 @@ public:
                 return tp.second;
             }
         }
-        RHI_ASSERT(false);
+        GFX_ASSERT(false);
         return VK_DESCRIPTOR_TYPE_MAX_ENUM;
     }
     

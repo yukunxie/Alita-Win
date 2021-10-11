@@ -39,9 +39,9 @@
 
 NS_GFX_BEGIN
 
-#define VKDEVICE() RHI_CAST(VKDevice*, GetGPUDevice())
+#define VKDEVICE() GFX_CAST(VKDevice*, GetGPUDevice())
 
-#if defined(RHI_DEBUG) && RHI_DEBUG
+#if defined(GFX_DEBUG) && GFX_DEBUG
 #define VULKAN_VALIDATE_LAYER_ENABLED 1
 #else
 #define VULKAN_VALIDATE_LAYER_ENABLED 1
@@ -272,12 +272,12 @@ public:
         _Tp* obj = new _Tp(this);
         if (obj && obj->Init(args...))
         {
-            RHI_ASSERT(obj->GetReferenceCount() >= 1);
+            GFX_ASSERT(obj->GetReferenceCount() >= 1);
             obj->AutoRelease();
         }
         else
         {
-            RHI_SAFE_RELEASE(obj);
+            GFX_SAFE_RELEASE(obj);
         }
         return obj;
         

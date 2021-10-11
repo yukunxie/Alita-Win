@@ -21,16 +21,16 @@ VKComputePassEncoder::~VKComputePassEncoder()
 
 void VKComputePassEncoder::Dispose()
 {
-    RHI_DISPOSE_BEGIN();
+    GFX_DISPOSE_BEGIN();
     
-    RHI_SAFE_RELEASE(commandBuffer_);
+    GFX_SAFE_RELEASE(commandBuffer_);
     
-    RHI_DISPOSE_END();
+    GFX_DISPOSE_END();
 }
 
 bool VKComputePassEncoder::Init(VKCommandBuffer* commandBuffer, const ComputePassDescriptor &descriptor)
 {
-    RHI_PTR_ASSIGN(commandBuffer_, commandBuffer);
+    GFX_PTR_ASSIGN(commandBuffer_, commandBuffer);
     return true;
 }
 
