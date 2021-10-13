@@ -7,7 +7,20 @@
 #include "Graphics/RenderScene.h"
 #include "World/World.h"
 
+#include <math.h>
+
 NS_RX_BEGIN
+
+const float PI = acos(-1.0f);
+
+void BindVertexBufferHandle(MeshComponent* meshComp, VertexBufferAttriKind kind, InputAttributeFormat format, const void* data, uint32 size)
+{
+	auto vbBuffer = new VertexBuffer();
+	vbBuffer->kind = kind;
+	vbBuffer->format = format;
+	vbBuffer->InitData(data, size);
+	meshComp->GetGeometry()->AppendVertexBuffer(vbBuffer);
+};
 
 MeshComponent::~MeshComponent()
 {
@@ -96,9 +109,16 @@ void MeshComponent::Tick(float dt)
 	SetupRenderObject();
 
 	const auto* etOwner = GetOwner();
-
-	const TMat4x4 worldMatrix = etOwner->GetWorldMatrix();
-	Material_->SetFloat("WorldMatrix", 0, 16, (float*)&worldMatrix);
+	if (etOwner)
+	{
+		const TMat4x4& worldMatrix = etOwner->GetWorldMatrix();
+		Material_->SetFloat("WorldMatrix", 0, 16, (float*)&worldMatrix);
+	}
+	else
+	{
+		const auto& matrix = TMat4x4(1.0f);;
+		Material_->SetFloat("WorldMatrix", 0, 16, (float*)&matrix);
+	}
 
 	Engine::GetRenderScene()->AddRenderObject(&RenderObject_);
 }
@@ -202,18 +222,11 @@ MeshComponent* MeshComponentBuilder::CreateBox(const std::string& material)
 		{1.0f, 1.0f}
 	};
 
-	auto BindVertexBufferHandle = [meshComp](VertexBufferAttriKind kind, InputAttributeFormat format, const void* data, uint32 size)
-	{
-		auto vbBuffer = new VertexBuffer();
-		vbBuffer->kind = kind;
-		vbBuffer->format = format;
-		vbBuffer->InitData(data, size);
-		meshComp->Geometry_->AppendVertexBuffer(vbBuffer);
-	};
+	
 
-	BindVertexBufferHandle(VertexBufferAttriKind::POSITION, InputAttributeFormat::FLOAT3, positions.data(), sizeof(positions[0]) * positions.size());
-	BindVertexBufferHandle(VertexBufferAttriKind::DIFFUSE, InputAttributeFormat::FLOAT3, colors.data(), sizeof(colors[0])* colors.size());
-	BindVertexBufferHandle(VertexBufferAttriKind::TEXCOORD, InputAttributeFormat::FLOAT2, texCoords.data(), sizeof(texCoords[0])* texCoords.size());
+	BindVertexBufferHandle(meshComp, VertexBufferAttriKind::POSITION, InputAttributeFormat::FLOAT3, positions.data(), sizeof(positions[0]) * positions.size());
+	BindVertexBufferHandle(meshComp, VertexBufferAttriKind::DIFFUSE, InputAttributeFormat::FLOAT3, colors.data(), sizeof(colors[0])* colors.size());
+	BindVertexBufferHandle(meshComp, VertexBufferAttriKind::TEXCOORD, InputAttributeFormat::FLOAT2, texCoords.data(), sizeof(texCoords[0])* texCoords.size());
 
 	std::vector<std::uint32_t> indices = {
 		// front
@@ -249,11 +262,110 @@ MeshComponent* MeshComponentBuilder::CreateBox(const std::string& material)
 			normals[indices[idx + i]] = normal;
 		}
 	}
-	BindVertexBufferHandle(VertexBufferAttriKind::NORMAL, InputAttributeFormat::FLOAT3, normals.data(), sizeof(normals[0])* normals.size());
+	BindVertexBufferHandle(meshComp, VertexBufferAttriKind::NORMAL, InputAttributeFormat::FLOAT3, normals.data(), sizeof(normals[0])* normals.size());
 
 	meshComp->Geometry_->indexBuffer_.indexType = IndexType::UINT32;
 	meshComp->Geometry_->indexBuffer_.InitData(indices.data(), indices.size() * sizeof(indices[0]));
 	
+
+	return meshComp;
+}
+
+MeshComponent* MeshComponentBuilder::CreateSphere(const std::string& material)
+{
+	/*auto segments : number = options.segments || 32;
+	auto diameterX : number = options.diameterX || options.diameter || 1;
+	auto diameterY : number = options.diameterY || options.diameter || 1;
+	auto diameterZ : number = options.diameterZ || options.diameter || 1;
+	auto arc : number = options.arc && (options.arc <= 0 || options.arc > 1) ? 1.0 : options.arc || 1.0;
+	auto slice : number = options.slice && (options.slice <= 0) ? 1.0 : options.slice || 1.0;
+	auto sideOrientation = (options.sideOrientation == = 0) ? 0 : options.sideOrientation || VertexData.DEFAULTSIDE;
+	auto dedupTopBottomIndices = !!options.dedupTopBottomIndices;*/
+
+	uint32 segments = 32;
+	float diameterX = 2;
+	float diameterY = 2;
+	float diameterZ = 2; 
+	float arc = 1;
+	float slice = 1;
+	uint32 sideOrientation = 0;
+
+	auto radius = TVector3(diameterX / 2, diameterY / 2, diameterZ / 2);
+
+	auto totalZRotationSteps = 2 + segments;
+	auto totalYRotationSteps = 2 * totalZRotationSteps;
+
+	auto indices = std::vector<uint32>();
+	auto positions = std::vector<float>();
+	auto colors = std::vector<float>();
+	auto normals = std::vector<float>();
+	auto uvs = std::vector<float>();
+
+	for (auto zRotationStep = 0; zRotationStep <= totalZRotationSteps; zRotationStep++) {
+		auto normalizedZ = float(zRotationStep) / totalZRotationSteps;
+		auto angleZ = normalizedZ * PI * slice;
+
+		for (auto yRotationStep = 0; yRotationStep <= totalYRotationSteps; yRotationStep++) {
+			auto normalizedY = float(yRotationStep) / totalYRotationSteps;
+
+			auto angleY = normalizedY * PI * 2 * arc;
+
+			auto matrix = TMat4x4(1.0f);
+
+			auto rotationZ = glm::rotate(matrix, -angleZ, { 0, 0, 1 });
+			auto rotationY = glm::rotate(matrix, angleY, { 0, 1, 0 });
+			auto afterRotZ = TVector3(rotationZ * TVector4(0, 1, 0, 1));
+			auto complete = TVector3(rotationY * TVector4(afterRotZ, 1));
+
+			auto vertex = complete * radius;
+			auto normal = glm::normalize(complete / radius);
+
+			{
+				positions.push_back(vertex.x);
+				positions.push_back(vertex.y);
+				positions.push_back(vertex.z);
+			}
+			{
+				colors.push_back(1);
+				colors.push_back(1);
+				colors.push_back(1);
+			}
+			{
+				normals.push_back(normal.x);
+				normals.push_back(normal.y);
+				normals.push_back(normal.z);
+			}
+			{
+				uvs.push_back(normalizedY);
+				uvs.push_back(normalizedZ);
+			}
+		}
+
+		if (zRotationStep > 0) {
+			auto verticesCount = positions.size() / 3;
+			for (auto firstIndex = verticesCount - 2 * (totalYRotationSteps + 1); (firstIndex + totalYRotationSteps + 2) < verticesCount; firstIndex++) {
+				indices.push_back(firstIndex);
+				indices.push_back(firstIndex + 1);
+				indices.push_back(firstIndex + totalYRotationSteps + 1);
+
+				indices.push_back(firstIndex + totalYRotationSteps + 1);
+				indices.push_back(firstIndex + 1);
+				indices.push_back(firstIndex + totalYRotationSteps + 2);
+			}
+		}
+	}
+
+	MeshComponent* meshComp = new MeshComponent();
+	meshComp->Geometry_ = new Geometry;
+	meshComp->Material_ = new Material(material.empty() ? "Materials/PBR.json" : material);
+
+	BindVertexBufferHandle(meshComp, VertexBufferAttriKind::POSITION, InputAttributeFormat::FLOAT3, positions.data(), sizeof(positions[0]) * positions.size());
+	BindVertexBufferHandle(meshComp, VertexBufferAttriKind::DIFFUSE, InputAttributeFormat::FLOAT3, colors.data(), sizeof(colors[0]) * colors.size());
+	BindVertexBufferHandle(meshComp, VertexBufferAttriKind::TEXCOORD, InputAttributeFormat::FLOAT2, uvs.data(), sizeof(uvs[0]) * uvs.size());
+	BindVertexBufferHandle(meshComp, VertexBufferAttriKind::NORMAL, InputAttributeFormat::FLOAT3, normals.data(), sizeof(normals[0]) * normals.size());
+
+	meshComp->Geometry_->indexBuffer_.indexType = IndexType::UINT32;
+	meshComp->Geometry_->indexBuffer_.InitData(indices.data(), indices.size() * sizeof(indices[0]));
 
 	return meshComp;
 }

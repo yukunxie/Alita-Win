@@ -1159,6 +1159,9 @@
     <ClInclude Include="Sources\GFX\xxhash64.h">
       <Filter>Sources\GFX</Filter>
     </ClInclude>
+    <ClInclude Include="Sources\Base\SharedPtr.h">
+      <Filter>Sources\Base\Public</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Third-Party\glslang\Include\revision.template">

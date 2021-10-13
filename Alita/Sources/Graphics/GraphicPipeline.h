@@ -51,6 +51,7 @@ private:
 	BloomPass DownSamplePass_;
 	ToneMapping ToneMappingPass_;
 	OutlinePass OutlinePass_;
+	CloudPass   CloudPass_;
 	TExtent2D  WindowSize_;
 
 	// RHI

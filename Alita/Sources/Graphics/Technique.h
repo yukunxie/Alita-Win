@@ -16,6 +16,7 @@ enum class ETechniqueType
     TShadowMapGen       ,
     TOutline            ,
     TSkyBox             ,
+    TVolumeCloud        ,
 
     TMaxCount           ,
 };

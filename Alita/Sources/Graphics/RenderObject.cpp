@@ -8,6 +8,7 @@ bool CheckSkipRenderObjects(ETechniqueType technique, std::uint64_t renderSetBit
 	{
 	case ETechniqueType::TShading:
 	case ETechniqueType::TOutline:
+	case ETechniqueType::TVolumeCloud:
 		return false;
 	case ETechniqueType::TGBufferGen:
 	case ETechniqueType::TShadowMapGen:

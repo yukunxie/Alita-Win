@@ -80,6 +80,7 @@ class MeshComponentBuilder
 {
 public:
 	static MeshComponent* CreateBox(const std::string& material = "");
+	static MeshComponent* CreateSphere(const std::string& material = "Materials/PBR.json");
 };
 
 NS_RX_END

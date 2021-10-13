@@ -312,6 +312,9 @@ Material::Material(const std::string& configFilename)
        case _SimpleHash("TOutline"):
            technique = ETechniqueType::TOutline;
            break;
+       case _SimpleHash("TVolumeCloud"):
+           technique = ETechniqueType::TVolumeCloud;
+           break;
        default:
            GFX_ASSERT(false);
        }
@@ -396,14 +399,19 @@ void Material::SetupPSOKey(PSOKey& psoKey, ETechniqueType technique)
     case ETechniqueType::TShading:
         break;
     case ETechniqueType::TGBufferGen:
-        psoKey.CullMode = 2;
+        psoKey.CullMode = gfx::CullMode::BACK_BIT;
         break;
     case ETechniqueType::TShadowMapGen:
-        psoKey.CullMode = 2;
+        psoKey.CullMode = gfx::CullMode::BACK_BIT;
         psoKey.DepthBias = 1;
         break;
     case ETechniqueType::TSkyBox:
-        psoKey.CullMode = 0;
+        psoKey.CullMode = gfx::CullMode::NONE;
+        psoKey.DepthWrite = false;
+        psoKey.StencilWrite = false;
+        break;
+    case ETechniqueType::TVolumeCloud:
+        psoKey.CullMode = gfx::CullMode::NONE; //gfx::CullMode::FRONT_BIT;
         psoKey.DepthWrite = false;
         psoKey.StencilWrite = false;
         break;

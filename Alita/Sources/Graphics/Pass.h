@@ -321,6 +321,32 @@ protected:
 
 };
 
+class CloudPass : public Pass
+{
+public:
+    CloudPass();
+
+    virtual void Execute(const std::vector<RenderObject*>& renderObjects) override
+    {
+        Execute();
+    }
+
+    void Setup(const Pass* inputPass, const Pass* depthPass)
+    {
+        InputPass_ = inputPass;
+        DepthPass_ = depthPass;
+    }
+
+protected:
+    void Execute();
+
+protected:
+    const Pass* InputPass_ = nullptr;
+    const Pass* DepthPass_ = nullptr;
+
+    TSharedPtr<MeshComponent> SphereMeshComponent_;
+};
+
 NS_RX_END
 
 

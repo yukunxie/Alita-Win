@@ -1,0 +1,65 @@
+{
+  "name": "Cloud",
+  "indexFormat": "uint32",
+  "code": {
+    "vs": "Shaders/Cloud.vert.gl",
+    "fs": "Shaders/Cloud.frag.gl"
+  },
+  "defines": [],
+  "techniques": {
+    "TVolumeCloud":
+    {
+      "vs_entry": "TVolumeCloud",
+      "fs_entry": "TVolumeCloud"
+    }
+  },
+  "bindings": [
+    {
+      "name": "uBatch",
+      "binding": 1,
+      "type": "Buffer",
+      "stride": 64,
+      "fields": [
+        {
+          "name": "WorldMatrix",
+          "format": "mat4",
+          "offset": 0
+        }
+      ]
+    },
+    {
+      "name": "ShadingBuffer",
+      "binding": 2,
+      "type": "Buffer",
+      "stride": 48,
+      "fields": [
+        {
+          "name": "emissiveFactor",
+          "format": "float4",
+          "offset": 0
+        },
+        {
+          "name": "baseColorFactor",
+          "format": "float4",
+          "offset": 16
+        },
+        {
+          "name": "metallicFactor",
+          "format": "float",
+          "offset": 32
+        },
+        {
+          "name": "roughnessFactor",
+          "format": "float",
+          "offset": 36
+        }
+      ]
+    },
+    {
+      "name": "tNoiseMap",
+      "binding": 11,
+      "type": "Texture2D",
+      "uri": "Textures/Cloud/NoiseMap.png"
+    }
+  ]
+}

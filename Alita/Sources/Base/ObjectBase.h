@@ -7,6 +7,7 @@
 
 #include "Macros.h"
 #include "Types/Enums.h"
+#include "SharedPtr.h"
 
 #include <stdint.h>
 #include <string>

@@ -89,6 +89,12 @@ void GraphicPipeline::Execute(const std::vector<RenderObject*>& renderObjects)
 	}
 
 	{
+		CloudPass_.Reset();
+		CloudPass_.Setup(&SkyBoxPass_, &DeferredPass_);
+		CloudPass_.Execute(renderObjects);
+	}
+
+	{
 		ToneMappingPass_.Reset();
 		ToneMappingPass_.Setup(&SkyBoxPass_);
 		ToneMappingPass_.Execute();

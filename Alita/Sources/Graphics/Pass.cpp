@@ -513,5 +513,30 @@ void OutlinePass::Execute(const std::vector<RenderObject*>& renderObjects)
 	CommandEncoder_->PopDebugGroup();
 }
 
+CloudPass::CloudPass()
+{
+	PassName_ = "CloudPass";
+	SphereMeshComponent_ = TSharedPtr<MeshComponent>(MeshComponentBuilder::CreateSphere("Materials/Cloud.json"));
+}
+
+void CloudPass::Execute()
+{
+	SphereMeshComponent_->SetupRenderObject();
+
+	SetupOutputAttachment(0, InputPass_->GetColorAttachments()[0].RenderTarget, false);
+	SetupDepthStencilAttachemnt(DepthPass_->GetDSAttachment(), false);
+
+	BeginPass();
+
+	auto matrix = TMat4x4(1);
+	matrix = glm::scale(matrix, TVector3(30000));
+
+	SphereMeshComponent_->GetMaterial()->SetFloat("WorldMatrix", 0, 16, (float*)&matrix);
+
+	SphereMeshComponent_->GetRenderObject()->Render(this, ETechniqueType::TVolumeCloud, ERenderSet::ERenderSet_Opaque, *RenderPassEncoder_);
+
+	EndPass();
+}
+
 
 NS_RX_END

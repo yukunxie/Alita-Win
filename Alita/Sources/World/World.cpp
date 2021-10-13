@@ -46,6 +46,16 @@ World::World()
 		}
 	}
 
+	//{
+	//	auto model = new Model();
+	//	model->AddComponment(MeshComponentBuilder::CreateSphere());
+	//	AddEntity(model);
+	//	float metallicFactor = 0.1;
+	//	model->GetComponent<MeshComponent>()->GetMaterial()->SetFloat("metallicFactor", 0, 1, &metallicFactor);
+	//	float roughnessFactor = 0.9;
+	//	model->GetComponent<MeshComponent>()->GetMaterial()->SetFloat("roughnessFactor", 0, 1, &roughnessFactor);
+	//}
+
 	{
 		AddEntity(new SkyBox);
 	}
@@ -66,7 +76,7 @@ void World::SetupDefaultCamera()
 		return;
 	}
 	auto wsize = Engine::GetEngine()->GetWindowSize();
-	defaultCamera_ = Camera::CreatePerspectiveCamera(45.0, float(wsize.width) / float(wsize.height), 1.0f, 1000.f);
+	defaultCamera_ = Camera::CreatePerspectiveCamera(45.0, float(wsize.width) / float(wsize.height), 1.0f, 100000.f);
 	//defaultCamera_->SetPosition({ 0, 5, 5 });
 	//defaultCamera_->SetRotation({ -45, 0, 0 });
 

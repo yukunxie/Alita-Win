@@ -1,0 +1,37 @@
+
+#ifndef USE_NORMAL
+#define USE_NORMAL 0
+#endif
+
+#ifndef USE_UV0
+#define USE_UV0 0
+#endif
+
+layout(binding = 2) uniform ShadingBuffer {
+    vec4 emissiveFactor;
+    vec4 baseColorFactor;
+    float metallicFactor;
+    float roughnessFactor;
+} uShading;
+
+layout(location = 0) in vec4 _WorldPosition;
+layout(location = 1) in vec2 _UV0;
+
+layout(binding = 11) uniform texture2D   tNoiseMap;
+layout(binding = 12) uniform sampler     sNoiseMap;
+
+// output
+layout(location = 0) out vec4 OutColor;
+
+void TVolumeCloud() {
+    if (_WorldPosition.y < 500)
+    {
+        discard;
+    }
+    vec4 diffuse = texture(sampler2D(tNoiseMap, sNoiseMap), _UV0 * 10);
+    if (diffuse.r < 0.5)
+    {
+        discard;
+    }
+    OutColor = vec4(diffuse.xyz , 1.0);
+}

@@ -74,7 +74,7 @@
       "name": "tAlbedo",
       "binding": 11,
       "type": "Texture2D",
-      "uri-": "Models/cerberus/Albedo.png"
+      "uri": "Textures/default-512.png"
     },
     {
       "name": "tNormalMap",
