@@ -182,6 +182,13 @@ struct PSOKey
 		this->StencilMask = 0;
 		this->FrontFace = (int)gfx::FrontFace::COUNTER_CLOCKWISE;
 		this->CullMode = (int)gfx::CullMode::BACK_BIT;
+
+		this->ColorSrcFactor = (uint8)gfx::BlendFactor::ONE;
+		this->ColorDstFactor = (uint8)gfx::BlendFactor::ZERO;
+		this->ColorOperation = (uint8)gfx::BlendOp::ADD;
+		this->AlphaSrcFactor = (uint8)gfx::BlendFactor::ONE;
+		this->AlphaDstFactor = (uint8)gfx::BlendFactor::ZERO;
+		this->AlphaOperation = (uint8)gfx::BlendOp::ADD;
 	}
 
 	PSOKey(const PSOKey& lhr) noexcept
@@ -205,9 +212,15 @@ struct PSOKey
 	uint8 StencilPassOp : 3;
 	uint8 FrontFace : 1;
 	uint8 CullMode : 2;
+	uint8 ColorSrcFactor : 5;
+	uint8 ColorDstFactor : 5;
+	uint8 ColorOperation : 3;
+	uint8 AlphaSrcFactor : 5;
+	uint8 AlphaDstFactor : 5;
+	uint8 AlphaOperation : 3;
 	uint8 StencilMask : 8;
-	uint8 AttachmentFormats[kMaxAttachmentCount];
 	uint8 DSAttachmentFormat: 8;
+	uint8 AttachmentFormats[kMaxAttachmentCount];
 };
 
 NS_RX_END

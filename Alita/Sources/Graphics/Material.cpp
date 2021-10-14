@@ -414,6 +414,12 @@ void Material::SetupPSOKey(PSOKey& psoKey, ETechniqueType technique)
         psoKey.CullMode = gfx::CullMode::NONE; //gfx::CullMode::FRONT_BIT;
         psoKey.DepthWrite = false;
         psoKey.StencilWrite = false;
+        psoKey.ColorDstFactor = (uint8)gfx::BlendFactor::ONE_MINUS_SRC_ALPHA;
+        psoKey.ColorSrcFactor = (uint8)gfx::BlendFactor::SRC_ALPHA;
+        psoKey.ColorOperation = (uint8)gfx::BlendOp::ADD;
+        psoKey.AlphaDstFactor = (uint8)gfx::BlendFactor::ONE_MINUS_SRC_ALPHA;
+        psoKey.AlphaSrcFactor = (uint8)gfx::BlendFactor::SRC_ALPHA;
+        psoKey.AlphaOperation = (uint8)gfx::BlendOp::ADD;
         break;
     default:
         break;
@@ -838,8 +844,12 @@ gfx::RenderPipeline* Material::CreatePipelineState(const PSOKey& psoKey, const S
                 gfx::ColorStateDescriptor csd;
                 {
                     csd.format = (gfx::TextureFormat)psoKey.AttachmentFormats[i];
-                    csd.alphaBlend = {};
-                    csd.colorBlend = {};
+                    csd.colorBlend.dstFactor = (gfx::BlendFactor)psoKey.ColorDstFactor;
+                    csd.colorBlend.srcFactor = (gfx::BlendFactor)psoKey.ColorSrcFactor;
+                    csd.colorBlend.operation = (gfx::BlendOp)psoKey.ColorOperation;
+                    csd.alphaBlend.dstFactor = (gfx::BlendFactor)psoKey.AlphaDstFactor;
+                    csd.alphaBlend.srcFactor = (gfx::BlendFactor)psoKey.AlphaSrcFactor;
+                    csd.alphaBlend.operation = (gfx::BlendOp)psoKey.AlphaOperation;
                     csd.writeMask = gfx::ColorWrite::ALL;
                 }
                 psoDesc.colorStates.push_back(csd);
