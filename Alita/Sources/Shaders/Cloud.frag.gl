@@ -45,6 +45,38 @@ float SceneSDF(vec3 samplePoint) {
     // return intersectSDF(cubeDist, sphereDist);
 }
 
+vec4 GetCloundDensity(in vec3 origin, in vec3 direction)
+{
+    const float CloudBottom = 100;
+    const float CloudTop = 1200;
+    vec3 ray = normalize(direction);
+    vec4 noise = vec4(0);
+    if (ray.y > 0) 
+    {
+       float yLength = 0;
+        if (ray.y < 0.0001)
+        {
+            yLength = CloudBottom - origin.y;
+        }
+        else 
+        {
+            yLength = (CloudBottom - origin.y) / ray.y;
+        }
+
+        vec3 startPos = ray * yLength;
+        if (abs(startPos.x) > 1000 || abs(startPos.z) > 1000)
+        {
+            return noise;
+        }
+        vec2 uv = startPos.xz / 300;
+        noise = textureLod(sampler2D(tNoiseMap, sNoiseMap), uv, 0);
+        noise *= textureLod(sampler2D(tNoiseMap, sNoiseMap),  vec2(7, 9) * uv, 0);
+        //noise = vec4(abs(uv), 0, 1);
+    }
+    return noise;
+    // return noise.x;
+}
+
 bool RayMarching(in vec3 origin, in vec3 direction, out vec4 color)
 {
     float depth = 0.1;
@@ -78,16 +110,24 @@ layout(location = 0) out vec4 OutColor;
 void TVolumeCloud()
 {
     vec3 rayDirection = normalize(_WorldPosition.xyz - uGlobal.EyePos.xyz);
-    vec4 color ;
-    bool ret = RayMarching(uGlobal.EyePos.xyz, rayDirection, color);
-    if (ret)
-    {
-        OutColor = color;
-    }
-    else 
+    // vec4 color ;
+    // bool ret = RayMarching(uGlobal.EyePos.xyz, rayDirection, color);
+    // if (ret)
+    // {
+    //     OutColor = color;
+    // }
+    // else 
+    // {
+    //     discard;
+    // }
+
+    vec4 density = GetCloundDensity(uGlobal.EyePos.xyz, rayDirection);
+    // OutColor = density;
+    if (density.x < 0.3)
     {
         discard;
     }
+    OutColor = vec4(1, 1, 1, density.x);
     // if (_WorldPosition.y < 500)
     // {
     //     discard;
