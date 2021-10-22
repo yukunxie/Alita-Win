@@ -31,6 +31,11 @@ std::shared_ptr<Texture> Texture::LoadTextureFromData(uint32 width, uint32 heigh
     return std::make_shared<Texture>(ImageLoader::LoadTextureFromData(width, height, component, data, byteLength, debugName));
 }
 
+std::shared_ptr<Texture> Texture::Create3DNoiseTexture()
+{
+    return std::make_shared<Texture>(ImageLoader::Create3DFloatTexture(256, 256, 128));
+}
+
 Texture::Texture(gfx::Texture* texture)
     : Resource(EResourceType::Texture)
 {

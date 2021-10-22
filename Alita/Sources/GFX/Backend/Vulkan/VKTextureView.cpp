@@ -53,6 +53,20 @@ bool VKTextureView::Init(VKTexture* vkTexture, const TextureViewDescriptor &desc
     
     texture_ = vkTexture;
     textureViewDescriptor_ = descriptor;
+    switch (vkTexture->GetImageType())
+    {
+       /*case TextureDimension::TEXTURE_2D:
+           textureViewDescriptor_.dimension = TextureViewDimension::DIM_2D;
+           break;
+       case TextureDimension::TEXTURE_1D:
+           textureViewDescriptor_.dimension = TextureViewDimension::DIM_1D;
+           break;*/
+       case TextureDimension::TEXTURE_3D:
+           textureViewDescriptor_.dimension = TextureViewDimension::DIM_3D;
+           break;
+       default:
+           break;
+    }
     
     //textureSize_ = texture_->GetTextureSize();
     textureFormat_ = texture_->GetFormat();

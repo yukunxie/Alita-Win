@@ -81,7 +81,7 @@ void World::SetupDefaultCamera()
 	//defaultCamera_->SetRotation({ -45, 0, 0 });
 
 	//defaultCamera_->Setup({ 0, 5, 5 }, 0.0f, -45.0f);
-	defaultCamera_->LookAt({ 0, 5, 5 }, { 0, 0, 0 }, { 0, 1, 0 });
+	defaultCamera_->LookAt({ 0, -5, 5 }, { 0, 0, 0 }, { 0, 1, 0 });
 	/*defaultCamera_->SetPosition({ 0, 15, 15 });
 	defaultCamera_->SetRotation({ -45, 0, 0 });*/
 

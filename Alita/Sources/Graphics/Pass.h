@@ -11,6 +11,7 @@
 #include "World/Camera.h"
 #include "Technique.h"
 #include "RenderTarget.h"
+#include "Texture.h"
 
 NS_RX_BEGIN
 
@@ -345,6 +346,7 @@ protected:
     const Pass* DepthPass_ = nullptr;
 
     TSharedPtr<MeshComponent> SphereMeshComponent_;
+    std::shared_ptr<Texture> NoiseMap3D_ = nullptr;
 };
 
 NS_RX_END

@@ -14,6 +14,8 @@
 #include <codecvt>
 #endif
 
+//#include <boost\filesystem.hpp>
+
 
 NS_RX_BEGIN
 
@@ -42,6 +44,17 @@ FileSystem::FileSystem()
 	{
 		searchPaths_.push_back(workingDir);
 	}
+	WorkingDirectory_ = workingDir;
+	GameDataDirectory_ = WorkingDirectory_ + "/GameData/";
+	if (!std::filesystem::is_directory(GameDataDirectory_))
+	{
+		std::filesystem::create_directories(GameDataDirectory_);
+	}
+	/*if (!boost::filesystem::is_directory(GameDataDirectory_))
+	{
+		boost::filesystem::create_directories(GameDataDirectory_);
+	}*/
+
 
 	std::string sWorkingDir = std::string(workingDir);
 	searchPaths_.push_back(std::string(workingDir) + "/Assets/");

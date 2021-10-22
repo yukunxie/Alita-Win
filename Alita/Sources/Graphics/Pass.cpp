@@ -517,6 +517,7 @@ CloudPass::CloudPass()
 {
 	PassName_ = "CloudPass";
 	SphereMeshComponent_ = TSharedPtr<MeshComponent>(MeshComponentBuilder::CreateSphere("Materials/Cloud.json"));
+	NoiseMap3D_ = Texture::Create3DNoiseTexture();
 }
 
 void CloudPass::Execute()
@@ -532,6 +533,7 @@ void CloudPass::Execute()
 	matrix = glm::scale(matrix, TVector3(30000));
 
 	SphereMeshComponent_->GetMaterial()->SetFloat("WorldMatrix", 0, 16, (float*)&matrix);
+	SphereMeshComponent_->GetMaterial()->SetTexture("tNoiseMap", NoiseMap3D_);
 
 	SphereMeshComponent_->GetRenderObject()->Render(this, ETechniqueType::TVolumeCloud, ERenderSet::ERenderSet_Opaque, *RenderPassEncoder_);
 

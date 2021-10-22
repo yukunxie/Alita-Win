@@ -29,7 +29,8 @@ public:
 
 private:
 	static FileSystem* instance_;
-
+	std::string		WorkingDirectory_;
+	std::string		GameDataDirectory_;
 	std::vector<std::string> searchPaths_;
 };
 

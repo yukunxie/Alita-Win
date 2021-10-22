@@ -13,6 +13,7 @@ namespace ImageLoader
 	gfx::Texture* LoadCubeTexture(const std::string& cubeTextureName);
 	gfx::Texture* LoadTextureFromData(const std::uint8_t* data, std::uint32_t byteLength, const std::string& debugName = "");
 	gfx::Texture* LoadTextureFromData(uint32 width, uint32 height, uint32 component, const uint8* data, uint32 byteLength, const std::string& debugName = "");
+	gfx::Texture* Create3DFloatTexture(uint32 width, uint32 height, uint32 depth);
 }
 
 NS_RX_END
