@@ -6,7 +6,7 @@
 
 NS_GFX_BEGIN
 
-VKPipelineLayout::VKPipelineLayout(VKDevice* device)
+VKPipelineLayout::VKPipelineLayout(const DevicePtr& device)
     : PipelineLayout(device)
 {
 
@@ -35,8 +35,8 @@ bool VKPipelineLayout::Init(const PipelineLayoutDescriptor &descriptor)
     std::vector<VkDescriptorSetLayout> setLayouts;
     for (size_t i = 0; i < descriptor.bindGroupLayouts.size(); ++i)
     {
-        const BindGroupLayout* bindGroupLayout = descriptor.bindGroupLayouts[i];
-        setLayouts.push_back(((VKBindGroupLayout*) bindGroupLayout)->GetNative());
+        auto bindGroupLayout = descriptor.bindGroupLayouts[i];
+        setLayouts.push_back(GFX_CAST(VKBindGroupLayout*, bindGroupLayout)->GetNative());
     }
     
     VkPipelineLayoutCreateInfo pipelineLayoutInfo = {

@@ -12,11 +12,10 @@ NS_GFX_BEGIN
 class Framebuffer : public GfxBase
 {
 public:
-    Framebuffer(Device* GPUDevice)
+    Framebuffer(DevicePtr GPUDevice)
         : GfxBase(GPUDevice, RHIObjectType::Framebuffer)
     {}
 
-protected:
     virtual ~Framebuffer() = default;
 };
 

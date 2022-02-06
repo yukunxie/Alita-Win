@@ -41,15 +41,15 @@ struct MaterialParameter
 
 struct TextureSamplerBindingObject
 {
-	const gfx::Texture* texture = nullptr;
-	const gfx::Sampler* sampler = nullptr;
+	gfx::TexturePtr texture = nullptr;
+	gfx::SamplerPtr sampler = nullptr;
 	std::string			preprocessor  = "";
 };
 
 struct BufferBindingObject
 {
 	std::uint32_t stride = 0;
-	const gfx::Buffer* buffer = nullptr;
+	gfx::BufferPtr buffer = nullptr;
 };
 
 struct MaterialBindingObject
@@ -257,9 +257,9 @@ NS_RX_BEGIN
 
 struct ShaderSet
 {
-	gfx::Shader* VertexShader = nullptr;
-	gfx::Shader* FragmentShader = nullptr;
-	gfx::Shader* ComputeShader = nullptr;
+	gfx::ShaderPtr VertexShader = nullptr;
+	gfx::ShaderPtr FragmentShader = nullptr;
+	gfx::ShaderPtr ComputeShader = nullptr;
 };
 
 struct TechniqueShaderEntry
@@ -278,7 +278,7 @@ public:
 
 	bool SetFloat(const std::string& name, std::uint32_t offset, std::uint32_t count, const float* data);
 
-	bool SetTexture(const std::string& name, const gfx::Texture* texture);
+	bool SetTexture(const std::string& name, gfx::TexturePtr texture);
 
 	bool SetTexture(const std::string& name, std::shared_ptr<Texture>& texture);
 
@@ -296,8 +296,8 @@ public:
 	}
 
 protected:
-	gfx::Shader* _CreateShader(const std::string& filename, gfx::ShaderType shaderType, ETechniqueType techType, const std::vector<std::string>& userDefines);
-	gfx::RenderPipeline* CreatePipelineState(const PSOKey& psoKey, const ShaderSet& shaderSet);
+	gfx::ShaderPtr _CreateShader(const std::string& filename, gfx::ShaderType shaderType, ETechniqueType techType, const std::vector<std::string>& userDefines);
+	gfx::RenderPipelinePtr CreatePipelineState(const PSOKey& psoKey, const ShaderSet& shaderSet);
 	gfx::SamplerDescriptor ParseSamplerDescriptor(const rapidjson::Value& doc);
 	void ParseBindGroupLayout(const rapidjson::Document& doc);
 	void SetupConstantBufferLayout();
@@ -326,15 +326,15 @@ protected:
 	std::vector<std::string> SystemDefines_;
 
 	// RHI
-	gfx::BindGroupLayout* rhiBindGroupLayout_ = nullptr;
-	gfx::PipelineLayout* rhiPipelineLayout_ = nullptr;
-	gfx::BindGroup* rhiBindGroup_ = nullptr;
-	gfx::Shader* rhiVertShader_ = nullptr;
-	gfx::Shader* rhiFragShader_ = nullptr;
-	gfx::RenderPipeline* rhiPipelineState_ = nullptr;
+	gfx::BindGroupLayoutPtr rhiBindGroupLayout_ = nullptr;
+	gfx::PipelineLayoutPtr rhiPipelineLayout_ = nullptr;
+	gfx::BindGroupPtr rhiBindGroup_ = nullptr;
+	gfx::ShaderPtr rhiVertShader_ = nullptr;
+	gfx::ShaderPtr rhiFragShader_ = nullptr;
+	gfx::RenderPipelinePtr rhiPipelineState_ = nullptr;
 
 	std::array<TechniqueShaderEntry, (int)ETechniqueType::TMaxCount> TechniqueShaderEntries_;
-	std::unordered_map< PSOKey, gfx::RenderPipeline*> rhiPSOMap_;
+	std::unordered_map< PSOKey, gfx::RenderPipelinePtr> rhiPSOMap_;
 
 	std::map<std::string, std::shared_ptr<Resource>> BindingResources_;
 

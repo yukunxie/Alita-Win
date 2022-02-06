@@ -12,16 +12,17 @@ NS_GFX_BEGIN
 class VKShader final : public Shader
 {
 protected:
-    VKShader(VKDevice* device);
+    VKShader(const DevicePtr& device);
     
 public:
+    virtual ~VKShader();
     
     bool Init(const ShaderModuleDescriptor &descriptor);
     
-    virtual ~VKShader();
-    
     VkShaderModule GetNative() const
-    { return vkShaderModule_; }
+    {
+        return vkShaderModule_;
+    }
     
     virtual void Dispose() override;
 

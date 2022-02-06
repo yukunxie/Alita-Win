@@ -20,7 +20,7 @@ struct VertexBuffer
 	std::uint32_t byteStride = 0;
 
 	TData buffer;
-	gfx::Buffer* gpuBuffer = nullptr;
+	gfx::BufferPtr gpuBuffer = nullptr;
 
 	void InitData(const void* data, std::uint32_t size)
 	{
@@ -32,13 +32,12 @@ struct VertexBuffer
 		{
 			buffer.resize(size);
 			memcpy(buffer.data(), data, size);
-			GFX_SAFE_RELEASE(gpuBuffer);
 			gfx::BufferDescriptor vertexBufferDescriptor;
 			{
 				vertexBufferDescriptor.usage = gfx::BufferUsage::VERTEX;
 				vertexBufferDescriptor.size = size;
 			}
-			GFX_PTR_ASSIGN(gpuBuffer, Engine::GetEngine()->GetGPUDevice()->CreateBuffer(vertexBufferDescriptor));
+			gpuBuffer = Engine::GetEngine()->GetGPUDevice()->CreateBuffer(vertexBufferDescriptor);
 		}
 
 		gpuBuffer->SetSubData(0, size, data);
@@ -52,7 +51,7 @@ struct IndexBuffer
 {
 	IndexType indexType = IndexType::UINT32;
 	TData buffer;
-	gfx::Buffer* gpuBuffer = nullptr;
+	gfx::BufferPtr gpuBuffer = nullptr;
 
 	void InitData(const void* data, std::uint32_t size)
 	{
@@ -64,13 +63,12 @@ struct IndexBuffer
 		{
 			buffer.resize(size);
 			memcpy(buffer.data(), data, size);
-			GFX_SAFE_RELEASE(gpuBuffer);
 			gfx::BufferDescriptor vertexBufferDescriptor;
 			{
 				vertexBufferDescriptor.usage = gfx::BufferUsage::INDEX;
 				vertexBufferDescriptor.size = size;
 			}
-			GFX_PTR_ASSIGN(gpuBuffer, Engine::GetEngine()->GetGPUDevice()->CreateBuffer(vertexBufferDescriptor));
+			gpuBuffer = Engine::GetEngine()->GetGPUDevice()->CreateBuffer(vertexBufferDescriptor);
 		}
 
 		gpuBuffer->SetSubData(0, size, data);

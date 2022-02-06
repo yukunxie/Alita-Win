@@ -13,7 +13,7 @@
 
 NS_GFX_BEGIN
 
-VKBindGroup::VKBindGroup(VKDevice* device)
+VKBindGroup::VKBindGroup(const DevicePtr& device)
     : BindGroup(device)
 {
 }
@@ -202,7 +202,7 @@ void VKBindGroup::TransImageLayoutToSampled(VKCommandBuffer *commandBuffer)
             VKTextureView* textureView = GFX_CAST(VKTextureView*,
                                                   textureViewBinding->GetTextureView());
             
-            ((VKTexture*)textureView->GetTexture())->TransToSampledImageLayout(commandBuffer);
+            GFX_CAST(VKTexture*, textureView->GetTexture())->TransToSampledImageLayout(commandBuffer);
         }
     }
 }
@@ -210,24 +210,18 @@ void VKBindGroup::TransImageLayoutToSampled(VKCommandBuffer *commandBuffer)
 void VKBindGroup::Dispose()
 {
     GFX_DISPOSE_BEGIN();
-    
-    for (size_t i = 0; i < bindingResources_.size(); ++i)
-    {
-        auto &res = bindingResources_[i];
-        GFX_SAFE_RELEASE(res.resource);
-    }
+
     bindingResources_.clear();
-    
-    VKDevice* device = GFX_CAST(VKDevice*, GetGPUDevice());
-    CALL_VK(vkFreeDescriptorSets(device->GetNative(),
-                                   device->GetDescriptorPool(),
-                                   1,
-                                   &vkDescriptorSet_));
-    
+
+    CALL_VK(vkFreeDescriptorSets(VKDEVICE()->GetNative(),
+        VKDEVICE()->GetDescriptorPool(),
+        1,
+        &vkDescriptorSet_));
+
     vkDescriptorSet_ = VK_NULL_HANDLE;
-    
+
     bindGroupLayout_.Reset();
-    
+
     GFX_DISPOSE_END();
 }
 
@@ -237,9 +231,9 @@ VKBindGroup::~VKBindGroup()
 }
 
 
-std::vector<VKBuffer *> VKBindGroup::getBindingBuffers()
+std::vector<BufferPtr> VKBindGroup::getBindingBuffers()
 {
-    std::vector<VKBuffer *> result;
+    std::vector<BufferPtr> result;
 
     for (std::uint32_t i = 0; i < bindingResources_.size(); ++i)
     {
@@ -250,11 +244,9 @@ std::vector<VKBuffer *> VKBindGroup::getBindingBuffers()
             continue;
 
         auto bindingBuffer = GFX_CAST(BufferBinding*, resource);
-        auto* buffer = GFX_CAST(VKBuffer*, bindingBuffer->GetBuffer());
-
-        result.push_back(buffer);
+        result.push_back(bindingBuffer->GetBuffer());
     }
-    return result;
+    return std::move(result);
 }
 
 NS_GFX_END

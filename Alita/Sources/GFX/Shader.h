@@ -14,12 +14,11 @@ NS_GFX_BEGIN
 class Shader : public GfxBase
 {
 public:
-    Shader(Device* GPUDevice)
+    Shader(DevicePtr GPUDevice)
         : GfxBase(GPUDevice, RHIObjectType::Shader)
     {
     }
 
-protected:
     virtual ~Shader() = default;
 };
 

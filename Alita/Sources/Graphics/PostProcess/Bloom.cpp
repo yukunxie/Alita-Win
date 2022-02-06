@@ -45,12 +45,12 @@ void BloomPass::Execute()
 	SetupOutputAttachment(0, RTColor_);
 
 	{
-		const auto* texture = InputPass_->GetColorAttachments()[0].RenderTarget->GetTexture();
+		auto texture = InputPass_->GetColorAttachments()[0].RenderTarget->GetTexture();
 		SetTexture("tAlbedo", texture);
 	}
 
 	{
-		const auto* texture = GaussianBlurPass_.GetColorAttachments()[0].RenderTarget->GetTexture();
+		auto texture = GaussianBlurPass_.GetColorAttachments()[0].RenderTarget->GetTexture();
 		SetTexture("tBloomMap", texture);
 	}
 

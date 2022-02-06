@@ -35,8 +35,6 @@ class Queue;
 
 class Fence;
 
-class RenderBundleEncoder;
-
 class RenderPass;
 
 class RenderPassEncoder;
@@ -107,53 +105,51 @@ public:
         return deviceExternalDeps_;
     }
 
-protected:
     virtual ~Device() = default;
 
 public:
-    virtual SwapChain* CreateSwapchain(const SwapChainDescriptor &descriptor) = 0;
+    virtual SwapChainPtr CreateSwapchain(const SwapChainDescriptor &descriptor) = 0;
     
     virtual TextureFormat GetSwapchainPreferredFormat() = 0;
     
-    virtual Buffer* CreateBuffer(const BufferDescriptor &descriptor) = 0;
+    virtual BufferPtr CreateBuffer(const BufferDescriptor &descriptor) = 0;
     
-    virtual BufferBinding*
-    CreateBufferBinding(Buffer* buffer, BufferSize offset, BufferSize size) = 0;
+    virtual BufferBindingPtr
+    CreateBufferBinding(BufferPtr buffer, BufferSize offset, BufferSize size) = 0;
     
     virtual void WriteBuffer(const Buffer* buffer, const void* data, std::uint32_t offset,
                              std::uint32_t size) = 0;
     
-    virtual RenderBundleEncoder* CreateRenderBundleEncoder(
-        const RenderBundleEncoderDescriptor &descriptor) = 0;
+    virtual RenderPipelinePtr CreateRenderPipeline(RenderPipelineDescriptor &descriptor) = 0;
     
-    virtual RenderPipeline* CreateRenderPipeline(RenderPipelineDescriptor &descriptor) = 0;
+    virtual ComputePipelinePtr CreateComputePipeline(ComputePipelineDescriptor &descriptor) = 0;
     
-    virtual ComputePipeline* CreateComputePipeline(ComputePipelineDescriptor &descriptor) = 0;
+    virtual ShaderPtr CreateShaderModule(const ShaderModuleDescriptor &descriptor) = 0;
     
-    virtual Shader* CreateShaderModule(const ShaderModuleDescriptor &descriptor) = 0;
+    virtual TexturePtr CreateTexture(const TextureDescriptor &descriptor) = 0;
+
+    virtual TextureViewPtr CreateTextureView(const TexturePtr& vkTexture, const TextureViewDescriptor& descriptor) = 0;
     
-    virtual Texture* CreateTexture(const TextureDescriptor &descriptor) = 0;
+    virtual SamplerPtr CreateSampler(const SamplerDescriptor &descriptor = {}) = 0;
     
-    virtual Sampler* CreateSampler(const SamplerDescriptor &descriptor = {}) = 0;
+    virtual SamplerBindingPtr CreateSamplerBinding(SamplerPtr sampler) = 0;
     
-    virtual SamplerBinding* CreateSamplerBinding(Sampler* sampler) = 0;
+    virtual TextureViewBindingPtr CreateTextureViewBinding(TextureViewPtr view) = 0;
     
-    virtual TextureViewBinding* CreateTextureViewBinding(TextureView* view) = 0;
+    virtual BindGroupLayoutPtr CreateBindGroupLayout(const BindGroupLayoutDescriptor &descriptor) = 0;
     
-    virtual BindGroupLayout* CreateBindGroupLayout(const BindGroupLayoutDescriptor &descriptor) = 0;
+    virtual BindGroupPtr CreateBindGroup(BindGroupDescriptor &descriptor) = 0;
     
-    virtual BindGroup* CreateBindGroup(BindGroupDescriptor &descriptor) = 0;
+    virtual PipelineLayoutPtr CreatePipelineLayout(const PipelineLayoutDescriptor &descriptor) = 0;
     
-    virtual PipelineLayout* CreatePipelineLayout(const PipelineLayoutDescriptor &descriptor) = 0;
+    virtual FencePtr CreateFence(const FenceDescriptor &descriptor) = 0;
     
-    virtual Fence* CreateFence(const FenceDescriptor &descriptor) = 0;
-    
-    virtual CommandEncoder*
+    virtual CommandEncoderPtr
     CreateCommandEncoder(const CommandEncoderDescriptor &descriptor = {}) = 0;
     
-    virtual QuerySet* CreateQuerySet(const QuerySetDescriptor& descriptor) = 0;
+    virtual QuerySetPtr CreateQuerySet(const QuerySetDescriptor& descriptor) = 0;
     
-    virtual Queue* GetQueue() = 0;
+    virtual QueuePtr GetQueue() = 0;
     
     virtual void OnScriptObjectDestroy()
     {}

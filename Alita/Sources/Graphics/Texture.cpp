@@ -31,12 +31,10 @@ std::shared_ptr<Texture> Texture::LoadTextureFromData(uint32 width, uint32 heigh
     return std::make_shared<Texture>(ImageLoader::LoadTextureFromData(width, height, component, data, byteLength, debugName));
 }
 
-Texture::Texture(gfx::Texture* texture)
+Texture::Texture(gfx::TexturePtr texture)
     : Resource(EResourceType::Texture)
 {
-    GFX_SAFE_RELEASE(Texture_);
     Texture_ = texture;
-    GFX_SAFE_RETAIN(Texture_);
 }
 
 Texture::Texture(uint32 width, uint32 height, gfx::TextureFormat format, const gfx::Color& color)
@@ -47,22 +45,19 @@ Texture::Texture(uint32 width, uint32 height, gfx::TextureFormat format, const g
 
 Texture::~Texture()
 {
-    GFX_SAFE_RELEASE(TextureView_);
-    GFX_SAFE_RELEASE(Texture_);
 }
 
-const gfx::TextureView* Texture::GetTextureView() const
+const gfx::TextureViewPtr Texture::GetTextureView() const
 {
     if (TextureView_)
     {
         return TextureView_;
     }
-    TextureView_ = Texture_->CreateView({});
-    GFX_SAFE_RETAIN(TextureView_);
+    TextureView_ = Engine::GetGPUDevice()->CreateTextureView(Texture_, {});
     return TextureView_;
 }
 
-const gfx::Texture* Texture::GetTexture() const
+const gfx::TexturePtr Texture::GetTexture() const
 {
     return Texture_;
 }

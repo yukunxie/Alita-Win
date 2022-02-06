@@ -7,7 +7,7 @@
 
 NS_GFX_BEGIN
 
-VKTextureView::VKTextureView(VKDevice* device)
+VKTextureView::VKTextureView(DevicePtr device)
     : TextureView(device)
 {
 }
@@ -21,7 +21,7 @@ void VKTextureView::Recreate()
         vkImageView_ = VK_NULL_HANDLE;
     }
     
-    Init(texture_.Get(), textureViewDescriptor_);
+    Init(texture_, textureViewDescriptor_);
 }
 
 void VKTextureView::Dispose()
@@ -34,7 +34,7 @@ void VKTextureView::Dispose()
                              nullptr);
         vkImageView_ = VK_NULL_HANDLE;
     }
-    texture_.Reset();
+    texture_.reset();
     
     GFX_DISPOSE_END();
 }
@@ -44,7 +44,7 @@ VKTextureView::~VKTextureView()
     Dispose();
 }
 
-bool VKTextureView::Init(VKTexture* vkTexture, const TextureViewDescriptor &descriptor)
+bool VKTextureView::Init(const TexturePtr& vkTexture, const TextureViewDescriptor &descriptor)
 {
     if (vkTexture->IsSwapchainImage())
     {
@@ -61,9 +61,9 @@ bool VKTextureView::Init(VKTexture* vkTexture, const TextureViewDescriptor &desc
     {
         viewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
         viewInfo.flags = 0;
-        viewInfo.image = texture_->GetNative();
+        viewInfo.image = GFX_CAST(VKTexture*, texture_)->GetNative();
         viewInfo.viewType = ToVulkanType(textureViewDescriptor_.dimension);
-        viewInfo.format = texture_->GetNativeFormat();
+        viewInfo.format = GFX_CAST(VKTexture*, texture_)->GetNativeFormat();
         
         viewInfo.components = {};
         {
@@ -75,8 +75,7 @@ bool VKTextureView::Init(VKTexture* vkTexture, const TextureViewDescriptor &desc
         
         viewInfo.subresourceRange = {};
         {
-            auto aspectMask = ToVulkanType(textureViewDescriptor_.aspect,
-                                           texture_->GetNativeFormat());
+            auto aspectMask = ToVulkanType(textureViewDescriptor_.aspect,  GFX_CAST(VKTexture*, texture_)->GetNativeFormat());
             viewInfo.subresourceRange.aspectMask = aspectMask;
             
             std::uint32_t levelCount = textureViewDescriptor_.mipLevelCount;

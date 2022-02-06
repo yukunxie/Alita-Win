@@ -13,11 +13,10 @@ NS_GFX_BEGIN
 class PipelineLayout : public GfxBase
 {
 public:
-    PipelineLayout(Device* GPUDevice)
+    PipelineLayout(DevicePtr GPUDevice)
         : GfxBase(GPUDevice, RHIObjectType::PipelineLayout)
     {}
 
-protected:
     virtual ~PipelineLayout() = default;
 };
 

@@ -10,7 +10,6 @@
 #include "VKBindGroup.h"
 #include "VKRenderPass.h"
 #include "VKCommandBuffer.h"
-#include "VKRenderBundleEncoder.h"
 #include "VKQuerySet.h"
 
 #include <vector>
@@ -19,7 +18,7 @@
 
 NS_GFX_BEGIN
 
-VKRenderPassEncoder::VKRenderPassEncoder(VKDevice* device)
+VKRenderPassEncoder::VKRenderPassEncoder(DevicePtr device)
     : RenderPassEncoder(device)
 {
 }
@@ -30,10 +29,6 @@ void VKRenderPassEncoder::Dispose()
     
     attachments_.clear();
     resolveTargets_.clear();
-    GFX_SAFE_RELEASE(commandBuffer_);
-    GFX_SAFE_RELEASE(depthStencilAttachemnt_);
-    GFX_SAFE_RELEASE(renderPass_);
-    GFX_SAFE_RELEASE(vkFramebuffer_);
     
     GFX_DISPOSE_END();
 }
@@ -43,7 +38,7 @@ VKRenderPassEncoder::~VKRenderPassEncoder()
     Dispose();
 }
 
-bool VKRenderPassEncoder::Init(VKCommandBuffer* commandBuffer,
+bool VKRenderPassEncoder::Init(CommandBufferPtr commandBuffer,
                                     const RenderPassDescriptor &descriptor)
 {
     hasSwapchainImage_ = false;
@@ -57,21 +52,21 @@ bool VKRenderPassEncoder::Init(VKCommandBuffer* commandBuffer,
             const auto &attachment = descriptor.colorAttachments[i];
             if (attachment.attachment)
             {
-                attachments_.pushBack(attachment.attachment);
+                attachments_.push_back(attachment.attachment);
                 hasSwapchainImage_ =
                     hasSwapchainImage_ || attachment.attachment->IsSwapchainImage();
             }
             if (attachment.resolveTarget)
             {
-                resolveTargets_.pushBack(attachment.resolveTarget);
+                resolveTargets_.push_back(attachment.resolveTarget);
                 hasSwapchainImage_ =
                     hasSwapchainImage_ || attachment.resolveTarget->IsSwapchainImage();
             }
         }
     }
     
-    GFX_PTR_ASSIGN(depthStencilAttachemnt_, descriptor.depthStencilAttachment.attachment);
-    GFX_PTR_ASSIGN(commandBuffer_, commandBuffer);
+    depthStencilAttachemnt_ = descriptor.depthStencilAttachment.attachment;
+    commandBuffer_ = commandBuffer;
     
     std::vector<VkClearAttachment> clearAttachments;
     
@@ -133,25 +128,25 @@ bool VKRenderPassEncoder::Init(VKCommandBuffer* commandBuffer,
             clearAttachments.push_back(clearAttachment);
         }
         
-        GFX_PTR_ASSIGN(renderPass_, VKDEVICE()->GetOrCreateRenderPass(query));
+        renderPass_= VKDEVICE()->GetOrCreateRenderPass(query);
     }
     
     {
-        const VKTextureView* colorAttachment = nullptr;
+        TextureViewPtr colorAttachment = nullptr;
         if (!descriptor.colorAttachments.empty())
         {
-            colorAttachment = GFX_CAST(const VKTextureView*, descriptor.colorAttachments[0].attachment);
+            colorAttachment = descriptor.colorAttachments[0].attachment;
         }
-        auto dsAttachment = GFX_CAST(const VKTextureView*, descriptor.depthStencilAttachment.attachment);
+        auto dsAttachment = descriptor.depthStencilAttachment.attachment;
         
         Extent3D attachmentSize;
         if (colorAttachment)
         {
-            attachmentSize = colorAttachment->GetTextureSize();
+            attachmentSize = colorAttachment->GetTexture()->GetTextureSize();
         }
         else if (dsAttachment)
         {
-            attachmentSize = dsAttachment->GetTextureSize();
+            attachmentSize = dsAttachment->GetTexture()->GetTextureSize();
         }
         else
         {
@@ -172,8 +167,7 @@ bool VKRenderPassEncoder::Init(VKCommandBuffer* commandBuffer,
             const auto &attachment = descriptor.colorAttachments[i];
             if (attachment.attachment)
             {
-                query.attachments[attachmentCount++] = GFX_CAST(const VKTextureView*,
-                                                                attachment.attachment);
+                query.attachments[attachmentCount++] = attachment.attachment;
             }
         }
         
@@ -182,8 +176,7 @@ bool VKRenderPassEncoder::Init(VKCommandBuffer* commandBuffer,
             const auto &attachment = descriptor.colorAttachments[i];
             if (attachment.resolveTarget)
             {
-                query.attachments[attachmentCount++] = GFX_CAST(const VKTextureView*,
-                                                                attachment.resolveTarget);
+                query.attachments[attachmentCount++] = attachment.resolveTarget;
             }
         }
         
@@ -208,22 +201,26 @@ bool VKRenderPassEncoder::Init(VKCommandBuffer* commandBuffer,
         float depthValue = descriptor.depthStencilAttachment.depthLoadValue;
         std::uint32_t stencilValue = descriptor.depthStencilAttachment.stencilLoadValue;
     
-        commandBuffer_->BeginRenderPassInRecordingStage();
-        commandBuffer_->RecordCommand<DeferredCmdBeginRenderPass>(renderPass_,
+        GFX_CAST(VKCommandBuffer*, commandBuffer_)->BeginRenderPassInRecordingStage();
+
+       /* GFX_CAST(VKCommandBuffer*, commandBuffer_)->RecordCommand<DeferredCmdBeginRenderPass>(renderPass_,
                                                                   vkFramebuffer_,
                                                                   descriptor.occlusionQuerySet,
                                                                   count,
                                                                   colors.data(),
                                                                   depthValue,
-                                                                  stencilValue);
-        commandBuffer_->AddBindingObject(renderPass_);
-        commandBuffer_->AddBindingObject(vkFramebuffer_);
-        commandBuffer_->AddBindingObject(descriptor.occlusionQuerySet);
+                                                                  stencilValue);*/
+
+        commandBuffer_->AddCmd([renderPass = renderPass_, framebuffer = vkFramebuffer_, occlusionQuerySet = descriptor.occlusionQuerySet,
+            clearValueCount = count, clearColors = colors, depthValue, stencilValue](CommandBuffer* commandBuffer) {
+            commandBuffer->BeginRenderPass(renderPass, framebuffer, occlusionQuerySet, clearValueCount, clearColors.data(), depthValue, stencilValue);
+        });
+
         
-        for (size_t i = 0; i < clearAttachments.size(); ++i)
+        /*for (size_t i = 0; i < clearAttachments.size(); ++i)
         {
-            commandBuffer_->RecordCommand<DeferredCmdClearAttachment>(clearAttachments[i]);
-        }
+            GFX_CAST(VKCommandBuffer*, commandBuffer_)->RecordCommand<DeferredCmdClearAttachment>(clearAttachments[i]);
+        }*/
     }
     else
     {
@@ -233,32 +230,49 @@ bool VKRenderPassEncoder::Init(VKCommandBuffer* commandBuffer,
     return true;
 }
 
-void VKRenderPassEncoder::SetPipeline(RenderPipeline* graphicPipeline)
+void VKRenderPassEncoder::SetPipeline(RenderPipelinePtr graphicPipeline)
 {
-    commandBuffer_->RecordCommand<DeferredCmdSetGraphicPipeline>(graphicPipeline);
-    commandBuffer_->AddBindingObject(graphicPipeline);
+    //GFX_CAST(VKCommandBuffer*, commandBuffer_)->RecordCommand<DeferredCmdSetGraphicPipeline>(graphicPipeline);
+
+    commandBuffer_->AddCmd([graphicPipeline](CommandBuffer* commandBuffer) {
+        commandBuffer->BindGraphicsPipeline(graphicPipeline);
+    });
 }
 
-void VKRenderPassEncoder::SetIndexBuffer(Buffer* buffer, std::uint32_t offset)
+void VKRenderPassEncoder::SetIndexBuffer(BufferPtr buffer, std::uint32_t offset)
 {
-    commandBuffer_->RecordCommand<DeferredCmdSetIndexBuffer>(buffer, offset);
-    commandBuffer_->AddBindingObject(buffer);
+    //GFX_CAST(VKCommandBuffer*, commandBuffer_)->RecordCommand<DeferredCmdSetIndexBuffer>(buffer, offset);
+
+    commandBuffer_->AddCmd([buffer, offset](CommandBuffer* commandBuffer) {
+        commandBuffer->SetIndexBuffer(buffer, offset);
+        });
+
+    GFX_CAST(VKCommandBuffer*, commandBuffer_)->AddBindingBuffer(buffer);
 }
 
 void
-VKRenderPassEncoder::SetVertexBuffer(Buffer* buffer, std::uint32_t offset, std::uint32_t slot)
+VKRenderPassEncoder::SetVertexBuffer(BufferPtr buffer, std::uint32_t offset, std::uint32_t slot)
 {
-    commandBuffer_->RecordCommand<DeferredCmdSetVertexBuffer>(buffer, offset, slot);
-    commandBuffer_->AddBindingObject(buffer);
+    //GFX_CAST(VKCommandBuffer*, commandBuffer_)->RecordCommand<DeferredCmdSetVertexBuffer>(buffer, offset, slot);
+
+    commandBuffer_->AddCmd([buffer, offset, slot](CommandBuffer* commandBuffer) {
+        commandBuffer->SetVertexBuffer(buffer, offset, slot);
+        });
+
+    GFX_CAST(VKCommandBuffer*, commandBuffer_)->AddBindingBuffer(buffer);
 }
 
 void VKRenderPassEncoder::Draw(std::uint32_t vertexCount, std::uint32_t instanceCount,
                                std::uint32_t firstVertex, std::uint32_t firstInstance)
 {
-    commandBuffer_->RecordCommand<DeferredCmdDraw>(vertexCount,
-                                                   instanceCount,
-                                                   firstVertex,
-                                                   firstInstance);
+    //GFX_CAST(VKCommandBuffer*, commandBuffer_)->RecordCommand<DeferredCmdDraw>(vertexCount,
+    //                                               instanceCount,
+    //                                               firstVertex,
+    //                                               firstInstance);
+
+    commandBuffer_->AddCmd([vertexCount, instanceCount, firstVertex, firstInstance](CommandBuffer* commandBuffer) {
+        commandBuffer->Draw(vertexCount, instanceCount, firstVertex, firstInstance);
+        });
 }
 
 void VKRenderPassEncoder::Draw(std::uint32_t vertexCount, std::uint32_t firstVertex)
@@ -276,97 +290,156 @@ void VKRenderPassEncoder::DrawIndexed(std::uint32_t indexCount, std::uint32_t in
                                       std::uint32_t firstInstance)
 {
     
-    commandBuffer_->RecordCommand<DeferredCmdDrawIndexed>(indexCount,
-                                                          instanceCount,
-                                                          firstIndex,
-                                                          baseVertex,
-                                                          firstInstance);
+    //GFX_CAST(VKCommandBuffer*, commandBuffer_)->RecordCommand<DeferredCmdDrawIndexed>(indexCount,
+    //                                                      instanceCount,
+    //                                                      firstIndex,
+    //                                                      baseVertex,
+    //                                                      firstInstance);
+
+    commandBuffer_->AddCmd([indexCount, instanceCount, firstIndex, baseVertex, firstInstance](CommandBuffer* commandBuffer) {
+        commandBuffer->DrawIndexed(indexCount, instanceCount, firstIndex, baseVertex, firstInstance);
+        });
 }
 
-void VKRenderPassEncoder::DrawIndirect(Buffer* indirectBuffer, BufferSize indirectOffset)
+void VKRenderPassEncoder::DrawIndirect(BufferPtr indirectBuffer, BufferSize indirectOffset)
 {
-    commandBuffer_->RecordCommand<DeferredCmdDrawIndirect>(indirectBuffer, indirectOffset);
-    commandBuffer_->AddBindingObject(indirectBuffer);
+    //GFX_CAST(VKCommandBuffer*, commandBuffer_)->RecordCommand<DeferredCmdDrawIndirect>(indirectBuffer, indirectOffset);
+
+    commandBuffer_->AddCmd([indirectBuffer, indirectOffset](CommandBuffer* commandBuffer) {
+        commandBuffer->DrawIndirect(indirectBuffer, indirectOffset);
+        });
+
+    GFX_CAST(VKCommandBuffer*, commandBuffer_)->AddBindingBuffer(indirectBuffer);
 }
 
-void VKRenderPassEncoder::DrawIndexedIndirect(Buffer* indirectBuffer, BufferSize indirectOffset)
+void VKRenderPassEncoder::DrawIndexedIndirect(BufferPtr indirectBuffer, BufferSize indirectOffset)
 {
-    commandBuffer_->RecordCommand<DeferredCmdDrawIndexedIndirect>(indirectBuffer, indirectOffset);
-    commandBuffer_->AddBindingObject(indirectBuffer);
+    //GFX_CAST(VKCommandBuffer*, commandBuffer_)->RecordCommand<DeferredCmdDrawIndexedIndirect>(indirectBuffer, indirectOffset);
+
+    commandBuffer_->AddCmd([indirectBuffer, indirectOffset](CommandBuffer* commandBuffer) {
+        commandBuffer->DrawIndexedIndirect(indirectBuffer, indirectOffset);
+        });
+
+    GFX_CAST(VKCommandBuffer*, commandBuffer_)->AddBindingBuffer(indirectBuffer);
 }
 
 void VKRenderPassEncoder::SetViewport(float x, float y, float width, float height,
                                       float minDepth,
                                       float maxDepth)
 {
-    commandBuffer_->RecordCommand<DeferredCmdSetViewport>(x, y, width, height, minDepth, maxDepth);
+    //GFX_CAST(VKCommandBuffer*, commandBuffer_)->RecordCommand<DeferredCmdSetViewport>(x, y, width, height, minDepth, maxDepth);
+
+    commandBuffer_->AddCmd([x, y, width, height, minDepth, maxDepth](CommandBuffer* commandBuffer) {
+        commandBuffer->SetViewport(x, y, width, height, minDepth, maxDepth);
+        });
 }
 
 void VKRenderPassEncoder::SetScissorRect(std::int32_t x, std::int32_t y, std::uint32_t width,
                                          std::uint32_t height)
 {
-    commandBuffer_->RecordCommand<DeferredCmdSetScissorRect>(x, y, width, height);
+    //GFX_CAST(VKCommandBuffer*, commandBuffer_)->RecordCommand<DeferredCmdSetScissorRect>(x, y, width, height);
+
+    commandBuffer_->AddCmd([x, y, width, height](CommandBuffer* commandBuffer) {
+        commandBuffer->SetScissorRect(x, y, width, height);
+        });
 }
 
 void VKRenderPassEncoder::SetStencilReference(std::uint32_t reference)
 {
-    commandBuffer_->RecordCommand<DeferredCmdSetStencilReference>(reference);
+    //GFX_CAST(VKCommandBuffer*, commandBuffer_)->RecordCommand<DeferredCmdSetStencilReference>(reference);
+
+    commandBuffer_->AddCmd([reference](CommandBuffer* commandBuffer) {
+        commandBuffer->SetStencilReference(reference);
+        });
 }
 
-void VKRenderPassEncoder::SetBindGroup(std::uint32_t index, BindGroup* bindGroup,
+void VKRenderPassEncoder::SetBindGroup(std::uint32_t index, BindGroupPtr bindGroup,
                                        std::uint32_t dynamicOffsetCount,
                                        const std::uint32_t* dynamicOffsets)
 {
-    commandBuffer_->RecordCommand<DeferredCmdSetBindGroup>(PipelineType::Graphic,
+   /* GFX_CAST(VKCommandBuffer*, commandBuffer_)->RecordCommand<DeferredCmdSetBindGroup>(PipelineType::Graphic,
                                                            index,
                                                            bindGroup,
                                                            dynamicOffsetCount,
-                                                           dynamicOffsets);
-    commandBuffer_->AddBindingObject(bindGroup);
+                                                           dynamicOffsets);*/
+
+    std::vector< std::uint32_t> tmpOffsets(dynamicOffsetCount);
+    if (dynamicOffsetCount > 0)
+    {
+        memcpy(tmpOffsets.data(), dynamicOffsets, sizeof(std::uint32_t) * dynamicOffsetCount);
+    }
+
+    commandBuffer_->AddCmd([index, bindGroup, dynamicOffsets = tmpOffsets](CommandBuffer* commandBuffer) {
+        commandBuffer->SetBindGroupToGraphicPipeline(index,
+            bindGroup,
+            dynamicOffsets.size(),
+            dynamicOffsets.data());
+        });
+
+    GFX_CAST(VKCommandBuffer*, commandBuffer_)->AddBindingBindGroup(bindGroup);
 }
 
 void VKRenderPassEncoder::PushDebugGroup(const std::string &groupLabel)
 {
-    commandBuffer_->RecordCommand<DeferredCmdPushDebugGroup>(groupLabel);
+    //GFX_CAST(VKCommandBuffer*, commandBuffer_)->RecordCommand<DeferredCmdPushDebugGroup>(groupLabel);
+
+    commandBuffer_->AddCmd([groupLabel](CommandBuffer* commandBuffer) {
+        commandBuffer->PushDebugGroup(groupLabel.c_str());
+        });
 }
 
 void VKRenderPassEncoder::PopDebugGroup()
 {
-    commandBuffer_->RecordCommand<DeferredCmdPopDebugGroup>();
+    //GFX_CAST(VKCommandBuffer*, commandBuffer_)->RecordCommand<DeferredCmdPopDebugGroup>();
+
+    commandBuffer_->AddCmd([](CommandBuffer* commandBuffer) {
+        commandBuffer->PopDebugGroup();
+        });
 }
 
 void VKRenderPassEncoder::InsertDebugMarker(const std::string &markerLabel)
 {
-    commandBuffer_->RecordCommand<DeferredCmdInsertDebugMarker>(markerLabel);
+    //GFX_CAST(VKCommandBuffer*, commandBuffer_)->RecordCommand<DeferredCmdInsertDebugMarker>(markerLabel);
+
+    commandBuffer_->AddCmd([markerLabel](CommandBuffer* commandBuffer) {
+        commandBuffer->InsertDebugMarker(markerLabel.c_str());
+        });
 }
 
 void VKRenderPassEncoder::SetBlendColor(const Color &color)
 {
-    commandBuffer_->RecordCommand<DeferredCmdSetBlendColor>(color);
-}
+    //GFX_CAST(VKCommandBuffer*, commandBuffer_)->RecordCommand<DeferredCmdSetBlendColor>(color);
 
-void VKRenderPassEncoder::ExecuteBundles(std::uint32_t count, RenderBundle** bundles)
-{
-    for (size_t i = 0; i < count; ++i)
-    {
-        commandBuffer_->RecordCommand<DeferredCmdExecuteBundle>(bundles[i]);
-        commandBuffer_->AddBindingObject(bundles[i]);
-    }
+    commandBuffer_->AddCmd([color](CommandBuffer* commandBuffer) {
+        commandBuffer->SetBlendColor(color);
+        });
 }
 
 void VKRenderPassEncoder::BeginOcclusionQuery(std::uint32_t queryIndex)
 {
-    commandBuffer_->RecordCommand<DeferredCmdBeginOcclusionQuery>(queryIndex);
+    //GFX_CAST(VKCommandBuffer*, commandBuffer_)->RecordCommand<DeferredCmdBeginOcclusionQuery>(queryIndex);
+
+    commandBuffer_->AddCmd([queryIndex](CommandBuffer* commandBuffer) {
+        commandBuffer->BeginOcclusionQuery(queryIndex);
+        });
 }
 
 void VKRenderPassEncoder::EndOcclusionQuery(std::uint32_t queryIndex)
 {
-    commandBuffer_->RecordCommand<DeferredCmdEndOcclusionQuery>(queryIndex);
+    //GFX_CAST(VKCommandBuffer*, commandBuffer_)->RecordCommand<DeferredCmdEndOcclusionQuery>(queryIndex);
+
+    commandBuffer_->AddCmd([queryIndex](CommandBuffer* commandBuffer) {
+        commandBuffer->EndOcclusionQuery(queryIndex);
+        });
 }
 
 void VKRenderPassEncoder::SetDepthBias(float depthBiasConstantFactor, float depthBiasClamp, float depthBiasSlopeFactor)
 {
-    commandBuffer_->RecordCommand<DeferredCmdSetDepthBias>(depthBiasConstantFactor, depthBiasClamp, depthBiasSlopeFactor);
+    //GFX_CAST(VKCommandBuffer*, commandBuffer_)->RecordCommand<DeferredCmdSetDepthBias>(depthBiasConstantFactor, depthBiasClamp, depthBiasSlopeFactor);
+
+    commandBuffer_->AddCmd([depthBiasConstantFactor, depthBiasClamp, depthBiasSlopeFactor](CommandBuffer* commandBuffer) {
+        commandBuffer->SetDepthBias(depthBiasConstantFactor, depthBiasClamp, depthBiasSlopeFactor);
+        });
 }
 
 void VKRenderPassEncoder::EndPass()
@@ -376,21 +449,22 @@ void VKRenderPassEncoder::EndPass()
         return;
     }
     
-    commandBuffer_->EndRenderPassInRecordingStage();
-    commandBuffer_->RecordCommand<DeferredCmdEndPass>();
+    GFX_CAST(VKCommandBuffer*, commandBuffer_)->EndRenderPassInRecordingStage();
+
+    //GFX_CAST(VKCommandBuffer*, commandBuffer_)->RecordCommand<DeferredCmdEndPass>();
+
+    commandBuffer_->AddCmd([](CommandBuffer* commandBuffer) {
+        commandBuffer->EndRenderPass();
+        });
     
     if (hasSwapchainImage_)
     {
-        commandBuffer_->MarkPresentSwapchain();
+        GFX_CAST(VKCommandBuffer*, commandBuffer_)->MarkPresentSwapchain();
         hasSwapchainImage_ = false;
     }
     
     attachments_.clear();
     resolveTargets_.clear();
-    GFX_SAFE_RELEASE(commandBuffer_);
-    GFX_SAFE_RELEASE(depthStencilAttachemnt_);
-    GFX_SAFE_RELEASE(renderPass_);
-    GFX_SAFE_RELEASE(vkFramebuffer_);
 }
 
 NS_GFX_END

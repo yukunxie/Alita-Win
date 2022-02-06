@@ -249,7 +249,7 @@ FullScreenPass::FullScreenPass(const std::string& materialName, ETechniqueType t
 	meshComponent_ = meshComp;
 }
 
-void FullScreenPass::SetTexture(const std::string& name, const gfx::Texture* texture)
+void FullScreenPass::SetTexture(const std::string& name, const gfx::TexturePtr texture)
 {
 	meshComponent_->GetRenderObject()->MaterialObject->SetTexture(name, texture);
 }
@@ -310,7 +310,7 @@ void ScreenResolvePass::Execute()
 	RTSwapChain_->Reset();
 	SetupOutputAttachment(0, RTSwapChain_);
 
-	const auto* texture = inputPass_->GetColorAttachments()[0].RenderTarget->GetTexture();
+	const gfx::TexturePtr texture = inputPass_->GetColorAttachments()[0].RenderTarget->GetTexture();
 	meshComponent_->GetRenderObject()->MaterialObject->SetTexture("tAlbedo", texture);
 	FullScreenPass::Execute();
 }
@@ -330,7 +330,7 @@ void DownSamplePass::Execute()
 
 	SetupOutputAttachment(0, RTColor_);
 
-	const auto* texture = InputPass_->GetColorAttachments()[0].RenderTarget->GetTexture();
+	const gfx::TexturePtr texture = InputPass_->GetColorAttachments()[0].RenderTarget->GetTexture();
 	SetTexture("tAlbedo", texture);
 	float imageSizeInfo[4] = { extent.width, extent.height, 1.0f / extent.width , 1.0f / extent.height };
 	SetFloat("ImageSize", 0, 4, imageSizeInfo);
@@ -357,7 +357,7 @@ void BloomBrightPass::Execute()
 
 	SetupOutputAttachment(0, RTColor_);
 
-	const auto* texture = InputPass_->GetColorAttachments()[0].RenderTarget->GetTexture();
+	const gfx::TexturePtr texture = InputPass_->GetColorAttachments()[0].RenderTarget->GetTexture();
 	SetTexture("tAlbedo", texture);
 
 	float params[4] = { 0.5f, 0, 0 , 0 };
@@ -415,7 +415,7 @@ void GaussianBlur::Execute()
 
 	SetupOutputAttachment(0, RTColor_);
 
-	const auto* texture = InputPass_->GetColorAttachments()[0].RenderTarget->GetTexture();
+	const gfx::TexturePtr texture = InputPass_->GetColorAttachments()[0].RenderTarget->GetTexture();
 	SetTexture("tAlbedo", texture);
 
 	float imageSizeInfo[4] = { extent.width, extent.height, 1.0f / extent.width , 1.0f / extent.height };
@@ -494,17 +494,17 @@ void OutlinePass::Execute(const std::vector<RenderObject*>& renderObjects)
 	SetupOutputAttachment(0, rtColor_, true);
 
 	{
-		const auto* texture = InputPass_->GetColorAttachments()[0].RenderTarget->GetTexture();
+		const gfx::TexturePtr texture = InputPass_->GetColorAttachments()[0].RenderTarget->GetTexture();
 		SetTexture("tColorMap", texture);
 	}
 	
 	{
-		const auto* texture = OutlineMarkPass_.GetColorAttachments()[0].RenderTarget->GetTexture();
+		const gfx::TexturePtr texture = OutlineMarkPass_.GetColorAttachments()[0].RenderTarget->GetTexture();
 		SetTexture("tMaskMap", texture);
 	}
 
 	{
-		const auto* texture = BlurPass_.GetColorAttachments()[0].RenderTarget->GetTexture();
+		const gfx::TexturePtr texture = BlurPass_.GetColorAttachments()[0].RenderTarget->GetTexture();
 		SetTexture("tBlurMap", texture);
 	}
 

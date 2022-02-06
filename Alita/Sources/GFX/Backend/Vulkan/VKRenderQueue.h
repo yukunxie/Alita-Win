@@ -12,8 +12,9 @@ NS_GFX_BEGIN
 class VKRenderQueue final : public RenderQueue
 {
 protected:
-    VKRenderQueue(VKDevice* device);
-    
+    VKRenderQueue(const DevicePtr& device);
+  
+public:
     virtual ~VKRenderQueue();
 
 public:

@@ -21,7 +21,7 @@ NS_GFX_BEGIN
 
 void AsyncWorkerVulkan::PostProcessDoneTask(AsyncTaskPtr task)
 {
-    device_->SetAsyncTaskDoneInRenderingThread(task);
+    GFX_CAST(VKDevice*, device_)->SetAsyncTaskDoneInRenderingThread(task);
 }
 
 AsyncWorkerVulkan::~AsyncWorkerVulkan()
@@ -33,10 +33,10 @@ AsyncWorkerVulkan::~AsyncWorkerVulkan()
     LOGW("AsyncWorkerVulkan exit end.");
 }
 
-AsyncTaskSumbitCommandBufferAndPresent::AsyncTaskSumbitCommandBufferAndPresent(VKDevice* device,
+AsyncTaskSumbitCommandBufferAndPresent::AsyncTaskSumbitCommandBufferAndPresent(const DevicePtr& device,
                                                                                FrameResource* frameResource,
                                                                                std::uint32_t commandBufferCount,
-                                                                               VKCommandBuffer** commandBuffers)
+                                                                               CommandBufferPtr* commandBuffers)
 {
     commandBuffers_.resize(commandBufferCount);
     for (size_t i = 0; i < commandBuffers_.size(); ++i)
@@ -47,7 +47,7 @@ AsyncTaskSumbitCommandBufferAndPresent::AsyncTaskSumbitCommandBufferAndPresent(V
     
     device_ = device;
     frameResource_ = frameResource;
-    queue_ = GFX_CAST(VKQueue*, device_->GetQueue());
+    queue_ = device_->GetQueue();
 }
 
 bool AsyncTaskSumbitCommandBufferAndPresent::RecordCommandBuffer(VkCommandBuffer vkCommandBuffer)
@@ -82,11 +82,11 @@ void AsyncTaskSumbitCommandBufferAndPresent::WaitingLastSubmissionDone()
     if (renderingFrameInfo && renderingFrameInfo->IsValid())
     {
         VkFence fence = renderingFrameInfo->frameResource->fenceToSyncSubmission;
-        VkResult fenceStatus = vkGetFenceStatus(device_->GetNative(), fence);
+        VkResult fenceStatus = vkGetFenceStatus(GFX_CAST(VKDevice*, device_)->GetNative(), fence);
         if (fenceStatus != VK_SUCCESS)
         {
             // timeout : 2000 ms
-            fenceStatus = vkWaitForFences(device_->GetNative(), 1, &fence, VK_TRUE,
+            fenceStatus = vkWaitForFences(GFX_CAST(VKDevice*, device_)->GetNative(), 1, &fence, VK_TRUE,
                                             2000 * 1000 * 1000);
             if (fenceStatus != VK_SUCCESS)
             {
@@ -97,10 +97,8 @@ void AsyncTaskSumbitCommandBufferAndPresent::WaitingLastSubmissionDone()
         for (size_t i = 0; i < renderingFrameInfo->commandBuffers.size(); ++i)
         {
             auto cmdBuffer = renderingFrameInfo->commandBuffers[i];
-            device_->ScheduleCallbackExecutedInGameThread([cmdBuffer](VKDevice* device) {
-                auto commandBuffer = cmdBuffer;
-                commandBuffer->PostprocessCommandBuffer();
-                GFX_SAFE_RELEASE(commandBuffer);
+            GFX_CAST(VKDevice*, device_)->ScheduleCallbackExecutedInGameThread([cmdBuffer](const DevicePtr& device) {
+                GFX_CAST(VKCommandBuffer*, cmdBuffer)->PostprocessCommandBuffer();
             });
         }
         renderingFrameInfo->commandBuffers.clear();
@@ -110,7 +108,7 @@ void AsyncTaskSumbitCommandBufferAndPresent::WaitingLastSubmissionDone()
 void AsyncTaskSumbitCommandBufferAndPresent::PostprocessLastSubmission()
 {
     auto renderingFrameInfo = frameResource_->swapChain->GetRenderingFrameInfo();
-    auto asyncWorker = static_cast<AsyncWorkerVulkan*>(((VKDevice*) queue_->GetGPUDevice())->GetAsyncWorker());
+    auto asyncWorker = static_cast<AsyncWorkerVulkan*>(GFX_CAST(VKDevice*, queue_->GetGPUDevice())->GetAsyncWorker());
     
     // 回收上一帧的VkCommandBuffer
     if (renderingFrameInfo && renderingFrameInfo->IsValid())
@@ -144,13 +142,13 @@ std::uint32_t AsyncTaskSumbitCommandBufferAndPresent::SumbitCommandBuffer(VkComm
         submitInfo.pSignalSemaphores = &semaNotify;
     }
     
-    if (VkResult result = vkResetFences(device_->GetNative(), 1, &fenceNotify); VK_SUCCESS != result)
+    if (VkResult result = vkResetFences(GFX_CAST(VKDevice*, device_)->GetNative(), 1, &fenceNotify); VK_SUCCESS != result)
     {
         LOGE("vkQueueSubmit-vkResetFences fail code=%s", GetVkResultString(result));
         return result;
     }
 
-    if (VkResult result = vkQueueSubmit(queue_->GetNative(), 1, &submitInfo, fenceNotify); VK_SUCCESS != result)
+    if (VkResult result = vkQueueSubmit(GFX_CAST(VKQueue*, queue_)->GetNative(), 1, &submitInfo, fenceNotify); VK_SUCCESS != result)
     {
         LOGE("vkQueueSubmit-vkQueueSubmit fail code=%s", GetVkResultString(result));
         return result;
@@ -162,9 +160,9 @@ std::uint32_t AsyncTaskSumbitCommandBufferAndPresent::SumbitCommandBuffer(VkComm
 
 bool AsyncTaskSumbitCommandBufferAndPresent::Execute()
 {
-    device_->CheckOnBackgroud();
+    GFX_CAST(VKDevice*, device_)->CheckOnBackgroud();
     
-    auto asyncWorker = static_cast<AsyncWorkerVulkan*>(((VKDevice*) queue_->GetGPUDevice())->GetAsyncWorker());
+    auto asyncWorker = static_cast<AsyncWorkerVulkan*>(GFX_CAST(VKDevice*, queue_->GetGPUDevice())->GetAsyncWorker());
     
     VkCommandBuffer vkCommandBuffer = asyncWorker->GetLocalAllocator()->AcquireVkCommandBuffer();
     
@@ -172,7 +170,7 @@ bool AsyncTaskSumbitCommandBufferAndPresent::Execute()
     
     WaitingLastSubmissionDone();
     
-    auto swapChain_ = device_->GetSwapChain();
+    auto swapChain_ = GFX_CAST(VKSwapChain*, GFX_CAST(VKDevice*, device_)->GetSwapChain());
     std::uint32_t imageIndex = frameResource_->imageIndex;
     
     auto imageAvailableSemaphore = frameResource_->semaImageAvaliable;
@@ -190,7 +188,7 @@ bool AsyncTaskSumbitCommandBufferAndPresent::Execute()
     if (result == VK_ERROR_DEVICE_LOST)
     {
         LOGE("SumbitCommandBuffer fail, RecreateSwapChain.");
-        device_->GetSwapChain()->RecreateSwapChain();
+        GFX_CAST(VKDevice*, device_)->GetSwapChain()->RecreateSwapChain();
     }
 
     if (result != VK_SUCCESS)
@@ -226,7 +224,7 @@ AsyncTaskSumbitCommandBufferAndPresent::~AsyncTaskSumbitCommandBufferAndPresent(
 
 // -------------
 
-AsyncTaskReturnVkSemaphore::AsyncTaskReturnVkSemaphore(VKDevice* device, VkSemaphore semaphore)
+AsyncTaskReturnVkSemaphore::AsyncTaskReturnVkSemaphore(const DevicePtr& device, VkSemaphore semaphore)
     : device_(device), vkSemaphore_(semaphore)
 {
 }
@@ -235,27 +233,26 @@ AsyncTaskReturnVkSemaphore::~AsyncTaskReturnVkSemaphore()
 {
     if (device_ && vkSemaphore_)
     {
-        device_->ReturnVkSemaphore(vkSemaphore_);
+        GFX_CAST(VKDevice*, device_)->ReturnVkSemaphore(vkSemaphore_);
     }
 }
 
 // ----
 
-AsyncTaskFenceCompletion::AsyncTaskFenceCompletion(VKDevice* device, VKQueue* queue, VKFence* fence)
+AsyncTaskFenceCompletion::AsyncTaskFenceCompletion(const DevicePtr& device, const QueuePtr& queue, const FencePtr& fence)
     : device_(device)
 {
-    GFX_PTR_ASSIGN(fence_, fence);
+    fence_ = fence;
 }
 
 AsyncTaskFenceCompletion::~AsyncTaskFenceCompletion()
 {
-    GFX_SAFE_RELEASE(fence_);
 }
 
 bool AsyncTaskFenceCompletion::Execute()
 {
     // Notice, the callback must be executed ahead of the destructor.
-    device_->ScheduleCallbackExecutedInGameThread([this](VKDevice*) {
+    GFX_CAST(VKDevice*, device_)->ScheduleCallbackExecutedInGameThread([this](DevicePtr) {
         fence_->OnSignaled();
     });
     return true;
@@ -263,46 +260,44 @@ bool AsyncTaskFenceCompletion::Execute()
 
 // ---
 
-AsyncTaskBufferMapRead::AsyncTaskBufferMapRead(VKDevice* device, VKBuffer* buffer, std::uint32_t offset, std::uint32_t size)
+AsyncTaskBufferMapRead::AsyncTaskBufferMapRead(const DevicePtr& device, const BufferPtr& buffer, std::uint32_t offset, std::uint32_t size)
 {
     device_ = device;
     offset_ = offset;
     size_ = size;
-    GFX_PTR_ASSIGN(buffer_, buffer);
+    buffer_ = buffer;
 }
 
 AsyncTaskBufferMapRead::~AsyncTaskBufferMapRead()
 {
-    GFX_SAFE_RELEASE(buffer_);
 }
 
 bool AsyncTaskBufferMapRead::Execute()
 {
-    device_->ScheduleCallbackExecutedInGameThread([this](VKDevice*) {
-        buffer_->CallMapReadCallback();
+    GFX_CAST(VKDevice*, device_)->ScheduleCallbackExecutedInGameThread([this](DevicePtr device) {
+        GFX_CAST(VKBuffer*, buffer_)->CallMapReadCallback();
     });
     return true;
 }
 
 // ----
 
-AsyncTaskBufferMapWrite::AsyncTaskBufferMapWrite(VKDevice* device, VKBuffer* buffer, std::uint32_t offset, std::uint32_t size)
+AsyncTaskBufferMapWrite::AsyncTaskBufferMapWrite(const DevicePtr& device, const BufferPtr& buffer, std::uint32_t offset, std::uint32_t size)
 {
     device_ = device;
     offset_ = offset;
     size_ = size;
-    GFX_PTR_ASSIGN(buffer_, buffer);
+    buffer_ = buffer;
 }
 
 AsyncTaskBufferMapWrite::~AsyncTaskBufferMapWrite()
 {
-    GFX_SAFE_RELEASE(buffer_);
 }
 
 bool AsyncTaskBufferMapWrite::Execute()
 {
-    device_->ScheduleCallbackExecutedInGameThread([this](VKDevice*) {
-        buffer_->CallMapWriteCallback();
+    GFX_CAST(VKDevice*, device_)->ScheduleCallbackExecutedInGameThread([this](DevicePtr device) {
+        GFX_CAST(VKBuffer*, buffer_)->CallMapWriteCallback();
     });
     return true;
 }

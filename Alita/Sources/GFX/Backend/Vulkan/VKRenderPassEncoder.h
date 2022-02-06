@@ -22,19 +22,20 @@ class VKBuffer;
 class VKRenderPassEncoder final : public RenderPassEncoder
 {
 protected:
-    VKRenderPassEncoder(VKDevice* device);
+    VKRenderPassEncoder(DevicePtr device);
     
+public:
     virtual ~VKRenderPassEncoder();
 
 public:
     
-    bool Init(VKCommandBuffer* commandBuffer, const RenderPassDescriptor &descriptor);
+    bool Init(CommandBufferPtr commandBuffer, const RenderPassDescriptor &descriptor);
     
-    virtual void SetPipeline(RenderPipeline* pipeline) override;
+    virtual void SetPipeline(RenderPipelinePtr pipeline) override;
     
-    virtual void SetIndexBuffer(Buffer* buffer, std::uint32_t offset = 0) override;
+    virtual void SetIndexBuffer(BufferPtr buffer, std::uint32_t offset = 0) override;
     
-    virtual void SetVertexBuffer(Buffer* buffer, std::uint32_t offset = 0,
+    virtual void SetVertexBuffer(BufferPtr buffer, std::uint32_t offset = 0,
                                  std::uint32_t slot = 0) override;
     
     virtual void
@@ -49,9 +50,9 @@ public:
                              std::uint32_t firstIndex, int32_t baseVertex,
                              std::uint32_t firstInstance) override;
     
-    virtual void DrawIndirect(Buffer* indirectBuffer, BufferSize indirectOffset) override;
+    virtual void DrawIndirect(BufferPtr indirectBuffer, BufferSize indirectOffset) override;
     
-    virtual void DrawIndexedIndirect(Buffer* indirectBuffer, BufferSize indirectOffset) override;
+    virtual void DrawIndexedIndirect(BufferPtr indirectBuffer, BufferSize indirectOffset) override;
     
     virtual void SetViewport(float x, float y, float width, float height, float minDepth,
                              float maxDepth) override;
@@ -62,7 +63,7 @@ public:
     virtual void SetStencilReference(std::uint32_t reference) override;
     
     virtual void
-    SetBindGroup(std::uint32_t index, BindGroup* bindGroup, std::uint32_t dynamicOffsetCount,
+    SetBindGroup(std::uint32_t index, BindGroupPtr bindGroup, std::uint32_t dynamicOffsetCount,
                  const std::uint32_t* dynamicOffsets) override;
     
     virtual void PushDebugGroup(const std::string &groupLabel) override;
@@ -72,8 +73,6 @@ public:
     virtual void InsertDebugMarker(const std::string &markerLabel) override;
     
     virtual void SetBlendColor(const Color &color) override;
-    
-    virtual void ExecuteBundles(std::uint32_t count, RenderBundle** bundles) override;
     
     virtual void BeginOcclusionQuery(std::uint32_t queryIndex) override;
     
@@ -86,12 +85,12 @@ public:
     virtual void Dispose() override;
     
 private:
-    VKCommandBuffer* commandBuffer_ = nullptr;
-    VKFramebuffer* vkFramebuffer_ = VK_NULL_HANDLE;
-    VKRenderPass* renderPass_ = nullptr;
-    Vector<const TextureView*> attachments_;
-    Vector<const TextureView*> resolveTargets_;
-    TextureView* depthStencilAttachemnt_ = nullptr;
+    CommandBufferPtr commandBuffer_ = nullptr;
+    FramebufferPtr vkFramebuffer_ = VK_NULL_HANDLE;
+    RenderPassPtr renderPass_ = nullptr;
+    std::vector<TextureViewPtr> attachments_;
+    std::vector<TextureViewPtr> resolveTargets_;
+    TextureViewPtr depthStencilAttachemnt_ = nullptr;
     
     bool hasSwapchainImage_ = false;
     

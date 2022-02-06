@@ -22,15 +22,15 @@ class VKSwapChain;
 class AsyncWorkerVulkan final : public AsyncWorker
 {
 public:
-    AsyncWorkerVulkan(VKDevice* device)
+    AsyncWorkerVulkan(const DevicePtr& device)
         : AsyncWorker(), device_(device)
     {
-        pVulkanAllocator_ = std::make_unique<ThreadLocalVulkanAllocator>(device_->GetNative());
+        pVulkanAllocator_ = std::make_unique<ThreadLocalVulkanAllocator>(GFX_CAST(VKDevice*, device_)->GetNative());
     }
     
     virtual void CheckForeground() override
     {
-        device_->CheckOnBackgroud();
+        GFX_CAST(VKDevice*, device_)->CheckOnBackgroud();
     }
     
     ThreadLocalVulkanAllocator* GetLocalAllocator()
@@ -42,17 +42,17 @@ protected:
     virtual void PostProcessDoneTask(AsyncTaskPtr task) override;
 
 private:
-    VKDevice* device_ = nullptr;
+    DevicePtr device_ = nullptr;
     std::unique_ptr<ThreadLocalVulkanAllocator> pVulkanAllocator_ = nullptr;
 };
 
 
 struct AsyncTaskSumbitCommandBufferAndPresent : public AsyncTask
 {
-    AsyncTaskSumbitCommandBufferAndPresent(VKDevice* device,
+    AsyncTaskSumbitCommandBufferAndPresent(const DevicePtr& device,
                                            FrameResource* frameResource,
                                            std::uint32_t commandBufferCount,
-                                           VKCommandBuffer** commandBuffers);
+                                           CommandBufferPtr* commandBuffers);
     
     bool RecordCommandBuffer(VkCommandBuffer vkCommandBuffer);
     
@@ -73,15 +73,15 @@ struct AsyncTaskSumbitCommandBufferAndPresent : public AsyncTask
     ~AsyncTaskSumbitCommandBufferAndPresent();
 
 protected:
-    VKDevice* device_ = nullptr;
-    VKQueue* queue_ = nullptr;
-    std::vector<VKCommandBuffer*> commandBuffers_;
+    DevicePtr device_ = nullptr;
+    QueuePtr queue_ = nullptr;
+    std::vector<CommandBufferPtr> commandBuffers_;
     FrameResource* frameResource_;
 };
 
 struct AsyncTaskReturnVkSemaphore : public AsyncTask
 {
-    AsyncTaskReturnVkSemaphore(VKDevice* device, VkSemaphore semaphore);
+    AsyncTaskReturnVkSemaphore(const DevicePtr& device, VkSemaphore semaphore);
     
     virtual bool Execute() override
     { return true; }
@@ -94,13 +94,13 @@ struct AsyncTaskReturnVkSemaphore : public AsyncTask
     virtual ~AsyncTaskReturnVkSemaphore();
 
 private:
-    VKDevice* device_ = nullptr;
+    DevicePtr device_ = nullptr;
     VkSemaphore vkSemaphore_ = VK_NULL_HANDLE;
 };
 
 struct AsyncTaskFenceCompletion : AsyncTask
 {
-    AsyncTaskFenceCompletion(VKDevice* device, VKQueue* queue, VKFence* fence);
+    AsyncTaskFenceCompletion(const DevicePtr& device, const QueuePtr& queue, const FencePtr& fence);
     
     ~AsyncTaskFenceCompletion();
     
@@ -112,13 +112,13 @@ struct AsyncTaskFenceCompletion : AsyncTask
     }
 
 protected:
-    VKDevice* device_ = nullptr;
-    VKFence* fence_ = nullptr;
+    DevicePtr device_ = nullptr;
+    FencePtr fence_ = nullptr;
 };
 
 struct AsyncTaskBufferMapRead : AsyncTask
 {
-    AsyncTaskBufferMapRead(VKDevice* device, VKBuffer* buffer, std::uint32_t offset = 0, std::uint32_t size = 0);
+    AsyncTaskBufferMapRead(const DevicePtr& device, const BufferPtr& buffer, std::uint32_t offset = 0, std::uint32_t size = 0);
     
     ~AsyncTaskBufferMapRead();
     
@@ -130,8 +130,8 @@ struct AsyncTaskBufferMapRead : AsyncTask
     }
 
 protected:
-    VKDevice* device_ = nullptr;
-    VKBuffer* buffer_ = nullptr;
+    DevicePtr device_ = nullptr;
+    BufferPtr buffer_ = nullptr;
 
     std::uint32_t offset_ = 0;
     std::uint32_t size_ = 0;
@@ -139,7 +139,7 @@ protected:
 
 struct AsyncTaskBufferMapWrite : AsyncTask
 {
-    AsyncTaskBufferMapWrite(VKDevice* device, VKBuffer* buffer, std::uint32_t offset = 0, std::uint32_t size = 0);
+    AsyncTaskBufferMapWrite(const DevicePtr& device, const BufferPtr& buffer, std::uint32_t offset = 0, std::uint32_t size = 0);
     
     ~AsyncTaskBufferMapWrite();
     
@@ -151,8 +151,8 @@ struct AsyncTaskBufferMapWrite : AsyncTask
     }
 
 protected:
-    VKDevice* device_ = nullptr;
-    VKBuffer* buffer_ = nullptr;
+    DevicePtr device_ = nullptr;
+    BufferPtr buffer_ = nullptr;
 
     std::uint32_t offset_ = 0;
     std::uint32_t size_ = 0;

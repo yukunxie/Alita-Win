@@ -54,36 +54,38 @@ NS_GFX_BEGIN
 #endif
 
 class VKBuffer;
-
 class VKRenderPipeline;
-
 class VKComputePipeline;
-
 class VKShader;
-
 class VKQueue;
-
 class VKSwapChain;
-
 class VKFramebuffer;
-
 class VKCommandBuffer;
-
 class VKRenderPassEncoder;
-
 class VKComputePassEncoder;
-
 class VKRenderPass;
-
 class VKTexture;
-
 class VKTextureView;
-
-class VKTextureViewManager;
-
+class TextureViewManager;
 class BindGroupLayout;
-
 class AsyncWorkerVulkan;
+class VKQuerySet;
+
+//#define VKBufferPtr std::shared_ptr<VKBuffer>
+//#define VKDevicePtr std::shared_ptr<VKDevice>
+//#define VKRenderPipelinePtr std::shared_ptr<VKRenderPipeline>
+//#define VKComputePipelinePtr std::shared_ptr<VKComputePipeline>
+//#define VKShaderPtr std::shared_ptr<VKShader>
+//#define VKQueuePtr std::shared_ptr<VKQueue>
+//#define VKSwapChainPtr std::shared_ptr<VKSwapChain>
+//#define VKFramebufferPtr std::shared_ptr<VKFramebuffer>
+//#define VKCommandBufferPtr std::shared_ptr<VKCommandBuffer>
+//#define VKRenderPassEncoderPtr std::shared_ptr<VKRenderPassEncoder>
+//#define VKComputePassEncoderPtr std::shared_ptr<VKComputePassEncoder>
+//#define VKRenderPassPtr std::shared_ptr<VKRenderPass>
+//#define VKTexturePtr std::shared_ptr<VKTexture>
+//#define VKTextureViewPtr std::shared_ptr<VKTextureView>
+//#define VKQuerySetPtr std::shared_ptr<VKQuerySet>
 
 class CommandList;
 typedef std::shared_ptr<CommandList> CommandListPtr;
@@ -121,8 +123,7 @@ struct QueueFamilyIndices
 class VKDevice final : public Device
 {
 public:
-    static VKDevice*
-    Create(const DeviceDescriptor &descriptor, std::unique_ptr<IDeviceExternalDeps>&& deviceExternalDeps);
+    static DevicePtr Create(const DeviceDescriptor &descriptor, std::unique_ptr<IDeviceExternalDeps>&& deviceExternalDeps);
 
 protected:
     VKDevice(std::unique_ptr<IDeviceExternalDeps>&& deviceExternalDeps);
@@ -161,19 +162,19 @@ public:
     void ClearWaitingSemaphores()
     { waitingSemaphores_.clear(); }
     
-    VKRenderPass* GetOrCreateRenderPass(const RenderPassCacheQuery &query);
+    RenderPassPtr GetOrCreateRenderPass(const RenderPassCacheQuery &query);
     
-    VKFramebuffer* GetOrCreateFramebuffer(const FramebufferCacheQuery &query);
+    FramebufferPtr GetOrCreateFramebuffer(const FramebufferCacheQuery &query);
     
     bool HasExtension(const std::vector<VkExtensionProperties> &extensions, const char* extension);
     
     bool SupportDebugGroup()
     { return supportDebugGroup_; }
     
-    void SetSwapChain(VKSwapChain* swapChain)
+    void SetSwapChain(const SwapChainPtr& swapChain)
     { this->swapChain_ = swapChain; }
     
-    VKSwapChain* GetSwapChain()
+    const SwapChainPtr& GetSwapChain()
     { return this->swapChain_; }
     
     const DefaultSwapchainConfig &GetSwapchainConfig()
@@ -191,52 +192,51 @@ public:
     { return pendingDestroyed_; }
 
 public:
-    virtual SwapChain* CreateSwapchain(const SwapChainDescriptor &descriptor) override;
+    virtual SwapChainPtr CreateSwapchain(const SwapChainDescriptor &descriptor) override;
     
     virtual TextureFormat GetSwapchainPreferredFormat() override;
     
-    virtual Buffer* CreateBuffer(const BufferDescriptor &descriptor) override;
+    virtual BufferPtr CreateBuffer(const BufferDescriptor &descriptor) override;
     
-    virtual BufferBinding*
-    CreateBufferBinding(Buffer* buffer, BufferSize offset, BufferSize size) override;
+    virtual BufferBindingPtr
+    CreateBufferBinding(BufferPtr buffer, BufferSize offset, BufferSize size) override;
     
     virtual void WriteBuffer(const Buffer* buffer, const void* data, std::uint32_t offset,
                              std::uint32_t size) override;
     
-    virtual RenderBundleEncoder*
-    CreateRenderBundleEncoder(const RenderBundleEncoderDescriptor &descriptor) override;
-    
-    virtual RenderPipeline*
+    virtual RenderPipelinePtr
     CreateRenderPipeline(RenderPipelineDescriptor &descriptor) override;
     
-    virtual ComputePipeline* CreateComputePipeline(ComputePipelineDescriptor &descriptor) override;
+    virtual ComputePipelinePtr CreateComputePipeline(ComputePipelineDescriptor &descriptor) override;
     
-    virtual Shader* CreateShaderModule(const ShaderModuleDescriptor &descriptor) override;
+    virtual ShaderPtr CreateShaderModule(const ShaderModuleDescriptor &descriptor) override;
     
-    virtual Texture* CreateTexture(const TextureDescriptor &descriptor) override;
+    virtual TexturePtr CreateTexture(const TextureDescriptor &descriptor) override;
+
+    virtual TextureViewPtr CreateTextureView(const TexturePtr& vkTexture, const TextureViewDescriptor& descriptor) override;
     
-    virtual Sampler* CreateSampler(const SamplerDescriptor &descriptor = {}) override;
+    virtual SamplerPtr CreateSampler(const SamplerDescriptor &descriptor = {}) override;
     
-    virtual SamplerBinding* CreateSamplerBinding(Sampler* sampler) override;
+    virtual SamplerBindingPtr CreateSamplerBinding(SamplerPtr sampler) override;
     
-    virtual TextureViewBinding* CreateTextureViewBinding(TextureView* view) override;
+    virtual TextureViewBindingPtr CreateTextureViewBinding(TextureViewPtr view) override;
     
-    virtual BindGroupLayout*
+    virtual BindGroupLayoutPtr
     CreateBindGroupLayout(const BindGroupLayoutDescriptor &descriptor) override;
     
-    virtual BindGroup* CreateBindGroup(BindGroupDescriptor &descriptor) override;
+    virtual BindGroupPtr CreateBindGroup(BindGroupDescriptor &descriptor) override;
     
-    virtual PipelineLayout*
+    virtual PipelineLayoutPtr
     CreatePipelineLayout(const PipelineLayoutDescriptor &descriptor) override;
     
-    virtual CommandEncoder*
+    virtual CommandEncoderPtr
     CreateCommandEncoder(const CommandEncoderDescriptor &descriptor = {}) override;
     
-    virtual Fence* CreateFence(const FenceDescriptor &descriptor) override;
+    virtual FencePtr CreateFence(const FenceDescriptor &descriptor) override;
     
-    virtual QuerySet* CreateQuerySet(const QuerySetDescriptor &descriptor) override;
+    virtual QuerySetPtr CreateQuerySet(const QuerySetDescriptor &descriptor) override;
     
-    virtual Queue* GetQueue() override;
+    virtual QueuePtr GetQueue() override;
     
     virtual void OnScriptObjectDestroy() override;
     
@@ -266,28 +266,23 @@ public:
     }
 
 public:
-    template<typename _Tp, typename ...Args>
-    FORCE_INLINE _Tp* CreateObject(Args ...args)
+    template<typename PtrType_, typename _VKType, typename ...Args>
+    FORCE_INLINE PtrType_ CreateObject(Args ...args)
     {
-        _Tp* obj = new _Tp(this);
-        if (obj && obj->Init(args...))
-        {
-            GFX_ASSERT(obj->GetReferenceCount() >= 1);
-            obj->AutoRelease();
-        }
-        else
+        _VKType* obj = new _VKType(GetDevicePtr());
+        if (obj && !obj->Init(args...))
         {
             GFX_SAFE_RELEASE(obj);
         }
-        return obj;
-        
+
+        return PtrType_(obj);
     }
+
+    const DevicePtr& GetDevicePtr();
     
-    VKCommandBuffer* CreateCommandBuffer();
+    CommandBufferPtr CreateCommandBuffer();
     
-    VKTextureView* CreateTextureView(VKTexture* vkTexture, const TextureViewDescriptor &descriptor);
-    
-    VKTextureViewManager* GetTextureViewManager()
+    TextureViewManager* GetTextureViewManager()
     {
         return pTextureViewMgr_.get();
     }
@@ -312,7 +307,7 @@ public:
     
     void ReleaseCommandList(CommandListPtr pCommandList);
     
-    void ScheduleCallbackExecutedInGameThread(const std::function<void(VKDevice*)> &callback);
+    void ScheduleCallbackExecutedInGameThread(const std::function<void(DevicePtr)> &callback);
     
     template<typename AsyncTaskName, typename ...Args>
     void ScheduleAsyncTask(Args ...args)
@@ -355,7 +350,7 @@ private:
     
     bool InitDescriptorPool();
     
-    Queue* CreateQueue();
+    QueuePtr CreateQueue();
     
     void ReleaseCaches();
 
@@ -414,27 +409,27 @@ private:
     
     DefaultSwapchainConfig defaultSwapchainConfig_;
     
-    std::unique_ptr<VKTextureViewManager> pTextureViewMgr_;
+    std::unique_ptr<TextureViewManager> pTextureViewMgr_;
     
     Viewport defaultViewport_;
-    VKSwapChain* swapChain_ = nullptr;
-    Queue* renderQueue_ = nullptr;
-    Queue* imageLayoutTransistQueue_ = nullptr;
+    SwapChainPtr swapChain_ = nullptr;
+    QueuePtr renderQueue_ = nullptr;
+    QueuePtr imageLayoutTransistQueue_ = nullptr;
     
     std::vector<VkSemaphore> waitingSemaphores_;
     RenderPassCache renderPassCache_;
     FramebufferCache framebufferCache_;
     
-    std::vector<std::pair<RenderPipelineDescriptor, RenderPipeline*>> renderPipelineCache_;
-    std::vector<std::pair<BindGroupLayoutDescriptor, BindGroupLayout*>> bindGroupLayoutCache_;
-    std::vector<std::pair<PipelineLayoutDescriptor, PipelineLayout*>> pipelineLayoutCache_;
+    std::vector<std::pair<RenderPipelineDescriptor, RenderPipelinePtr>> renderPipelineCache_;
+    std::vector<std::pair<BindGroupLayoutDescriptor, BindGroupLayoutPtr>> bindGroupLayoutCache_;
+    std::vector<std::pair<PipelineLayoutDescriptor, PipelineLayoutPtr>> pipelineLayoutCache_;
     std::vector<VkFence> vkFenceCache_;
     std::vector<AsyncTaskPtr> pendingDoneTasks_;
     std::condition_variable cv_;
     std::vector<CommandListPtr> freeCommandLists_;
     std::vector<CommandListPtr> pendingReleaseCommandLists_;
     
-    std::vector<std::function<void(VKDevice*)>> scheduledAsyncCallbacks_;
+    std::vector<std::function<void(DevicePtr)>> scheduledAsyncCallbacks_;
     
     std::mutex mutex_;
     std::mutex mutexPendingDoneTask_;
@@ -451,6 +446,7 @@ private:
     std::vector<VkExtensionProperties> deviceExtensions_;
     
     friend class VKSwapChain;
+
 };
 
 NS_GFX_END

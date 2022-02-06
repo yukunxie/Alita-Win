@@ -124,7 +124,7 @@ struct RenderPassCacheQueryFuncs
     }
 };
 
-typedef std::unordered_map<RenderPassCacheQuery, VKRenderPass*, RenderPassCacheQueryFuncs, RenderPassCacheQueryFuncs> RenderPassCache;
+typedef std::unordered_map<RenderPassCacheQuery, RenderPassPtr, RenderPassCacheQueryFuncs, RenderPassCacheQueryFuncs> RenderPassCache;
 
 struct FramebufferCacheQuery
 {
@@ -151,8 +151,8 @@ struct FramebufferCacheQuery
         return (size_t) (_hashFunc.hash(&renderPass, sizeof(FramebufferCacheQuery), 0));
     }
     
-    VKRenderPass* renderPass;
-    const VKTextureView* attachments[kMaxColorAttachments];
+    RenderPassPtr renderPass;
+    TextureViewPtr attachments[kMaxColorAttachments];
     std::uint32_t width = 0;
     std::uint32_t height = 0;
     std::uint32_t layers = 1;
@@ -171,7 +171,7 @@ struct FramebufferCacheQueryFuncs
     }
 };
 
-typedef std::unordered_map<FramebufferCacheQuery, VKFramebuffer*, FramebufferCacheQueryFuncs, FramebufferCacheQueryFuncs> FramebufferCache;
+typedef std::unordered_map<FramebufferCacheQuery, FramebufferPtr, FramebufferCacheQueryFuncs, FramebufferCacheQueryFuncs> FramebufferCache;
 
 NS_GFX_END
 

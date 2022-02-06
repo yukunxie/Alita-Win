@@ -14,6 +14,8 @@
 #include <optional>
 #include <limits>
 
+#include "GFXBase.h"
+
 NS_GFX_BEGIN
 
 class Device;
@@ -182,8 +184,8 @@ union Color
 
 struct RenderPassColorAttachmentDescriptor
 {
-    const TextureView* attachment = nullptr;
-    const TextureView* resolveTarget = nullptr;
+    TextureViewPtr attachment = nullptr;
+    TextureViewPtr resolveTarget = nullptr;
     Color loadValue;
     LoadOp loadOp = LoadOp::LOAD;
     StoreOp storeOp = StoreOp::STORE;
@@ -201,7 +203,7 @@ struct RenderPassColorAttachmentDescriptor
 
 struct RenderPassDepthStencilAttachmentDescriptor
 {
-    const TextureView* attachment = nullptr;
+    TextureViewPtr attachment = nullptr;
     
     LoadOp depthLoadOp = LoadOp::CLEAR;
     StoreOp depthStoreOp = StoreOp::STORE;
@@ -221,18 +223,7 @@ struct RenderPassDescriptor : ObjectDescriptorBase
 {
     std::vector<RenderPassColorAttachmentDescriptor> colorAttachments;
     RenderPassDepthStencilAttachmentDescriptor depthStencilAttachment;
-    QuerySet* occlusionQuerySet = nullptr;
-};
-
-struct RenderBundleEncoderDescriptor : ObjectDescriptorBase
-{
-    std::vector<TextureFormat> colorFormats;
-    TextureFormat depthStencilFormat = TextureFormat::INVALID;
-    std::uint32_t sampleCount = 1;
-};
-
-struct RenderBundleDescriptor : ObjectDescriptorBase
-{
+    QuerySetPtr occlusionQuerySet = nullptr;
 };
 
 struct ComputePassDescriptor : ObjectDescriptorBase
@@ -246,7 +237,7 @@ struct FenceDescriptor : ObjectDescriptorBase
 
 struct ProgrammableStageDescriptor
 {
-    Shader* shader;
+    ShaderPtr shader;
     std::string entryPoint;
     // TODO: other stuff like specialization constants?
     
@@ -443,7 +434,7 @@ struct VertexStateDescriptor
 
 struct PipelineDescriptorBase : ObjectDescriptorBase
 {
-    PipelineLayout* layout = nullptr;
+    PipelineLayoutPtr layout = nullptr;
 };
 
 struct ComputePipelineDescriptor : public PipelineDescriptorBase
@@ -655,7 +646,7 @@ typedef Origin3DDict Origin3D;
 
 struct BufferCopyView
 {
-    Buffer* buffer = nullptr;
+    BufferPtr buffer = nullptr;
     BufferSize offset = 0;
     // Notice, bytesPerRow must be exact divided by 256
     std::uint32_t bytesPerRow = 0;
@@ -664,7 +655,7 @@ struct BufferCopyView
 
 struct TextureCopyView
 {
-    Texture* texture = nullptr;
+    TexturePtr texture = nullptr;
     std::uint32_t mipLevel = 0;
     // origin.z 存储了baseArrayLayer信息
     Origin3D origin = {};
@@ -731,19 +722,19 @@ struct BindGroupLayoutDescriptor
 
 struct BindGroupBinding
 {
-    std::uint32_t binding;
-    BindingResource* resource = nullptr;
+    std::uint32_t binding = -1;
+    BindingResourcePtr resource = nullptr;
 };
 
 struct BindGroupDescriptor : ObjectDescriptorBase
 {
-    BindGroupLayout* layout = nullptr;
+    BindGroupLayoutPtr layout = nullptr;
     std::vector<BindGroupBinding> entries;
 };
 
 struct PipelineLayoutDescriptor
 {
-    std::vector<BindGroupLayout*> bindGroupLayouts;
+    std::vector<BindGroupLayoutPtr> bindGroupLayouts;
     
     bool operator == (const PipelineLayoutDescriptor& other) const
     {
@@ -782,7 +773,7 @@ struct CommandBufferDescriptor : ObjectDescriptorBase
 
 struct SwapChainDescriptor : ObjectDescriptorBase
 {
-    Device* device = nullptr;
+    DevicePtr device = nullptr;
     TextureFormat format = TextureFormat::RGBA8UNORM;
     TextureUsageFlags usage = TextureUsage::OUTPUT_ATTACHMENT;
 };

@@ -17,14 +17,14 @@ public:
 
 	struct VertexBufferInfo
 	{
-		gfx::Buffer*	GpuBuffer = nullptr;
+		gfx::BufferPtr	GpuBuffer = nullptr;
 		std::uint32_t	Offset = 0;
 		std::uint32_t	Slot = 0xFFFFFFFF;
 	};
 
 	struct IndexBufferInfo
 	{
-		gfx::Buffer*	GpuBuffer = nullptr;
+		gfx::BufferPtr	GpuBuffer = nullptr;
 		std::uint32_t	Offset = 0;
 		std::uint32_t	IndexCount = 0;
 		std::uint32_t	InstanceCount = 0;

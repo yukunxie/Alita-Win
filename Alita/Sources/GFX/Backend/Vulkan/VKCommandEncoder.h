@@ -18,8 +18,9 @@ class VKComputePassEncoder;
 class VKCommandEncoder final : public CommandEncoder
 {
 protected:
-    VKCommandEncoder(VKDevice* device);
+    VKCommandEncoder(const DevicePtr& device);
     
+public:
     ~VKCommandEncoder();
 
 public:
@@ -28,16 +29,16 @@ public:
     
     virtual void Reset() override;
 
-    virtual RenderPassEncoder* BeginRenderPass(const RenderPassDescriptor &descriptor) override;
+    virtual RenderPassEncoderPtr BeginRenderPass(const RenderPassDescriptor &descriptor) override;
     
-    virtual ComputePassEncoder* BeginComputePass(const ComputePassDescriptor &descriptor) override;
+    virtual ComputePassEncoderPtr BeginComputePass(const ComputePassDescriptor &descriptor) override;
     
-    virtual CommandBuffer* Finish(const CommandBufferDescriptor &descriptor = {}) override;
+    virtual CommandBufferPtr Finish(const CommandBufferDescriptor &descriptor = {}) override;
     
     virtual void CopyBufferToBuffer(
-        Buffer* source,
+        BufferPtr source,
         BufferSize sourceOffset,
-        Buffer* destination,
+        BufferPtr destination,
         BufferSize destinationOffset,
         BufferSize size) override;
     
@@ -57,10 +58,10 @@ public:
         Extent3D &copySize) override;
     
     virtual void ResolveQuerySet(
-        QuerySet* querySet,
+        const QuerySetPtr& querySet,
         std::uint32_t queryFirstIndex,
         std::uint32_t queryCount,
-        Buffer* dstBuffer,
+        const BufferPtr& dstBuffer,
         std::uint32_t dstOffset) override;
     
     virtual void PushDebugGroup(const std::string &groupLabel) override;
@@ -72,9 +73,9 @@ public:
     virtual void Dispose() override;
 
 private:
-    VKCommandBuffer* commandBuffer_ = nullptr;
-    VKRenderPassEncoder* renderPassEncoder_ = nullptr;
-    VKComputePassEncoder* computePassEncoder_ = nullptr;
+    CommandBufferPtr commandBuffer_ = nullptr;
+    RenderPassEncoderPtr renderPassEncoder_ = nullptr;
+    ComputePassEncoderPtr computePassEncoder_ = nullptr;
     
     friend class VKDevice;
 };

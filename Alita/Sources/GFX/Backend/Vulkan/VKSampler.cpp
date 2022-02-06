@@ -6,7 +6,7 @@
 
 NS_GFX_BEGIN
 
-VKSampler::VKSampler(VKDevice* device)
+VKSampler::VKSampler(const DevicePtr& device)
     : Sampler(device)
 {
 }

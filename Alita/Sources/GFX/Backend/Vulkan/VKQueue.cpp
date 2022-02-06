@@ -11,7 +11,7 @@
 
 NS_GFX_BEGIN
 
-VKQueue::VKQueue(VKDevice* device)
+VKQueue::VKQueue(const DevicePtr& device)
     : Queue(device)
 {
 }
@@ -48,7 +48,7 @@ bool VKQueue::Init()
     return VK_NULL_HANDLE != vkQueue_;
 }
 
-void VKQueue::Signal(Fence* fence, std::uint64_t signalValue)
+void VKQueue::Signal(const FencePtr& fence, std::uint64_t signalValue)
 {
     auto it = std::find(waitingFences_.begin(), waitingFences_.end(), fence);
     if (it == waitingFences_.end())
@@ -63,13 +63,11 @@ void VKQueue::WaitQueueIdle()
     vkQueueWaitIdle(vkQueue_);
 }
 
-void VKQueue::Submit(std::uint32_t commandBufferCount, CommandBuffer* const* commandBuffers)
+void VKQueue::Submit(std::uint32_t commandBufferCount, CommandBufferPtr const* commandBuffers)
 {
     for (int i = 0; i < commandBufferCount; ++i)
     {
-        auto cmdBuffer = GFX_CAST(VKCommandBuffer*, commandBuffers[i]);
-        GFX_SAFE_RETAIN(cmdBuffer);
-        commandBufferCaches_.push_back(cmdBuffer);
+        commandBufferCaches_.push_back(commandBuffers[i]);
     }
 }
 
@@ -81,39 +79,33 @@ void VKQueue::SubmitInternal()
     }
     
     VKDevice* device = VKDEVICE();
-    VKSwapChain* swapChain = device->GetSwapChain();
+    VKSwapChain* swapChain = GFX_CAST(VKSwapChain*, device->GetSwapChain());
     FrameResource* frameResource = swapChain->GetFrameResource();
     
-    device->ScheduleAsyncTask<AsyncTaskSumbitCommandBufferAndPresent>(device,
-                                                                      frameResource,
-                                                                      commandBufferCaches_.size(),
-                                                                      commandBufferCaches_.data());
-    
-    for (auto cmdBuffer : commandBufferCaches_)
-    {
-        GFX_SAFE_RELEASE(cmdBuffer);
-    }
+    device->ScheduleAsyncTask<AsyncTaskSumbitCommandBufferAndPresent>(GetGPUDevice(), 
+        frameResource,
+        commandBufferCaches_.size(),
+        commandBufferCaches_.data());
+
     commandBufferCaches_.clear();
     
     imageLayoutInitCommandBuffer_ = nullptr;
     
     for (auto fence : waitingFences_)
     {
-        device->ScheduleAsyncTask<AsyncTaskFenceCompletion>(device,
-                                                            this,
-                                                            GFX_CAST(VKFence*, fence));
+        device->ScheduleAsyncTask<AsyncTaskFenceCompletion>(GetGPUDevice(), GetShared(), fence);
     }
     waitingFences_.clear();
     
     swapChain->AcquireNextImage();
 }
 
-Fence* VKQueue::CreateFence(const FenceDescriptor &descriptor)
+FencePtr VKQueue::CreateFence(const FenceDescriptor &descriptor)
 {
     return VKDEVICE()->CreateFence(descriptor);
 }
 
-VKCommandBuffer* VKQueue::GetImageLayoutInitCommandBuffer()
+CommandBufferPtr VKQueue::GetImageLayoutInitCommandBuffer()
 {
     if (!imageLayoutInitCommandBuffer_)
     {

@@ -271,11 +271,6 @@ void DeferredCmdInsertDebugMarker::Execute(gfx::VKCommandBuffer* commandBuffer)
     commandBuffer->PushDebugGroup(strings_.data());
 }
 
-void DeferredCmdExecuteBundle::Execute(gfx::VKCommandBuffer* commandBuffer)
-{
-    renderBundle_->Execute(commandBuffer);
-}
-
 void DeferredCmdBeginOcclusionQuery::Execute(gfx::VKCommandBuffer* commandBuffer)
 {
     commandBuffer->BeginOcclusionQuery(queryIndex_);

@@ -210,9 +210,6 @@ echo "xxxxx"</Command>
     <ClCompile Include="Sources\GFX\Backend\Vulkan\VKPipelineLayout.cpp" />
     <ClCompile Include="Sources\GFX\Backend\Vulkan\VKQuerySet.cpp" />
     <ClCompile Include="Sources\GFX\Backend\Vulkan\VKQueue.cpp" />
-    <ClCompile Include="Sources\GFX\Backend\Vulkan\VKRenderBundle.cpp" />
-    <ClCompile Include="Sources\GFX\Backend\Vulkan\VKRenderBundleCommandImpl.cpp" />
-    <ClCompile Include="Sources\GFX\Backend\Vulkan\VKRenderBundleEncoder.cpp" />
     <ClCompile Include="Sources\GFX\Backend\Vulkan\VKRenderPass.cpp" />
     <ClCompile Include="Sources\GFX\Backend\Vulkan\VKRenderPassEncoder.cpp" />
     <ClCompile Include="Sources\GFX\Backend\Vulkan\VKRenderPipeline.cpp" />
@@ -326,13 +323,9 @@ echo "xxxxx"</Command>
     <ClInclude Include="Sources\GFX\PipelineLayout.h" />
     <ClInclude Include="Sources\GFX\QuerySet.h" />
     <ClInclude Include="Sources\GFX\Queue.h" />
-    <ClInclude Include="Sources\GFX\RenderBundle.h" />
-    <ClInclude Include="Sources\GFX\RenderBundleCommands.h" />
-    <ClInclude Include="Sources\GFX\RenderBundleEncoder.h" />
     <ClInclude Include="Sources\GFX\RenderCommandTypes.h" />
     <ClInclude Include="Sources\GFX\RenderPass.h" />
     <ClInclude Include="Sources\GFX\RenderPassEncoder.h" />
-    <ClInclude Include="Sources\GFX\RenderPipeine.h" />
     <ClInclude Include="Sources\GFX\RenderPipeline.h" />
     <ClInclude Include="Sources\GFX\RenderQueue.h" />
     <ClInclude Include="Sources\GFX\RenderTarget.h" />
@@ -391,8 +384,6 @@ echo "xxxxx"</Command>
     <ClInclude Include="Sources\GFX\Backend\Vulkan\VKPipelineLayout.h" />
     <ClInclude Include="Sources\GFX\Backend\Vulkan\VKQuerySet.h" />
     <ClInclude Include="Sources\GFX\Backend\Vulkan\VKQueue.h" />
-    <ClInclude Include="Sources\GFX\Backend\Vulkan\VKRenderBundle.h" />
-    <ClInclude Include="Sources\GFX\Backend\Vulkan\VKRenderBundleEncoder.h" />
     <ClInclude Include="Sources\GFX\Backend\Vulkan\VKRenderCommands.h" />
     <ClInclude Include="Sources\GFX\Backend\Vulkan\VKRenderPass.h" />
     <ClInclude Include="Sources\GFX\Backend\Vulkan\VKRenderPassEncoder.h" />

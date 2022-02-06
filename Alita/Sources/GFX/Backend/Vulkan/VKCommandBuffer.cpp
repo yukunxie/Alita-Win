@@ -17,8 +17,8 @@
 
 NS_GFX_BEGIN
 
-RenderPassEntry::RenderPassEntry(RenderPass* renderPass,
-                                 Framebuffer* framebuffer,
+RenderPassEntry::RenderPassEntry(RenderPassPtr renderPass,
+                                 FramebufferPtr framebuffer,
                                  std::uint32_t clearValueCount,
                                  Color* clearValues,
                                  float clearDepth,
@@ -49,7 +49,7 @@ RenderPassEntry::RenderPassEntry(RenderPass* renderPass,
 }
 
 
-VKCommandBuffer::VKCommandBuffer(VKDevice* device)
+VKCommandBuffer::VKCommandBuffer(DevicePtr device)
     : CommandBuffer(device)
 {
 }
@@ -68,11 +68,11 @@ void VKCommandBuffer::Dispose()
     GFX_DISPOSE_END();
 }
 
-void VKCommandBuffer::BeginRenderPass(RenderPass* pass,
-                                      Framebuffer* framebuffer,
-                                      QuerySet* occlusionQuerySet,
+void VKCommandBuffer::BeginRenderPass(RenderPassPtr pass,
+                                      FramebufferPtr framebuffer,
+                                      QuerySetPtr occlusionQuerySet,
                                       std::uint32_t clearValueCount,
-                                      Color* clearValues,
+                                      const Color* clearValues,
                                       float clearDepth,
                                       uint32_t clearStencil)
 {
@@ -81,8 +81,8 @@ void VKCommandBuffer::BeginRenderPass(RenderPass* pass,
     
     if (renderPassBinding_ && framebufferBinding_)
     {
-        if (renderPassBinding_->GetNative() == vkRenderPass->GetNative() &&
-            framebufferBinding_->GetNative() == vkFramebuffer->GetNative())
+        if (GFX_CAST(VKRenderPass*, renderPassBinding_)->GetNative() == vkRenderPass->GetNative() &&
+            GFX_CAST(VKFramebuffer*, framebufferBinding_)->GetNative() == vkFramebuffer->GetNative())
         {
             return;
         }
@@ -90,19 +90,19 @@ void VKCommandBuffer::BeginRenderPass(RenderPass* pass,
     
     ForceEndRenderPass();
     
-    renderPassBinding_ = vkRenderPass;
-    framebufferBinding_ = vkFramebuffer;
-    occlusionQuerySetBinding_ = GFX_CAST(VKQuerySet*, occlusionQuerySet);
+    renderPassBinding_ = pass;
+    framebufferBinding_ = framebuffer;
+    occlusionQuerySetBinding_ = occlusionQuerySet;
     
     VkOffset2D offset = {0, 0};
-    const auto &fbSize = framebufferBinding_->GetExtent2D();
+    const auto &fbSize = GFX_CAST(VKFramebuffer*, framebufferBinding_)->GetExtent2D();
     VkExtent2D extent = {fbSize.width, fbSize.height};
     
     VkRenderPassBeginInfo renderPassBeginInfo;
     renderPassBeginInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
     renderPassBeginInfo.pNext = nullptr;
-    renderPassBeginInfo.renderPass = renderPassBinding_->GetNative();
-    renderPassBeginInfo.framebuffer = framebufferBinding_->GetNative();
+    renderPassBeginInfo.renderPass = GFX_CAST(VKRenderPass*, renderPassBinding_)->GetNative();
+    renderPassBeginInfo.framebuffer = GFX_CAST(VKFramebuffer*, framebufferBinding_)->GetNative();
     renderPassBeginInfo.renderArea.offset = offset;
     renderPassBeginInfo.renderArea.extent = extent;
     
@@ -131,21 +131,21 @@ void VKCommandBuffer::BeginRenderPass(RenderPass* pass,
         for (size_t i = 0; i < vkFramebuffer->GetColorAttachmentCount(); ++i)
         {
             auto textureView = vkFramebuffer->GetColorAttachments()[i];
-            auto texture = (VKTexture*)textureView->GetTexture();
-            texture->TransToOutputAttachmentImageLayout(this);
+            auto texture = GFX_CAST(VKTextureView*, textureView)->GetTexture();
+            GFX_CAST(VKTexture*, texture)->TransToOutputAttachmentImageLayout(this);
         }
         GFX_ASSERT(currentRenderPassIndex_ < bindGroupCatagories_.size());
-        std::vector<VKBindGroup*>& bindGroups = bindGroupCatagories_[currentRenderPassIndex_];
-        for (VKBindGroup* pBindGroup : bindGroups)
+        std::vector<BindGroupPtr>& bindGroups = bindGroupCatagories_[currentRenderPassIndex_++];
+        for (BindGroupPtr pBindGroup : bindGroups)
         {
-            pBindGroup->TransImageLayoutToSampled(this);
+            GFX_CAST(VKBindGroup*, pBindGroup)->TransImageLayoutToSampled(this);
         }
     }
 
     vkCmdBeginRenderPass(GetNative(), &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
     
     // 这里需要判断一个是否是对swapchain中的image进行操作的
-    isRenderPassPresentable_ = framebufferBinding_->HasSwapChainImages();
+    isRenderPassPresentable_ = GFX_CAST(VKFramebuffer*, framebufferBinding_)->HasSwapChainImages();
 }
 
 void VKCommandBuffer::ClearAttachment(VkClearAttachment clearAttachment)
@@ -171,30 +171,33 @@ void VKCommandBuffer::ClearAttachment(VkClearAttachment clearAttachment)
 
 void VKCommandBuffer::EndRenderPass()
 {
-    currentRenderPassIndex_++;
     bHasPendingEndRenderPass_ = true;
     ForceEndRenderPass();
 }
 
-template<typename PipelineType_>
+template<typename BasePipelineType>
 void SetBindGroupToGraphicPipelineImpl(VKCommandBuffer* thiz,
-                                       PipelineType_* pipeline,
-                                       std::uint32_t index,
-                                       BindGroup* bindGroup,
-                                       uint32_t dynamicOffsetCount,
-                                       const uint32_t* pDynamicOffsets)
+    BasePipelineType pipeline,
+    std::uint32_t index,
+    BindGroupPtr bindGroup,
+    uint32_t dynamicOffsetCount,
+    const uint32_t* pDynamicOffsets)
 {
     auto bindGroupLayout = GFX_CAST(VKBindGroup*, bindGroup)->GetBindGroupLayout();
     auto expectedOffsetCount = bindGroupLayout->GetDynamicOffsetCount();
-    
+
     auto vkDescriptorSet = thiz->AsyncWriteBindGroupToGPU(GFX_CAST(VKBindGroup*, bindGroup));
-    
+
     if (dynamicOffsetCount >= expectedOffsetCount)
     {
-        vkCmdBindDescriptorSets(thiz->GetNative(), pipeline->GetPipelineBindPoint(),
-                                  pipeline->GetPipelineLayout(), index, 1,
-                                  &vkDescriptorSet,
-                                  dynamicOffsetCount, pDynamicOffsets);
+        vkCmdBindDescriptorSets(thiz->GetNative(),
+            pipeline->GetPipelineBindPoint(),
+            pipeline->GetPipelineLayout(),
+            index,
+            1,
+            &vkDescriptorSet,
+            dynamicOffsetCount,
+            pDynamicOffsets);
     }
     else
     {
@@ -203,73 +206,77 @@ void SetBindGroupToGraphicPipelineImpl(VKCommandBuffer* thiz,
         {
             offsets[i] = pDynamicOffsets[i];
         }
-        vkCmdBindDescriptorSets(thiz->GetNative(), pipeline->GetPipelineBindPoint(),
-                                  pipeline->GetPipelineLayout(), index, 1,
-                                  &vkDescriptorSet,
-                                  (std::uint32_t) offsets.size(), offsets.data());
+        vkCmdBindDescriptorSets(thiz->GetNative(),
+            pipeline->GetPipelineBindPoint(),
+            pipeline->GetPipelineLayout(),
+            index,
+            1,
+            &vkDescriptorSet,
+            (std::uint32_t)offsets.size(),
+            offsets.data());
     }
 }
 
-void VKCommandBuffer::SetBindGroupToGraphicPipeline(std::uint32_t index, BindGroup* bindGroup,
+void VKCommandBuffer::SetBindGroupToGraphicPipeline(std::uint32_t index, BindGroupPtr bindGroup,
                                                     uint32_t dynamicOffsetCount,
                                                     const uint32_t* pDynamicOffsets)
 {
     GFX_ASSERT(graphicPipelineBinding_, "graphicPipelineBinding_ can't be NULL");
     SetBindGroupToGraphicPipelineImpl(this,
-                                      graphicPipelineBinding_,
-                                      index,
-                                      bindGroup,
-                                      dynamicOffsetCount,
-                                      pDynamicOffsets);
+        GFX_CAST(VKRenderPipeline*, graphicPipelineBinding_),
+        index,
+        bindGroup,
+        dynamicOffsetCount,
+        pDynamicOffsets);
 }
 
-void VKCommandBuffer::SetBindGroupToComputePipeline(std::uint32_t index, BindGroup* bindGroup,
+void VKCommandBuffer::SetBindGroupToComputePipeline(std::uint32_t index, BindGroupPtr bindGroup,
                                                     uint32_t dynamicOffsetCount,
                                                     const uint32_t* pDynamicOffsets)
 {
     GFX_ASSERT(computePipelineBinding_, "computePipelineBinding_ can't be NULL");
     SetBindGroupToGraphicPipelineImpl(this,
-                                      computePipelineBinding_,
-                                      index,
-                                      bindGroup,
-                                      dynamicOffsetCount,
-                                      pDynamicOffsets);
+        GFX_CAST(VKComputePipeline*, computePipelineBinding_),
+        index,
+        bindGroup,
+        dynamicOffsetCount,
+        pDynamicOffsets);
 }
 
 
-void VKCommandBuffer::BindGraphicsPipeline(RenderPipeline* graphicPipeline)
+void VKCommandBuffer::BindGraphicsPipeline(RenderPipelinePtr graphicPipeline)
 {
     if (graphicPipelineBinding_ == graphicPipeline)
     {
         return;
     }
-    graphicPipelineBinding_ = GFX_CAST(VKRenderPipeline*, graphicPipeline);
+    graphicPipelineBinding_ = graphicPipeline;
     vkCmdBindPipeline(GetNative(), VK_PIPELINE_BIND_POINT_GRAPHICS,
                         GFX_CAST(VKRenderPipeline *, graphicPipeline)->GetNative());
 }
 
-void VKCommandBuffer::BindComputePipeline(ComputePipeline* computePipeline)
+void VKCommandBuffer::BindComputePipeline(ComputePipelinePtr computePipeline)
 {
     if (computePipelineBinding_ == computePipeline)
     {
         return;
     }
-    computePipelineBinding_ = GFX_CAST(VKComputePipeline*, computePipeline);
+    computePipelineBinding_ = computePipeline;
     
     vkCmdBindPipeline(GetNative(), VK_PIPELINE_BIND_POINT_COMPUTE,
                         GFX_CAST(VKComputePipeline *, computePipeline)->GetNative());
 }
 
-void VKCommandBuffer::SetIndexBuffer(Buffer* buffer, std::uint32_t offset)
+void VKCommandBuffer::SetIndexBuffer(BufferPtr buffer, std::uint32_t offset)
 {
     // The format of indexBuffer depends on the GraphicPipeline, so, we need to delay set the index buffer
     // by SetIndexBufferInternal
-    boundIndexBufferItem_.indexBuffer = GFX_CAST(VKBuffer*, buffer);
+    boundIndexBufferItem_.indexBuffer = buffer;
     boundIndexBufferItem_.offset = offset;
 }
 
 void
-VKCommandBuffer::SetVertexBuffer(Buffer* buffer, std::uint32_t offset, std::uint32_t slot)
+VKCommandBuffer::SetVertexBuffer(BufferPtr buffer, std::uint32_t offset, std::uint32_t slot)
 {
     auto vkBuffer = GFX_CAST(VKBuffer *, buffer)->GetNative();
     VkDeviceSize vkOffset = offset;
@@ -282,32 +289,25 @@ void VKCommandBuffer::Dispatch(std::uint32_t groupCountX, std::uint32_t groupCou
     vkCmdDispatch(GetNative(), groupCountX, groupCountY, groupCountZ);
 }
 
-void VKCommandBuffer::DispatchIndirect(Buffer* indirectBuffer, BufferSize indirectOffset)
+void VKCommandBuffer::DispatchIndirect(BufferPtr indirectBuffer, BufferSize indirectOffset)
 {
     vkCmdDispatchIndirect(GetNative(), GFX_CAST(VKBuffer *, indirectBuffer)->GetNative(),
                             indirectOffset);
-    bindingObjects_.pushBack(indirectBuffer);
 }
 
-void VKCommandBuffer::AddBindingObject(GfxBase* object)
+void VKCommandBuffer::AddBindingBuffer(const BufferPtr& buffer)
 {
-    if (!object) return;
-    
-    bindingObjects_.pushBack(object);
-    
-    if (object->GetObjectType() == RHIObjectType::Buffer)
-    {
-        auto buffer = GFX_CAST(VKBuffer*, object);
-        buffer->increaseBindCount();
-        bindBuffers_.push_back(buffer);
-    }
+    buffer->increaseBindCount();
+    bindBuffers_.push_back(buffer);
+}
 
-    if (isInRenderPass_ && (object->GetObjectType() == RHIObjectType::BindGroup))
+void VKCommandBuffer::AddBindingBindGroup(const BindGroupPtr& bindGroup)
+{
+    if (isInRenderPass_ && (bindGroup->GetObjectType() == RHIObjectType::BindGroup))
     {
-        auto bindGroup = GFX_CAST(VKBindGroup*, object);
         bindGroupCatagories_.back().push_back(bindGroup);
 
-        const std::vector<VKBuffer *>& buffs = bindGroup->getBindingBuffers();
+        const std::vector<BufferPtr>& buffs = GFX_CAST(VKBindGroup*, bindGroup)->getBindingBuffers();
         for (auto buff : buffs)
         {
             buff->increaseBindCount();
@@ -328,7 +328,6 @@ void VKCommandBuffer::ResetCommandBuffer()
     bindBuffers_.clear();
     // }
 
-    bindingObjects_.clear();
     bindGroupCatagories_.clear();
     isRecording_ = false;
     currentRenderPassIndex_ = 0;
@@ -336,11 +335,14 @@ void VKCommandBuffer::ResetCommandBuffer()
     graphicPipelineBinding_ = nullptr;
     computePipelineBinding_ = nullptr;
     
-    if (pCommandList_)
-    {
-        VKDEVICE()->ReleaseCommandList(pCommandList_);
-        pCommandList_.reset();
-    }
+    //if (pCommandList_)
+    //{
+    //    VKDEVICE()->ReleaseCommandList(pCommandList_);
+    //    pCommandList_.reset();
+    //}
+
+    //GFX_ASSERT(pCommandList_->GetCmdCount() == 0);
+    ResetCommandList();
     
     vkCommandBuffer_ = VK_NULL_HANDLE;
 }
@@ -495,7 +497,7 @@ void VKCommandBuffer::DrawIndexed(std::uint32_t indexCount, std::uint32_t instan
                        firstInstance);
 }
 
-void VKCommandBuffer::DrawIndirect(Buffer* indirectBuffer, BufferSize indirectOffset)
+void VKCommandBuffer::DrawIndirect(BufferPtr indirectBuffer, BufferSize indirectOffset)
 {
     CheckViewportScissorBeforDraw();
     
@@ -512,7 +514,7 @@ void VKCommandBuffer::DrawIndirect(Buffer* indirectBuffer, BufferSize indirectOf
                         stride);
 }
 
-void VKCommandBuffer::DrawIndexedIndirect(Buffer* indirectBuffer, BufferSize indirectOffset)
+void VKCommandBuffer::DrawIndexedIndirect(BufferPtr indirectBuffer, BufferSize indirectOffset)
 {
     SetIndexBufferInternal();
     
@@ -580,24 +582,24 @@ void VKCommandBuffer::BeginOcclusionQuery(std::uint32_t queryIndex)
 {
     GFX_ASSERT(occlusionQuerySetBinding_);
     vkCmdBeginQuery(GetNative(),
-                      occlusionQuerySetBinding_->GetNative(),
-                      queryIndex,
-                      VK_QUERY_CONTROL_PRECISE_BIT);
+        GFX_CAST(VKQuerySet*, occlusionQuerySetBinding_)->GetNative(),
+        queryIndex,
+        VK_QUERY_CONTROL_PRECISE_BIT);
 }
 
 void VKCommandBuffer::EndOcclusionQuery(std::uint32_t queryIndex)
 {
     GFX_ASSERT(occlusionQuerySetBinding_);
     vkCmdEndQuery(GetNative(),
-                      occlusionQuerySetBinding_->GetNative(),
-                      queryIndex);
+        GFX_CAST(VKQuerySet*, occlusionQuerySetBinding_)->GetNative(),
+        queryIndex);
 }
 
 void VKCommandBuffer::ResolveQuerySet(
-    QuerySet* querySet,
+    QuerySetPtr querySet,
     std::uint32_t queryFirstIndex,
     std::uint32_t queryCount,
-    Buffer* dstBuffer,
+    BufferPtr dstBuffer,
     std::uint32_t dstOffset)
 {
     vkCmdCopyQueryPoolResults(GetNative(),
@@ -639,157 +641,153 @@ VkDescriptorSet VKCommandBuffer::AsyncWriteBindGroupToGPU(VKBindGroup* bindGroup
     return bindGroup->GetNative();
 }
 
-void VKCommandBuffer::SubmitCommandList()
-{
-    if (!pCommandList_)
-    {
-        return;
-    }
-    
-    CommandListIterator iterator(pCommandList_.get());
-    while (iterator.HasCommandLeft())
-    {
-        auto cmd = iterator.NextCommand();
-#if 0
-        cmd->Execute(this);
-#else
-        switch (cmd->commandType)
-        {
-            case RenderCommand::BeginCommandBuffer:
-                static_cast<DeferredCmdBeginCommandBuffer*>(cmd)->Execute(this);
-                break;
-    
-            case RenderCommand::BeginRenderPass:
-                static_cast<DeferredCmdBeginRenderPass*>(cmd)->Execute(this);
-                break;
-    
-            case RenderCommand::ClearAttachment:
-                static_cast<DeferredCmdClearAttachment*>(cmd)->Execute(this);
-                break;
-    
-            case RenderCommand::CopyBufferToBuffer:
-                static_cast<DeferredCmdCopyBufferToBuffer*>(cmd)->Execute(this);
-                break;
-    
-            case RenderCommand::CopyBufferToTexture:
-                static_cast<DeferredCmdCopyBufferToTexture*>(cmd)->Execute(this);
-                break;
-    
-            case RenderCommand::CopyTextureToBuffer:
-                static_cast<DeferredCmdCopyTextureToBuffer*>(cmd)->Execute(this);
-                break;
-    
-            case RenderCommand::CopyTextureToTexture:
-                static_cast<DeferredCmdCopyTextureToTexture*>(cmd)->Execute(this);
-                break;
-    
-            case RenderCommand::Dispatch:
-                static_cast<DeferredCmdDispatch*>(cmd)->Execute(this);
-                break;
-    
-            case RenderCommand::DispatchIndirect:
-                static_cast<DeferredCmdDispatchIndirect*>(cmd)->Execute(this);
-                break;
-    
-            case RenderCommand::Draw:
-                static_cast<DeferredCmdDraw*>(cmd)->Execute(this);
-                break;
-    
-            case RenderCommand::DrawIndexed:
-                static_cast<DeferredCmdDrawIndexed*>(cmd)->Execute(this);
-                break;
-    
-            case RenderCommand::DrawIndirect:
-                static_cast<DeferredCmdDrawIndirect*>(cmd)->Execute(this);
-                break;
-    
-            case RenderCommand::DrawIndexedIndirect:
-                static_cast<DeferredCmdDrawIndexedIndirect*>(cmd)->Execute(this);
-                break;
-    
-            case RenderCommand::EndPass:
-                static_cast<DeferredCmdEndPass*>(cmd)->Execute(this);
-                break;
-    
-            case RenderCommand::SetComputePipeline:
-                static_cast<DeferredCmdSetComputePipeline*>(cmd)->Execute(this);
-                break;
-    
-            case RenderCommand::SetGraphicPipeline:
-                static_cast<DeferredCmdSetGraphicPipeline*>(cmd)->Execute(this);
-                break;
-    
-            case RenderCommand::SetStencilReference:
-                static_cast<DeferredCmdSetStencilReference*>(cmd)->Execute(this);
-                break;
-    
-            case RenderCommand::SetScissorRect:
-                static_cast<DeferredCmdSetScissorRect*>(cmd)->Execute(this);
-                break;
-    
-            case RenderCommand::SetViewport:
-                static_cast<DeferredCmdSetViewport*>(cmd)->Execute(this);
-                break;
-    
-            case RenderCommand::SetBlendColor:
-                static_cast<DeferredCmdSetBlendColor*>(cmd)->Execute(this);
-                break;
-
-            case RenderCommand::SetDepthBias:
-                static_cast<DeferredCmdSetDepthBias*>(cmd)->Execute(this);
-                break;
-    
-            case RenderCommand::SetBindGroup:
-                static_cast<DeferredCmdSetBindGroup*>(cmd)->Execute(this);
-                break;
-    
-            case RenderCommand::SetIndexBuffer:
-                static_cast<DeferredCmdSetIndexBuffer*>(cmd)->Execute(this);
-                break;
-    
-            case RenderCommand::SetVertexBuffer:
-                static_cast<DeferredCmdSetVertexBuffer*>(cmd)->Execute(this);
-                break;
-    
-            case RenderCommand::PushDebugGroup:
-                static_cast<DeferredCmdPushDebugGroup*>(cmd)->Execute(this);
-                break;
-    
-            case RenderCommand::PopDebugGroup:
-                static_cast<DeferredCmdPopDebugGroup*>(cmd)->Execute(this);
-                break;
-    
-            case RenderCommand::InsertDebugMarker:
-                static_cast<DeferredCmdInsertDebugMarker*>(cmd)->Execute(this);
-                break;
-    
-            case RenderCommand::ExecuteBundle:
-                static_cast<DeferredCmdExecuteBundle*>(cmd)->Execute(this);
-                break;
-    
-            case RenderCommand::BeginOcclusionQuery:
-                static_cast<DeferredCmdBeginOcclusionQuery*>(cmd)->Execute(this);
-                break;
-    
-            case RenderCommand::EndOcclusionQuery:
-                static_cast<DeferredCmdEndOcclusionQuery*>(cmd)->Execute(this);
-                break;
-    
-            case RenderCommand::ResolveQuerySet:
-                static_cast<DeferredCmdResolveQuerySet*>(cmd)->Execute(this);
-                break;
-    
-            case RenderCommand::PipelineBarrier:
-                static_cast<DeferredCmdPipelineBarrier*>(cmd)->Execute(this);
-                break;
-    
-            default:
-                LOGE("unprocessed command: %d", cmd->commandType);
-                GFX_ASSERT(false);
-        }
-#endif
-    }
-}
+//void VKCommandBuffer::SubmitCommandList()
+//{
+//    if (!pCommandList_)
+//    {
+//        return;
+//    }
+//    
+//    CommandListIterator iterator(pCommandList_.get());
+//    while (iterator.HasCommandLeft())
+//    {
+//        auto cmd = iterator.NextCommand();
+//#if 0
+//        cmd->Execute(this);
+//#else
+//        switch (cmd->commandType)
+//        {
+//            case RenderCommand::BeginCommandBuffer:
+//                static_cast<DeferredCmdBeginCommandBuffer*>(cmd)->Execute(this);
+//                break;
+//    
+//            case RenderCommand::BeginRenderPass:
+//                static_cast<DeferredCmdBeginRenderPass*>(cmd)->Execute(this);
+//                break;
+//    
+//            case RenderCommand::ClearAttachment:
+//                static_cast<DeferredCmdClearAttachment*>(cmd)->Execute(this);
+//                break;
+//    
+//            case RenderCommand::CopyBufferToBuffer:
+//                static_cast<DeferredCmdCopyBufferToBuffer*>(cmd)->Execute(this);
+//                break;
+//    
+//            case RenderCommand::CopyBufferToTexture:
+//                static_cast<DeferredCmdCopyBufferToTexture*>(cmd)->Execute(this);
+//                break;
+//    
+//            case RenderCommand::CopyTextureToBuffer:
+//                static_cast<DeferredCmdCopyTextureToBuffer*>(cmd)->Execute(this);
+//                break;
+//    
+//            case RenderCommand::CopyTextureToTexture:
+//                static_cast<DeferredCmdCopyTextureToTexture*>(cmd)->Execute(this);
+//                break;
+//    
+//            case RenderCommand::Dispatch:
+//                static_cast<DeferredCmdDispatch*>(cmd)->Execute(this);
+//                break;
+//    
+//            case RenderCommand::DispatchIndirect:
+//                static_cast<DeferredCmdDispatchIndirect*>(cmd)->Execute(this);
+//                break;
+//    
+//            case RenderCommand::Draw:
+//                static_cast<DeferredCmdDraw*>(cmd)->Execute(this);
+//                break;
+//    
+//            case RenderCommand::DrawIndexed:
+//                static_cast<DeferredCmdDrawIndexed*>(cmd)->Execute(this);
+//                break;
+//    
+//            case RenderCommand::DrawIndirect:
+//                static_cast<DeferredCmdDrawIndirect*>(cmd)->Execute(this);
+//                break;
+//    
+//            case RenderCommand::DrawIndexedIndirect:
+//                static_cast<DeferredCmdDrawIndexedIndirect*>(cmd)->Execute(this);
+//                break;
+//    
+//            case RenderCommand::EndPass:
+//                static_cast<DeferredCmdEndPass*>(cmd)->Execute(this);
+//                break;
+//    
+//            case RenderCommand::SetComputePipeline:
+//                static_cast<DeferredCmdSetComputePipeline*>(cmd)->Execute(this);
+//                break;
+//    
+//            case RenderCommand::SetGraphicPipeline:
+//                static_cast<DeferredCmdSetGraphicPipeline*>(cmd)->Execute(this);
+//                break;
+//    
+//            case RenderCommand::SetStencilReference:
+//                static_cast<DeferredCmdSetStencilReference*>(cmd)->Execute(this);
+//                break;
+//    
+//            case RenderCommand::SetScissorRect:
+//                static_cast<DeferredCmdSetScissorRect*>(cmd)->Execute(this);
+//                break;
+//    
+//            case RenderCommand::SetViewport:
+//                static_cast<DeferredCmdSetViewport*>(cmd)->Execute(this);
+//                break;
+//    
+//            case RenderCommand::SetBlendColor:
+//                static_cast<DeferredCmdSetBlendColor*>(cmd)->Execute(this);
+//                break;
+//
+//            case RenderCommand::SetDepthBias:
+//                static_cast<DeferredCmdSetDepthBias*>(cmd)->Execute(this);
+//                break;
+//    
+//            case RenderCommand::SetBindGroup:
+//                static_cast<DeferredCmdSetBindGroup*>(cmd)->Execute(this);
+//                break;
+//    
+//            case RenderCommand::SetIndexBuffer:
+//                static_cast<DeferredCmdSetIndexBuffer*>(cmd)->Execute(this);
+//                break;
+//    
+//            case RenderCommand::SetVertexBuffer:
+//                static_cast<DeferredCmdSetVertexBuffer*>(cmd)->Execute(this);
+//                break;
+//    
+//            case RenderCommand::PushDebugGroup:
+//                static_cast<DeferredCmdPushDebugGroup*>(cmd)->Execute(this);
+//                break;
+//    
+//            case RenderCommand::PopDebugGroup:
+//                static_cast<DeferredCmdPopDebugGroup*>(cmd)->Execute(this);
+//                break;
+//    
+//            case RenderCommand::InsertDebugMarker:
+//                static_cast<DeferredCmdInsertDebugMarker*>(cmd)->Execute(this);
+//                break;
+//    
+//            case RenderCommand::BeginOcclusionQuery:
+//                static_cast<DeferredCmdBeginOcclusionQuery*>(cmd)->Execute(this);
+//                break;
+//    
+//            case RenderCommand::EndOcclusionQuery:
+//                static_cast<DeferredCmdEndOcclusionQuery*>(cmd)->Execute(this);
+//                break;
+//    
+//            case RenderCommand::ResolveQuerySet:
+//                static_cast<DeferredCmdResolveQuerySet*>(cmd)->Execute(this);
+//                break;
+//    
+//            case RenderCommand::PipelineBarrier:
+//                static_cast<DeferredCmdPipelineBarrier*>(cmd)->Execute(this);
+//                break;
+//    
+//            default:
+//                LOGE("unprocessed command: %d", cmd->commandType);
+//                GFX_ASSERT(false);
+//        }
+//#endif
+//    }
+//}
 
 void VKCommandBuffer::SetIndexBufferInternal()
 {
@@ -809,7 +807,7 @@ void VKCommandBuffer::SetIndexBufferInternal()
         indexType = VK_INDEX_TYPE_UINT32;
     }
     
-    VkBuffer indexBuffer = boundIndexBufferItem_.indexBuffer->GetNative();
+    VkBuffer indexBuffer = GFX_CAST(VKBuffer*, boundIndexBufferItem_.indexBuffer)->GetNative();
     std::uint32_t offset = boundIndexBufferItem_.offset;
     vkCmdBindIndexBuffer(GetNative(), indexBuffer, offset, indexType);
     
@@ -857,9 +855,40 @@ void VKCommandBuffer::PostprocessCommandBuffer()
     VKDEVICE()->GetObjectManager().AddObjectToCache(this);
 }
 
+void VKCommandBuffer::SetupTexturePipelineBarrier(VKCommandBuffer* commandBuffer, const TexturePtr& texture_, TextureUsageFlags srcUsageFlags_, TextureUsageFlags dstUsageFlags_)
+{
+    TextureFormat textureFormat = texture_->GetFormat();
+
+    VkPipelineStageFlags srcStages = VulkanPipelineStage(srcUsageFlags_, textureFormat);
+    VkPipelineStageFlags dstStages = VulkanPipelineStage(dstUsageFlags_, textureFormat);
+
+    VkImageMemoryBarrier barrier;
+    barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+    barrier.pNext = nullptr;
+    barrier.srcAccessMask = VulkanAccessFlags(srcUsageFlags_, textureFormat);
+    barrier.dstAccessMask = VulkanAccessFlags(dstUsageFlags_, textureFormat);
+    barrier.oldLayout = GetVulkanImageLayout(srcUsageFlags_, textureFormat);
+    barrier.newLayout = GetVulkanImageLayout(dstUsageFlags_, textureFormat);
+    barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+    barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+    barrier.image = GFX_CAST(VKTexture*, texture_)->GetNative();
+
+    // This transitions the whole resource but assumes it is a 2D texture
+    barrier.subresourceRange.aspectMask = VulkanAspectMask(textureFormat);
+    barrier.subresourceRange.baseMipLevel = 0;
+    barrier.subresourceRange.levelCount = texture_->GetMipLevelCount();
+    barrier.subresourceRange.baseArrayLayer = 0;
+    barrier.subresourceRange.layerCount = texture_->GetArrayLayerCount();
+
+    auto vkCommandBuffer = commandBuffer->GetNative();
+    vkCmdPipelineBarrier(vkCommandBuffer, srcStages, dstStages, 0, 0, NULL, 0, NULL, 1, &barrier);
+}
+
+
+
 void VKCommandBuffer::ForceEndRenderPass()
 {
-    if (bHasPendingEndRenderPass_)
+    if (bHasPendingEndRenderPass_ && renderPassBinding_ && framebufferBinding_)
     {
         vkCmdEndRenderPass(vkCommandBuffer_);
     }

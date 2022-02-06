@@ -15,7 +15,7 @@
 
 NS_GFX_BEGIN
 
-VKRenderPass::VKRenderPass(VKDevice* device)
+VKRenderPass::VKRenderPass(const DevicePtr& device)
     : RenderPass(device)
 {
 }

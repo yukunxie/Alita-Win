@@ -18,7 +18,6 @@ public:
         : GfxBase(RHIObjectType::RenderTarget)
     {}
 
-protected:
     virtual ~RenderTarget() = default;
 };
 

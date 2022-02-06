@@ -12,7 +12,7 @@ NS_GFX_BEGIN
 class VKQuerySet : public QuerySet
 {
 public:
-    VKQuerySet(VKDevice* device);
+    VKQuerySet(const DevicePtr& device);
     
     bool Init(const QuerySetDescriptor &descriptor);
     
@@ -21,7 +21,7 @@ public:
     
     virtual void Dispose() override;
 
-protected:
+public:
     ~VKQuerySet();
 
 private:

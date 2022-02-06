@@ -11,59 +11,39 @@
 
 NS_GFX_BEGIN
 
-class VKTextureViewManager
+class TextureViewManager
 {
 public:
-    VKTextureViewManager(VKDevice* device)
+    TextureViewManager(const DevicePtr& device)
     {
         device_ = device;
     }
     
-    ~VKTextureViewManager()
+    ~TextureViewManager()
     {
         Purge();
     }
     
     void Purge()
     {
-        LOGI("Purge VKTextureViewManager");
-        std::vector<VKTextureView*> pendingReleasedTVs;
-        for (auto &it : cache_)
-        {
-            pendingReleasedTVs.push_back(it.second.textureView);
-        }
+        LOGI("Purge TextureViewManager");
+
         cache_.clear();
-        
-        for (auto tv : pendingReleasedTVs)
-        {
-            GFX_SAFE_RELEASE(tv);
-        }
-        
-        LOGI("Purge VKTextureViewManager done.");
+
+        LOGI("Purge TextureViewManager done.");
     }
     
     void RemoveByTexture(Texture* texture)
     {
-        std::vector<VKTextureView*> pendingReleasedTVs;
-        
         auto itStart = cache_.lower_bound(texture);
         auto itEnd = cache_.upper_bound(texture);
-        for (auto it = itStart; it != itEnd; ++it)
-        {
-            pendingReleasedTVs.push_back(it->second.textureView);
-        }
         cache_.erase(itStart, itEnd);
-        
-        for (auto tv : pendingReleasedTVs)
-        {
-            GFX_SAFE_RELEASE(tv);
-        }
     }
     
-    VKTextureView* GetOrCreateTextureView(Texture* texture, const TextureViewDescriptor &descriptor)
+    TextureViewPtr GetOrCreateTextureView(const TexturePtr& texture, const TextureViewDescriptor &descriptor)
     {
-        auto it = cache_.lower_bound(texture);
-        for (auto itEnd = cache_.upper_bound(texture); it != itEnd; ++it)
+        auto it = cache_.lower_bound(texture.get());
+        for (auto itEnd = cache_.upper_bound(texture.get()); it != itEnd; ++it)
         {
             if (it->second.descriptor == descriptor)
             {
@@ -71,17 +51,15 @@ public:
             }
         }
         
-        auto vkTexture = GFX_CAST(VKTexture*, texture);
-        auto texView = device_->CreateObject<VKTextureView>(vkTexture, descriptor);
-        GFX_SAFE_RETAIN(texView);
-        cache_.emplace(texture, TextureViewCacheItem{texView, descriptor});
+        auto texView = GFX_CAST(VKDevice*, device_)->CreateObject<TextureViewPtr, VKTextureView>(texture, descriptor);
+        cache_.emplace(texture.get(), TextureViewCacheItem{texView, descriptor});
         
         return texView;
     }
     
-    std::vector<VKTextureView*> GetAllCreatedTextureViews(Texture* texture)
+    std::vector<TextureViewPtr> GetAllCreatedTextureViews(Texture* texture)
     {
-        std::vector<VKTextureView*> tvs;
+        std::vector<TextureViewPtr> tvs;
         auto it = cache_.lower_bound(texture);
         for (auto itEnd = cache_.upper_bound(texture); it != itEnd; ++it)
         {
@@ -91,11 +69,11 @@ public:
     }
 
 protected:
-    VKDevice* device_ = nullptr;
+    DevicePtr device_ = nullptr;
     
     struct TextureViewCacheItem
     {
-        VKTextureView* textureView = nullptr;
+        TextureViewPtr textureView = nullptr;
         TextureViewDescriptor descriptor;
     };
     std::multimap<Texture*, TextureViewCacheItem> cache_;

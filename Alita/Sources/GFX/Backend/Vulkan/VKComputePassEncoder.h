@@ -14,25 +14,26 @@ NS_GFX_BEGIN
 class VKComputePassEncoder final : public ComputePassEncoder
 {
 protected:
-    VKComputePassEncoder(VKDevice* device);
+    VKComputePassEncoder(const DevicePtr& device);
     
+public:
     ~VKComputePassEncoder();
 
 public:
     
-    bool Init(VKCommandBuffer* commandBuffer, const ComputePassDescriptor &descriptor);
+    bool Init(const CommandBufferPtr& commandBuffer, const ComputePassDescriptor &descriptor);
     
-    virtual void SetPipeline(ComputePipeline* pipeline) override;
+    virtual void SetPipeline(const ComputePipelinePtr& pipeline) override;
     
     virtual void Dispatch(uint32_t x, uint32_t y = 1, uint32_t z = 1) override;
     
-    virtual void DispatchIndirect(Buffer* indirectBuffer, BufferSize indirectOffset) override;
+    virtual void DispatchIndirect(const BufferPtr& indirectBuffer, BufferSize indirectOffset) override;
     
     virtual void EndPass() override;
     
     virtual void Dispose() override;
     
-    virtual void SetBindGroup(std::uint32_t index, BindGroup* bindGroup, std::uint32_t count,
+    virtual void SetBindGroup(std::uint32_t index, const BindGroupPtr& bindGroup, std::uint32_t count,
                               std::uint32_t* dynamicOffsets) override;
     
     virtual void PushDebugGroup(const std::string &groupLabel) override
@@ -51,7 +52,7 @@ public:
     }
 
 private:
-    VKCommandBuffer* commandBuffer_ = nullptr;
+    CommandBufferPtr commandBuffer_ = nullptr;
     
     friend class VKDevice;
 };

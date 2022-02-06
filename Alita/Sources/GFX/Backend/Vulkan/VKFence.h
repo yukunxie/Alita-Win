@@ -17,8 +17,9 @@ class VKFence final : public Fence
 protected:
     VKFence() = delete;
     
-    VKFence(VKDevice* device);
+    VKFence(const DevicePtr& device);
     
+public:
     virtual ~VKFence();
 
 public:

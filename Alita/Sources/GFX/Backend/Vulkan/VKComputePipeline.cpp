@@ -9,7 +9,7 @@
 
 NS_GFX_BEGIN
 
-VKComputePipeline::VKComputePipeline(VKDevice* device)
+VKComputePipeline::VKComputePipeline(const DevicePtr& device)
     : ComputePipeline(device)
 {
 }

@@ -14,10 +14,9 @@ NS_GFX_BEGIN
 
 extern PFN_vkDebugMarkerSetObjectNameEXT vkDebugMarkerSetObjectName;
 
-VKTexture::VKTexture(VKDevice* device)
+VKTexture::VKTexture(DevicePtr device)
     : Texture(device)
 {
-
 }
 
 void VKTexture::Dispose()
@@ -107,13 +106,7 @@ bool VKTexture::Init(const TextureDescriptor &descriptor)
     CALL_VK(vkBindImageMemory(vkDevice_, vkImage_, vkDeviceMemory_, 0));
 #endif
     
-    if (textureUsage_ & TextureUsage::PRESENT)
-    {
-        VKCommandBuffer* commandBuffer = GFX_CAST(VKQueue*, VKDEVICE()->GetQueue())->GetImageLayoutInitCommandBuffer();
-        commandBuffer->RecordCommand<DeferredCmdPipelineBarrier>(this, TextureUsage::UNDEFINED, TextureUsage::PRESENT);
-        commandBuffer->AddBindingObject(this);
-        currentTexUsageForMemLayout_ = TextureUsage::PRESENT;
-    }
+    
     
     return vkImage_ != VK_NULL_HANDLE;
 }
@@ -128,15 +121,7 @@ bool VKTexture::Init(VkImage vkImage, const TextureDescriptor &descriptor)
     auto device = VKDEVICE();
     vkDevice_ = device->GetNative();
     vkFormat_ = ToVulkanType(descriptor.format);
-    
-    if (textureUsage_ & TextureUsage::PRESENT)
-    {
-        VKCommandBuffer* commandBuffer = GFX_CAST(VKQueue*, VKDEVICE()->GetQueue())->GetImageLayoutInitCommandBuffer();
-        commandBuffer->RecordCommand<DeferredCmdPipelineBarrier>(this, TextureUsage::UNDEFINED, TextureUsage::PRESENT);
-        commandBuffer->AddBindingObject(this);
-        currentTexUsageForMemLayout_ = TextureUsage::PRESENT;
-    }
-    
+   
     return true;
 }
 
@@ -168,31 +153,33 @@ void VKTexture::DisposeNativeHandle()
     }
 }
 
-void VKTexture::SetVkImageHandleDirectly(VkImage vkImage)
+void VKTexture::SetVkImageHandleDirectly(const TexturePtr& texture, VkImage vkImage)
 {
-    GFX_ASSERT(vkImage_ == VK_NULL_HANDLE);
+    VKTexture* pThiz = GFX_CAST(VKTexture*, texture);
     
-    vkImage_ = vkImage;
-    currentTexUsageForMemLayout_ = TextureUsage::UNDEFINED;
+    pThiz->vkImage_ = vkImage;
+    pThiz->currentTexUsageForMemLayout_ = TextureUsage::UNDEFINED;
     
-    if (textureUsage_ & TextureUsage::PRESENT)
+    if (pThiz->GetTextureUsage() & TextureUsage::PRESENT)
     {
-        VKCommandBuffer* commandBuffer = GFX_CAST(VKQueue*, VKDEVICE()->GetQueue())->GetImageLayoutInitCommandBuffer();
-        commandBuffer->RecordCommand<DeferredCmdPipelineBarrier>(this, TextureUsage::UNDEFINED, TextureUsage::PRESENT);
-        commandBuffer->AddBindingObject(this);
-        currentTexUsageForMemLayout_ = TextureUsage::PRESENT;
+        auto queue = GFX_CAST(VKQueue*, texture->GetGPUDevice()->GetQueue());
+        VKCommandBuffer* commandBuffer = GFX_CAST(VKCommandBuffer*, queue->GetImageLayoutInitCommandBuffer());
+
+        //commandBuffer->RecordCommand<DeferredCmdPipelineBarrier>(texture, TextureUsage::UNDEFINED, TextureUsage::PRESENT);
+
+        commandBuffer->AddCmd([texture_ = texture, srcUsageFlags_ = TextureUsage::UNDEFINED, dstUsageFlags_ = TextureUsage::PRESENT](CommandBuffer* commandBuffer) {
+            VKCommandBuffer* commandBuffer_ = (VKCommandBuffer*)commandBuffer;
+            VKCommandBuffer::SetupTexturePipelineBarrier(commandBuffer_, texture_, srcUsageFlags_, dstUsageFlags_);
+        });
+
+        pThiz->currentTexUsageForMemLayout_ = TextureUsage::PRESENT;
     }
     
-    const auto& tvs = VKDEVICE()->GetTextureViewManager()->GetAllCreatedTextureViews(this);
-    for (VKTextureView* tv : tvs)
+    const auto& tvs = GFX_CAST(VKDevice*, texture->GetGPUDevice())->GetTextureViewManager()->GetAllCreatedTextureViews(texture.get());
+    for (const auto& tv : tvs)
     {
         tv->Recreate();
     }
-}
-
-TextureView* VKTexture::CreateView(const TextureViewDescriptor &descriptor)
-{
-    return VKDEVICE()->CreateTextureView(this, descriptor);
 }
 
 void VKTexture::TransToCopySrcImageLayout(VKCommandBuffer* commandBuffer)
@@ -236,7 +223,6 @@ void VKTexture::TransToSampledImageLayout(VKCommandBuffer* commandBuffer)
 
 void VKTexture::TransToTargetImageLayout_(VKCommandBuffer* commandBuffer, TextureUsageFlags targetTextureUsage)
 {
-    // commandBuffer->RecordCommand<DeferredCmdPipelineBarrier>(this, currentImageLayout_, targetTextureUsage);
     VkPipelineStageFlags srcStages = VulkanPipelineStage(currentTexUsageForMemLayout_, textureFormat_);
     VkPipelineStageFlags dstStages = VulkanPipelineStage(targetTextureUsage, textureFormat_);
 

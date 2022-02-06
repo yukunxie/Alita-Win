@@ -9,7 +9,7 @@
 
 NS_GFX_BEGIN
 
-VKFramebuffer::VKFramebuffer(VKDevice* device)
+VKFramebuffer::VKFramebuffer(const DevicePtr& device)
     : Framebuffer(device)
 {
 }
@@ -19,14 +19,12 @@ bool VKFramebuffer::Init(const FramebufferCacheQuery &query)
     colorAttachments_.fill(nullptr);
     
     renderPass_ = query.renderPass;
-    GFX_SAFE_RETAIN(renderPass_);
     
     for (std::uint32_t i = 0; i < kMaxColorAttachments; ++i)
     {
         if (query.attachments[i])
         {
             colorAttachments_[colorAttachmentCount_] = query.attachments[i];
-            GFX_SAFE_RETAIN(colorAttachments_[colorAttachmentCount_]);
             ++colorAttachmentCount_;
         }
     }
@@ -47,7 +45,7 @@ void VKFramebuffer::Prepare()
     attachments.fill(VK_NULL_HANDLE);
     for (std::uint32_t i = 0; i < colorAttachmentCount_; ++i)
     {
-        attachments[i] = colorAttachments_[i]->GetNative();
+        attachments[i] = GFX_CAST(VKTextureView*, colorAttachments_[i])->GetNative();
         hasSwapChainImages_ |= colorAttachments_[i]->GetTexture()->IsSwapchainImage();
     }
     
@@ -56,7 +54,7 @@ void VKFramebuffer::Prepare()
         createInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
         createInfo.flags = 0;
         createInfo.pNext = nullptr;
-        createInfo.renderPass = renderPass_->GetNative();
+        createInfo.renderPass = GFX_CAST(VKRenderPass*, renderPass_)->GetNative();
         createInfo.layers = 1;
         createInfo.attachmentCount = colorAttachmentCount_;
         createInfo.pAttachments = attachments.data();
@@ -90,9 +88,9 @@ void VKFramebuffer::Dispose()
     
     for (std::uint32_t i = 0; i < colorAttachmentCount_; ++i)
     {
-        GFX_SAFE_RELEASE(colorAttachments_[i]);
+        colorAttachments_[i].reset();
     }
-    GFX_SAFE_RELEASE(renderPass_);
+    renderPass_.reset();
     
     GFX_DISPOSE_END();
 }

@@ -14,12 +14,11 @@ NS_GFX_BEGIN
 class RenderQueue : public GfxBase
 {
 public:
-    RenderQueue(Device* GPUDevice)
+    RenderQueue(DevicePtr GPUDevice)
         : GfxBase(GPUDevice, RHIObjectType::RenderQueue)
     {
     }
 
-protected:
     virtual ~RenderQueue() = default;
 
 public:

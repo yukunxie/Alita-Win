@@ -18,24 +18,23 @@ NS_GFX_BEGIN
 class CommandEncoder : public GfxBase
 {
 public:
-    CommandEncoder(Device* GPUDevice)
+    CommandEncoder(DevicePtr GPUDevice)
         : GfxBase(GPUDevice, RHIObjectType::CommandEncoder)
     {}
 
-protected:
     virtual ~CommandEncoder() = default;
 
 public:
-    virtual RenderPassEncoder* BeginRenderPass(const RenderPassDescriptor &descriptor) = 0;
+    virtual RenderPassEncoderPtr BeginRenderPass(const RenderPassDescriptor &descriptor) = 0;
     
-    virtual ComputePassEncoder* BeginComputePass(const ComputePassDescriptor &descriptor) = 0;
+    virtual ComputePassEncoderPtr BeginComputePass(const ComputePassDescriptor &descriptor) = 0;
     
-    virtual CommandBuffer* Finish(const CommandBufferDescriptor &descriptor = {}) = 0;
+    virtual CommandBufferPtr Finish(const CommandBufferDescriptor &descriptor = {}) = 0;
     
     virtual void CopyBufferToBuffer(
-        Buffer* source,
+        BufferPtr source,
         BufferSize sourceOffset,
-        Buffer* destination,
+        BufferPtr destination,
         BufferSize destinationOffset,
         BufferSize size) = 0;
     
@@ -55,10 +54,10 @@ public:
         Extent3D &copySize) = 0;
     
     virtual void ResolveQuerySet(
-        QuerySet* querySet,
+        const QuerySetPtr& querySet,
         std::uint32_t queryFirstIndex,
         std::uint32_t queryCount,
-        Buffer* dstBuffer,
+        const BufferPtr& dstBuffer,
         std::uint32_t dstOffset) = 0;
     
     virtual void PushDebugGroup(const std::string &groupLabel) = 0;

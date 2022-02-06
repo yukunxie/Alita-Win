@@ -11,10 +11,13 @@ NS_GFX_BEGIN
 
 class VKBuffer final : public Buffer
 {
-protected:
-    VKBuffer(VKDevice* device);
-    
+public:
     virtual ~VKBuffer();
+
+protected:
+    VKBuffer(const DevicePtr& device);
+    
+    
 
 public:
     

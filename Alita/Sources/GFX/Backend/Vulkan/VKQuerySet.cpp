@@ -7,7 +7,7 @@
 NS_GFX_BEGIN
 
 
-VKQuerySet::VKQuerySet(VKDevice* device)
+VKQuerySet::VKQuerySet(const DevicePtr& device)
     : QuerySet(device)
 {
 }

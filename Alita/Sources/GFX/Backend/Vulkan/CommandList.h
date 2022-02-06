@@ -61,6 +61,16 @@ public:
     
         cmdCount_++;
     }
+
+    void AddCmd(std::function<void(const CommandBufferPtr&)>&& func)
+    {
+        gfxCmds_.push_back(std::move(func));
+    }
+
+    void AddCmd(const std::function<void(const CommandBufferPtr&)>& func)
+    {
+        gfxCmds_.push_back(func);
+    }
     
     void Reset();
     
@@ -82,6 +92,8 @@ protected:
     
     DeferredCmdWrapper* firstCommandNode_ = nullptr;
     DeferredCmdWrapper* lastCommandNode_ = nullptr;
+
+    std::vector<std::function<void(const CommandBufferPtr&)>> gfxCmds_;
     
     friend class CommandListIterator;
 };

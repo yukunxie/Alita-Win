@@ -8,7 +8,7 @@
 
 NS_GFX_BEGIN
 
-VKBuffer::VKBuffer(VKDevice* device)
+VKBuffer::VKBuffer(const DevicePtr& device)
     : Buffer(device)
 {
 }
@@ -167,7 +167,7 @@ void VKBuffer::MapReadAsync(
     const std::function<void(bool, Buffer*, const void*)> &onMapReadReady, 
     std::uint32_t offset, std::uint32_t size)
 {
-    if (onMapReadReady == nullptr) {
+ /*   if (onMapReadReady == nullptr) {
         onMapReadReady_ = nullptr;
         return;
     }
@@ -180,13 +180,13 @@ void VKBuffer::MapReadAsync(
     else {
         auto data = MapRead(0, GetBufferSize());
         onMapReadReady(true, this, data);
-    }
+    }*/
 }
 
 void VKBuffer::MapWriteAsync(const std::function<void(bool, Buffer*, void*)> &onMapWriteReady, 
     std::uint32_t offset, std::uint32_t size)
 {
-    if (onMapWriteReady == nullptr) {
+ /*   if (onMapWriteReady == nullptr) {
         onMapWriteReady_ = nullptr;
         return;
     }
@@ -199,7 +199,7 @@ void VKBuffer::MapWriteAsync(const std::function<void(bool, Buffer*, void*)> &on
     else {
         auto data = MapWrite(0, GetBufferSize());
         onMapWriteReady(true, this, data);
-    }
+    }*/
 }
 
 void VKBuffer::CallMapReadCallback(std::uint32_t offset, std::uint32_t size)

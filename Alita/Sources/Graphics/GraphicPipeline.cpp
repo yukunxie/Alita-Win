@@ -50,7 +50,7 @@ GraphicPipeline::GraphicPipeline()
 		};
 		rhiDSTexture_ = Engine::GetGPUDevice()->CreateTexture(descriptor);
 		GFX_SAFE_RETAIN(rhiDSTexture_);
-		rhiDSTextureView_ = rhiDSTexture_->CreateView({});
+		rhiDSTextureView_ = Engine::GetGPUDevice()->CreateTextureView(rhiDSTexture_, {});
 		GFX_SAFE_RETAIN(rhiDSTextureView_);
 	}
 }
@@ -112,8 +112,7 @@ void GraphicPipeline::Execute(const std::vector<RenderObject*>& renderObjects)
 		ScreenResolvePass_.Execute();
 	}
 
-		gfx::CommandBuffer* cmdBuffer = CommandEncoder_->Finish();
-		GFX_SAFE_RETAIN(cmdBuffer);
+		gfx::CommandBufferPtr cmdBuffer = CommandEncoder_->Finish();
 
 		GraphicQueue_->Submit(1, &cmdBuffer);
 		Engine::GetGPUDevice()->OnFrameEnd();

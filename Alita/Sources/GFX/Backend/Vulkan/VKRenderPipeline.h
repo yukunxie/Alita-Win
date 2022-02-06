@@ -16,8 +16,9 @@ class VKPipelineLayout;
 class VKRenderPipeline final : public RenderPipeline
 {
 protected:
-    VKRenderPipeline(VKDevice* device);
+    VKRenderPipeline(const DevicePtr& device);
     
+public:
     virtual ~VKRenderPipeline();
 
 public:
@@ -37,9 +38,9 @@ public:
     }
 
 private:
-    VKPipelineLayout* pipelineLayout_ = nullptr;
+    PipelineLayoutPtr pipelineLayout_ = nullptr;
     VkPipeline vkGraphicsPipeline_ = VK_NULL_HANDLE;
-    VKRenderPass* renderPass_ = nullptr;
+    RenderPassPtr renderPass_ = nullptr;
     
     friend class VKDevice;
 };

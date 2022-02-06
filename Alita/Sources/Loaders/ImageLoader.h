@@ -9,10 +9,10 @@ NS_RX_BEGIN
 
 namespace ImageLoader
 {
-	gfx::Texture* LoadTextureFromUri(const std::string& filename);
-	gfx::Texture* LoadCubeTexture(const std::string& cubeTextureName);
-	gfx::Texture* LoadTextureFromData(const std::uint8_t* data, std::uint32_t byteLength, const std::string& debugName = "");
-	gfx::Texture* LoadTextureFromData(uint32 width, uint32 height, uint32 component, const uint8* data, uint32 byteLength, const std::string& debugName = "");
+	gfx::TexturePtr LoadTextureFromUri(const std::string& filename);
+	gfx::TexturePtr LoadCubeTexture(const std::string& cubeTextureName);
+	gfx::TexturePtr LoadTextureFromData(const std::uint8_t* data, std::uint32_t byteLength, const std::string& debugName = "");
+	gfx::TexturePtr LoadTextureFromData(uint32 width, uint32 height, uint32 component, const uint8* data, uint32 byteLength, const std::string& debugName = "");
 }
 
 NS_RX_END

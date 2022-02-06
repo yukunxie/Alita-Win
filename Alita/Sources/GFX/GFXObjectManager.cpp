@@ -11,7 +11,7 @@ NS_GFX_BEGIN
 
 void GfxObjectManager::AddObject(GfxBase* objectBase)
 {
-    if (TestObject(objectBase))
+    /*if (TestObject(objectBase))
     {
         return;
     }
@@ -65,12 +65,12 @@ void GfxObjectManager::AddObject(GfxBase* objectBase)
 
 #if GFX_DEBUG
     TrackObjectDebugging_(objectBase);
-#endif
+#endif*/
 }
     
 void GfxObjectManager::RemoveObject(const GfxBase* object)
 {
-    if (object->GetObjectType() == RHIObjectType::CommandBuffer)
+    /*if (object->GetObjectType() == RHIObjectType::CommandBuffer)
     {
         commandBufferCount_--;
     }
@@ -131,34 +131,35 @@ void GfxObjectManager::RemoveObject(const GfxBase* object)
 
 #if GFX_DEBUG
     RemoveTrackedObjectDebugging_(object);
-#endif
+#endif*/
 }
 
     
 #if GFX_DEBUG
 void GfxObjectManager::TrackObjectDebugging_(const GfxBase* object)
 {
-    auto type = (std::uint32_t) object->GetObjectType();
+   /* auto type = (std::uint32_t) object->GetObjectType();
     GFX_ASSERT(type > 0 && type < kMaxRHIObjectTypeCount);
     objectTrackers_[type][object] = object->GetObjectType();
-    objectTrackerCount_++;
+    objectTrackerCount_++;*/
 }
 
 bool GfxObjectManager::FindObjectDebugging_(const GfxBase* object)
 {
-    for (std::uint32_t i = 0; i < kMaxRHIObjectTypeCount; ++i)
+   /* for (std::uint32_t i = 0; i < kMaxRHIObjectTypeCount; ++i)
     {
         if (objectTrackers_[i].find(object) != objectTrackers_[i].end())
         {
             return true;
         }
     }
+    return false;*/
     return false;
 }
 
 void GfxObjectManager::RemoveTrackedObjectDebugging_(const GfxBase* object)
 {
-    if (!FindObjectDebugging_(object))
+   /* if (!FindObjectDebugging_(object))
     {
         return;
     }
@@ -173,7 +174,7 @@ void GfxObjectManager::RemoveTrackedObjectDebugging_(const GfxBase* object)
     {
         objects.erase(it);
     }
-    objectTrackerCount_--;
+    objectTrackerCount_--;*/
 }
 #endif // #if GFX_DEBUG
 

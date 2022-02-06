@@ -13,11 +13,10 @@ NS_GFX_BEGIN
 class RenderPass : public GfxBase
 {
 public:
-    RenderPass(Device* GPUDevice)
+    RenderPass(DevicePtr GPUDevice)
         : GfxBase(GPUDevice, RHIObjectType::RenderPass)
     {}
 
-protected:
     virtual ~RenderPass() = default;
 };
 

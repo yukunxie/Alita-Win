@@ -13,8 +13,9 @@ NS_GFX_BEGIN
 class VKRenderPass final : public RenderPass
 {
 protected:
-    VKRenderPass(VKDevice* device);
+    VKRenderPass(const DevicePtr& device);
     
+public:
     virtual ~VKRenderPass();
 
 public:

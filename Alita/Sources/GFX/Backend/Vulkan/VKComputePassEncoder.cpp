@@ -9,7 +9,7 @@
 
 NS_GFX_BEGIN
 
-VKComputePassEncoder::VKComputePassEncoder(VKDevice* device)
+VKComputePassEncoder::VKComputePassEncoder(const DevicePtr& device)
     : ComputePassEncoder(device)
 {
 }
@@ -28,27 +28,40 @@ void VKComputePassEncoder::Dispose()
     GFX_DISPOSE_END();
 }
 
-bool VKComputePassEncoder::Init(VKCommandBuffer* commandBuffer, const ComputePassDescriptor &descriptor)
+bool VKComputePassEncoder::Init(const CommandBufferPtr& commandBuffer, const ComputePassDescriptor &descriptor)
 {
-    GFX_PTR_ASSIGN(commandBuffer_, commandBuffer);
+    commandBuffer_ = commandBuffer;
     return true;
 }
 
-void VKComputePassEncoder::SetPipeline(ComputePipeline* pipeline)
+void VKComputePassEncoder::SetPipeline(const ComputePipelinePtr& pipeline)
 {
-    commandBuffer_->RecordCommand<DeferredCmdSetComputePipeline>(pipeline);
-    commandBuffer_->AddBindingObject(pipeline);
+    //GFX_CAST(VKCommandBuffer*, commandBuffer_)->RecordCommand<DeferredCmdSetComputePipeline>(pipeline);
+
+    commandBuffer_->AddCmd([pipeline](CommandBuffer* commandBuffer) {
+        commandBuffer->BindComputePipeline(pipeline);
+        });
 }
 
 void VKComputePassEncoder::Dispatch(std::uint32_t x, std::uint32_t y, std::uint32_t z)
 {
-    commandBuffer_->RecordCommand<DeferredCmdDispatch>(x, y, z);
+    //GFX_CAST(VKCommandBuffer*, commandBuffer_)->RecordCommand<DeferredCmdDispatch>(x, y, z);
+
+    commandBuffer_->AddCmd([x, y, z](CommandBuffer* commandBuffer) {
+        commandBuffer->Dispatch(x, y, z);
+        });
+
 }
 
-void VKComputePassEncoder::DispatchIndirect(Buffer* indirectBuffer, BufferSize indirectOffset)
+void VKComputePassEncoder::DispatchIndirect(const BufferPtr& indirectBuffer, BufferSize indirectOffset)
 {
-    commandBuffer_->RecordCommand<DeferredCmdDispatchIndirect>(indirectBuffer, indirectOffset);
-    commandBuffer_->AddBindingObject(indirectBuffer);
+    //GFX_CAST(VKCommandBuffer*, commandBuffer_)->RecordCommand<DeferredCmdDispatchIndirect>(indirectBuffer, indirectOffset);
+
+    commandBuffer_->AddCmd([indirectBuffer, indirectOffset](CommandBuffer* commandBuffer) {
+        commandBuffer->DispatchIndirect(indirectBuffer, indirectOffset);
+        });
+
+    GFX_CAST(VKCommandBuffer*, commandBuffer_)->AddBindingBuffer(indirectBuffer);
 }
 
 void VKComputePassEncoder::EndPass()
@@ -56,15 +69,29 @@ void VKComputePassEncoder::EndPass()
 }
 
 void
-VKComputePassEncoder::SetBindGroup(std::uint32_t index, BindGroup* bindGroup, std::uint32_t count,
+VKComputePassEncoder::SetBindGroup(std::uint32_t index, const BindGroupPtr& bindGroup, std::uint32_t count,
                                    std::uint32_t* dynamicOffsets)
 {
-    commandBuffer_->RecordCommand<DeferredCmdSetBindGroup>(PipelineType::Compute,
+    /*GFX_CAST(VKCommandBuffer*, commandBuffer_)->RecordCommand<DeferredCmdSetBindGroup>(PipelineType::Compute,
                                                            index,
                                                            bindGroup,
                                                            count,
-                                                           dynamicOffsets);
-    commandBuffer_->AddBindingObject(bindGroup);
+                                                           dynamicOffsets);*/
+
+    std::vector<std::uint32_t> tmpOffsets(count);
+    if (count > 0)
+    {
+        memcpy(tmpOffsets.data(), dynamicOffsets, sizeof(std::uint32_t) * count);
+    }
+
+    commandBuffer_->AddCmd([index, bindGroup, dynamicOffsets = tmpOffsets](CommandBuffer* commandBuffer) {
+        commandBuffer->SetBindGroupToComputePipeline(index,
+            bindGroup,
+            (std::uint32_t)dynamicOffsets.size(),
+            dynamicOffsets.data());
+    });
+
+    GFX_CAST(VKCommandBuffer*, commandBuffer_)->AddBindingBindGroup(bindGroup);
 }
 
 NS_GFX_END

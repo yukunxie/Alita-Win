@@ -15,14 +15,14 @@
 
 NS_GFX_BEGIN
 
-VKSwapChain::VKSwapChain(VKDevice* device)
+VKSwapChain::VKSwapChain(const DevicePtr& device)
     : SwapChain(device)
 {
 }
 
 VKSwapChain::~VKSwapChain()
 {
-    if (VKDEVICE()->GetSwapChain() == this)
+    if (VKDEVICE()->GetSwapChain().get() == this)
     {
         VKDEVICE()->SetSwapChain(nullptr);
     }
@@ -47,8 +47,6 @@ bool VKSwapChain::Init(const SwapChainDescriptor& descriptor)
     CreateVulkanSwapChain();
     
     Init();
-    
-    VKDEVICE()->SetSwapChain(this);
     
     for (ssize_t i = 0; i < swapchainTextures_.size(); ++i)
     {
@@ -139,11 +137,12 @@ void VKSwapChain::Init()
     
     for (size_t i = 0; i < swapChainImages.size(); ++i)
     {
-        if (swapchainTextures_[i])
+        auto texture = GFX_CAST(VKTexture*, swapchainTextures_[i]);
+        if (texture)
         {
             // Here. this branch is adapted for recreate swapchain.
-            swapchainTextures_[i]->SetVkImageHandleDirectly(swapChainImages[i]);
-            swapchainTextures_[i]->textureSize_ = { extent_.width, extent_.height, 1 };
+            texture->SetVkImageHandleDirectly(swapchainTextures_[i], swapChainImages[i]);
+            texture->textureSize_ = { extent_.width, extent_.height, 1 };
         }
         else
         {
@@ -155,11 +154,10 @@ void VKSwapChain::Init()
             descriptor.arrayLayerCount = 1;
             descriptor.format = format_;
             descriptor.mipLevelCount = 1;
-            swapchainTextures_[i] = VKDEVICE()->CreateObject<VKTexture>(swapChainImages[i],
-                                                                        descriptor);
-            swapchainTextures_[i]->MarkSwapchainImage();
-            swapchainTextures_[i]->SetIsSwapChainTexture(true);
-            GFX_SAFE_RETAIN(swapchainTextures_[i]);
+            swapchainTextures_[i] = VKDEVICE()->CreateObject<TexturePtr, VKTexture>(swapChainImages[i], descriptor);
+            texture = GFX_CAST(VKTexture*, swapchainTextures_[i]);
+            texture->MarkSwapchainImage();
+            texture->SetIsSwapChainTexture(true);
         }
     }
 }
@@ -179,9 +177,8 @@ void VKSwapChain::Dispose()
     {
         if (textureViewCache)
         {
-            textureViewCache->RemoveByTexture(texture);
+            textureViewCache->RemoveByTexture(texture.get());
         }
-        GFX_SAFE_RELEASE(texture);
     }
     swapchainTextures_.clear();
     
@@ -197,8 +194,8 @@ void VKSwapChain::NotifyPresentDone(bool hasDrawCommands)
 {
     pSemaphoreCxx_->Signal();
     
-    VKDEVICE()->ScheduleCallbackExecutedInGameThread([hasDrawCommands](VKDevice* device) {
-        device->SetPresentDone(hasDrawCommands);
+    VKDEVICE()->ScheduleCallbackExecutedInGameThread([hasDrawCommands](const DevicePtr& device) {
+        GFX_CAST(VKDevice*, device)->SetPresentDone(hasDrawCommands);
     });
 }
 
@@ -213,7 +210,7 @@ bool VKSwapChain::RecreateSwapChainInternal()
     // Release vulkan image resource manually.
     for (auto texture : swapchainTextures_)
     {
-        texture->DisposeNativeHandle();
+        GFX_CAST(VKTexture*, texture)->DisposeNativeHandle();
     }
     
     if (vkSwapChain_)
@@ -254,7 +251,7 @@ void VKSwapChain::AcquireNextImage()
     imageIndex_ = (imageIndex_ + 1) % swapchainTextures_.size();
 }
 
-Texture* VKSwapChain::GetCurrentTexture()
+TexturePtr VKSwapChain::GetCurrentTexture()
 {
     return swapchainTextures_[imageIndex_];
 }

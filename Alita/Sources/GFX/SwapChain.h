@@ -16,16 +16,15 @@ NS_GFX_BEGIN
 class SwapChain : public GfxBase
 {
 public:
-    SwapChain(Device* GPUDevice)
+    SwapChain(DevicePtr GPUDevice)
         : GfxBase(GPUDevice, RHIObjectType::SwapChain)
     {}
 
-protected:
     virtual ~SwapChain() = default;
 
 public:
     
-    virtual Texture* GetCurrentTexture() = 0;
+    virtual TexturePtr GetCurrentTexture() = 0;
     
     // virtual void Present(Queue* queue) = 0;
     

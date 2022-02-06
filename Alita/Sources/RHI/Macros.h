@@ -57,13 +57,6 @@ obj = nullptr;                  \
 
 #define GFX_SAFE_RETAIN(obj)    \
     do {                        \
-        auto tmp = obj;         \
-        if (tmp)                \
-        {                       \
-            PUSH_TRACEBACK      \
-            tmp->Retain();      \
-            POP_TRACEBACK       \
-        }                       \
     } while (0)
 
 // #define GFX_SAFE_RETAIN(obj)    \
@@ -75,11 +68,6 @@ obj = nullptr;                  \
 
 #define GFX_SAFE_RELEASE(obj)   \
 do {                            \
-    auto tmp = obj;             \
-    PUSH_TRACEBACK              \
-    (obj) = nullptr;            \
-    if (tmp) tmp->Release();    \
-    POP_TRACEBACK               \
 } while (0)
 
 #define GFX_PTR_ASSIGN(dstObjPtr, srcObjPtr)    \
@@ -87,13 +75,11 @@ do {                                            \
     auto srcObjPtr_ = (srcObjPtr);              \
     if (dstObjPtr != srcObjPtr_)                \
     {                                           \
-        GFX_SAFE_RELEASE(dstObjPtr);            \
         dstObjPtr = (decltype(dstObjPtr))srcObjPtr_;                 \
-        GFX_SAFE_RETAIN(dstObjPtr);             \
     }                                           \
 } while (0)
 
-#define GFX_CAST(TYPE, obj) (static_cast<TYPE>(obj))
+#define GFX_CAST(TYPE, obj) (static_cast<TYPE>((obj).get()))
 
 #define GFX_DISPOSE_BEGIN()         \
 do {                                \

@@ -42,7 +42,6 @@ enum class RenderCommand
     PushDebugGroup,
     PopDebugGroup,
     InsertDebugMarker,
-    ExecuteBundle,
     BeginOcclusionQuery,
     EndOcclusionQuery,
     ResolveQuerySet,

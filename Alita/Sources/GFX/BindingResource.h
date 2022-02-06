@@ -24,18 +24,20 @@ enum class BindingResourceType
 class BindingResource : public GfxBase
 {
 public:
-    BindingResource(Device* device, BindingResourceType bindingResourceType)
+    BindingResource(DevicePtr device, BindingResourceType bindingResourceType)
         : GfxBase(device, RHIObjectType::BindingResource)
     {
         bindingResourceType_ = bindingResourceType;
     }
-    
-    BindingResourceType GetResourceType() const
-    { return bindingResourceType_;}
 
-protected:
+    BindingResourceType GetResourceType() const
+    {
+        return bindingResourceType_;
+    }
+
     virtual ~BindingResource() = default;
     
+protected:
     BindingResourceType bindingResourceType_;
 };
 

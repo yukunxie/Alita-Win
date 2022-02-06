@@ -13,7 +13,7 @@ NS_GFX_BEGIN
 class TextureView : public GfxBase
 {
 public:
-    TextureView(Device* GPUDevice)
+    TextureView(DevicePtr GPUDevice)
         : GfxBase(GPUDevice, RHIObjectType::TextureView)
     {
     }
@@ -24,9 +24,10 @@ public:
     void MarkSwapchainImage()
     { isSwapchainImage_ = true; }
 
-    virtual const Texture* GetTexture() const { return nullptr; }
+    virtual const TexturePtr& GetTexture() const { return {}; }
 
-protected:
+    virtual void Recreate() = 0;
+
     virtual ~TextureView() = default;
 
 public:
@@ -39,29 +40,29 @@ protected:
 class TextureViewBinding final : public BindingResource
 {
 public:
-    TextureViewBinding(Device* device)
+    TextureViewBinding(const DevicePtr& device)
         : BindingResource(device, BindingResourceType::TextureView)
     {
     }
     
     virtual ~TextureViewBinding() = default;
     
-    bool Init(TextureView* textureView)
+    bool Init(const TextureViewPtr& textureView)
     {
         textureView_ = textureView;
         return true;
     }
     
-    TextureView* GetTextureView()
+    const TextureViewPtr& GetTextureView()
     {
-        return textureView_.Get();
+        return textureView_;
     }
     
     virtual void Dispose() override
     {}
 
 protected:
-    RHIObjectWrapper<TextureView> textureView_;
+    TextureViewPtr textureView_;
 };
 
 NS_GFX_END

@@ -13,8 +13,9 @@ NS_GFX_BEGIN
 class VKPipelineLayout final : public PipelineLayout
 {
 protected:
-    VKPipelineLayout(VKDevice* device);
+    VKPipelineLayout(const DevicePtr& device);
     
+public:
     ~VKPipelineLayout();
     
 public:

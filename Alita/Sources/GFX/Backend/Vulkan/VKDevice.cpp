@@ -19,7 +19,6 @@
 #include "VKBindGroup.h"
 #include "VKQueue.h"
 #include "VKQuerySet.h"
-#include "VKRenderBundleEncoder.h"
 #include "VKRenderQueue.h"
 #include "VKRenderPass.h"
 #include "VKRenderPassEncoder.h"
@@ -65,44 +64,30 @@ static VKAPI_ATTR VkBool32 VKAPI_CALL DebugReportCallback(
 
 void DumpVulkanErrorMessage(VkResult code, const char* filename, uint32_t lineno);
 
-// 目前仅处理单个WebGPU实例的情况，该变量用来标记是否有Device未释放
-static VKDevice* sActivedDevice_ = nullptr;
+static DevicePtr sActivedDevice_ = nullptr;
 
-VKDevice* VKDevice::Create(const DeviceDescriptor &descriptor, std::unique_ptr<IDeviceExternalDeps>&& deviceExternalDeps)
+
+DevicePtr VKDevice::Create(const DeviceDescriptor &descriptor, std::unique_ptr<IDeviceExternalDeps>&& deviceExternalDeps)
 {
 #if defined(GFX_DEBUG) && GFX_DEBUG
     GfxBase::SetMainThreadId(pthread_self());
 #endif
     
-    auto device = new VKDevice(std::move(deviceExternalDeps));
-    if (device && device->Init(descriptor))
+    auto device = new VKDevice(std::move(deviceExternalDeps));// std::make_shared<VKDevice>(std::move(deviceExternalDeps));
+    sActivedDevice_ = DevicePtr(device);
+    if (device && !device->Init(descriptor))
     {
-        device->AutoRelease();
-        return device;
+        GFX_SAFE_DELETE(device);
     }
-    
-    if (device)
-    {
-        device->Release();
-    }
-    return nullptr;
+    return sActivedDevice_;
 }
 
 VKDevice::VKDevice(std::unique_ptr<IDeviceExternalDeps>&& deviceExternalDeps)
 : Device(std::move(deviceExternalDeps))
 {
-    if (sActivedDevice_)
-    {
-        deviceExternalDeps_->ShowDebugMessage("Fatal Error, VKDevice has been leaked!");
-        GFX_ASSERT(sActivedDevice_ == nullptr);
-        LOGW("Force delete sActivedDevice_");
-        GFX_SAFE_DELETE(sActivedDevice_);
-    }
-    sActivedDevice_ = this;
-    
     //LOGI("device thread-id: %p", (void*)pthread_self());
     
-    pTextureViewMgr_ = std::make_unique<VKTextureViewManager>(this);
+    pTextureViewMgr_ = std::make_unique<TextureViewManager>(sActivedDevice_);
    /* 
     gameThreadId_ = pthread_self();
     
@@ -110,6 +95,11 @@ VKDevice::VKDevice(std::unique_ptr<IDeviceExternalDeps>&& deviceExternalDeps)
     struct sched_param param;
     pthread_getschedparam(pthread_self(), &policy, &param);
     LOGI("GLThread's Priority %d: policy=%d, min=%d, max=%d", param.sched_priority, policy, sched_get_priority_min(policy), sched_get_priority_max(policy));*/
+}
+
+const DevicePtr& VKDevice::GetDevicePtr()
+{
+    return sActivedDevice_;
 }
 
 bool VKDevice::Init(const DeviceDescriptor &descriptor)
@@ -141,7 +131,7 @@ bool VKDevice::Init(const DeviceDescriptor &descriptor)
         if (!InitDescriptorPool()) break;
     
         LOGI("Create AsyncWorkerVulkan");
-        pAsyncWorker_ = std::make_unique<AsyncWorkerVulkan>(this);
+        pAsyncWorker_ = std::make_unique<AsyncWorkerVulkan>(sActivedDevice_);
         LOGI("VKDevice AsyncWorkerVulkan pAsyncWorker_=%p.", pAsyncWorker_.get());
         
         return true;
@@ -156,22 +146,8 @@ void VKDevice::ReleaseCaches()
 {
     LOGW("VKDevice::ReleaseCaches begin.");
     
-    for (auto tp : renderPipelineCache_)
-    {
-        GFX_SAFE_RELEASE(tp.second);
-    }
     renderPipelineCache_.clear();
-    
-    for (auto tp : bindGroupLayoutCache_)
-    {
-        GFX_SAFE_RELEASE(tp.second);
-    }
     bindGroupLayoutCache_.clear();
-    
-    for (auto tp : pipelineLayoutCache_)
-    {
-        GFX_SAFE_RELEASE(tp.second);
-    }
     pipelineLayoutCache_.clear();
     
     if (!freeCommandLists_.empty())
@@ -186,7 +162,7 @@ void VKDevice::ReleaseCaches()
         
         for (auto &callback : scheduledAsyncCallbacks_)
         {
-            callback(this);
+            callback(sActivedDevice_);
         }
         scheduledAsyncCallbacks_.clear();
     }
@@ -203,7 +179,7 @@ void VKDevice::ReleaseCaches()
         
         for (auto &callback : scheduledAsyncCallbacks_)
         {
-            callback(this);
+            callback(sActivedDevice_);
         }
         scheduledAsyncCallbacks_.clear();
     }
@@ -214,21 +190,11 @@ void VKDevice::ReleaseCaches()
         pendingDoneTasks_.clear();
     }
     
-    for (auto &it : renderPassCache_)
-    {
-        it.second->Release();
-    }
     renderPassCache_.clear();
-    
-    for (auto &it : framebufferCache_)
-    {
-        it.second->Release();
-    }
     framebufferCache_.clear();
-    
-    GFX_SAFE_RELEASE(renderQueue_);
-    
-    GFX_SAFE_RELEASE(imageLayoutTransistQueue_);
+
+    renderQueue_ = nullptr;
+    imageLayoutTransistQueue_ = nullptr;
     
     if (pTextureViewMgr_)
     {
@@ -277,7 +243,7 @@ void VKDevice::OnFrameCallback(float dt)
         
         for (auto &callback : scheduledAsyncCallbacks_)
         {
-            callback(this);
+            callback(sActivedDevice_);
         }
         scheduledAsyncCallbacks_.clear();
     }
@@ -388,7 +354,7 @@ VKDevice::~VKDevice()
     sActivedDevice_ = nullptr;
 }
 
-VKRenderPass* VKDevice::GetOrCreateRenderPass(const RenderPassCacheQuery &query)
+RenderPassPtr VKDevice::GetOrCreateRenderPass(const RenderPassCacheQuery &query)
 {
     auto it = renderPassCache_.find(query);
     if (it != renderPassCache_.end())
@@ -396,14 +362,13 @@ VKRenderPass* VKDevice::GetOrCreateRenderPass(const RenderPassCacheQuery &query)
         return it->second;
     }
     
-    auto renderPass = CreateObject<VKRenderPass>(query);
+    auto renderPass = CreateObject<RenderPassPtr, VKRenderPass>(query);
     renderPassCache_[query] = renderPass;
-    GFX_SAFE_RETAIN(renderPass);
     
     return renderPass;
 }
 
-VKFramebuffer* VKDevice::GetOrCreateFramebuffer(const FramebufferCacheQuery &query)
+FramebufferPtr VKDevice::GetOrCreateFramebuffer(const FramebufferCacheQuery &query)
 {
     SCOPED_LOCK(mutex_);
     
@@ -413,20 +378,19 @@ VKFramebuffer* VKDevice::GetOrCreateFramebuffer(const FramebufferCacheQuery &que
         return it->second;
     }
     
-    auto framebuffer = CreateObject<VKFramebuffer>(query);
+    auto framebuffer = CreateObject<FramebufferPtr, VKFramebuffer>(query);
     framebufferCache_[query] = framebuffer;
-    GFX_SAFE_RETAIN(framebuffer);
     
     return framebuffer;
 }
 
-SwapChain* VKDevice::CreateSwapchain(const SwapChainDescriptor &descriptor)
+SwapChainPtr VKDevice::CreateSwapchain(const SwapChainDescriptor &descriptor)
 {
-    if (swapChain_)
+    if (!swapChain_)
     {
-        return swapChain_;
+        swapChain_ = CreateObject<SwapChainPtr, VKSwapChain>(descriptor);
     }
-    return CreateObject<VKSwapChain>(descriptor);
+    return swapChain_;
 }
 
 TextureFormat VKDevice::GetSwapchainPreferredFormat()
@@ -434,9 +398,9 @@ TextureFormat VKDevice::GetSwapchainPreferredFormat()
     return TextureFormat::BGRA8UNORM;
 }
 
-Buffer* VKDevice::CreateBuffer(const BufferDescriptor &descriptor)
+BufferPtr VKDevice::CreateBuffer(const BufferDescriptor &descriptor)
 {
-    auto buffer = CreateObject<VKBuffer>(descriptor);
+    auto buffer = CreateObject<BufferPtr, VKBuffer>(descriptor);
     if (buffer)
     {
         GetObjectManager().increaseBufferSize(descriptor.size);
@@ -444,9 +408,9 @@ Buffer* VKDevice::CreateBuffer(const BufferDescriptor &descriptor)
     return buffer;
 }
 
-BufferBinding* VKDevice::CreateBufferBinding(Buffer* buffer, BufferSize offset, BufferSize size)
+BufferBindingPtr VKDevice::CreateBufferBinding(BufferPtr buffer, BufferSize offset, BufferSize size)
 {
-    return CreateObject<BufferBinding>(buffer, offset, size);
+    return CreateObject<BufferBindingPtr, BufferBinding>(buffer, offset, size);
 }
 
 void VKDevice::WriteBuffer(const Buffer* buffer, const void* data, std::uint32_t offset,
@@ -1491,13 +1455,7 @@ bool VKDevice::InitDescriptorPool()
     return VK_NULL_HANDLE != vkDescriptorPool_;
 }
 
-RenderBundleEncoder* VKDevice::CreateRenderBundleEncoder(
-    const RenderBundleEncoderDescriptor &descriptor)
-{
-    return CreateObject<VKRenderBundleEncoder>(descriptor);
-}
-
-RenderPipeline* VKDevice::CreateRenderPipeline(RenderPipelineDescriptor &descriptor)
+RenderPipelinePtr VKDevice::CreateRenderPipeline(RenderPipelineDescriptor &descriptor)
 {
     for (size_t i = 0; i < renderPipelineCache_.size(); ++i)
     {
@@ -1507,49 +1465,73 @@ RenderPipeline* VKDevice::CreateRenderPipeline(RenderPipelineDescriptor &descrip
         }
     }
     
-    auto pipeline = CreateObject<VKRenderPipeline>(descriptor);
+    auto pipeline = CreateObject<RenderPipelinePtr, VKRenderPipeline>(descriptor);
     renderPipelineCache_.emplace_back(descriptor, pipeline);
     GFX_SAFE_RETAIN(pipeline);
     
     return pipeline;
 }
 
-ComputePipeline* VKDevice::CreateComputePipeline(ComputePipelineDescriptor &descriptor)
+ComputePipelinePtr VKDevice::CreateComputePipeline(ComputePipelineDescriptor &descriptor)
 {
-    return CreateObject<VKComputePipeline>(descriptor);
+    return CreateObject<ComputePipelinePtr, VKComputePipeline>(descriptor);
 }
 
-Shader* VKDevice::CreateShaderModule(const ShaderModuleDescriptor &descriptor)
+ShaderPtr VKDevice::CreateShaderModule(const ShaderModuleDescriptor &descriptor)
 {
-    return CreateObject<VKShader>(descriptor);
+    return CreateObject<ShaderPtr, VKShader>(descriptor);
 }
 
-Texture* VKDevice::CreateTexture(const TextureDescriptor &descriptor)
+TexturePtr VKDevice::CreateTexture(const TextureDescriptor &descriptor)
 {
-    auto texture = CreateObject<VKTexture>(descriptor);
+    auto texture = CreateObject<TexturePtr, VKTexture>(descriptor);
     if (texture)
     {
         GetObjectManager().increaseTextureMem(texture->getMemoryUsage());
     }
+
+    if (texture->GetTextureUsage() & TextureUsage::PRESENT)
+    {
+        auto queue = GFX_CAST(VKQueue*, GetQueue());
+        
+      
+        //commandBuffer->RecordCommand<DeferredCmdPipelineBarrier>(texture, TextureUsage::UNDEFINED, TextureUsage::PRESENT);
+
+        VKCommandBuffer* commandBuffer = GFX_CAST(VKCommandBuffer*, queue->GetImageLayoutInitCommandBuffer());
+        commandBuffer->AddCmd([texture_ = texture, srcUsageFlags_ = TextureUsage::UNDEFINED, dstUsageFlags_ = TextureUsage::PRESENT](CommandBuffer* commandBuffer) {
+
+            VKCommandBuffer* commandBuffer_ = (VKCommandBuffer*)commandBuffer;
+            VKCommandBuffer::SetupTexturePipelineBarrier(commandBuffer_, texture_, srcUsageFlags_, dstUsageFlags_);
+        });
+
+        GFX_CAST(VKTexture*, texture)->SetTextureMemoryLayout(TextureUsage::PRESENT);
+    }
+
     return texture;
 }
 
-Sampler* VKDevice::CreateSampler(const SamplerDescriptor &descriptor)
+TextureViewPtr VKDevice::CreateTextureView(const TexturePtr& texture,
+    const TextureViewDescriptor& descriptor)
 {
-    return CreateObject<VKSampler>(descriptor);
+    return pTextureViewMgr_->GetOrCreateTextureView(texture, descriptor);
 }
 
-SamplerBinding* VKDevice::CreateSamplerBinding(Sampler* sampler)
+SamplerPtr VKDevice::CreateSampler(const SamplerDescriptor &descriptor)
 {
-    return CreateObject<SamplerBinding>(sampler);
+    return CreateObject<SamplerPtr, VKSampler>(descriptor);
 }
 
-TextureViewBinding* VKDevice::CreateTextureViewBinding(TextureView* view)
+SamplerBindingPtr VKDevice::CreateSamplerBinding(SamplerPtr sampler)
 {
-    return CreateObject<TextureViewBinding>(view);
+    return CreateObject<SamplerBindingPtr, SamplerBinding>(sampler);
 }
 
-BindGroupLayout* VKDevice::CreateBindGroupLayout(const BindGroupLayoutDescriptor &descriptor)
+TextureViewBindingPtr VKDevice::CreateTextureViewBinding(TextureViewPtr view)
+{
+    return CreateObject<TextureViewBindingPtr, TextureViewBinding>(view);
+}
+
+BindGroupLayoutPtr VKDevice::CreateBindGroupLayout(const BindGroupLayoutDescriptor &descriptor)
 {
     for (size_t i = 0; i < bindGroupLayoutCache_.size(); ++i)
     {
@@ -1559,19 +1541,17 @@ BindGroupLayout* VKDevice::CreateBindGroupLayout(const BindGroupLayoutDescriptor
         }
     }
     
-    auto bindGroupLayout = CreateObject<VKBindGroupLayout>(descriptor);
+    auto bindGroupLayout = CreateObject<BindGroupLayoutPtr, VKBindGroupLayout>(descriptor);
     bindGroupLayoutCache_.emplace_back(descriptor, bindGroupLayout);
-    GFX_SAFE_RETAIN(bindGroupLayout);
-    
     return bindGroupLayout;
 }
 
-BindGroup* VKDevice::CreateBindGroup(BindGroupDescriptor &descriptor)
+BindGroupPtr VKDevice::CreateBindGroup(BindGroupDescriptor &descriptor)
 {
-    return CreateObject<VKBindGroup>(descriptor);
+    return CreateObject<BindGroupPtr, VKBindGroup>(descriptor);
 }
 
-PipelineLayout*
+PipelineLayoutPtr
 VKDevice::CreatePipelineLayout(const PipelineLayoutDescriptor &descriptor)
 {
     for (size_t i = 0; i < pipelineLayoutCache_.size(); ++i)
@@ -1582,56 +1562,52 @@ VKDevice::CreatePipelineLayout(const PipelineLayoutDescriptor &descriptor)
         }
     }
     
-    auto pipelineLayout = CreateObject<VKPipelineLayout>(descriptor);
+    auto pipelineLayout = CreateObject<PipelineLayoutPtr, VKPipelineLayout>(descriptor);
     pipelineLayoutCache_.emplace_back(descriptor, pipelineLayout);
-    GFX_SAFE_RETAIN(pipelineLayout);
     
     return pipelineLayout;
 }
 
-Queue* VKDevice::CreateQueue()
+QueuePtr VKDevice::CreateQueue()
 {
-    return CreateObject<VKQueue>();
+    auto queue = CreateObject<QueuePtr, VKQueue>();
+    queue->AttachWeakRef(queue);
+    return queue;
 }
 
-CommandEncoder* VKDevice::CreateCommandEncoder(const CommandEncoderDescriptor &descriptor)
+CommandEncoderPtr VKDevice::CreateCommandEncoder(const CommandEncoderDescriptor &descriptor)
 {
-    return CreateObject<VKCommandEncoder>();
+    return CreateObject<CommandEncoderPtr, VKCommandEncoder>();
 }
 
-Fence* VKDevice::CreateFence(const FenceDescriptor &descriptor)
+FencePtr VKDevice::CreateFence(const FenceDescriptor &descriptor)
 {
-    return CreateObject<VKFence>(descriptor);
+    return CreateObject<FencePtr, VKFence>(descriptor);
 }
 
-QuerySet* VKDevice::CreateQuerySet(const QuerySetDescriptor &descriptor)
+QuerySetPtr VKDevice::CreateQuerySet(const QuerySetDescriptor &descriptor)
 {
-    return CreateObject<VKQuerySet>(descriptor);
+    return CreateObject<QuerySetPtr, VKQuerySet>(descriptor);
 }
 
-Queue* VKDevice::GetQueue()
+QueuePtr VKDevice::GetQueue()
 {
     if (!renderQueue_)
     {
-        GFX_PTR_ASSIGN(renderQueue_, CreateQueue());
+        renderQueue_ = CreateQueue();
     }
     return renderQueue_;
 }
 
-VKCommandBuffer* VKDevice::CreateCommandBuffer()
+CommandBufferPtr VKDevice::CreateCommandBuffer()
 {
-    auto obj = GetObjectManager().GetObjectFromCacheByType(RHIObjectType::CommandBuffer);
+    auto obj = CreateObject<CommandBufferPtr, VKCommandBuffer>();
+    /*auto obj = GetObjectManager().GetObjectFromCacheByType(RHIObjectType::CommandBuffer);
     if (!obj)
     {
         obj = CreateObject<VKCommandBuffer>();
-    }
-    return GFX_CAST(VKCommandBuffer*, obj);
-}
-
-VKTextureView* VKDevice::CreateTextureView(VKTexture* vkTexture,
-                                           const TextureViewDescriptor &descriptor)
-{
-    return pTextureViewMgr_->GetOrCreateTextureView(vkTexture, descriptor);
+    }*/
+    return obj;
 }
 
 bool
@@ -1650,7 +1626,7 @@ void VKDevice::InvalidateFramebuffers()
     SCOPED_LOCK(mutex_);
     for (auto fb : framebufferCache_)
     {
-        fb.second->Invalidate();
+        GFX_CAST(VKFramebuffer*, fb.second)->Invalidate();
     }
 }
 
@@ -1716,7 +1692,7 @@ void VKDevice::ReleaseCommandList(CommandListPtr pCommandList)
     }
 }
 
-void VKDevice::ScheduleCallbackExecutedInGameThread(const std::function<void(VKDevice*)> &callback)
+void VKDevice::ScheduleCallbackExecutedInGameThread(const std::function<void(DevicePtr)> &callback)
 {
     SCOPED_LOCK(mutexScheduleAsyncCallback_);
     scheduledAsyncCallbacks_.push_back(callback);

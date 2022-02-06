@@ -14,25 +14,22 @@
 
 NS_GFX_BEGIN
 
-class RenderBundle;
-
 class RenderPassEncoder : public GfxBase
 {
 public:
-    RenderPassEncoder(Device* GPUDevice)
+    RenderPassEncoder(DevicePtr GPUDevice)
         : GfxBase(GPUDevice, RHIObjectType::RenderPassEncoder)
     {}
 
-protected:
     virtual ~RenderPassEncoder() = default;
 
 public:
-    virtual void SetPipeline(RenderPipeline* pipeline) = 0;
+    virtual void SetPipeline(RenderPipelinePtr pipeline) = 0;
     
-    virtual void SetIndexBuffer(Buffer* buffer, std::uint32_t offset = 0) = 0;
+    virtual void SetIndexBuffer(BufferPtr buffer, std::uint32_t offset = 0) = 0;
     
     virtual void
-    SetVertexBuffer(Buffer* buffer, std::uint32_t offset = 0, std::uint32_t slot = 0) = 0;
+    SetVertexBuffer(BufferPtr buffer, std::uint32_t offset = 0, std::uint32_t slot = 0) = 0;
     
     virtual void
     Draw(std::uint32_t vertexCount, std::uint32_t instanceCount, std::uint32_t firstVertex,
@@ -46,9 +43,9 @@ public:
                              std::uint32_t firstIndex, int32_t baseVertex,
                              std::uint32_t firstInstance) = 0;
     
-    virtual void DrawIndirect(Buffer* indirectBuffer, BufferSize indirectOffset) = 0;
+    virtual void DrawIndirect(BufferPtr indirectBuffer, BufferSize indirectOffset) = 0;
     
-    virtual void DrawIndexedIndirect(Buffer* indirectBuffer, BufferSize indirectOffset) = 0;
+    virtual void DrawIndexedIndirect(BufferPtr indirectBuffer, BufferSize indirectOffset) = 0;
     
     virtual void
     SetViewport(float x, float y, float width, float height, float minDepth, float maxDepth) = 0;
@@ -61,7 +58,7 @@ public:
     virtual void EndPass() = 0;
     
     virtual void
-    SetBindGroup(std::uint32_t index, BindGroup* bindGroup, uint32_t dynamicOffsetCount,
+    SetBindGroup(std::uint32_t index, BindGroupPtr bindGroup, uint32_t dynamicOffsetCount,
                  const std::uint32_t* dynamicOffsets) = 0;
     
     // virtual void SetBindGroup(std::uint32_t index, BindGroup* bindGroup,
@@ -76,8 +73,6 @@ public:
     virtual void InsertDebugMarker(const std::string &markerLabel) = 0;
     
     virtual void SetBlendColor(const Color &color) = 0;
-    
-    virtual void ExecuteBundles(std::uint32_t count, RenderBundle** bundles) = 0;
     
     virtual void BeginOcclusionQuery(std::uint32_t queryIndex) = 0;
     

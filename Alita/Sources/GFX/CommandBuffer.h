@@ -12,6 +12,9 @@
 #include "RenderPass.h"
 #include "Framebuffer.h"
 
+#include <vector>
+#include <functional>
+
 // class RenderPipeline;
 //
 // class ComputePipeline;
@@ -21,61 +24,45 @@ NS_GFX_BEGIN
 class CommandBuffer : public GfxBase
 {
 public:
-    CommandBuffer(Device* GPUDevice)
+    CommandBuffer(DevicePtr GPUDevice)
         : GfxBase(GPUDevice, RHIObjectType::CommandBuffer)
     {}
     
     virtual bool HasDrawCmdInPresentableImage()
-    { return true; }
+    {
+        return true;
+    }
     
     virtual void
-    BeginRenderPass(RenderPass* pass, Framebuffer* framebuffer, QuerySet* occlusionQuerySet,
-                    std::uint32_t clearValueCount, Color* clearValues, float clearDepth,
+    BeginRenderPass(RenderPassPtr pass, FramebufferPtr framebuffer, QuerySetPtr occlusionQuerySet,
+                    std::uint32_t clearValueCount, const Color* clearValues, float clearDepth,
                     uint32_t clearStencil) = 0;
 
+    virtual void EndRenderPass() = 0;
+
     
-    // virtual void
-    // BindDescriptorSets(RenderPipeline* pipeline, std::uint32_t index, BindGroup* bindGroup,
-    //                    uint32_t dynamicOffsetCount = 0,
-    //                    const uint32_t* pDynamicOffsets = nullptr) = 0;
-    //
-    // virtual void
-    // BindDescriptorSets(ComputePipeline* pipeline, std::uint32_t index, BindGroup* bindGroup,
-    //                    uint32_t dynamicOffsetCount = 0,
-    //                    const uint32_t* pDynamicOffsets = nullptr) = 0;
-    
-    virtual void SetBindGroupToGraphicPipeline(std::uint32_t index, BindGroup* bindGroup,
+    virtual void SetBindGroupToGraphicPipeline(std::uint32_t index, BindGroupPtr bindGroup,
                               uint32_t dynamicOffsetCount = 0,
                               const uint32_t* pDynamicOffsets = nullptr) = 0;
     
-    virtual void SetBindGroupToComputePipeline(std::uint32_t index, BindGroup* bindGroup,
+    virtual void SetBindGroupToComputePipeline(std::uint32_t index, BindGroupPtr bindGroup,
                                                uint32_t dynamicOffsetCount = 0,
                                                const uint32_t* pDynamicOffsets = nullptr) = 0;
     
     
-    virtual void BindGraphicsPipeline(RenderPipeline* graphicPipeline) = 0;
+    virtual void BindGraphicsPipeline(RenderPipelinePtr graphicPipeline) = 0;
     
-    virtual void BindComputePipeline(ComputePipeline* computePipeline) = 0;
+    virtual void BindComputePipeline(ComputePipelinePtr computePipeline) = 0;
     
-    // virtual void SetPipeline(RenderPipeline* pipeline) override;
+    virtual void SetIndexBuffer(BufferPtr buffer, std::uint32_t offset = 0) = 0;
     
-    virtual void SetIndexBuffer(Buffer* buffer, std::uint32_t offset = 0) = 0;
-    
-    virtual void SetVertexBuffer(Buffer* buffer, std::uint32_t offset = 0,
+    virtual void SetVertexBuffer(BufferPtr buffer, std::uint32_t offset = 0,
                                  std::uint32_t slot = 0) = 0;
     
     virtual void
     Dispatch(std::uint32_t groupCountX, std::uint32_t groupCountY, std::uint32_t groupCountZ) = 0;
     
-    virtual void DispatchIndirect(Buffer* indirectBuffer, BufferSize indirectOffset) = 0;
-    
-    // virtual void ResetCommandBuffer() = 0;
-    //
-    // virtual void BeginCommandBuffer() = 0;
-    //
-    // virtual void EndCommandBuffer() = 0;
-    
-    // virtual void Dispose() override;
+    virtual void DispatchIndirect(BufferPtr indirectBuffer, BufferSize indirectOffset) = 0;
     
     virtual void
     Draw(std::uint32_t vertexCount, std::uint32_t instanceCount, std::uint32_t firstVertex,
@@ -89,9 +76,9 @@ public:
                              std::uint32_t firstIndex, int32_t baseVertex,
                              std::uint32_t firstInstance) = 0;
     
-    virtual void DrawIndirect(Buffer* indirectBuffer, BufferSize indirectOffset) = 0;
+    virtual void DrawIndirect(BufferPtr indirectBuffer, BufferSize indirectOffset) = 0;
     
-    virtual void DrawIndexedIndirect(Buffer* indirectBuffer, BufferSize indirectOffset) = 0;
+    virtual void DrawIndexedIndirect(BufferPtr indirectBuffer, BufferSize indirectOffset) = 0;
     
     virtual void SetViewport(float x, float y, float width, float height, float minDepth,
                              float maxDepth) = 0;
@@ -116,15 +103,41 @@ public:
     virtual void EndOcclusionQuery(std::uint32_t queryIndex) = 0;
     
     virtual void ResolveQuerySet(
-        QuerySet* querySet,
+        QuerySetPtr querySet,
         std::uint32_t queryFirstIndex,
         std::uint32_t queryCount,
-        Buffer* dstBuffer,
+        BufferPtr dstBuffer,
         std::uint32_t dstOffset) = 0;
+
+    void AddCmd(std::function<void(CommandBuffer*)>&& func)
+    {
+        gfxCachedCommands_.push_back(std::move(func));
+    }
     
-protected:
+    void AddCmd(const std::function<void(CommandBuffer*)>& func)
+    {
+        gfxCachedCommands_.push_back(func);
+    }
+
+    void SubmitCommandList()
+    {
+        for (auto& func : gfxCachedCommands_)
+        {
+            func(this);
+        }
+    }
+
+    void ResetCommandList()
+    {
+        gfxCachedCommands_.clear();
+    }
+    
+public:
     virtual ~CommandBuffer()
     {}
+
+protected:
+    std::vector< std::function<void(CommandBuffer*)>> gfxCachedCommands_;
 };
 
 NS_GFX_END

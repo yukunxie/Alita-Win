@@ -13,7 +13,7 @@
 
 NS_GFX_BEGIN
 
-VKRenderPipeline::VKRenderPipeline(VKDevice* device)
+VKRenderPipeline::VKRenderPipeline(const DevicePtr& device)
     : RenderPipeline(device)
 {
 }
@@ -21,8 +21,8 @@ VKRenderPipeline::VKRenderPipeline(VKDevice* device)
 bool VKRenderPipeline::Init(const RenderPipelineDescriptor &descriptor)
 {
     RenderPipeline::Init(descriptor);
-    
-    GFX_PTR_ASSIGN(pipelineLayout_, GFX_CAST(VKPipelineLayout * , descriptor.layout));
+
+    pipelineLayout_ = descriptor.layout;
     
     VkPipelineShaderStageCreateInfo shaderStages[2];
     int shaderStageCount = 0;
@@ -313,7 +313,7 @@ bool VKRenderPipeline::Init(const RenderPipelineDescriptor &descriptor)
                                   StoreOp::STORE);
         }
         
-        GFX_PTR_ASSIGN(renderPass_, VKDEVICE()->GetOrCreateRenderPass(query));
+        renderPass_ = VKDEVICE()->GetOrCreateRenderPass(query);
     }
     
     // The create info chains in a bunch of things created on the stack here or inside state
@@ -334,8 +334,8 @@ bool VKRenderPipeline::Init(const RenderPipelineDescriptor &descriptor)
         createInfo.pDepthStencilState = &depthStencilStateCreateInfo;
         createInfo.pColorBlendState = &colorBlending;
         createInfo.pDynamicState = &dynamic;
-        createInfo.layout = GFX_CAST(const VKPipelineLayout*, descriptor.layout)->GetNative();
-        createInfo.renderPass = renderPass_->GetNative();
+        createInfo.layout = GFX_CAST(VKPipelineLayout*, descriptor.layout)->GetNative();
+        createInfo.renderPass = GFX_CAST(VKRenderPass*, renderPass_)->GetNative();
         createInfo.subpass = 0;
         createInfo.basePipelineHandle = VK_NULL_HANDLE;
         createInfo.basePipelineIndex = -1;
@@ -351,7 +351,7 @@ bool VKRenderPipeline::Init(const RenderPipelineDescriptor &descriptor)
 
 VkPipelineLayout VKRenderPipeline::GetPipelineLayout() const
 {
-    return pipelineLayout_->GetNative();
+    return GFX_CAST(VKPipelineLayout*, pipelineLayout_)->GetNative();
 }
 
 void VKRenderPipeline::Dispose()

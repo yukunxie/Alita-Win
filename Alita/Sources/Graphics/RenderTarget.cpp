@@ -57,13 +57,13 @@ void RenderTarget::ResizeTarget(uint32 width, uint32 height, gfx::TextureFormat 
     }
 }
 
-const gfx::TextureView* RenderTarget::GetTextureView() const
+const gfx::TextureViewPtr RenderTarget::GetTextureView() const
 {
     TryCreateTextureView();
     return TextureView_;
 }
 
-const gfx::Texture* RenderTarget::GetTexture() const
+const gfx::TexturePtr RenderTarget::GetTexture() const
 {
     return GetTextureView()->GetTexture();
 }
@@ -73,7 +73,6 @@ void RenderTarget::TryCreateTextureView() const
     if (!Dirty_ && TextureView_)
         return;
     Dirty_ = false;
-    GFX_SAFE_RELEASE(TextureView_);
 
     gfx::TextureDescriptor descriptor;
     descriptor.sampleCount = 1;
@@ -84,8 +83,8 @@ void RenderTarget::TryCreateTextureView() const
     descriptor.mipLevelCount = 1;
     descriptor.dimension = gfx::TextureDimension::TEXTURE_2D;
     descriptor.debugName = Name_;
-    TextureView_ = Engine::GetGPUDevice()->CreateTexture(descriptor)->CreateView({});
-    GFX_SAFE_RETAIN(TextureView_);
+    auto texture = Engine::GetGPUDevice()->CreateTexture(descriptor);
+    TextureView_ = Engine::GetGPUDevice()->CreateTextureView(texture, {});
 }
 
 RenderTargetSwapChain::RenderTargetSwapChain()
@@ -97,12 +96,12 @@ RenderTargetSwapChain::~RenderTargetSwapChain()
 {
 }
 
-const gfx::TextureView* RenderTargetSwapChain::GetTextureView() const
+const gfx::TextureViewPtr RenderTargetSwapChain::GetTextureView() const
 {
     return TextureView_;
 }
 
-const gfx::Texture* RenderTargetSwapChain::GetTexture() const
+const gfx::TexturePtr RenderTargetSwapChain::GetTexture() const
 {
     return TextureView_->GetTexture();
 }
@@ -128,9 +127,7 @@ gfx::TextureFormat RenderTargetSwapChain::GetFormat() const
 }
 void  RenderTargetSwapChain::Reset()
 {
-    GFX_SAFE_RELEASE(TextureView_);
     auto swapchain = Engine::GetRenderScene()->GetGraphicPipeline()->GetSwapChain();
-    TextureView_ = swapchain->GetCurrentTexture()->CreateView({});
-    GFX_SAFE_RETAIN(TextureView_);
+    TextureView_ = Engine::GetGPUDevice()->CreateTextureView(swapchain->GetCurrentTexture(), {});
 }
 NS_RX_END

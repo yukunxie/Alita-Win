@@ -14,6 +14,70 @@
 
 NS_GFX_BEGIN
 
+class GfxBase;
+class Device;
+class BindGroup;
+class BindGroupLayout;
+class BindingResource;
+class Buffer;
+class BufferBinding;
+class CanvasContext;
+class CommandBuffer;
+class CommandEncoder;
+class ComputePipeline;
+class ComputePassEncoder;
+class Framebuffer;
+class Fence;
+class PipelineLayout;
+class Queue;
+class RenderPass;
+class RenderPassEncoder;
+class RenderPipeline;
+class RenderQueue;
+class RenderTarget;
+class Sampler;
+class Shader;
+class SwapChain;
+class Texture;
+class TextureView;
+class SampledTextureView;
+class DescriptorSet;
+class QuerySet;
+class SamplerBinding;
+class TextureViewBinding;
+
+typedef std::shared_ptr<GfxBase> GfxBasePtr;
+typedef std::shared_ptr<Device> DevicePtr;
+typedef std::shared_ptr<BindGroup> BindGroupPtr;
+typedef std::shared_ptr<BindGroupLayout> BindGroupLayoutPtr;
+typedef std::shared_ptr<BindingResource> BindingResourcePtr;
+typedef std::shared_ptr<Buffer> BufferPtr;
+typedef std::shared_ptr<BufferBinding> BufferBindingPtr;
+typedef std::shared_ptr<CanvasContext> CanvasContextPtr;
+typedef std::shared_ptr<CommandBuffer> CommandBufferPtr;
+typedef std::shared_ptr<CommandEncoder> CommandEncoderPtr;
+typedef std::shared_ptr<ComputePipeline> ComputePipelinePtr;
+typedef std::shared_ptr<ComputePassEncoder> ComputePassEncoderPtr;
+typedef std::shared_ptr<Framebuffer> FramebufferPtr;
+typedef std::shared_ptr<Fence> FencePtr;
+typedef std::shared_ptr<PipelineLayout> PipelineLayoutPtr;
+typedef std::shared_ptr<Queue> QueuePtr;
+typedef std::shared_ptr<RenderPass> RenderPassPtr;
+typedef std::shared_ptr<RenderPassEncoder> RenderPassEncoderPtr;
+typedef std::shared_ptr<RenderPipeline> RenderPipelinePtr;
+typedef std::shared_ptr<RenderQueue> RenderQueuePtr;
+typedef std::shared_ptr<RenderTarget> RenderTargetPtr;
+typedef std::shared_ptr<Sampler> SamplerPtr;
+typedef std::shared_ptr<Shader> ShaderPtr;
+typedef std::shared_ptr<SwapChain> SwapChainPtr;
+typedef std::shared_ptr<Texture> TexturePtr;
+typedef std::shared_ptr<TextureView> TextureViewPtr;
+typedef std::shared_ptr<SampledTextureView> SampledTextureViewPtr;
+typedef std::shared_ptr<DescriptorSet> DescriptorSetPtr;
+typedef std::shared_ptr<QuerySet> QuerySetPtr;
+typedef std::shared_ptr<SamplerBinding> SamplerBindingPtr;
+typedef std::shared_ptr<TextureViewBinding> TextureViewBindingPtr;
+
 enum class PipelineType
 {
     Graphic,
@@ -40,8 +104,6 @@ enum class RHIObjectType
     Queue,
     RenderPass,
     RenderPassEncoder,
-    RenderBundle,
-    RenderBundleEncoder,
     RenderPipeline,
     RenderQueue,
     RenderTarget,
@@ -78,8 +140,6 @@ const char* const RHIObjectTypeNames[kMaxRHIObjectTypeCount] = {
     "Queue",
     "RenderPass",
     "RenderPassEncoder",
-    "RenderBundle",
-    "RenderBundleEncoder",
     "RenderPipeline",
     "RenderQueue",
     "RenderTarget",
@@ -117,15 +177,14 @@ constexpr std::uint32_t INVALID_OBJECT_ID = std::numeric_limits<std::uint32_t>::
 class GfxBase : public GfxNoncopyable
 {
 protected:
-    GfxBase(Device* device, RHIObjectType objectType);
+    GfxBase(DevicePtr device, RHIObjectType objectType);
     
     GfxBase(RHIObjectType objectType);
     
-    virtual ~GfxBase();
-    
 public:
-    
-    GfxBase* AutoRelease();
+
+    virtual ~GfxBase();
+
     
     FORCE_INLINE RHIObjectType GetObjectType() const
     {
@@ -144,18 +203,9 @@ public:
         globalId__ = id;
     }
     
-    Device* GetGPUDevice() const
+    DevicePtr GetGPUDevice() const
     {
-        return GPUDevice_;
-    }
-    
-    void Retain() const;
-    
-    void Release() const;
-    
-    FORCE_INLINE std::int32_t GetReferenceCount() const
-    {
-        return referenceCount__;
+        return GPUDevice_.lock();
     }
     
     void SetScriptObject(void* object)
@@ -207,12 +257,9 @@ protected:
 private:
     RHIObjectType objectType__ = RHIObjectType::UNDEFINED;
     bool disposed__ = false;
-    bool autoReleased_ = false;
-    // referenceCount__初始化为1，因此需要对其进行AutoRelease
-    mutable std::int32_t referenceCount__ = 1;
     std::uint32_t globalId__ = INVALID_OBJECT_ID;
     void* bindingScriptObject_ = nullptr;
-    Device* GPUDevice_ = nullptr;
+    std::weak_ptr<Device> GPUDevice_;
     
 #if defined(GFX_DEBUG) && GFX_DEBUG
     static std::thread::native_handle_type mainThreadId_;
@@ -318,5 +365,7 @@ struct RHIObjectWrapper final
 protected:
     TP_* data_ = nullptr;
 };
+
+
 
 NS_GFX_END

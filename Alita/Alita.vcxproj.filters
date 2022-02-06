@@ -452,15 +452,6 @@
     <ClCompile Include="Sources\GFX\Backend\Vulkan\VKQueue.cpp">
       <Filter>Sources\Backend\Vulkan</Filter>
     </ClCompile>
-    <ClCompile Include="Sources\GFX\Backend\Vulkan\VKRenderBundle.cpp">
-      <Filter>Sources\Backend\Vulkan</Filter>
-    </ClCompile>
-    <ClCompile Include="Sources\GFX\Backend\Vulkan\VKRenderBundleCommandImpl.cpp">
-      <Filter>Sources\Backend\Vulkan</Filter>
-    </ClCompile>
-    <ClCompile Include="Sources\GFX\Backend\Vulkan\VKRenderBundleEncoder.cpp">
-      <Filter>Sources\Backend\Vulkan</Filter>
-    </ClCompile>
     <ClCompile Include="Sources\GFX\Backend\Vulkan\VKRenderPass.cpp">
       <Filter>Sources\Backend\Vulkan</Filter>
     </ClCompile>
@@ -979,12 +970,6 @@
     <ClInclude Include="Sources\GFX\Backend\Vulkan\VKQueue.h">
       <Filter>Sources\Backend\Vulkan</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\GFX\Backend\Vulkan\VKRenderBundle.h">
-      <Filter>Sources\Backend\Vulkan</Filter>
-    </ClInclude>
-    <ClInclude Include="Sources\GFX\Backend\Vulkan\VKRenderBundleEncoder.h">
-      <Filter>Sources\Backend\Vulkan</Filter>
-    </ClInclude>
     <ClInclude Include="Sources\GFX\Backend\Vulkan\VKRenderCommands.h">
       <Filter>Sources\Backend\Vulkan</Filter>
     </ClInclude>
@@ -1099,15 +1084,6 @@
     <ClInclude Include="Sources\GFX\Queue.h">
       <Filter>Sources\GFX</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\GFX\RenderBundle.h">
-      <Filter>Sources\GFX</Filter>
-    </ClInclude>
-    <ClInclude Include="Sources\GFX\RenderBundleCommands.h">
-      <Filter>Sources\GFX</Filter>
-    </ClInclude>
-    <ClInclude Include="Sources\GFX\RenderBundleEncoder.h">
-      <Filter>Sources\GFX</Filter>
-    </ClInclude>
     <ClInclude Include="Sources\GFX\RenderCommandTypes.h">
       <Filter>Sources\GFX</Filter>
     </ClInclude>
@@ -1115,9 +1091,6 @@
       <Filter>Sources\GFX</Filter>
     </ClInclude>
     <ClInclude Include="Sources\GFX\RenderPassEncoder.h">
-      <Filter>Sources\GFX</Filter>
-    </ClInclude>
-    <ClInclude Include="Sources\GFX\RenderPipeine.h">
       <Filter>Sources\GFX</Filter>
     </ClInclude>
     <ClInclude Include="Sources\GFX\RenderPipeline.h">

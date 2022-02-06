@@ -98,7 +98,7 @@ namespace ImageLoader
         }
     };
 
-    gfx::Texture* CreateCubeTexture(const ImageData& imageData)
+    gfx::TexturePtr CreateCubeTexture(const ImageData& imageData)
     {
         GFX_ASSERT(imageData.format == gfx::TextureFormat::RGBA8UNORM);
 
@@ -154,14 +154,12 @@ namespace ImageLoader
         }
 
         auto cmdBuffer = commandEncoder->Finish();
-        GFX_SAFE_RETAIN(cmdBuffer);
         Engine::GetGPUDevice()->GetQueue()->Submit(1, &cmdBuffer);
-        GFX_SAFE_RELEASE(cmdBuffer);
 
         return texture;
     }
 
-    gfx::Texture* LoadTextureFromData(uint32 texWidth, uint32 texHeight, uint32 texChannels, const std::uint8_t* pixels, std::uint32_t byteLength, const std::string& debugName)
+    gfx::TexturePtr LoadTextureFromData(uint32 texWidth, uint32 texHeight, uint32 texChannels, const std::uint8_t* pixels, std::uint32_t byteLength, const std::string& debugName)
     {
         ImageData imageData;
         {
@@ -221,7 +219,7 @@ namespace ImageLoader
         return texture;
     }
 
-    gfx::Texture* LoadTextureFromData(const std::uint8_t* data, std::uint32_t byteLength, const std::string& fileName)
+    gfx::TexturePtr LoadTextureFromData(const std::uint8_t* data, std::uint32_t byteLength, const std::string& fileName)
     {
         int texWidth, texHeight, texChannels;
         stbi_uc* pixels = stbi_load_from_memory(data, byteLength, &texWidth, &texHeight, &texChannels, STBI_default);
@@ -233,13 +231,13 @@ namespace ImageLoader
         return texture;
     }
 
-    gfx::Texture* LoadTextureFromKtxFormat(const void* bytes, uint32 size, const std::string& fileName = "")
+    gfx::TexturePtr LoadTextureFromKtxFormat(const void* bytes, uint32 size, const std::string& fileName = "")
     {
         ktxTexture* ktxTexture;
         KTX_error_code result = ktxTexture_CreateFromMemory((ktx_uint8_t*)bytes, size, KTX_TEXTURE_CREATE_LOAD_IMAGE_DATA_BIT, &ktxTexture);
         GFX_ASSERT(result == KTX_SUCCESS);
 
-        gfx::Texture* texture;
+        gfx::TexturePtr texture;
 
         GFX_ASSERT(ktxTexture->glFormat == 6408);
         ImageData imageData;
@@ -274,7 +272,7 @@ namespace ImageLoader
         return texture;
     }
 
-    gfx::Texture* LoadTextureFromUri(const std::string& filename)
+    gfx::TexturePtr LoadTextureFromUri(const std::string& filename)
     {
         const TData& imageData = FileSystem::GetInstance()->GetBinaryData(filename.c_str());
         
@@ -286,7 +284,7 @@ namespace ImageLoader
         }
     }
 
-    gfx::Texture* LoadCubeTexture(const std::string& cubeTextureName)
+    gfx::TexturePtr LoadCubeTexture(const std::string& cubeTextureName)
     {
         constexpr uint32 kFaceNum = 6;
         const char* kFaceNames[kFaceNum] = {"px", "nx", "py", "ny", "pz", "nz"};

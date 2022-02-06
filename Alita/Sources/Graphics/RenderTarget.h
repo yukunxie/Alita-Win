@@ -28,9 +28,9 @@ public:
 
     void ResizeTarget(uint32 width, uint32 height, gfx::TextureFormat format = gfx::TextureFormat::INVALID);
 
-    virtual const gfx::TextureView* GetTextureView() const;
+    virtual const gfx::TextureViewPtr GetTextureView() const;
 
-    virtual const gfx::Texture* GetTexture() const;
+    virtual const gfx::TexturePtr GetTexture() const;
 
     // Getters / Setters
 
@@ -66,7 +66,7 @@ protected:
     uint8               ClearStencil_   = 0;
     float               ClearDepth_     = 1.0f;
     gfx::Color          ClearColor_     = { 0, 0, 0, 1 };
-    mutable gfx::TextureView*   TextureView_    = nullptr;
+    mutable gfx::TextureViewPtr   TextureView_    = nullptr;
 };
 
 class RenderTargetSwapChain : public RenderTarget
@@ -75,9 +75,9 @@ public:
     RenderTargetSwapChain();
     virtual ~RenderTargetSwapChain();
 
-    virtual const gfx::TextureView* GetTextureView() const;
+    virtual const gfx::TextureViewPtr GetTextureView() const;
 
-    virtual const gfx::Texture* GetTexture() const;
+    virtual const gfx::TexturePtr GetTexture() const;
 
     // Getters / Setters
 

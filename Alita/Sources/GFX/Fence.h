@@ -14,7 +14,7 @@ NS_GFX_BEGIN
 class Fence : public GfxBase
 {
 public:
-    Fence(Device* GPUDevice)
+    Fence(DevicePtr GPUDevice)
         : GfxBase(GPUDevice, RHIObjectType::Fence)
     {}
     
@@ -55,7 +55,6 @@ public:
         waitingSignaledValue_ = signalValue;
     }
 
-protected:
     virtual ~Fence() = default;
 
 protected:

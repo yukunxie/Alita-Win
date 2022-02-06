@@ -18,7 +18,7 @@ class SamplerBinding;
 class Sampler : public GfxBase
 {
 public:
-    Sampler(Device* GPUDevice)
+    Sampler(DevicePtr GPUDevice)
         : GfxBase(GPUDevice, RHIObjectType::Sampler)
     {}
 
@@ -29,27 +29,27 @@ protected:
 class SamplerBinding final : public BindingResource
 {
 public:
-    SamplerBinding(Device* device)
+    SamplerBinding(const DevicePtr& device)
         : BindingResource(device, BindingResourceType::Sampler)
     {
     }
     
     virtual ~SamplerBinding() = default;
     
-    bool Init(Sampler* sampler)
+    bool Init(const SamplerPtr& sampler)
     {
         sampler_ = sampler;
         return true;
     }
     
-    Sampler* GetSampler()
-    { return sampler_.Get(); }
+    const SamplerPtr& GetSampler()
+    { return sampler_; }
     
     virtual void Dispose() override
     {}
 
 protected:
-    RHIObjectWrapper<Sampler> sampler_ = nullptr;
+    SamplerPtr sampler_ = nullptr;
 };
 
 NS_GFX_END

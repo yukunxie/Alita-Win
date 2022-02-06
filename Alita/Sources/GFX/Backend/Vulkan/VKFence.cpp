@@ -7,7 +7,7 @@
 
 NS_GFX_BEGIN
 
-VKFence::VKFence(VKDevice* device)
+VKFence::VKFence(const DevicePtr& device)
     : Fence(device)
 {
 }

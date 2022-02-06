@@ -12,10 +12,11 @@ NS_GFX_BEGIN
 
 class VKBindGroupLayout final : public BindGroupLayout
 {
-protected:
-    VKBindGroupLayout(VKDevice* device);
-    
+public:
     virtual ~VKBindGroupLayout();
+
+protected:
+    VKBindGroupLayout(const DevicePtr& device);
     
 public:
     

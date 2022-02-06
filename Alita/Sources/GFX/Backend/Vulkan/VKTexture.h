@@ -20,14 +20,15 @@ VkImageLayout GetVulkanImageLayout(TextureUsageFlags usage, TextureFormat format
 class VKTexture final : public Texture
 {
 protected:
-    VKTexture(VKDevice* device);
+    VKTexture(DevicePtr device);
     
+public:
     virtual ~VKTexture();
 
 protected:
     void DisposeNativeHandle();
     
-    void SetVkImageHandleDirectly(VkImage vkImage);
+    static void SetVkImageHandleDirectly(const TexturePtr& texture, VkImage vkImage);
 
 public:
     
@@ -36,12 +37,14 @@ public:
     bool Init(VkImage vkImage, const TextureDescriptor &descriptor);
     
     VkImage GetNative() const
-    { return vkImage_; }
-    
+    {
+        return vkImage_;
+    }
+
     VkFormat GetNativeFormat() const
-    { return vkFormat_; }
-    
-    virtual TextureView* CreateView(const TextureViewDescriptor &descriptor) override;
+    {
+        return vkFormat_;
+    }
     
     virtual void Dispose() override;
     
@@ -62,6 +65,16 @@ public:
     void TransToOutputAttachmentImageLayout(VKCommandBuffer* commandBuffer);
     
     void TransToSampledImageLayout(VKCommandBuffer* commandBuffer);
+
+    TextureUsageFlags GetTextureMemoryLayout() const
+    {
+        return currentTexUsageForMemLayout_;
+    }
+
+    void SetTextureMemoryLayout(TextureUsageFlags flags)
+    {
+        currentTexUsageForMemLayout_ = flags;
+    }
 
 private:
     void TransToTargetImageLayout_(VKCommandBuffer* commandBuffer, TextureUsageFlags targetTextureUsage);

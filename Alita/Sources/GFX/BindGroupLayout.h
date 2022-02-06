@@ -13,11 +13,10 @@ NS_GFX_BEGIN
 class BindGroupLayout : public GfxBase
 {
 public:
-    BindGroupLayout(Device* GPUDevice)
+    BindGroupLayout(DevicePtr GPUDevice)
         : GfxBase(GPUDevice, RHIObjectType::BindGroupLayout)
     {}
 
-protected:
     virtual ~BindGroupLayout() = default;
 };
 

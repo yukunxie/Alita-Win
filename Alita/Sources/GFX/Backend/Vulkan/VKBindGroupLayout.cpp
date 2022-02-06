@@ -7,7 +7,7 @@
 
 NS_GFX_BEGIN
 
-VKBindGroupLayout::VKBindGroupLayout(VKDevice* device)
+VKBindGroupLayout::VKBindGroupLayout(const DevicePtr& device)
     : BindGroupLayout(device)
 {
 }

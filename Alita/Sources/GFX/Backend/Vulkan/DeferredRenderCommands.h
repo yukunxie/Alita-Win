@@ -17,9 +17,6 @@ class VKBindGroup;
 
 NS_GFX_BEGIN
 
-// 注意，所有的command都使用栈上分配内存，消除所有动态分配内存的逻辑，如string, vector等所有的使用都是非法的。
-// 所以，所有的command的dtor都被声明成delete了。
-
 struct DeferredCmdBase
 {
 public:
@@ -32,7 +29,6 @@ public:
     
     ~DeferredCmdBase()
     {
-        GFX_ASSERT(false, "Don't call the dtor");
     }
 
 protected:
@@ -50,14 +46,12 @@ struct DeferredCmdBeginCommandBuffer final : public DeferredCmdBase
     }
     
     virtual void Execute(VKCommandBuffer* commandBuffer) override;
-    
-    ~DeferredCmdBeginCommandBuffer() = delete;
 };
 
 struct DeferredCmdBeginRenderPass final : public DeferredCmdBase
 {
-    DeferredCmdBeginRenderPass(RenderPass* renderPass, Framebuffer* framebuffer,
-                               QuerySet* occlusionQuerySet, std::uint32_t clearValueCount,
+    DeferredCmdBeginRenderPass(RenderPassPtr renderPass, FramebufferPtr framebuffer,
+                               QuerySetPtr occlusionQuerySet, std::uint32_t clearValueCount,
                                Color* clearValues, float clearDepth, uint32_t clearStencil)
         : DeferredCmdBase(RenderCommand::BeginRenderPass)
     {
@@ -73,12 +67,10 @@ struct DeferredCmdBeginRenderPass final : public DeferredCmdBase
     
     virtual void Execute(VKCommandBuffer* commandBuffer) override;
     
-    ~DeferredCmdBeginRenderPass() = delete;
-
 protected:
-    RenderPass* renderPass_ = nullptr;
-    Framebuffer* framebuffer_ = nullptr;
-    QuerySet* occlusionQuerySet_ = nullptr;
+    RenderPassPtr renderPass_ = nullptr;
+    FramebufferPtr framebuffer_ = nullptr;
+    QuerySetPtr occlusionQuerySet_ = nullptr;
     std::uint32_t clearValueCount_ = 0;
     std::array<Color, kMaxColorAttachments> clearColors_;
     float clearDepth_ = 1.0f;
@@ -94,15 +86,13 @@ struct DeferredCmdClearAttachment final : public DeferredCmdBase
     
     virtual void Execute(VKCommandBuffer* commandBuffer) override;
     
-    ~DeferredCmdClearAttachment() = delete;
-
 private:
     VkClearAttachment clearAttachment_;
 };
 
 struct DeferredCmdSetGraphicPipeline final : public DeferredCmdBase
 {
-    DeferredCmdSetGraphicPipeline(RenderPipeline* graphicPipeline)
+    DeferredCmdSetGraphicPipeline(RenderPipelinePtr graphicPipeline)
         : DeferredCmdBase(RenderCommand::SetGraphicPipeline)
     {
         graphicPipeline_ = graphicPipeline;
@@ -110,26 +100,22 @@ struct DeferredCmdSetGraphicPipeline final : public DeferredCmdBase
     
     virtual void Execute(VKCommandBuffer* commandBuffer) override;
     
-    ~DeferredCmdSetGraphicPipeline() = delete;
-
 private:
-    RenderPipeline* graphicPipeline_ = nullptr;
+    RenderPipelinePtr graphicPipeline_ = nullptr;
 };
 
 struct DeferredCmdSetComputePipeline final : public DeferredCmdBase
 {
-    DeferredCmdSetComputePipeline(ComputePipeline* computePipeline)
+    DeferredCmdSetComputePipeline(ComputePipelinePtr computePipeline)
         : DeferredCmdBase(RenderCommand::SetComputePipeline)
     {
         computePipeline_ = computePipeline;
     }
     
     virtual void Execute(VKCommandBuffer* commandBuffer) override;
-    
-    ~DeferredCmdSetComputePipeline() = delete;
 
 private:
-    ComputePipeline* computePipeline_ = nullptr;
+    ComputePipelinePtr computePipeline_ = nullptr;
 };
 
 struct DeferredCmdDispatch final : public DeferredCmdBase
@@ -140,8 +126,6 @@ struct DeferredCmdDispatch final : public DeferredCmdBase
     }
     
     virtual void Execute(VKCommandBuffer* commandBuffer) override;
-    
-    ~DeferredCmdDispatch() = delete;
 
 private:
     std::uint32_t x_;
@@ -151,7 +135,7 @@ private:
 
 struct DeferredCmdDispatchIndirect final : public DeferredCmdBase
 {
-    DeferredCmdDispatchIndirect(Buffer* indirectBuffer, BufferSize indirectOffset)
+    DeferredCmdDispatchIndirect(BufferPtr indirectBuffer, BufferSize indirectOffset)
         : DeferredCmdBase(RenderCommand::DispatchIndirect)
     {
         indirectBuffer_ = indirectBuffer;
@@ -160,10 +144,8 @@ struct DeferredCmdDispatchIndirect final : public DeferredCmdBase
     
     virtual void Execute(VKCommandBuffer* commandBuffer) override;
     
-    ~DeferredCmdDispatchIndirect() = delete;
-
 private:
-    Buffer* indirectBuffer_ = nullptr;
+    BufferPtr indirectBuffer_ = nullptr;
     BufferSize indirectOffset_ = 0;
 };
 
@@ -181,8 +163,6 @@ struct DeferredCmdDraw final : public DeferredCmdBase
     
     virtual void Execute(VKCommandBuffer* commandBuffer) override;
     
-    ~DeferredCmdDraw() = delete;
-
 private:
     std::uint32_t vertexCount_;
     std::uint32_t instanceCount_;
@@ -208,8 +188,6 @@ struct DeferredCmdDrawIndexed final : public DeferredCmdBase
     
     virtual void Execute(VKCommandBuffer* commandBuffer) override;
     
-    ~DeferredCmdDrawIndexed() = delete;
-
 private:
     std::uint32_t indexCount_;
     std::uint32_t instanceCount_;
@@ -226,14 +204,11 @@ struct DeferredCmdEndPass final : public DeferredCmdBase
     }
     
     virtual void Execute(VKCommandBuffer* commandBuffer) override;
-    
-    ~DeferredCmdEndPass() = delete;
-    
 };
 
 struct DeferredCmdSetVertexBuffer final : public DeferredCmdBase
 {
-    DeferredCmdSetVertexBuffer(Buffer* buffer, std::uint32_t offset, std::uint32_t slot)
+    DeferredCmdSetVertexBuffer(BufferPtr buffer, std::uint32_t offset, std::uint32_t slot)
         : DeferredCmdBase(RenderCommand::SetVertexBuffer)
     {
         buffer_ = buffer;
@@ -243,17 +218,15 @@ struct DeferredCmdSetVertexBuffer final : public DeferredCmdBase
     
     virtual void Execute(VKCommandBuffer* commandBuffer) override;
     
-    ~DeferredCmdSetVertexBuffer() = delete;
-
 private:
-    Buffer* buffer_ = nullptr;
+    BufferPtr buffer_ = nullptr;
     std::uint32_t offset_ = 0;
     std::uint32_t slot_ = 0;
 };
 
 struct DeferredCmdSetIndexBuffer final : public DeferredCmdBase
 {
-    DeferredCmdSetIndexBuffer(Buffer* buffer, std::uint32_t offset)
+    DeferredCmdSetIndexBuffer(BufferPtr buffer, std::uint32_t offset)
         : DeferredCmdBase(RenderCommand::SetIndexBuffer)
     {
         buffer_ = buffer;
@@ -262,16 +235,14 @@ struct DeferredCmdSetIndexBuffer final : public DeferredCmdBase
     
     virtual void Execute(VKCommandBuffer* commandBuffer) override;
     
-    ~DeferredCmdSetIndexBuffer() = delete;
-
 private:
-    Buffer* buffer_ = nullptr;
+    BufferPtr buffer_ = nullptr;
     std::uint32_t offset_ = 0;
 };
 
 struct DeferredCmdDrawIndirect final : public DeferredCmdBase
 {
-    DeferredCmdDrawIndirect(Buffer* indirectBuffer, BufferSize indirectOffset)
+    DeferredCmdDrawIndirect(BufferPtr indirectBuffer, BufferSize indirectOffset)
         : DeferredCmdBase(RenderCommand::DrawIndirect)
     {
         indirectBuffer_ = indirectBuffer;
@@ -280,16 +251,14 @@ struct DeferredCmdDrawIndirect final : public DeferredCmdBase
     
     virtual void Execute(VKCommandBuffer* commandBuffer) override;
     
-    ~DeferredCmdDrawIndirect() = delete;
-
 private:
-    Buffer* indirectBuffer_ = nullptr;
+    BufferPtr indirectBuffer_ = nullptr;
     BufferSize indirectOffset_ = 0;
 };
 
 struct DeferredCmdDrawIndexedIndirect final : public DeferredCmdBase
 {
-    DeferredCmdDrawIndexedIndirect(Buffer* indirectBuffer, BufferSize indirectOffset)
+    DeferredCmdDrawIndexedIndirect(BufferPtr indirectBuffer, BufferSize indirectOffset)
         : DeferredCmdBase(RenderCommand::DrawIndexedIndirect)
     {
         indirectBuffer_ = indirectBuffer;
@@ -298,10 +267,8 @@ struct DeferredCmdDrawIndexedIndirect final : public DeferredCmdBase
     
     virtual void Execute(VKCommandBuffer* commandBuffer) override;
     
-    ~DeferredCmdDrawIndexedIndirect() = delete;
-
 private:
-    Buffer* indirectBuffer_ = nullptr;
+    BufferPtr indirectBuffer_ = nullptr;
     BufferSize indirectOffset_ = 0;
 };
 
@@ -321,8 +288,6 @@ struct DeferredCmdSetViewport final : public DeferredCmdBase
     
     virtual void Execute(VKCommandBuffer* commandBuffer) override;
     
-    ~DeferredCmdSetViewport() = delete;
-
 private:
     float x_;
     float y_;
@@ -346,8 +311,6 @@ struct DeferredCmdSetScissorRect final : public DeferredCmdBase
     
     virtual void Execute(VKCommandBuffer* commandBuffer) override;
     
-    ~DeferredCmdSetScissorRect() = delete;
-
 private:
     std::int32_t x_;
     std::int32_t y_;
@@ -364,8 +327,6 @@ struct DeferredCmdSetStencilReference final : public DeferredCmdBase
     }
     
     virtual void Execute(VKCommandBuffer* commandBuffer) override;
-    
-    ~DeferredCmdSetStencilReference() = delete;
 
 private:
     std::uint32_t reference_ = 0;
@@ -374,7 +335,7 @@ private:
 struct DeferredCmdSetBindGroup final : public DeferredCmdBase
 {
     DeferredCmdSetBindGroup(PipelineType pipelineType, std::uint32_t index,
-                            BindGroup* bindGroup,
+                            const BindGroupPtr& bindGroup,
                             uint32_t dynamicOffsetCount,
                             const uint32_t* pDynamicOffsets)
         : DeferredCmdBase(RenderCommand::SetBindGroup)
@@ -399,13 +360,11 @@ struct DeferredCmdSetBindGroup final : public DeferredCmdBase
     }
     
     virtual void Execute(VKCommandBuffer* commandBuffer) override;
-    
-    ~DeferredCmdSetBindGroup() = delete;
 
 private:
     PipelineType pipelineType_ = PipelineType::Graphic;
     std::uint32_t index_ = 0;
-    BindGroup* bindGroup_ = nullptr;
+    BindGroupPtr bindGroup_ = nullptr;
     uint32_t dynamicOffsetCount_ = 0;
     std::array<std::uint32_t, kMaxBindingsPerGroup> dynamicOffsets_;
 };
@@ -423,8 +382,6 @@ struct DeferredCmdCopyBufferToTexture final : public DeferredCmdBase
     }
     
     virtual void Execute(VKCommandBuffer* commandBuffer) override;
-    
-    ~DeferredCmdCopyBufferToTexture() = delete;
 
 private:
     BufferCopyView source_;
@@ -445,8 +402,6 @@ struct DeferredCmdCopyTextureToBuffer final : public DeferredCmdBase
     }
     
     virtual void Execute(VKCommandBuffer* commandBuffer) override;
-    
-    ~DeferredCmdCopyTextureToBuffer() = delete;
 
 private:
     TextureCopyView source_;
@@ -467,8 +422,6 @@ struct DeferredCmdCopyTextureToTexture final : public DeferredCmdBase
     }
     
     virtual void Execute(VKCommandBuffer* commandBuffer) override;
-    
-    ~DeferredCmdCopyTextureToTexture() = delete;
 
 private:
     TextureCopyView source_;
@@ -478,9 +431,9 @@ private:
 
 struct DeferredCmdCopyBufferToBuffer final : public DeferredCmdBase
 {
-    DeferredCmdCopyBufferToBuffer(Buffer* source,
+    DeferredCmdCopyBufferToBuffer(BufferPtr source,
                                   BufferSize sourceOffset,
-                                  Buffer* destination,
+                                  BufferPtr destination,
                                   BufferSize destinationOffset,
                                   BufferSize size)
         : DeferredCmdBase(RenderCommand::CopyBufferToBuffer)
@@ -493,13 +446,11 @@ struct DeferredCmdCopyBufferToBuffer final : public DeferredCmdBase
     }
     
     virtual void Execute(VKCommandBuffer* commandBuffer) override;
-    
-    ~DeferredCmdCopyBufferToBuffer() = delete;
 
 private:
-    Buffer* source_ = nullptr;
+    BufferPtr source_ = nullptr;
     BufferSize sourceOffset_;
-    Buffer* destination_ = nullptr;
+    BufferPtr destination_ = nullptr;
     BufferSize destinationOffset_;
     BufferSize size_;
 };
@@ -513,8 +464,6 @@ struct DeferredCmdSetBlendColor final : public DeferredCmdBase
     }
     
     virtual void Execute(VKCommandBuffer* commandBuffer) override;
-    
-    ~DeferredCmdSetBlendColor() = delete;
 
 private:
     Color color_;
@@ -534,28 +483,10 @@ struct DeferredCmdSetDepthBias final : public DeferredCmdBase
 
     virtual void Execute(VKCommandBuffer* commandBuffer) override;
 
-    ~DeferredCmdSetDepthBias() = delete;
-
 private:
     float                                       depthBiasConstantFactor_;
     float                                       depthBiasClamp_;
     float                                       depthBiasSlopeFactor_;
-};
-
-struct DeferredCmdExecuteBundle final : public DeferredCmdBase
-{
-    DeferredCmdExecuteBundle(RenderBundle* renderBundle)
-        : DeferredCmdBase(RenderCommand::ExecuteBundle)
-    {
-        renderBundle_ = renderBundle;
-    }
-    
-    virtual void Execute(VKCommandBuffer* commandBuffer) override;
-    
-    ~DeferredCmdExecuteBundle() = delete;
-
-private:
-    RenderBundle* renderBundle_ = nullptr;
 };
 
 struct DeferredCmdPushDebugGroup final : public DeferredCmdBase
@@ -570,8 +501,6 @@ struct DeferredCmdPushDebugGroup final : public DeferredCmdBase
     
     virtual void Execute(VKCommandBuffer* commandBuffer) override;
     
-    ~DeferredCmdPushDebugGroup() = delete;
-
 private:
     std::array<char, 64> strings_;
 };
@@ -584,8 +513,6 @@ struct DeferredCmdPopDebugGroup final : public DeferredCmdBase
     }
     
     virtual void Execute(VKCommandBuffer* commandBuffer) override;
-    
-    ~DeferredCmdPopDebugGroup() = delete;
 };
 
 struct DeferredCmdInsertDebugMarker final : public DeferredCmdBase
@@ -600,8 +527,6 @@ struct DeferredCmdInsertDebugMarker final : public DeferredCmdBase
     
     virtual void Execute(VKCommandBuffer* commandBuffer) override;
     
-    ~DeferredCmdInsertDebugMarker() = delete;
-
 private:
     std::array<char, 64> strings_;
 };
@@ -615,8 +540,6 @@ struct DeferredCmdBeginOcclusionQuery final : public DeferredCmdBase
     
     virtual void Execute(VKCommandBuffer* commandBuffer) override;
     
-    ~DeferredCmdBeginOcclusionQuery() = delete;
-
 private:
     std::uint32_t queryIndex_;
 };
@@ -630,18 +553,16 @@ struct DeferredCmdEndOcclusionQuery final : public DeferredCmdBase
     
     virtual void Execute(VKCommandBuffer* commandBuffer) override;
     
-    ~DeferredCmdEndOcclusionQuery() = delete;
-
 private:
     std::uint32_t queryIndex_;
 };
 
 struct DeferredCmdResolveQuerySet final : public DeferredCmdBase
 {
-    DeferredCmdResolveQuerySet(QuerySet* querySet,
+    DeferredCmdResolveQuerySet(const QuerySetPtr& querySet,
                                std::uint32_t queryFirstIndex,
                                std::uint32_t queryCount,
-                               Buffer* dstBuffer,
+                               const BufferPtr& dstBuffer,
                                std::uint32_t dstOffset)
         : DeferredCmdBase(RenderCommand::ResolveQuerySet)
     {
@@ -654,19 +575,17 @@ struct DeferredCmdResolveQuerySet final : public DeferredCmdBase
     
     virtual void Execute(VKCommandBuffer* commandBuffer) override;
     
-    ~DeferredCmdResolveQuerySet() = delete;
-
 private:
-    QuerySet* querySet_;
+    QuerySetPtr querySet_;
     std::uint32_t queryFirstIndex_;
     std::uint32_t queryCount_;
-    Buffer* dstBuffer_;
+    BufferPtr dstBuffer_;
     std::uint32_t dstOffset_;
 };
 
 struct DeferredCmdPipelineBarrier final : public DeferredCmdBase
 {
-    DeferredCmdPipelineBarrier(Texture* texture,
+    DeferredCmdPipelineBarrier(TexturePtr texture,
                                TextureUsageFlags srcUsageFlags,
                                TextureUsageFlags dstUsageFlags)
         : DeferredCmdBase(RenderCommand::PipelineBarrier)
@@ -678,10 +597,8 @@ struct DeferredCmdPipelineBarrier final : public DeferredCmdBase
     
     virtual void Execute(VKCommandBuffer* commandBuffer) override;
     
-    ~DeferredCmdPipelineBarrier() = delete;
-
 private:
-    Texture* texture_ = nullptr;
+    TexturePtr texture_ = nullptr;
     TextureUsageFlags srcUsageFlags_;
     TextureUsageFlags dstUsageFlags_;
 };

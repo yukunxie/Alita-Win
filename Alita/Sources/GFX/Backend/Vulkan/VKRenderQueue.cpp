@@ -6,7 +6,7 @@
 
 NS_GFX_BEGIN
 
-VKRenderQueue::VKRenderQueue(VKDevice* device)
+VKRenderQueue::VKRenderQueue(const DevicePtr& device)
     : RenderQueue(device)
 {
 }

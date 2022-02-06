@@ -14,8 +14,9 @@ NS_GFX_BEGIN
 class VKFramebuffer final : public Framebuffer
 {
 protected:
-    VKFramebuffer(VKDevice* device);
+    VKFramebuffer(const DevicePtr& device);
     
+public:
     ~VKFramebuffer();
 
 public:
@@ -42,7 +43,7 @@ public:
         return colorAttachmentCount_;
     }
     
-    const std::array<const VKTextureView*, kMaxColorAttachments>& GetColorAttachments() const
+    const std::array<TextureViewPtr, kMaxColorAttachments>& GetColorAttachments() const
     {
         return colorAttachments_;
     }
@@ -52,11 +53,11 @@ public:
 
 private:
     VkFramebuffer vkFramebuffer_ = VK_NULL_HANDLE;
-    VKRenderPass* renderPass_ = nullptr;
+    RenderPassPtr renderPass_ = nullptr;
     Extent2D extent2D_;
     
     std::uint32_t colorAttachmentCount_ = 0;
-    std::array<const VKTextureView*, kMaxColorAttachments> colorAttachments_;
+    std::array<TextureViewPtr, kMaxColorAttachments> colorAttachments_;
     
     bool hasSwapChainImages_ = false;
     

@@ -16,7 +16,7 @@ NS_GFX_BEGIN
 class RenderPipeline : public GfxBase
 {
 public:
-    RenderPipeline(Device* GPUDevice)
+    RenderPipeline(DevicePtr GPUDevice)
         : GfxBase(GPUDevice, RHIObjectType::RenderPipeline)
     {}
     
@@ -29,7 +29,6 @@ public:
         return true;
     }
 
-protected:
     virtual ~RenderPipeline() = default;
 
 protected:

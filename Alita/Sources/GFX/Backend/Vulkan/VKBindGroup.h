@@ -17,8 +17,9 @@ class VKBuffer;
 class VKBindGroup final : public BindGroup
 {
 protected:
-    VKBindGroup(VKDevice* device);
+    VKBindGroup(const DevicePtr& device);
     
+public:
     ~VKBindGroup();
 
 public:
@@ -37,7 +38,7 @@ public:
     
     void TransImageLayoutToSampled(VKCommandBuffer *commandBuffer);
 
-    std::vector<VKBuffer *> getBindingBuffers();
+    std::vector<BufferPtr> getBindingBuffers();
 
 private:
     RHIObjectWrapper<VKBindGroupLayout> bindGroupLayout_;

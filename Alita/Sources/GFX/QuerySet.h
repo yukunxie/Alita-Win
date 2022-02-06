@@ -13,7 +13,7 @@ NS_GFX_BEGIN
 class QuerySet : public GfxBase
 {
 public:
-    QuerySet(Device* GPUDevice)
+    QuerySet(DevicePtr GPUDevice)
         : GfxBase(GPUDevice, RHIObjectType::QuerySet)
     {}
     
@@ -30,7 +30,6 @@ public:
     std::uint32_t GetCount() const
     { return count_; }
 
-protected:
     virtual ~QuerySet() = default;
 
 protected:

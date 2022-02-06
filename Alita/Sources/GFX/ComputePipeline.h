@@ -16,11 +16,10 @@ NS_GFX_BEGIN
 class ComputePipeline : public GfxBase
 {
 public:
-    ComputePipeline(Device* GPUDevice)
+    ComputePipeline(DevicePtr GPUDevice)
         : GfxBase(GPUDevice, RHIObjectType::ComputePipeline)
     {}
 
-protected:
     virtual ~ComputePipeline() = default;
 };
 

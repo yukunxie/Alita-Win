@@ -12,8 +12,9 @@ NS_GFX_BEGIN
 class VKSampler final : public Sampler
 {
 protected:
-    VKSampler(VKDevice* device);
+    VKSampler(const DevicePtr& device);
     
+public:
     virtual ~VKSampler();
     
 public:

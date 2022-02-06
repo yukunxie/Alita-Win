@@ -220,7 +220,7 @@ void Material::SetupConstantBufferLayout()
     }
 }
 
-gfx::Shader* Material::_CreateShader(const std::string& filename, gfx::ShaderType shaderType, ETechniqueType techType, const std::vector<std::string>& userDefines)
+gfx::ShaderPtr Material::_CreateShader(const std::string& filename, gfx::ShaderType shaderType, ETechniqueType techType, const std::vector<std::string>& userDefines)
 {
     std::string data = FileSystem::GetInstance()->GetStringData(filename.c_str());
 
@@ -353,7 +353,7 @@ void Material::Apply(const Pass* pass, ETechniqueType technique, ERenderSet rend
     SetupPSOKey(psoKey, renderSet);
     SetupPSOKey(psoKey, pass);
 
-    gfx::RenderPipeline* pso = nullptr;
+    gfx::RenderPipelinePtr pso = nullptr;
 
     if (rhiPSOMap_.contains(psoKey))
     {
@@ -453,7 +453,7 @@ bool Material::SetFloat(const std::string& name, std::uint32_t offset, std::uint
     return true;
 }
 
-bool Material::SetTexture(const std::string& name, const gfx::Texture* texture)
+bool Material::SetTexture(const std::string& name, gfx::TexturePtr texture)
 {
     Assert(texture != nullptr, "null is invalid");
     const auto it = parameters_.find(name);
@@ -469,9 +469,7 @@ bool Material::SetTexture(const std::string& name, const gfx::Texture* texture)
     {
         rhiPSOMap_.clear();
     }
-    //GFX_SAFE_RELEASE(param.bindingObject->Texture.texture);
     param.bindingObject->Texture.texture = texture;
-    //GFX_SAFE_RETAIN(param.bindingObject->Texture.texture);
     bBindingDirty_ = true;
     return true;
 }
@@ -497,8 +495,7 @@ void Material::ApplyModifyToBindGroup(gfx::RenderPassEncoder& passEndcoder)
     {
         if (it->type == MaterailBindingObjectType::BUFFER)
         {
-            auto resource = Engine::GetGPUDevice()->CreateBufferBinding((gfx::Buffer*)it->Buffer.buffer, 0, it->Buffer.stride);
-            GFX_SAFE_RETAIN(resource);
+            auto resource = Engine::GetGPUDevice()->CreateBufferBinding(it->Buffer.buffer, 0, it->Buffer.stride);
             gfx::BindGroupBinding tmp;
             {
                 tmp.binding = it->binding;
@@ -516,18 +513,16 @@ void Material::ApplyModifyToBindGroup(gfx::RenderPassEncoder& passEndcoder)
                     tvDescriptor.dimension = gfx::TextureViewDimension::DIM_CUBE;
                 }
 
-                auto tv = Engine::GetGPUDevice()->CreateTextureViewBinding(((gfx::Texture*)it->Texture.texture)->CreateView(tvDescriptor));
-                GFX_SAFE_RETAIN(tv);
+                auto tv = Engine::GetGPUDevice()->CreateTextureView(it->Texture.texture, tvDescriptor);
                 gfx::BindGroupBinding tmp;
                 {
                     tmp.binding = it->binding;
-                    tmp.resource = tv;
+                    tmp.resource = Engine::GetGPUDevice()->CreateTextureViewBinding(tv);
                 }
                 descriptor.entries.push_back(tmp);
 
                 // create sampler for this texture
-                auto sampler = Engine::GetGPUDevice()->CreateSamplerBinding((gfx::Sampler*)it->Texture.sampler);
-                GFX_SAFE_RETAIN(sampler);
+                auto sampler = Engine::GetGPUDevice()->CreateSamplerBinding(it->Texture.sampler);
                 descriptor.entries.push_back(gfx::BindGroupBinding{ it->binding + 1 , sampler });
             }
         }
@@ -537,7 +532,6 @@ void Material::ApplyModifyToBindGroup(gfx::RenderPassEncoder& passEndcoder)
         }
     }
     rhiBindGroup_ = Engine::GetGPUDevice()->CreateBindGroup(descriptor);
-    GFX_SAFE_RETAIN(rhiBindGroup_);
 }
 
 gfx::SamplerDescriptor Material::ParseSamplerDescriptor(const rapidjson::Value& doc)
@@ -660,7 +654,6 @@ void Material::ParseBindGroupLayout(const rapidjson::Document& doc)
                     bufferDescriptor.usage = gfx::BufferUsage::UNIFORM;
                 };
                 bindingObject->Buffer.buffer = Engine::GetGPUDevice()->CreateBuffer(bufferDescriptor);
-                GFX_SAFE_RETAIN(bindingObject->Buffer.buffer);
 
                 for (auto& field : fields)
                 {
@@ -804,7 +797,7 @@ void Material::PrepareBindingLayout()
     }
 }
 
-gfx::RenderPipeline* Material::CreatePipelineState(const PSOKey& psoKey, const ShaderSet& shaderSet)
+gfx::RenderPipelinePtr Material::CreatePipelineState(const PSOKey& psoKey, const ShaderSet& shaderSet)
 {
     gfx::RenderPipelineDescriptor psoDesc;
     {

@@ -10,50 +10,56 @@
 
 NS_GFX_BEGIN
 
-class VKTextureViewManager;
+class TextureViewManager;
 
 class VKTextureView final : public TextureView
 {
 protected:
-    VKTextureView(VKDevice* device);
+    VKTextureView(DevicePtr device);
     
+    virtual void Recreate() override;
+
+public:
     virtual ~VKTextureView();
-    
-    void Recreate();
 
 public:
     
-    bool Init(VKTexture* vkTexture, const TextureViewDescriptor &descriptor);
-    
+    bool Init(const TexturePtr& vkTexture, const TextureViewDescriptor& descriptor);
+
     VkImageView GetNative() const
-    { return vkImageView_; }
-    
+    {
+        return vkImageView_;
+    }
+
     Extent3D GetTextureSize() const
-    { return texture_->GetTextureSize(); }
-    
+    {
+        return texture_->GetTextureSize();
+    }
+
     std::uint32_t GetSampleCount() const
     {
         return texture_ ? texture_->GetSampleCount() : 1;
     }
-    
+
     virtual TextureFormat GetFormat() const override
-    { return textureFormat_; }
-    
+    {
+        return textureFormat_;
+    }
+
     virtual void Dispose() override;
-    
+
     VkImage GetImage()
     {
-        return texture_ ? texture_->GetNative() : VK_NULL_HANDLE;
+        return texture_ ? GFX_CAST(VKTexture*, texture_)->GetNative() : VK_NULL_HANDLE;
     }
-    
-    //VKTexture* GetTexture()
-    //{ return texture_.Get(); }
 
-    virtual const Texture* GetTexture() const override 
-    { return texture_.Get(); }
+    virtual const TexturePtr& GetTexture() const override
+    {
+        return texture_;
+    }
 
 private:
-    RHIObjectWrapper<VKTexture> texture_ = nullptr;
+    TexturePtr texture_ = nullptr;
     
     VkImageView vkImageView_ = VK_NULL_HANDLE;
     
@@ -64,7 +70,7 @@ private:
     
     friend class VKDevice;
     
-    friend class VKTextureViewManager;
+    friend class TextureViewManager;
     
     friend class VKTexture;
 };

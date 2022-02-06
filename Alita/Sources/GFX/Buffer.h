@@ -16,7 +16,7 @@ class BufferBinding;
 class Buffer : public GfxBase
 {
 public:
-    Buffer(Device* GPUDevice)
+    Buffer(DevicePtr GPUDevice)
         : GfxBase(GPUDevice, RHIObjectType::Buffer)
     {}
 
@@ -73,12 +73,12 @@ class BufferBinding final : public BindingResource
 public:
     BufferBinding() = delete;
     
-    BufferBinding(Device* device)
+    BufferBinding(const DevicePtr& device)
         : BindingResource(device, BindingResourceType::Buffer)
     {
     }
     
-    bool Init(Buffer* buffer_, BufferSize offset_, BufferSize size_)
+    bool Init(const BufferPtr& buffer_, BufferSize offset_, BufferSize size_)
     {
         buffer = buffer_;
         offset = offset_;
@@ -86,24 +86,30 @@ public:
         return true;
     }
 
-protected:
+public:
     virtual ~BufferBinding() = default;
 
-public:
     virtual void Dispose() override
-    {}
-    
-    Buffer* GetBuffer()
-    { return buffer.Get(); }
-    
+    {
+    }
+
+    const BufferPtr& GetBuffer()
+    {
+        return buffer;
+    }
+
     BufferSize GetOffset()
-    { return offset; }
-    
+    {
+        return offset;
+    }
+
     BufferSize GetSize()
-    { return size; }
+    {
+        return size;
+    }
 
 private:
-    RHIObjectWrapper<Buffer> buffer;
+    BufferPtr buffer;
     BufferSize offset = 0;
     BufferSize size = std::numeric_limits<BufferSize>::max();
 };

@@ -16,7 +16,7 @@ class TextureView;
 class Texture : public GfxBase
 {
 public:
-    Texture(Device* GPUDevice)
+    Texture(DevicePtr GPUDevice)
         : GfxBase(GPUDevice, RHIObjectType::Texture)
     {
     }
@@ -104,11 +104,7 @@ public:
     std::uint32_t getMemoryUsage()
     { return memoryUsage_; }
 
-protected:
     virtual ~Texture() = default;
-
-public:
-    virtual TextureView* CreateView(const TextureViewDescriptor &descriptor) = 0;
 
 protected:
     TextureFormat textureFormat_;

@@ -15,15 +15,15 @@ NS_RX_BEGIN
 class Texture : public Resource
 {
 public:
-    Texture(gfx::Texture* texture);
+    Texture(gfx::TexturePtr texture);
 
     Texture(uint32 width, uint32 height, gfx::TextureFormat format, const gfx::Color& color);
 
     virtual ~Texture();
 
-    virtual const gfx::TextureView* GetTextureView() const;
+    virtual const gfx::TextureViewPtr GetTextureView() const;
 
-    virtual const gfx::Texture* GetTexture() const;
+    virtual const gfx::TexturePtr GetTexture() const;
 
     virtual gfx::Extent3D GetExtent() const { return { Width_, Height_, 1 }; }
 
@@ -46,10 +46,10 @@ public:
 
 protected:
     std::string                 Name_;
-    uint32                      Width_          = 1;
-    uint32                      Height_         = 1;
-    gfx::TextureFormat          Format_         = gfx::TextureFormat::RGBA8UNORM;
-    gfx::Texture*               Texture_        = nullptr;
-    mutable gfx::TextureView*   TextureView_    = nullptr;
+    uint32                      Width_ = 1;
+    uint32                      Height_ = 1;
+    gfx::TextureFormat          Format_ = gfx::TextureFormat::RGBA8UNORM;
+    gfx::TexturePtr             Texture_ = nullptr;
+    mutable gfx::TextureViewPtr TextureView_ = nullptr;
 };
 NS_RX_END

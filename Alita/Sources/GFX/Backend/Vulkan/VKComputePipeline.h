@@ -13,8 +13,9 @@ NS_GFX_BEGIN
 class VKComputePipeline final : public ComputePipeline
 {
 protected:
-    VKComputePipeline(VKDevice* device);
+    VKComputePipeline(const DevicePtr& device);
     
+public:
     ~VKComputePipeline();
 
 public:

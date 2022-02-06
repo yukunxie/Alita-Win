@@ -21,6 +21,8 @@ void CommandList::Reset()
     offset_ = 0;
     firstCommandNode_ = nullptr;
     lastCommandNode_ = nullptr;
+
+    gfxCmds_.clear();
 }
 
 NS_GFX_END

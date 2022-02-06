@@ -31,16 +31,16 @@ public:
     
     void AddObjectToCache(GfxBase* object)
     {
-        if (TestObject(object))
+       /* if (TestObject(object))
         {
             RHIObjectType type = object->GetObjectType();
             weakedRefObjectCache_.emplace(type, object);
-        }
+        }*/
     }
     
     void RemoveObjectFromCache(const GfxBase* object)
     {
-        GFX_ASSERT(TestObject(object));
+        /*GFX_ASSERT(TestObject(object));
         RHIObjectType type = object->GetObjectType();
         auto itStart = weakedRefObjectCache_.lower_bound(type);
         auto itEnd = weakedRefObjectCache_.upper_bound(type);
@@ -53,19 +53,20 @@ public:
             }
             itStart = weakedRefObjectCache_.erase(itStart);
             break;
-        }
+        }*/
     }
     
-    GfxBase* GetObjectFromCacheByType(RHIObjectType type)
+    GfxBasePtr GetObjectFromCacheByType(RHIObjectType type)
     {
-        GfxBase* object = nullptr;
+        /*GfxBasePtr object = nullptr;
         auto it = weakedRefObjectCache_.find(type);
         if (it != weakedRefObjectCache_.end())
         {
             object = it->second;
             weakedRefObjectCache_.erase(it);
         }
-        return object;
+        return object;*/
+        return nullptr;
     }
 
     std::uint32_t getCommandBufferCount() { return commandBufferCount_;}
@@ -95,7 +96,7 @@ protected:
     std::vector<GfxBase*> trackedObjects_;
     std::vector<std::uint32_t> freeIds_;
     
-    std::multimap<RHIObjectType, GfxBase*> weakedRefObjectCache_;
+    std::multimap<RHIObjectType, GfxBasePtr> weakedRefObjectCache_;
 
 private:
 #if GFX_DEBUG

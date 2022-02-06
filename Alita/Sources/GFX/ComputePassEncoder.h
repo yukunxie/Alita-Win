@@ -18,29 +18,23 @@ class VKCommandBuffer;
 class ComputePassEncoder : public GfxBase
 {
 public:
-    ComputePassEncoder(Device* GPUDevice)
+    ComputePassEncoder(const DevicePtr& GPUDevice)
         : GfxBase(GPUDevice, RHIObjectType::ComputePassEncoder)
     {}
 
-protected:
     virtual ~ComputePassEncoder() = default;
 
 public:
-    virtual void SetPipeline(ComputePipeline* pipeline) = 0;
+    virtual void SetPipeline(const ComputePipelinePtr& pipeline) = 0;
     
     virtual void Dispatch(uint32_t x, uint32_t y = 1, uint32_t z = 1) = 0;
     
-    virtual void DispatchIndirect(Buffer* indirectBuffer, BufferSize indirectOffset) = 0;
+    virtual void DispatchIndirect(const BufferPtr& indirectBuffer, BufferSize indirectOffset) = 0;
     
     virtual void EndPass() = 0;
     
-    virtual void SetBindGroup(std::uint32_t index, BindGroup* bindGroup, std::uint32_t count,
+    virtual void SetBindGroup(std::uint32_t index, const BindGroupPtr& bindGroup, std::uint32_t count,
                               std::uint32_t* dynamicOffsets) = 0;
-    
-    // virtual void SetBindGroup(std::uint32_t index, BindGroup* bindGroup,
-    //                           const std::uint32_t* dynamicOffsetsData,
-    //                           uint32_t dynamicOffsetsDataStart,
-    //                           uint32_t dynamicOffsetsDataLength) = 0;
     
     virtual void PushDebugGroup(const std::string &groupLabel) = 0;
     

@@ -12,8 +12,9 @@ NS_GFX_BEGIN
 class VKQueue final : public Queue
 {
 protected:
-    VKQueue(VKDevice* device);
+    VKQueue(const DevicePtr& device);
     
+public:
     virtual ~VKQueue();
 
 public:
@@ -25,27 +26,27 @@ public:
 
 public:
     virtual void
-    Submit(std::uint32_t commandBufferCount, CommandBuffer* const* commandBuffers) override;
+    Submit(std::uint32_t commandBufferCount, CommandBufferPtr const* commandBuffers) override;
     
     void SubmitInternal();
     
-    virtual Fence* CreateFence(const FenceDescriptor &descriptor) override;
+    virtual FencePtr CreateFence(const FenceDescriptor &descriptor) override;
     
     virtual void Dispose() override;
     
-    virtual void Signal(Fence* fence, std::uint64_t signalValue) override;
+    virtual void Signal(const FencePtr& fence, std::uint64_t signalValue) override;
     
     virtual void WaitQueueIdle() override;
     
-    VKCommandBuffer* GetImageLayoutInitCommandBuffer();
+    CommandBufferPtr GetImageLayoutInitCommandBuffer();
     
 private:
-    std::vector<Fence*> waitingFences_;
+    std::vector<FencePtr> waitingFences_;
     VkQueue vkQueue_ = VK_NULL_HANDLE;
     VkFence vkFence_ = VK_NULL_HANDLE;
     
-    VKCommandBuffer* imageLayoutInitCommandBuffer_ = nullptr;
-    std::vector<VKCommandBuffer*> commandBufferCaches_;
+    CommandBufferPtr imageLayoutInitCommandBuffer_ = nullptr;
+    std::vector<CommandBufferPtr> commandBufferCaches_;
     
     friend class VKDevice;
 };

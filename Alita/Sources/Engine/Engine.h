@@ -49,7 +49,7 @@ public:
 		return windowHandler_;
 	}
 
-	static gfx::Device* GetGPUDevice()
+	static gfx::DevicePtr GetGPUDevice()
 	{
 		return Engine::GetEngine()->gpuDevice_;
 	}
@@ -92,7 +92,7 @@ protected:
 	std::uint32_t schedulerIDRecorder_ = 0;
 	std::map<std::uint32_t, SchedulerEntity> schedulers_;
 
-	gfx::Device* gpuDevice_ = nullptr;
+	gfx::DevicePtr gpuDevice_ = nullptr;
 
 	gfx::CommandEncoder* rhiCommandEncoder_ = nullptr;
 	gfx::SwapChain* rhiSwapChain_ = nullptr;

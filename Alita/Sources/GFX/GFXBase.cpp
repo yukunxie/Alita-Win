@@ -64,59 +64,16 @@ GfxBase::GfxBase(RHIObjectType objectType)
 #if AUTO_UNWIND_TRACEBACK_ENABLED
     UNWIND_CURRENT_STACK_TRACEBACK(_unwindTraceback);
 #endif
+
+    static std::atomic_uint32_t sIdCounter = 0;
+    globalId__ = sIdCounter.fetch_add(1);
 }
 
-GfxBase::GfxBase(Device* device, RHIObjectType objectType)
-: GfxBase(objectType)
+GfxBase::GfxBase(DevicePtr device, RHIObjectType objectType)
+    : GfxBase(objectType)
 {
-    GFX_PTR_ASSIGN(GPUDevice_, device);
-    GPUDevice_->GetObjectManager().AddObject(this);
-}
-
-GfxBase* GfxBase::AutoRelease()
-{
-    if (this->GetObjectType() == RHIObjectType::Device)
-    {
-        GFX_CAST(Device * , this)->AddAutoReleaseObjectToPool(this);
-    }
-    else
-    {
-        GFX_ASSERT(GPUDevice_);
-        GPUDevice_->AddAutoReleaseObjectToPool(this);
-    }
-    
-    autoReleased_ = true;
-    
-    return this;
-}
-
-void GfxBase::Retain() const
-{
-    NEW_OBJ_REF_COUNT_TRACEBACK(xxxfuncCallRetainTracebacks_);
-    
-    CheckThread();
-    GFX_ASSERT(!IsDisposed());
-    GFX_ASSERT((int) objectType__ >= 0 && (int) objectType__ <= (int) RHIObjectType::MAX_COUNT);
-    ++referenceCount__;
-}
-
-void GfxBase::Release() const
-{
-    NEW_OBJ_REF_COUNT_TRACEBACK(xxxfuncCallReleaseTracebacks_);
-
-    CheckThread();
-    GFX_ASSERT(referenceCount__ > 0);
-    GFX_ASSERT((int) objectType__ >= 0 && (int) objectType__ <= (int) RHIObjectType::MAX_COUNT);
-    
-    if (0 == --referenceCount__)
-    {
-        OnDeleteEvent();
-        if (GPUDevice_)
-        {
-            GPUDevice_->GetObjectManager().RemoveObject(this);
-        }
-        delete this;
-    }
+    GPUDevice_ = device;
+    GetGPUDevice()->GetObjectManager().AddObject(this);
 }
 
 NS_GFX_END

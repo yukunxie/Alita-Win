@@ -10,7 +10,7 @@
 
 NS_GFX_BEGIN
 
-VKShader::VKShader(VKDevice* device)
+VKShader::VKShader(const DevicePtr& device)
     : Shader(device)
 {
 }

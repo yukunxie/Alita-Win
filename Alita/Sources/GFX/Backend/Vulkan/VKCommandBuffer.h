@@ -21,8 +21,8 @@ class VKCommandBuffer;
 
 struct RenderPassEntry
 {
-    RenderPassEntry(RenderPass* renderPass,
-                    Framebuffer* framebuffer,
+    RenderPassEntry(RenderPassPtr renderPass,
+                    FramebufferPtr framebuffer,
                     std::uint32_t clearValueCount,
                     Color* clearValues,
                     float clearDepth,
@@ -42,8 +42,9 @@ protected:
 class VKCommandBuffer final : public CommandBuffer
 {
 protected:
-    VKCommandBuffer(VKDevice* device);
+    VKCommandBuffer(DevicePtr device);
     
+public:
     virtual ~VKCommandBuffer();
 
 public:
@@ -77,38 +78,40 @@ public:
     }
     
     virtual void
-    BeginRenderPass(RenderPass* pass, Framebuffer* framebuffer, QuerySet* occlusionQuerySet,
-                    std::uint32_t clearValueCount, Color* clearValues, float clearDepth,
+    BeginRenderPass(RenderPassPtr pass, FramebufferPtr framebuffer, QuerySetPtr occlusionQuerySet,
+                    std::uint32_t clearValueCount, const Color* clearValues, float clearDepth,
                     uint32_t clearStencil) override;
+
+    virtual void EndRenderPass() override;
     
     void ClearAttachment(VkClearAttachment clearAttachment);
     
-    void EndRenderPass();
-    
-    virtual void SetBindGroupToGraphicPipeline(std::uint32_t index, BindGroup* bindGroup,
+    virtual void SetBindGroupToGraphicPipeline(std::uint32_t index, BindGroupPtr bindGroup,
                                                uint32_t dynamicOffsetCount = 0,
                                                const uint32_t* pDynamicOffsets = nullptr) override;
     
-    virtual void SetBindGroupToComputePipeline(std::uint32_t index, BindGroup* bindGroup,
+    virtual void SetBindGroupToComputePipeline(std::uint32_t index, BindGroupPtr bindGroup,
                                                uint32_t dynamicOffsetCount = 0,
                                                const uint32_t* pDynamicOffsets = nullptr) override;
     
-    virtual void BindGraphicsPipeline(RenderPipeline* graphicPipeline) override;
+    virtual void BindGraphicsPipeline(RenderPipelinePtr graphicPipeline) override;
     
-    virtual void BindComputePipeline(ComputePipeline* computePipeline) override;
+    virtual void BindComputePipeline(ComputePipelinePtr computePipeline) override;
     
-    virtual void SetIndexBuffer(Buffer* buffer, std::uint32_t offset = 0) override;
+    virtual void SetIndexBuffer(BufferPtr buffer, std::uint32_t offset = 0) override;
     
-    virtual void SetVertexBuffer(Buffer* buffer, std::uint32_t offset = 0,
+    virtual void SetVertexBuffer(BufferPtr buffer, std::uint32_t offset = 0,
                                  std::uint32_t slot = 0) override;
     
     virtual void
     Dispatch(std::uint32_t groupCountX, std::uint32_t groupCountY,
              std::uint32_t groupCountZ) override;
     
-    virtual void DispatchIndirect(Buffer* indirectBuffer, BufferSize indirectOffset) override;
+    virtual void DispatchIndirect(BufferPtr indirectBuffer, BufferSize indirectOffset) override;
     
-    void AddBindingObject(GfxBase* object);
+    void AddBindingBuffer(const BufferPtr& buffer);
+
+    void AddBindingBindGroup(const BindGroupPtr& bindGroup);
     
     void ResetCommandBuffer();
     
@@ -130,9 +133,9 @@ public:
                              std::uint32_t firstIndex, int32_t baseVertex,
                              std::uint32_t firstInstance) override;
     
-    virtual void DrawIndirect(Buffer* indirectBuffer, BufferSize indirectOffset) override;
+    virtual void DrawIndirect(BufferPtr indirectBuffer, BufferSize indirectOffset) override;
     
-    virtual void DrawIndexedIndirect(Buffer* indirectBuffer, BufferSize indirectOffset) override;
+    virtual void DrawIndexedIndirect(BufferPtr indirectBuffer, BufferSize indirectOffset) override;
     
     virtual void SetViewport(float x, float y, float width, float height, float minDepth,
                              float maxDepth) override;
@@ -157,10 +160,10 @@ public:
     virtual void EndOcclusionQuery(std::uint32_t queryIndex) override;
     
     virtual void ResolveQuerySet(
-        QuerySet* querySet,
+        QuerySetPtr querySet,
         std::uint32_t queryFirstIndex,
         std::uint32_t queryCount,
-        Buffer* dstBuffer,
+        BufferPtr dstBuffer,
         std::uint32_t dstOffset) override;
     
     virtual void OnDeleteEvent() const override;
@@ -179,19 +182,19 @@ public:
     
     void PostprocessCommandBuffer();
 
+    static void SetupTexturePipelineBarrier(VKCommandBuffer* commandBuffer, const TexturePtr& texture_, TextureUsageFlags srcUsageFlags_, TextureUsageFlags dstUsageFlags_);
+
 protected:
     void ForceEndRenderPass();
     
-    void SubmitCommandList();
+    //void SubmitCommandList();
     
     void SetIndexBufferInternal();
 
 private:
     VkCommandBuffer vkCommandBuffer_ = VK_NULL_HANDLE;
     
-    Vector<GfxBase*> bindingObjects_;
-    // 将不同render pass中的bindGroup聚合在不同的列表中
-    std::vector<std::vector<VKBindGroup*>> bindGroupCatagories_;
+   
     bool isRecording_ = false;
     bool hasSetViewport_ = false;
     bool hasSetScissor_ = false;
@@ -201,25 +204,27 @@ private:
     bool isInRenderPass_ = false;
     CommandListPtr pCommandList_ = nullptr;
     
-    VKRenderPipeline* graphicPipelineBinding_ = nullptr;
-    VKComputePipeline* computePipelineBinding_ = nullptr;
+    RenderPipelinePtr graphicPipelineBinding_ = nullptr;
+    ComputePipelinePtr computePipelineBinding_ = nullptr;
     
-    VKRenderPass* renderPassBinding_ = nullptr;
-    VKFramebuffer* framebufferBinding_ = nullptr;
-    VKQuerySet* occlusionQuerySetBinding_ = nullptr;
+    RenderPassPtr renderPassBinding_ = nullptr;
+    FramebufferPtr framebufferBinding_ = nullptr;
+    QuerySetPtr occlusionQuerySetBinding_ = nullptr;
     
     friend class VKDevice;
     
     struct BoundIndexBufferItem
     {
-        VKBuffer* indexBuffer = nullptr;
+        BufferPtr indexBuffer = nullptr;
         std::uint32_t offset = 0;
     };
     
     BoundIndexBufferItem boundIndexBufferItem_;
     std::uint32_t currentRenderPassIndex_ = 0;
 
-    std::vector<VKBuffer*> bindBuffers_;
+    // 将不同render pass中的bindGroup聚合在不同的列表中
+    std::vector<std::vector<BindGroupPtr>> bindGroupCatagories_;
+    std::vector<BufferPtr> bindBuffers_;
     // bool enableCalcBindBufferCount_ = true;
 };
 
