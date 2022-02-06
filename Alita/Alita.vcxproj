@@ -193,8 +193,6 @@ echo "xxxxx"</Command>
     <ClCompile Include="Sources\Meshes\VertexBuffer.cpp" />
     <ClCompile Include="Sources\Physics\Physics.cpp" />
     <ClCompile Include="Sources\Platform\Windows\Windows.cpp" />
-    <ClCompile Include="Sources\GFX\Backend\Vulkan\CommandList.cpp" />
-    <ClCompile Include="Sources\GFX\Backend\Vulkan\DeferredRenderCommands.cpp" />
     <ClCompile Include="Sources\GFX\Backend\Vulkan\RenderThreading.cpp" />
     <ClCompile Include="Sources\GFX\Backend\Vulkan\ShaderHelper.cpp" />
     <ClCompile Include="Sources\GFX\Backend\Vulkan\VKBindGroup.cpp" />
@@ -365,8 +363,6 @@ echo "xxxxx"</Command>
     <ClInclude Include="Sources\Physics\Physics.h" />
     <ClInclude Include="Sources\Platform\Platform.h" />
     <ClInclude Include="Sources\Platform\Windows\Windows.h" />
-    <ClInclude Include="Sources\GFX\Backend\Vulkan\CommandList.h" />
-    <ClInclude Include="Sources\GFX\Backend\Vulkan\DeferredRenderCommands.h" />
     <ClInclude Include="Sources\GFX\Backend\Vulkan\RenderThreading.h" />
     <ClInclude Include="Sources\GFX\Backend\Vulkan\RenderThreadingVkAllocator.h" />
     <ClInclude Include="Sources\GFX\Backend\Vulkan\ShaderHelper.h" />

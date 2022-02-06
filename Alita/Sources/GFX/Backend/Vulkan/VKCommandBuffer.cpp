@@ -335,13 +335,6 @@ void VKCommandBuffer::ResetCommandBuffer()
     graphicPipelineBinding_ = nullptr;
     computePipelineBinding_ = nullptr;
     
-    //if (pCommandList_)
-    //{
-    //    VKDEVICE()->ReleaseCommandList(pCommandList_);
-    //    pCommandList_.reset();
-    //}
-
-    //GFX_ASSERT(pCommandList_->GetCmdCount() == 0);
     ResetCommandList();
     
     vkCommandBuffer_ = VK_NULL_HANDLE;
@@ -641,154 +634,6 @@ VkDescriptorSet VKCommandBuffer::AsyncWriteBindGroupToGPU(VKBindGroup* bindGroup
     return bindGroup->GetNative();
 }
 
-//void VKCommandBuffer::SubmitCommandList()
-//{
-//    if (!pCommandList_)
-//    {
-//        return;
-//    }
-//    
-//    CommandListIterator iterator(pCommandList_.get());
-//    while (iterator.HasCommandLeft())
-//    {
-//        auto cmd = iterator.NextCommand();
-//#if 0
-//        cmd->Execute(this);
-//#else
-//        switch (cmd->commandType)
-//        {
-//            case RenderCommand::BeginCommandBuffer:
-//                static_cast<DeferredCmdBeginCommandBuffer*>(cmd)->Execute(this);
-//                break;
-//    
-//            case RenderCommand::BeginRenderPass:
-//                static_cast<DeferredCmdBeginRenderPass*>(cmd)->Execute(this);
-//                break;
-//    
-//            case RenderCommand::ClearAttachment:
-//                static_cast<DeferredCmdClearAttachment*>(cmd)->Execute(this);
-//                break;
-//    
-//            case RenderCommand::CopyBufferToBuffer:
-//                static_cast<DeferredCmdCopyBufferToBuffer*>(cmd)->Execute(this);
-//                break;
-//    
-//            case RenderCommand::CopyBufferToTexture:
-//                static_cast<DeferredCmdCopyBufferToTexture*>(cmd)->Execute(this);
-//                break;
-//    
-//            case RenderCommand::CopyTextureToBuffer:
-//                static_cast<DeferredCmdCopyTextureToBuffer*>(cmd)->Execute(this);
-//                break;
-//    
-//            case RenderCommand::CopyTextureToTexture:
-//                static_cast<DeferredCmdCopyTextureToTexture*>(cmd)->Execute(this);
-//                break;
-//    
-//            case RenderCommand::Dispatch:
-//                static_cast<DeferredCmdDispatch*>(cmd)->Execute(this);
-//                break;
-//    
-//            case RenderCommand::DispatchIndirect:
-//                static_cast<DeferredCmdDispatchIndirect*>(cmd)->Execute(this);
-//                break;
-//    
-//            case RenderCommand::Draw:
-//                static_cast<DeferredCmdDraw*>(cmd)->Execute(this);
-//                break;
-//    
-//            case RenderCommand::DrawIndexed:
-//                static_cast<DeferredCmdDrawIndexed*>(cmd)->Execute(this);
-//                break;
-//    
-//            case RenderCommand::DrawIndirect:
-//                static_cast<DeferredCmdDrawIndirect*>(cmd)->Execute(this);
-//                break;
-//    
-//            case RenderCommand::DrawIndexedIndirect:
-//                static_cast<DeferredCmdDrawIndexedIndirect*>(cmd)->Execute(this);
-//                break;
-//    
-//            case RenderCommand::EndPass:
-//                static_cast<DeferredCmdEndPass*>(cmd)->Execute(this);
-//                break;
-//    
-//            case RenderCommand::SetComputePipeline:
-//                static_cast<DeferredCmdSetComputePipeline*>(cmd)->Execute(this);
-//                break;
-//    
-//            case RenderCommand::SetGraphicPipeline:
-//                static_cast<DeferredCmdSetGraphicPipeline*>(cmd)->Execute(this);
-//                break;
-//    
-//            case RenderCommand::SetStencilReference:
-//                static_cast<DeferredCmdSetStencilReference*>(cmd)->Execute(this);
-//                break;
-//    
-//            case RenderCommand::SetScissorRect:
-//                static_cast<DeferredCmdSetScissorRect*>(cmd)->Execute(this);
-//                break;
-//    
-//            case RenderCommand::SetViewport:
-//                static_cast<DeferredCmdSetViewport*>(cmd)->Execute(this);
-//                break;
-//    
-//            case RenderCommand::SetBlendColor:
-//                static_cast<DeferredCmdSetBlendColor*>(cmd)->Execute(this);
-//                break;
-//
-//            case RenderCommand::SetDepthBias:
-//                static_cast<DeferredCmdSetDepthBias*>(cmd)->Execute(this);
-//                break;
-//    
-//            case RenderCommand::SetBindGroup:
-//                static_cast<DeferredCmdSetBindGroup*>(cmd)->Execute(this);
-//                break;
-//    
-//            case RenderCommand::SetIndexBuffer:
-//                static_cast<DeferredCmdSetIndexBuffer*>(cmd)->Execute(this);
-//                break;
-//    
-//            case RenderCommand::SetVertexBuffer:
-//                static_cast<DeferredCmdSetVertexBuffer*>(cmd)->Execute(this);
-//                break;
-//    
-//            case RenderCommand::PushDebugGroup:
-//                static_cast<DeferredCmdPushDebugGroup*>(cmd)->Execute(this);
-//                break;
-//    
-//            case RenderCommand::PopDebugGroup:
-//                static_cast<DeferredCmdPopDebugGroup*>(cmd)->Execute(this);
-//                break;
-//    
-//            case RenderCommand::InsertDebugMarker:
-//                static_cast<DeferredCmdInsertDebugMarker*>(cmd)->Execute(this);
-//                break;
-//    
-//            case RenderCommand::BeginOcclusionQuery:
-//                static_cast<DeferredCmdBeginOcclusionQuery*>(cmd)->Execute(this);
-//                break;
-//    
-//            case RenderCommand::EndOcclusionQuery:
-//                static_cast<DeferredCmdEndOcclusionQuery*>(cmd)->Execute(this);
-//                break;
-//    
-//            case RenderCommand::ResolveQuerySet:
-//                static_cast<DeferredCmdResolveQuerySet*>(cmd)->Execute(this);
-//                break;
-//    
-//            case RenderCommand::PipelineBarrier:
-//                static_cast<DeferredCmdPipelineBarrier*>(cmd)->Execute(this);
-//                break;
-//    
-//            default:
-//                LOGE("unprocessed command: %d", cmd->commandType);
-//                GFX_ASSERT(false);
-//        }
-//#endif
-//    }
-//}
-
 void VKCommandBuffer::SetIndexBufferInternal()
 {
     if (!boundIndexBufferItem_.indexBuffer)
@@ -832,7 +677,6 @@ bool VKCommandBuffer::BakeCmdBufferAsync(VkCommandBuffer vkCmdBuffer)
 #else
         char debugGroudTag[128] = {0};
         static uint32_t sFrameCount = 0;
-        /*snprintf(debugGroudTag, sizeof(debugGroudTag), "%p-%u", vkCommandBuffer_, pCommandList_->GetCmdCount());*/
 #endif
         //PushDebugGroup(debugGroudTag);
         SubmitCommandList();

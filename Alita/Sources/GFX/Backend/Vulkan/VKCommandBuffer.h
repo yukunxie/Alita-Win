@@ -7,8 +7,6 @@
 
 #include "VKDevice.h"
 #include "VKBindGroupLayout.h"
-#include "DeferredRenderCommands.h"
-#include "CommandList.h"
 #include "VKRenderPass.h"
 #include "VKFramebuffer.h"
 #include "VKQuerySet.h"
@@ -52,18 +50,16 @@ public:
     bool Init();
     
     VkCommandBuffer GetNative() const
-    { return vkCommandBuffer_; }
-    
-    template<typename CommandName, typename ...ArgTypes>
-    void RecordCommand(ArgTypes ... args)
     {
-        pCommandList_ = pCommandList_? pCommandList_ : VKDEVICE()->GetCommandList();
-        pCommandList_->RecordCommand<CommandName>(args...);
+        return vkCommandBuffer_;
     }
-    
+
+
     virtual bool HasDrawCmdInPresentableImage() override
-    { return isRenderPassPresentable_; }
-    
+    {
+        return isRenderPassPresentable_;
+    }
+
     void BeginRenderPassInRecordingStage()
     {
         // 在一个新的pass中记录绑定的bindGroup
@@ -187,8 +183,6 @@ public:
 protected:
     void ForceEndRenderPass();
     
-    //void SubmitCommandList();
-    
     void SetIndexBufferInternal();
 
 private:
@@ -202,7 +196,6 @@ private:
     bool bHasPendingEndRenderPass_ = false;
     bool isRenderPassPresentable_ = false;
     bool isInRenderPass_ = false;
-    CommandListPtr pCommandList_ = nullptr;
     
     RenderPipelinePtr graphicPipelineBinding_ = nullptr;
     ComputePipelinePtr computePipelineBinding_ = nullptr;

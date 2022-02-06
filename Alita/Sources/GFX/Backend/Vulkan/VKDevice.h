@@ -71,24 +71,6 @@ class BindGroupLayout;
 class AsyncWorkerVulkan;
 class VKQuerySet;
 
-//#define VKBufferPtr std::shared_ptr<VKBuffer>
-//#define VKDevicePtr std::shared_ptr<VKDevice>
-//#define VKRenderPipelinePtr std::shared_ptr<VKRenderPipeline>
-//#define VKComputePipelinePtr std::shared_ptr<VKComputePipeline>
-//#define VKShaderPtr std::shared_ptr<VKShader>
-//#define VKQueuePtr std::shared_ptr<VKQueue>
-//#define VKSwapChainPtr std::shared_ptr<VKSwapChain>
-//#define VKFramebufferPtr std::shared_ptr<VKFramebuffer>
-//#define VKCommandBufferPtr std::shared_ptr<VKCommandBuffer>
-//#define VKRenderPassEncoderPtr std::shared_ptr<VKRenderPassEncoder>
-//#define VKComputePassEncoderPtr std::shared_ptr<VKComputePassEncoder>
-//#define VKRenderPassPtr std::shared_ptr<VKRenderPass>
-//#define VKTexturePtr std::shared_ptr<VKTexture>
-//#define VKTextureViewPtr std::shared_ptr<VKTextureView>
-//#define VKQuerySetPtr std::shared_ptr<VKQuerySet>
-
-class CommandList;
-typedef std::shared_ptr<CommandList> CommandListPtr;
 
 void DumpVulkanErrorMessage(VkResult code, const char* filename, uint32_t lineno);
 
@@ -303,10 +285,6 @@ public:
     
     void ReturnVkFence(VkFence vkFence);
     
-    CommandListPtr GetCommandList();
-    
-    void ReleaseCommandList(CommandListPtr pCommandList);
-    
     void ScheduleCallbackExecutedInGameThread(const std::function<void(DevicePtr)> &callback);
     
     template<typename AsyncTaskName, typename ...Args>
@@ -426,8 +404,6 @@ private:
     std::vector<VkFence> vkFenceCache_;
     std::vector<AsyncTaskPtr> pendingDoneTasks_;
     std::condition_variable cv_;
-    std::vector<CommandListPtr> freeCommandLists_;
-    std::vector<CommandListPtr> pendingReleaseCommandLists_;
     
     std::vector<std::function<void(DevicePtr)>> scheduledAsyncCallbacks_;
     

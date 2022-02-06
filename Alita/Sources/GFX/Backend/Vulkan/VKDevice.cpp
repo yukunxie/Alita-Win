@@ -29,7 +29,6 @@
 #include "VKFramebuffer.h"
 #include "VKFence.h"
 #include "GFX/xxhash64.h"
-#include "CommandList.h"
 
 #include <vector>
 #include <array>
@@ -150,11 +149,6 @@ void VKDevice::ReleaseCaches()
     bindGroupLayoutCache_.clear();
     pipelineLayoutCache_.clear();
     
-    if (!freeCommandLists_.empty())
-    {
-        SCOPED_LOCK(mutex_);
-        freeCommandLists_.clear();
-    }
     
     if (!scheduledAsyncCallbacks_.empty())
     {
@@ -165,12 +159,6 @@ void VKDevice::ReleaseCaches()
             callback(sActivedDevice_);
         }
         scheduledAsyncCallbacks_.clear();
-    }
-    
-    if (!pendingReleaseCommandLists_.empty())
-    {
-        SCOPED_LOCK(mutex_);
-        pendingReleaseCommandLists_.clear();
     }
     
     if (!scheduledAsyncCallbacks_.empty())
@@ -252,18 +240,6 @@ void VKDevice::OnFrameCallback(float dt)
     {
         SCOPED_LOCK(mutexPendingDoneTask_);
         pendingDoneTasks_.clear();
-    }
-    
-    if (!pendingReleaseCommandLists_.empty())
-    {
-        SCOPED_LOCK(mutex_);
-        
-        for (auto commandQueue: pendingReleaseCommandLists_)
-        {
-            commandQueue->Reset();
-            freeCommandLists_.push_back(commandQueue);
-        }
-        pendingReleaseCommandLists_.clear();
     }
     
     PurgeAutoReleasePool();
@@ -1664,32 +1640,6 @@ void VKDevice::ReturnVkFence(VkFence vkFence)
 {
     vkResetFences(GetNative(), 1, &vkFence);
     vkFenceCache_.push_back(vkFence);
-}
-
-CommandListPtr VKDevice::GetCommandList()
-{
-    if (freeCommandLists_.empty())
-    {
-        freeCommandLists_.push_back(
-            static_cast<CommandListPtr>(std::make_shared<CommandList>()));
-    }
-    auto cmdList = freeCommandLists_.back();
-    freeCommandLists_.pop_back();
-    return cmdList;
-}
-
-void VKDevice::ReleaseCommandList(CommandListPtr pCommandList)
-{
-    SCOPED_LOCK(mutex_);
-    if (pCommandList)
-    {
-        pendingReleaseCommandLists_.push_back(pCommandList);
-        pCommandList.reset();
-    }
-    else
-    {
-        LOGE("invalid commandList");
-    }
 }
 
 void VKDevice::ScheduleCallbackExecutedInGameThread(const std::function<void(DevicePtr)> &callback)
