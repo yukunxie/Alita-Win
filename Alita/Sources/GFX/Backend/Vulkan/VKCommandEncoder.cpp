@@ -133,9 +133,12 @@ void VKCommandEncoder::CopyBufferToTexture(
                 source.bytesPerRow / GetTextureFormatPixelSize(texture->GetFormat());
             bufferImageCopy.bufferImageHeight = source.rowsPerImage;
             bufferImageCopy.imageSubresource = {
-                VKTexture::GetVkImageAspectFlags(texture->GetNativeFormat()), destination.mipLevel,
-                (std::uint32_t)destination.origin.z,1 };
-            bufferImageCopy.imageOffset = { destination.origin.x, destination.origin.y, 0 };
+                VKTexture::GetVkImageAspectFlags(texture->GetNativeFormat()),
+                destination.mipLevel,
+                (std::uint32_t)destination.baseArrayLayer,
+                destination.arrayLayerCount
+            };
+            bufferImageCopy.imageOffset = { destination.origin.x, destination.origin.y, destination.origin.z };
             bufferImageCopy.imageExtent = { copySize.width, copySize.height, copySize.depth };
         }
         vkCmdCopyBufferToImage(commandBuffer_->GetNative(),

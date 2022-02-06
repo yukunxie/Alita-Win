@@ -657,7 +657,8 @@ struct TextureCopyView
 {
     TexturePtr texture = nullptr;
     std::uint32_t mipLevel = 0;
-    // origin.z 存储了baseArrayLayer信息
+    std::uint32_t baseArrayLayer = 0;
+    std::uint32_t arrayLayerCount = 1;
     Origin3D origin = {};
 };
 

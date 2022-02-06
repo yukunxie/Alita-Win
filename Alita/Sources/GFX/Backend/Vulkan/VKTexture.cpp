@@ -239,7 +239,7 @@ void VKTexture::TransToTargetImageLayout_(VKCommandBuffer* commandBuffer, Textur
     barrier.image = vkImage_;
 
     // This transitions the whole resource but assumes it is a 2D texture
-    GFX_ASSERT(textureDimension_ == TextureDimension::TEXTURE_2D);
+    //GFX_ASSERT(textureDimension_ == TextureDimension::TEXTURE_2D);
     barrier.subresourceRange.aspectMask = VulkanAspectMask(format);
     barrier.subresourceRange.baseMipLevel = 0;
     barrier.subresourceRange.levelCount = mipLevelCount_;

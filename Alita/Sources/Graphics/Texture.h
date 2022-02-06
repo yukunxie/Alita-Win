@@ -44,6 +44,8 @@ public:
 
     static std::shared_ptr<Texture> LoadTextureFromData(uint32 width, uint32 height, uint32 component, const uint8* data, uint32 byteLength, const std::string& debugName = "");
 
+    static std::shared_ptr<Texture> Create3DNoiseTexture();
+
 protected:
     std::string                 Name_;
     uint32                      Width_ = 1;

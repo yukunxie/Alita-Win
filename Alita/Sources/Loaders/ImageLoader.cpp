@@ -9,6 +9,9 @@
 
 #include "ktx.h"
 
+#include <random>
+#include <numeric>
+
 NS_RX_BEGIN
 
 uint32 GetMipMapLevels(uint32 n)
@@ -47,7 +50,7 @@ std::vector<std::vector<uint8>> GenerateMipMap(uint32 width, uint32 height, cons
             {
                 uint32 rgba[4] = { 0, 0, 0, 0 };
                 const uint8* ph0 = pData + (2 * h * lBytesPerRow + 2 * w * pixelSize);
-                const uint8* ph1 = pData + ((2 * h + 1) * lBytesPerRow + 2 *  w * pixelSize);
+                const uint8* ph1 = pData + ((2 * h + 1) * lBytesPerRow + 2 * w * pixelSize);
                 for (uint32 c = 0; c < pixelSize; ++c)
                 {
                     rgba[c] += ph0[c];
@@ -144,8 +147,10 @@ namespace ImageLoader
                 gfx::TextureCopyView textureCopyView;
                 {
                     textureCopyView.texture = texture;
-                    textureCopyView.origin = { 0, 0, (std::int32_t)face };
+                    textureCopyView.origin = { 0, 0, 0 };
                     textureCopyView.mipLevel = level;
+                    textureCopyView.baseArrayLayer = face;
+                    textureCopyView.arrayLayerCount = 1;
                 }
 
                 auto size = gfx::Extent3D{ imageData.baseHeight >> level, imageData.baseWidth >> level, 1 };
@@ -154,7 +159,9 @@ namespace ImageLoader
         }
 
         auto cmdBuffer = commandEncoder->Finish();
+        GFX_SAFE_RETAIN(cmdBuffer);
         Engine::GetGPUDevice()->GetQueue()->Submit(1, &cmdBuffer);
+        GFX_SAFE_RELEASE(cmdBuffer);
 
         return texture;
     }
@@ -275,11 +282,13 @@ namespace ImageLoader
     gfx::TexturePtr LoadTextureFromUri(const std::string& filename)
     {
         const TData& imageData = FileSystem::GetInstance()->GetBinaryData(filename.c_str());
-        
-        if (filename.substr(filename.find_last_of(".") + 1) == "ktx") {
+
+        if (filename.substr(filename.find_last_of(".") + 1) == "ktx")
+        {
             return LoadTextureFromKtxFormat(imageData.data(), imageData.size(), filename);
         }
-        else {
+        else
+        {
             return LoadTextureFromData(imageData.data(), imageData.size(), filename);
         }
     }
@@ -287,7 +296,7 @@ namespace ImageLoader
     gfx::TexturePtr LoadCubeTexture(const std::string& cubeTextureName)
     {
         constexpr uint32 kFaceNum = 6;
-        const char* kFaceNames[kFaceNum] = {"px", "nx", "py", "ny", "pz", "nz"};
+        const char* kFaceNames[kFaceNum] = { "px", "nx", "py", "ny", "pz", "nz" };
         std::string fileExt = "";
         for (const auto& ext : sImageExts)
         {
@@ -372,6 +381,219 @@ namespace ImageLoader
         auto texture = CreateCubeTexture(imageData);
         return texture;
     }
-}
+
+    // Translation of Ken Perlin's JAVA implementation (http://mrl.nyu.edu/~perlin/noise/)
+    template <typename T>
+    class PerlinNoise
+    {
+    private:
+        uint32_t permutations[512];
+        T fade(T t)
+        {
+            return t * t * t * (t * (t * (T)6 - (T)15) + (T)10);
+        }
+        T lerp(T t, T a, T b)
+        {
+            return a + t * (b - a);
+        }
+        T grad(int hash, T x, T y, T z)
+        {
+            // Convert LO 4 bits of hash code into 12 gradient directions
+            int h = hash & 15;
+            T u = h < 8 ? x : y;
+            T v = h < 4 ? y : h == 12 || h == 14 ? x : z;
+            return ((h & 1) == 0 ? u : -u) + ((h & 2) == 0 ? v : -v);
+        }
+    public:
+        PerlinNoise()
+        {
+            // Generate random lookup for permutations containing all numbers from 0..255
+            std::vector<uint8_t> plookup;
+            plookup.resize(256);
+            std::iota(plookup.begin(), plookup.end(), 0);
+            std::default_random_engine rndEngine(std::random_device{}());
+            std::shuffle(plookup.begin(), plookup.end(), rndEngine);
+
+            for (uint32_t i = 0; i < 256; i++)
+            {
+                permutations[i] = permutations[256 + i] = plookup[i];
+            }
+        }
+        T noise(T x, T y, T z)
+        {
+            // Find unit cube that contains point
+            int32_t X = (int32_t)floor(x) & 255;
+            int32_t Y = (int32_t)floor(y) & 255;
+            int32_t Z = (int32_t)floor(z) & 255;
+            // Find relative x,y,z of point in cube
+            x -= floor(x);
+            y -= floor(y);
+            z -= floor(z);
+
+            // Compute fade curves for each of x,y,z
+            T u = fade(x);
+            T v = fade(y);
+            T w = fade(z);
+
+            // Hash coordinates of the 8 cube corners
+            uint32_t A = permutations[X] + Y;
+            uint32_t AA = permutations[A] + Z;
+            uint32_t AB = permutations[A + 1] + Z;
+            uint32_t B = permutations[X + 1] + Y;
+            uint32_t BA = permutations[B] + Z;
+            uint32_t BB = permutations[B + 1] + Z;
+
+            // And add blended results for 8 corners of the cube;
+            T res = lerp(w, lerp(v,
+                lerp(u, grad(permutations[AA], x, y, z), grad(permutations[BA], x - 1, y, z)), lerp(u, grad(permutations[AB], x, y - 1, z), grad(permutations[BB], x - 1, y - 1, z))),
+                lerp(v, lerp(u, grad(permutations[AA + 1], x, y, z - 1), grad(permutations[BA + 1], x - 1, y, z - 1)), lerp(u, grad(permutations[AB + 1], x, y - 1, z - 1), grad(permutations[BB + 1], x - 1, y - 1, z - 1))));
+            return res;
+        }
+    };
+
+    // Fractal noise generator based on perlin noise above
+    template <typename T>
+    class FractalNoise
+    {
+    private:
+        PerlinNoise<float> perlinNoise;
+        uint32_t octaves;
+        T frequency;
+        T amplitude;
+        T persistence;
+    public:
+
+        FractalNoise(const PerlinNoise<T>& perlinNoise)
+        {
+            this->perlinNoise = perlinNoise;
+            octaves = 6;
+            persistence = (T)0.5;
+        }
+
+        T noise(T x, T y, T z)
+        {
+            T sum = 0;
+            T frequency = (T)1;
+            T amplitude = (T)1;
+            T max = (T)0;
+            for (uint32_t i = 0; i < octaves; i++)
+            {
+                sum += perlinNoise.noise(x * frequency, y * frequency, z * frequency) * amplitude;
+                max += amplitude;
+                amplitude *= persistence;
+                frequency *= (T)2;
+            }
+
+            sum = sum / max;
+            return (sum + (T)1.0) / (T)2.0;
+        }
+    };
+
+
+
+    gfx::TexturePtr Create3DFloatTexture(uint32 width, uint32 height, uint32 depth)
+    {
+        auto bufferSize = width * height * depth * sizeof(float);
+        std::vector<float> tmpBuffer(bufferSize);
+        float* data = tmpBuffer.data();
+
+        // Generate perlin based noise
+        std::cout << "Generating " << width << " x " << height << " x " << depth << " noise texture..." << std::endl;
+
+        auto tStart = std::chrono::high_resolution_clock::now();
+
+        PerlinNoise<float> perlinNoise;
+        FractalNoise<float> fractalNoise(perlinNoise);
+
+        const float noiseScale = static_cast<float>(rand() % 10) + 4.0f;
+
+#pragma omp parallel for
+        for (int32_t z = 0; z < depth; z++)
+        {
+            for (int32_t y = 0; y < height; y++)
+            {
+                for (int32_t x = 0; x < width; x++)
+                {
+                    float nx = (float)x / (float)width;
+                    float ny = (float)y / (float)height;
+                    float nz = (float)z / (float)depth;
+#define FRACTAL
+#ifdef FRACTAL
+                    float n = fractalNoise.noise(nx * noiseScale, ny * noiseScale, nz * noiseScale);
+#else
+                    float n = 20.0 * perlinNoise.noise(nx, ny, nz);
+#endif
+                    n = n - floor(n);
+
+                    data[x + y * width + z * width * height] = n;
+                }
+            }
+        }
+
+        auto tEnd = std::chrono::high_resolution_clock::now();
+        auto tDiff = std::chrono::duration<double, std::milli>(tEnd - tStart).count();
+
+        std::cout << "Done in " << tDiff << "ms" << std::endl;
+
+        gfx::TextureDescriptor descriptor;
+        {
+            descriptor.sampleCount = 1;
+            descriptor.format = gfx::TextureFormat::R32FLOAT;
+            descriptor.usage = gfx::TextureUsage::SAMPLED | gfx::TextureUsage::COPY_DST;
+            descriptor.size = { width, height, depth };
+            descriptor.arrayLayerCount = 1;
+            descriptor.mipLevelCount = 1;
+            descriptor.dimension = gfx::TextureDimension::TEXTURE_3D;
+            descriptor.debugName = "3dNoiseMap";
+        };
+        auto texture = Engine::GetGPUDevice()->CreateTexture(descriptor);
+
+
+        gfx::BufferDescriptor bufferDescriptor;
+        {
+            bufferDescriptor.size = bufferSize;
+            bufferDescriptor.usage = gfx::BufferUsage::COPY_DST | gfx::BufferUsage::COPY_SRC;
+        }
+
+        auto buffer = Engine::GetGPUDevice()->CreateBuffer(bufferDescriptor);
+        buffer->SetSubData(0, bufferSize, data);
+
+        auto sliceImageSize = width * height * sizeof(float);
+        auto commandEncoder = Engine::GetGPUDevice()->CreateCommandEncoder();
+
+        for (int z = 0; z < depth; z++)
+        {
+            uint32 offset = sliceImageSize * z;
+
+            gfx::BufferCopyView bufferCopyView;
+            {
+                bufferCopyView.buffer = buffer;
+                bufferCopyView.offset = offset;
+                bufferCopyView.rowsPerImage = height;
+                bufferCopyView.bytesPerRow = width * sizeof(float);
+            }
+
+            gfx::TextureCopyView textureCopyView;
+            {
+                textureCopyView.texture = texture;
+                textureCopyView.origin = { 0, 0, z };
+                textureCopyView.mipLevel = 0;
+                textureCopyView.baseArrayLayer = 0;
+                textureCopyView.arrayLayerCount = 1;
+            }
+
+            auto size = gfx::Extent3D{ width, height, 1 };
+            commandEncoder->CopyBufferToTexture(bufferCopyView, textureCopyView, size);
+        }
+
+        auto cmdBuffer = commandEncoder->Finish();
+        GFX_SAFE_RETAIN(cmdBuffer);
+        Engine::GetGPUDevice()->GetQueue()->Submit(1, &cmdBuffer);
+        GFX_SAFE_RELEASE(cmdBuffer);
+
+        return texture;
+    }
+
+}// end of namespace
 
 NS_RX_END

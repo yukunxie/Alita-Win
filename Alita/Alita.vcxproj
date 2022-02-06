@@ -81,7 +81,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
     <IncludePath>$(ProjectDir)Sources;$(ProjectDir)Sources\RHI\;$(ProjectDir)Sources\GFX\;$(ProjectDir)Sources\RHI\Include;$(ProjectDir)Third-Party\OGLCompilersDLL;$(ProjectDir)Third-Party;$(ProjectDir)Third-Party\vulkan\Include;$(ProjectDir)Third-Party\ktx\include;$(ProjectDir)Third-Party\glfw\include;$(ProjectDir)Third-Party\ktx\other_include;$(ProjectDir)Third-Party\imgui;$(ProjectDir)Third-Party\PhysX/Include;$(ProjectDir)Third-Party\PhysX\pxshared\include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(ProjectDir)Third-Party\vulkan\Lib\Win64;$(ProjectDir)Third-Party\glfw\Lib\Win64;$(ProjectDir)Third-Party\PhysX\Lib\debug;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(ProjectDir)Third-Party\vulkan\Lib\Win64;$(ProjectDir)Third-Party\glfw\Lib\Win64;$(ProjectDir)Third-Party\boost\Libs;$(ProjectDir)Third-Party\PhysX\Lib\debug;$(LibraryPath)</LibraryPath>
     <CustomBuildBeforeTargets>Run</CustomBuildBeforeTargets>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
