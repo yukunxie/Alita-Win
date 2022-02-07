@@ -533,6 +533,9 @@
     <ClCompile Include="Sources\GFX\GFXObjectManager.cpp">
       <Filter>Sources\GFX</Filter>
     </ClCompile>
+    <ClCompile Include="Sources\Graphics\FrameGraph.cpp">
+      <Filter>Sources\Graphics\Private</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Sources\Platform\Platform.h">
@@ -1122,6 +1125,9 @@
     </ClInclude>
     <ClInclude Include="Sources\Base\SharedPtr.h">
       <Filter>Sources\Base\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Graphics\FrameGraph.h">
+      <Filter>Sources\Graphics\Public</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

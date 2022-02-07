@@ -169,6 +169,7 @@ echo "xxxxx"</Command>
     <ClCompile Include="Sources\GFX\GFXBase.cpp" />
     <ClCompile Include="Sources\GFX\GFXObjectManager.cpp" />
     <ClCompile Include="Sources\Graphics\Effect.cpp" />
+    <ClCompile Include="Sources\Graphics\FrameGraph.cpp" />
     <ClCompile Include="Sources\Graphics\GraphicPipeline.cpp" />
     <ClCompile Include="Sources\Graphics\Material.cpp" />
     <ClCompile Include="Sources\Graphics\Pass.cpp" />
@@ -338,6 +339,7 @@ echo "xxxxx"</Command>
     <ClInclude Include="Sources\GFX\TimeProfiler.h" />
     <ClInclude Include="Sources\GFX\xxhash64.h" />
     <ClInclude Include="Sources\Graphics\Effect.h" />
+    <ClInclude Include="Sources\Graphics\FrameGraph.h" />
     <ClInclude Include="Sources\Graphics\GraphicPipeline.h" />
     <ClInclude Include="Sources\Graphics\Material.h" />
     <ClInclude Include="Sources\Graphics\Pass.h" />
