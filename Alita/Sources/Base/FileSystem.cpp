@@ -133,4 +133,56 @@ std::string FileSystem::GetStringData(const char* filename)
 	return ret;
 }
 
+std::string FileSystem::GetDirectory(const std::string& path)
+{
+	std::string normalPath = path;
+	std::replace(normalPath.begin(), normalPath.end(), '\\', '/');
+	auto idx = normalPath.rfind('/');
+	if (idx == std::string::npos)
+		return "";
+	return normalPath.substr(0, idx);
+}
+
+bool FileSystem::WriteBinaryData(const char* filename, const TData& data)
+{
+	return WriteBinaryData(filename, data.data(), (std::uint32_t)(data.size()));
+}
+
+bool FileSystem::WriteBinaryData(const char* filename, const void* data, std::uint32_t byteLength)
+{
+	auto absFilename = GetGameDataDirectory() + "/" + filename;
+	auto directory = GetDirectory(absFilename);
+	if (!std::filesystem::is_directory(directory))
+	{
+		std::filesystem::create_directories(directory);
+	}
+
+	std::fstream myfile;
+	myfile = std::fstream(absFilename, std::ios::out | std::ios::binary);
+	myfile.write((const char*)data, byteLength);
+	myfile.close();
+
+	return true;
+}
+
+bool FileSystem::ReadBinaryData(const char* filename, TData& data)
+{
+	auto absFilename = GetGameDataDirectory() + "/" + filename;
+	if (!std::filesystem::exists(absFilename))
+	{
+		return false;
+	}
+
+	std::fstream myfile;
+	myfile = std::fstream(absFilename, std::ios::in | std::ios::binary);
+	myfile.seekg(0, std::ios::end);
+	size_t byteLength = myfile.tellg();
+	myfile.seekg(0, std::ios::beg);
+	data.resize(byteLength);
+	myfile.read((char*)data.data(), byteLength);
+	myfile.close();
+
+	return true;
+}
+
 NS_RX_END

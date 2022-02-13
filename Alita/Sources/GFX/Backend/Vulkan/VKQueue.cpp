@@ -19,16 +19,11 @@ VKQueue::VKQueue(const DevicePtr& device)
 void VKQueue::Dispose()
 {
     GFX_DISPOSE_BEGIN();
-    
-    for (auto cmdBuffer : commandBufferCaches_)
-    {
-        GFX_SAFE_RELEASE(cmdBuffer);
-    }
+
     commandBufferCaches_.clear();
     
     if (vkQueue_)
     {
-        // vkQueueWaitIdle(vkQueue_);
         vkQueue_ = VK_NULL_HANDLE;
     }
     
@@ -110,7 +105,6 @@ CommandBufferPtr VKQueue::GetImageLayoutInitCommandBuffer()
     if (!imageLayoutInitCommandBuffer_)
     {
         imageLayoutInitCommandBuffer_ = VKDEVICE()->CreateCommandBuffer();
-        GFX_SAFE_RETAIN(imageLayoutInitCommandBuffer_);
         commandBufferCaches_.insert(commandBufferCaches_.begin(),imageLayoutInitCommandBuffer_);
     }
     return imageLayoutInitCommandBuffer_;

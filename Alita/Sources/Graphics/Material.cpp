@@ -211,7 +211,6 @@ void Material::SetupConstantBufferLayout()
         bufferDescriptor.usage = gfx::BufferUsage::UNIFORM;
     };
     bindingObject->Buffer.buffer = Engine::GetGPUDevice()->CreateBuffer(bufferDescriptor);
-    GFX_SAFE_RETAIN(bindingObject->Buffer.buffer);
 
     for (auto& param : parameters)
     {
@@ -365,7 +364,6 @@ void Material::Apply(const Pass* pass, ETechniqueType technique, ERenderSet rend
         ShaderSet shaders = CreateShaderSet(technique);
         pso = CreatePipelineState(psoKey, shaders);
         rhiPSOMap_[psoKey] = pso;
-        GFX_SAFE_RETAIN(pso);
     }
 
     ApplyModifyToBindGroup(passEndcoder);
@@ -702,8 +700,6 @@ void Material::ParseBindGroupLayout(const rapidjson::Document& doc)
                 }
             }
             
-            //GFX_SAFE_RETAIN(bindingObject->Texture.texture);
-
             MaterialParameter param;
             param.name = bindingObject->name;
             param.offset = 0;
@@ -715,7 +711,6 @@ void Material::ParseBindGroupLayout(const rapidjson::Document& doc)
             // sampler
             gfx::SamplerDescriptor descriptor = ParseSamplerDescriptor(cfg);
             bindingObject->Texture.sampler = Engine::GetGPUDevice()->CreateSampler(descriptor);
-            GFX_SAFE_RETAIN(bindingObject->Texture.sampler);
         }
         else
         {

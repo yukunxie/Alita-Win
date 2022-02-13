@@ -55,15 +55,6 @@ obj = nullptr;                  \
 #define POP_TRACEBACK
 #endif
 
-#define GFX_SAFE_RETAIN(obj)    \
-    do {                        \
-    } while (0)
-
-// #define GFX_SAFE_RETAIN(obj)    \
-// do {                            \
-// auto tmp = obj;                 \
-// if (tmp) tmp->Retain();         \
-// } while (0)
 
 
 #define GFX_SAFE_RELEASE(obj)   \

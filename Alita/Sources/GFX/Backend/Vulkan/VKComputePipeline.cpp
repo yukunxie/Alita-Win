@@ -29,8 +29,8 @@ void VKComputePipeline::Dispose()
         vkComputePipeline_ = VK_NULL_HANDLE;
     }
     
-    GFX_SAFE_RELEASE(pipelineLayout_);
-    GFX_SAFE_RELEASE(renderPass_);
+    pipelineLayout_ = nullptr;
+    renderPass_ = nullptr;
     
     GFX_DISPOSE_END();
 }

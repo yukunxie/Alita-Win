@@ -29,8 +29,7 @@ public:
     VkDescriptorSet GetNative()
     { return vkDescriptorSet_; }
     
-    VKBindGroupLayout* GetBindGroupLayout()
-    { return bindGroupLayout_.Get(); }
+    VKBindGroupLayout* GetBindGroupLayout();
     
     virtual void Dispose() override;
     
@@ -41,7 +40,7 @@ public:
     std::vector<BufferPtr> getBindingBuffers();
 
 private:
-    RHIObjectWrapper<VKBindGroupLayout> bindGroupLayout_;
+    BindGroupLayoutPtr bindGroupLayout_;
     
     VkDescriptorSet vkDescriptorSet_ = VK_NULL_HANDLE;
     std::vector<BindGroupBinding> bindingResources_;

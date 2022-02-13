@@ -144,6 +144,9 @@
     <Filter Include="Sources\Backend\Vulkan\WMA">
       <UniqueIdentifier>{6b21ab81-5f1e-495d-8833-cf6dddb5594d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Sources\Concurrent">
+      <UniqueIdentifier>{f0e2fecc-a8cb-4a10-b04e-38f572191e8a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Third-Party\StandAlone\ResourceLimits.cpp">
@@ -535,6 +538,9 @@
     </ClCompile>
     <ClCompile Include="Sources\Graphics\FrameGraph.cpp">
       <Filter>Sources\Graphics\Private</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Concurrent\Thread.cpp">
+      <Filter>Sources\Concurrent</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1006,9 +1012,6 @@
     <ClInclude Include="Sources\Utils\MD5\md5.h">
       <Filter>Sources\Utils\MD5</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\GFX\Helper\Vector.h">
-      <Filter>Sources\GFX</Filter>
-    </ClInclude>
     <ClInclude Include="Sources\GFX\AsyncWorker.h">
       <Filter>Sources\GFX</Filter>
     </ClInclude>
@@ -1128,6 +1131,9 @@
     </ClInclude>
     <ClInclude Include="Sources\Graphics\FrameGraph.h">
       <Filter>Sources\Graphics\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Concurrent\Thread.h">
+      <Filter>Sources\Concurrent</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -159,9 +159,7 @@ namespace ImageLoader
         }
 
         auto cmdBuffer = commandEncoder->Finish();
-        GFX_SAFE_RETAIN(cmdBuffer);
         Engine::GetGPUDevice()->GetQueue()->Submit(1, &cmdBuffer);
-        GFX_SAFE_RELEASE(cmdBuffer);
 
         return texture;
     }
@@ -490,22 +488,36 @@ namespace ImageLoader
     };
 
 
-
-    gfx::TexturePtr Create3DFloatTexture(uint32 width, uint32 height, uint32 depth)
+    void Gen3dNoiseData(uint32 width, uint32 height, uint32 depth, std::vector<float>& buffer)
     {
-        auto bufferSize = width * height * depth * sizeof(float);
-        std::vector<float> tmpBuffer(bufferSize);
-        float* data = tmpBuffer.data();
+        auto bufferSize = width * height * depth;
 
-        // Generate perlin based noise
-        std::cout << "Generating " << width << " x " << height << " x " << depth << " noise texture..." << std::endl;
+        buffer.resize(bufferSize);
 
-        auto tStart = std::chrono::high_resolution_clock::now();
+        std::string filename = "3dNoiseTextures/" + std::to_string(width) + "x" + std::to_string(height) + "x" + std::to_string(depth) + ".tex";
+
+        // try to load from files
+        {
+            TData data;
+            if (FileSystem::ReadBinaryData(filename.c_str(), data) && data.size() == buffer.size() * sizeof(float))
+            {
+                memcpy(buffer.data(), data.data(), data.size());
+                return;
+            }
+        }
+        
+
+        float* data = buffer.data();
 
         PerlinNoise<float> perlinNoise;
         FractalNoise<float> fractalNoise(perlinNoise);
 
         const float noiseScale = static_cast<float>(rand() % 10) + 4.0f;
+
+        // Generate perlin based noise
+        std::cout << "Generating " << width << " x " << height << " x " << depth << " noise texture..." << std::endl;
+
+        auto tStart = std::chrono::high_resolution_clock::now();
 
 #pragma omp parallel for
         for (int32_t z = 0; z < depth; z++)
@@ -535,6 +547,60 @@ namespace ImageLoader
 
         std::cout << "Done in " << tDiff << "ms" << std::endl;
 
+        FileSystem::WriteBinaryData(filename.c_str(), data, buffer.size() * sizeof(float));
+    }
+
+
+    gfx::TexturePtr Create3DFloatTexture(uint32 width, uint32 height, uint32 depth)
+    {
+        std::vector<float> noiseTextureData;
+        Gen3dNoiseData(width, height, depth, noiseTextureData);
+        size_t bufferSize = noiseTextureData.size() * sizeof(noiseTextureData[0]);
+
+//        auto bufferSize = width * height * depth;
+//        std::vector<float> tmpBuffer(bufferSize);
+//        float* data = tmpBuffer.data();
+//
+//        // Generate perlin based noise
+//        std::cout << "Generating " << width << " x " << height << " x " << depth << " noise texture..." << std::endl;
+//
+//        auto tStart = std::chrono::high_resolution_clock::now();
+//
+//        PerlinNoise<float> perlinNoise;
+//        FractalNoise<float> fractalNoise(perlinNoise);
+//
+//        const float noiseScale = static_cast<float>(rand() % 10) + 4.0f;
+//
+//#pragma omp parallel for
+//        for (int32_t z = 0; z < depth; z++)
+//        {
+//            for (int32_t y = 0; y < height; y++)
+//            {
+//                for (int32_t x = 0; x < width; x++)
+//                {
+//                    float nx = (float)x / (float)width;
+//                    float ny = (float)y / (float)height;
+//                    float nz = (float)z / (float)depth;
+//#define FRACTAL
+//#ifdef FRACTAL
+//                    float n = fractalNoise.noise(nx * noiseScale, ny * noiseScale, nz * noiseScale);
+//#else
+//                    float n = 20.0 * perlinNoise.noise(nx, ny, nz);
+//#endif
+//                    n = n - floor(n);
+//
+//                    data[x + y * width + z * width * height] = n;
+//                }
+//            }
+//        }
+//
+//        auto tEnd = std::chrono::high_resolution_clock::now();
+//        auto tDiff = std::chrono::duration<double, std::milli>(tEnd - tStart).count();
+//
+//        std::cout << "Done in " << tDiff << "ms" << std::endl;
+//
+//        FileSystem::WriteBinaryData("/3dNoise/texture.3dt", data, bufferSize);
+
         gfx::TextureDescriptor descriptor;
         {
             descriptor.sampleCount = 1;
@@ -556,7 +622,7 @@ namespace ImageLoader
         }
 
         auto buffer = Engine::GetGPUDevice()->CreateBuffer(bufferDescriptor);
-        buffer->SetSubData(0, bufferSize, data);
+        buffer->SetSubData(0, bufferSize, noiseTextureData.data());
 
         auto sliceImageSize = width * height * sizeof(float);
         auto commandEncoder = Engine::GetGPUDevice()->CreateCommandEncoder();
@@ -587,9 +653,7 @@ namespace ImageLoader
         }
 
         auto cmdBuffer = commandEncoder->Finish();
-        GFX_SAFE_RETAIN(cmdBuffer);
         Engine::GetGPUDevice()->GetQueue()->Submit(1, &cmdBuffer);
-        GFX_SAFE_RELEASE(cmdBuffer);
 
         return texture;
     }

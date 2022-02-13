@@ -197,7 +197,6 @@ void VKDevice::OnScriptObjectDestroy()
     LOGW("VKDevice::OnScriptObjectDestroy begin.");
     
     pendingDestroyed_ = true;
-    PurgeAutoReleasePool();
     if (pAsyncWorker_)
     {
         pAsyncWorker_->Stop();
@@ -241,8 +240,6 @@ void VKDevice::OnFrameCallback(float dt)
         SCOPED_LOCK(mutexPendingDoneTask_);
         pendingDoneTasks_.clear();
     }
-    
-    PurgeAutoReleasePool();
 }
 
 void VKDevice::OnFrameEnd()
@@ -1443,7 +1440,6 @@ RenderPipelinePtr VKDevice::CreateRenderPipeline(RenderPipelineDescriptor &descr
     
     auto pipeline = CreateObject<RenderPipelinePtr, VKRenderPipeline>(descriptor);
     renderPipelineCache_.emplace_back(descriptor, pipeline);
-    GFX_SAFE_RETAIN(pipeline);
     
     return pipeline;
 }

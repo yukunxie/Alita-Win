@@ -95,7 +95,7 @@ public:
         return frameResources_ + imageIndex_;
     }
 
-    void SetRenderingFrameInfo(FrameResource* frameResource, VkCommandBuffer vkCommandBuffer, ssize_t count, CommandBufferPtr* commandBuffers)
+    void SetRenderingFrameInfo(FrameResource* frameResource, VkCommandBuffer vkCommandBuffer, size_t count, CommandBufferPtr* commandBuffers)
     {
         GFX_ASSERT(renderingFrameInfo_.commandBuffers.empty());
         renderingFrameInfo_.frameResource = frameResource;

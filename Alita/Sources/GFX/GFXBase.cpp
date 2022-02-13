@@ -52,7 +52,6 @@ GfxBase::~GfxBase()
 {
     GFX_ASSERT(globalId__ != INVALID_OBJECT_ID);
     GFX_ASSERT(bindingScriptObject_ == nullptr);
-    GFX_SAFE_RELEASE(GPUDevice_);
 }
 
 GfxBase::GfxBase(RHIObjectType objectType)

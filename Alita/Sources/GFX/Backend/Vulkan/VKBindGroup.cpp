@@ -20,17 +20,16 @@ VKBindGroup::VKBindGroup(const DevicePtr& device)
 
 bool VKBindGroup::Init(BindGroupDescriptor &descriptor)
 {
-    bindGroupLayout_ = GFX_CAST(VKBindGroupLayout * , descriptor.layout);
+    bindGroupLayout_ = descriptor.layout;
     
     bindingResources_.resize(descriptor.entries.size());
     for (size_t i = 0; i < descriptor.entries.size(); ++i)
     {
         auto &res = descriptor.entries[i];
         bindingResources_[i] = res;
-        GFX_SAFE_RETAIN(res.resource);
     }
     
-    VkDescriptorSetLayout layout = bindGroupLayout_->GetNative();
+    VkDescriptorSetLayout layout = GFX_CAST(VKBindGroupLayout*, bindGroupLayout_)->GetNative();
     VkDescriptorSetAllocateInfo allocInfo;
     {
         allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
@@ -87,7 +86,7 @@ void VKBindGroup::UpdateDescriptorSetAsync()
                     descriptorWrite.dstSet = vkDescriptorSet_;
                     descriptorWrite.dstBinding = binding.binding;
                     descriptorWrite.dstArrayElement = 0;
-                    descriptorWrite.descriptorType = bindGroupLayout_->GetDescriptorType(
+                    descriptorWrite.descriptorType = GFX_CAST(VKBindGroupLayout*, bindGroupLayout_)->GetDescriptorType(
                         binding.binding);
                     descriptorWrite.descriptorCount = 1;
                     descriptorWrite.pBufferInfo = &bufferInfo;
@@ -207,6 +206,11 @@ void VKBindGroup::TransImageLayoutToSampled(VKCommandBuffer *commandBuffer)
     }
 }
 
+VKBindGroupLayout* VKBindGroup::GetBindGroupLayout()
+{
+    return GFX_CAST(VKBindGroupLayout*, bindGroupLayout_);
+}
+
 void VKBindGroup::Dispose()
 {
     GFX_DISPOSE_BEGIN();
@@ -220,7 +224,7 @@ void VKBindGroup::Dispose()
 
     vkDescriptorSet_ = VK_NULL_HANDLE;
 
-    bindGroupLayout_.Reset();
+    bindGroupLayout_.reset();
 
     GFX_DISPOSE_END();
 }

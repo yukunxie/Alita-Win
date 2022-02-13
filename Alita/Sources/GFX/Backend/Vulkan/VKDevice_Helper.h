@@ -6,7 +6,6 @@
 #define RHI_VKDEVICE_HELPER_H
 
 #include "GFX/GFX.h"
-#include "GFX/Helper/Vector.h"
 #include "GFX/xxhash64.h"
 
 #include "VulkanMacros.h"

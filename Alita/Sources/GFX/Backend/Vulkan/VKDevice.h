@@ -6,7 +6,6 @@
 #define RHI_VKDEVICE_H
 
 #include "GFX/GFX.h"
-#include "GFX/Helper/Vector.h"
 #include "GFX/xxhash64.h"
 
 #include "Platform/Platform.h"
@@ -254,7 +253,8 @@ public:
         _VKType* obj = new _VKType(GetDevicePtr());
         if (obj && !obj->Init(args...))
         {
-            GFX_SAFE_RELEASE(obj);
+            delete obj;
+            obj = nullptr;
         }
 
         return PtrType_(obj);

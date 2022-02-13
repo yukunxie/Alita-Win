@@ -300,14 +300,12 @@ struct RHIObjectWrapper final
     
     RHIObjectWrapper(RHIObjectWrapper &&entity)
     {
-        GFX_SAFE_RELEASE(data_);
         data_ = entity.data_;
         entity.data_ = nullptr;
     }
 
     ~RHIObjectWrapper()
     {
-        GFX_SAFE_RELEASE(data_);
     }
     
     TP_* Get() const
@@ -359,7 +357,7 @@ struct RHIObjectWrapper final
     
     void Reset()
     {
-        GFX_SAFE_RELEASE(data_);
+        delete data_;
     }
 
 protected:

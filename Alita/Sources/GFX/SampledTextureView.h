@@ -22,15 +22,13 @@ NS_GFX_BEGIN
 //         : BindingResource(sampler->GetGPUDevice(), RHIObjectType::SampledTextureView), sampler_(sampler),
 //           imageView_(imageView)
 //     {
-//         GFX_SAFE_RETAIN(sampler_);
-//         GFX_SAFE_RETAIN(imageView_);
 //     }
 //
 //
 //     virtual void Dispose() override
 //     {
-//         GFX_SAFE_RELEASE(sampler_);
-//         GFX_SAFE_RELEASE(imageView_);
+//         sampler_ = nullptr;
+//         imageView_ = nullptr;
 //     }
 //
 //     virtual ~SampledTextureView()

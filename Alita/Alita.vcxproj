@@ -80,7 +80,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(ProjectDir)Sources;$(ProjectDir)Sources\RHI\;$(ProjectDir)Sources\GFX\;$(ProjectDir)Sources\RHI\Include;$(ProjectDir)Third-Party\OGLCompilersDLL;$(ProjectDir)Third-Party;$(ProjectDir)Third-Party\vulkan\Include;$(ProjectDir)Third-Party\ktx\include;$(ProjectDir)Third-Party\glfw\include;$(ProjectDir)Third-Party\ktx\other_include;$(ProjectDir)Third-Party\imgui;$(ProjectDir)Third-Party\PhysX/Include;$(ProjectDir)Third-Party\PhysX\pxshared\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)Sources;$(ProjectDir)Sources\RHI\;$(ProjectDir)Sources\GFX\;$(ProjectDir)Sources\RHI\Include;$(ProjectDir)Third-Party\OGLCompilersDLL;$(ProjectDir)Third-Party;$(ProjectDir)Third-Party\vulkan\Include;$(ProjectDir)Third-Party\ktx\include;$(ProjectDir)Third-Party\glfw\include;$(ProjectDir)Third-Party\ktx\other_include;$(ProjectDir)Third-Party\imgui;$(ProjectDir)Third-Party\PhysX/Include;$(ProjectDir)Third-Party\PhysX\pxshared\include;$(ProjectDir)Third-Party\boost;$(IncludePath)</IncludePath>
     <LibraryPath>$(ProjectDir)Third-Party\vulkan\Lib\Win64;$(ProjectDir)Third-Party\glfw\Lib\Win64;$(ProjectDir)Third-Party\boost\Libs;$(ProjectDir)Third-Party\PhysX\Lib\debug;$(LibraryPath)</LibraryPath>
     <CustomBuildBeforeTargets>Run</CustomBuildBeforeTargets>
   </PropertyGroup>
@@ -163,6 +163,7 @@ echo "xxxxx"</Command>
     <ClCompile Include="Sources\Base\Entity.cpp" />
     <ClCompile Include="Sources\Base\FileSystem.cpp" />
     <ClCompile Include="Sources\Base\ObjectBase.cpp" />
+    <ClCompile Include="Sources\Concurrent\Thread.cpp" />
     <ClCompile Include="Sources\Engine\Engine.cpp" />
     <ClCompile Include="Sources\Event\EventSystem.cpp" />
     <ClCompile Include="Sources\GFX\Device.cpp" />
@@ -297,6 +298,7 @@ echo "xxxxx"</Command>
     <ClInclude Include="Sources\Base\ObjectBase.h" />
     <ClInclude Include="Sources\Base\Resource.h" />
     <ClInclude Include="Sources\Base\SharedPtr.h" />
+    <ClInclude Include="Sources\Concurrent\Thread.h" />
     <ClInclude Include="Sources\Engine\Engine.h" />
     <ClInclude Include="Sources\Event\EventSystem.h" />
     <ClInclude Include="Sources\GFX\AsyncWorker.h" />
@@ -318,7 +320,6 @@ echo "xxxxx"</Command>
     <ClInclude Include="Sources\GFX\GFX.h" />
     <ClInclude Include="Sources\GFX\GFXBase.h" />
     <ClInclude Include="Sources\GFX\GFXObjectManager.h" />
-    <ClInclude Include="Sources\GFX\Helper\Vector.h" />
     <ClInclude Include="Sources\GFX\PipelineLayout.h" />
     <ClInclude Include="Sources\GFX\QuerySet.h" />
     <ClInclude Include="Sources\GFX\Queue.h" />

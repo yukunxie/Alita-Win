@@ -18,14 +18,10 @@ GraphicPipeline::GraphicPipeline()
 	LOGI("xxxx 0");
 
 	GraphicQueue_ = Engine::GetGPUDevice()->GetQueue();
-	GFX_SAFE_RETAIN(GraphicQueue_);
 
 	LOGI("xxxx 1");
 
 	CommandEncoder_ = Engine::GetGPUDevice()->CreateCommandEncoder();
-	GFX_SAFE_RETAIN(CommandEncoder_);
-	GFX_SAFE_RETAIN(CommandEncoder_);
-	g_test_released = true;
 
 	LOGI("xxxx 2");
 
@@ -34,7 +30,6 @@ GraphicPipeline::GraphicPipeline()
 	swapChainDescriptor.format = gfx::TextureFormat::RGBA8UNORM;
 
 	RHISwapChain_ = Engine::GetGPUDevice()->CreateSwapchain(swapChainDescriptor);
-	GFX_SAFE_RETAIN(RHISwapChain_);
 
 	WindowSize_ = { RHISwapChain_->GetExtent().width, RHISwapChain_->GetExtent().height };
 	{
@@ -49,15 +44,13 @@ GraphicPipeline::GraphicPipeline()
 			descriptor.dimension = gfx::TextureDimension::TEXTURE_2D;
 		};
 		rhiDSTexture_ = Engine::GetGPUDevice()->CreateTexture(descriptor);
-		GFX_SAFE_RETAIN(rhiDSTexture_);
 		rhiDSTextureView_ = Engine::GetGPUDevice()->CreateTextureView(rhiDSTexture_, {});
-		GFX_SAFE_RETAIN(rhiDSTextureView_);
 	}
 }
 
 GraphicPipeline::~GraphicPipeline()
 {
-	GFX_SAFE_RELEASE(CommandEncoder_);
+	CommandEncoder_ = nullptr;
 }
 
 void GraphicPipeline::Execute(const std::vector<RenderObject*>& renderObjects)
@@ -88,11 +81,11 @@ void GraphicPipeline::Execute(const std::vector<RenderObject*>& renderObjects)
 		SkyBoxPass_.Execute(renderObjects);
 	}
 
-	{
-		CloudPass_.Reset();
-		CloudPass_.Setup(&SkyBoxPass_, &DeferredPass_);
-		CloudPass_.Execute(renderObjects);
-	}
+	//{
+	//	CloudPass_.Reset();
+	//	CloudPass_.Setup(&SkyBoxPass_, &DeferredPass_);
+	//	CloudPass_.Execute(renderObjects);
+	//}
 
 	{
 		ToneMappingPass_.Reset();

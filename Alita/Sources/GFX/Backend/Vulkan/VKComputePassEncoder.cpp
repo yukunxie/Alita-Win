@@ -23,7 +23,7 @@ void VKComputePassEncoder::Dispose()
 {
     GFX_DISPOSE_BEGIN();
     
-    GFX_SAFE_RELEASE(commandBuffer_);
+    commandBuffer_ = nullptr;
     
     GFX_DISPOSE_END();
 }

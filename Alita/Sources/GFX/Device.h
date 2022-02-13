@@ -96,10 +96,6 @@ public:
         return rhiObjectManager_;
     }
     
-    void AddAutoReleaseObjectToPool(GfxBase* object);
-    
-    void PurgeAutoReleasePool();
-    
     const std::unique_ptr<IDeviceExternalDeps>& GetDeviceExternalDeps() const
     {
         return deviceExternalDeps_;
@@ -166,11 +162,6 @@ public:
 
 private:
     GfxObjectManager rhiObjectManager_;
-#if GFX_DEBUG
-    std::multimap<RHIObjectType, GfxBase*> autoReleasedObjectPool_;
-#else
-    std::vector<GfxBase*> autoReleasedObjectPool_;
-#endif
 
 protected:
     std::unique_ptr<IDeviceExternalDeps> deviceExternalDeps_;

@@ -31,10 +31,6 @@ VKSwapChain::~VKSwapChain()
     
     pSemaphoreCxx_.reset();
     
-    // TODO realxie 这里需要仔细处理一下commandbuffer的所有权问题
-    for (auto cmdBuffer : renderingFrameInfo_.commandBuffers) {
-        GFX_SAFE_RELEASE(cmdBuffer);
-    }
     renderingFrameInfo_.commandBuffers.clear();
 }
 
@@ -48,7 +44,7 @@ bool VKSwapChain::Init(const SwapChainDescriptor& descriptor)
     
     Init();
     
-    for (ssize_t i = 0; i < swapchainTextures_.size(); ++i)
+    for (size_t i = 0; i < swapchainTextures_.size(); ++i)
     {
         auto &frame = frameResources_[i];
         frame.swapChain = this;
@@ -164,7 +160,7 @@ void VKSwapChain::Init()
 
 void VKSwapChain::Dispose()
 {
-    for (ssize_t i = 0; i < swapchainTextures_.size(); ++i)
+    for (size_t i = 0; i < swapchainTextures_.size(); ++i)
     {
         auto &frame = frameResources_[i];
         VKDEVICE()->ReturnVkFence(frame.fenceToSyncSubmission);
