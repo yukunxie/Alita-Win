@@ -15,6 +15,8 @@
 #include <iostream>
 #include <chrono>
 
+#include "boost/asio.hpp""
+
 #pragma comment(lib, "glfw3.lib")
 #pragma comment(lib, "vulkan-1.lib")
 #pragma comment(lib, "VkLayer_utils.lib")
@@ -100,7 +102,8 @@ WString QueryRenderdocFromRegister()
 
 int main() {
 
-    
+    auto io_service(new boost::asio::io_service);
+
 #if WIN32 && 1
     WString RenderdocPath = QueryRenderdocFromRegister();
     RenderdocPath += TEXT("renderdoc.dll");

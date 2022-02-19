@@ -14,7 +14,16 @@
 
 NS_RX_BEGIN
 
+class FrameGraphNode : public ObjectBase
+{
+public:
+	FrameGraphNode() = default;
 
+	~FrameGraphNode() = default;
+
+public:
+	void AddDependentNode(FrameGraphNode* node);
+};
 
 NS_RX_END
 

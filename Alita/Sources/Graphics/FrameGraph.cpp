@@ -13,6 +13,8 @@
 
 NS_RX_BEGIN
 
-
+void FrameGraphNode::AddDependentNode(FrameGraphNode* node)
+{
+}
 
 NS_RX_END
